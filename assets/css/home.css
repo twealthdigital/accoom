@@ -1,0 +1,312 @@
+/* ==========================================================================
+   ACCOOM — home.css
+   Home page only: hero + quick search. Depends on tokens/components
+   from base.css and header.css.
+   ========================================================================== */
+
+/* ---------------------------------------------------------
+   Hero
+   --------------------------------------------------------- */
+.hero {
+  position: relative;
+  background: var(--navy-2);
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.hero-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.62) 45%, rgba(0,0,0,0.25) 100%);
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  padding-block: 64px 56px;
+}
+
+.hero-content h1 {
+  color: var(--white);
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.hero-content h1 .accent { color: var(--gold); }
+
+.hero-content > p {
+  margin-top: 14px;
+  max-width: 480px;
+  color: var(--ink-on-dark);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Feature badges */
+.hero-features {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.hero-features li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-feature-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-m);
+  background: var(--gold-soft);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-feature-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-feature-text strong {
+  color: var(--white);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.hero-feature-text small {
+  color: var(--ink-on-dark-soft);
+  font-size: 0.8rem;
+}
+
+/* ---------------------------------------------------------
+   Hero search card
+   --------------------------------------------------------- */
+.hero-search {
+  margin-top: 24px;
+  background: rgba(255, 255, 255, 0.147);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-s);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.hero-search-divider {
+  display: none;
+}
+
+.hero-search-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hero-search-field label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ink-on-dark-soft);
+}
+
+.hero-search-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  border-radius: var(--radius-s);
+  padding: 10px 14px;
+  color: var(--ink-soft);
+}
+
+.hero-search-input input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.hero-search-input input::placeholder {
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+.hero-search-input input:focus { outline: none; }
+
+.hero-locate-btn {
+  flex-shrink: 0;
+  color: var(--gold);
+}
+
+.hero-search-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--white);
+  border-radius: var(--radius-s);
+  padding: 10px 14px;
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 600;
+  width: 100%;
+}
+
+
+.hero-search-submit {
+  width: 100%;
+  padding: 14px;
+  font-size: 0.95rem;
+}
+
+/* ---------------------------------------------------------
+   Quick search (below hero)
+   --------------------------------------------------------- */
+.quick-search {
+  background: var(--white);
+  padding-block: 20px 8px;
+}
+
+.quick-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 6px 6px 6px 18px;
+  color: var(--ink-soft);
+  box-shadow: 0 8px 24px rgba(17, 31, 53, 0.08);
+}
+
+.quick-search-bar input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.quick-search-bar input::placeholder { color: var(--ink-soft); }
+.quick-search-bar input:focus { outline: none; }
+
+.quick-search-bar .btn {
+  flex-shrink: 0;
+  padding: 10px 20px;
+}
+
+.popular-searches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.popular-searches-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-right: 2px;
+}
+
+.pill {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+
+.pill:hover {
+  background: var(--gold-soft);
+  border-color: var(--gold);
+  color: var(--gold-dark);
+}
+
+@media (min-width: 768px) {
+  .hero-features {
+    flex-direction: row;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .hero-search {
+    flex-direction: row;
+    align-items: stretch;
+    padding: 10px 10px 10px 20px;
+    border-radius: var(--radius-s);
+  }
+
+  .hero-search-field {
+    justify-content: center;
+    padding-block: 4px;
+  }
+
+  .hero-search-field--location { flex: 1.4; min-width: 0; }
+  .hero-search-field:not(.hero-search-field--location) { flex: 1.2; min-width: 220px; }
+
+  .hero-search-divider {
+    display: block;
+    width: 1px;
+    align-self: center;
+    height: 34px;
+    background: var(--line-dark);
+    flex-shrink: 0;
+  }
+
+  .hero-search-submit {
+    width: auto;
+    flex-shrink: 0;
+    padding-inline: 28px;
+  }
+}
+
+/* ---------------------------------------------------------
+   Breakpoint: desktop
+   --------------------------------------------------------- */
+@media (min-width: 992px) {
+  .hero-inner { padding-block: 100px 88px; }
+
+  .hero-content h1 { font-size: 2.75rem; }
+
+  .hero-content > p { font-size: 1rem; }
+
+  .hero-features {
+    flex-direction: row;
+    gap: 32px;
+    margin-top: 28px;
+  }
+
+  .hero-search { margin-top: 32px; max-width: 1080px; }
+  .hero-search-field:not(.hero-search-field--location) { min-width: 260px; }
+
+  .quick-search { padding-block: 28px 8px; }
+
+  .quick-search-bar { max-width: 900px; }
+
+  .popular-searches { margin-top: 18px; }
+}
