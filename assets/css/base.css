@@ -8,6 +8,7 @@
   /* Brand */
   --gold: #DF962E;
   --gold-dark: #9D5F16;
+  --gold-dark-grad: var(--gold-dark);
   --gold-soft: rgba(223, 150, 46, 0.14);
   --navy: #111F35;
   --navy-2: #0B1220;
@@ -21,6 +22,13 @@
   --ink-on-dark-soft: rgba(199, 205, 214, 0.62);
   --line: #E7E2D9;
   --line-dark: rgba(255, 255, 255, 0.10);
+  --surface-page: var(--white);
+  --surface-page-alt: var(--white);
+  --on-page: var(--ink);
+  --on-page-soft: var(--ink-soft);
+  --line-page: var(--line);
+  --on-surface: var(--white);
+  --switch-track-off: rgba(255, 255, 255, 0.15);
 
   /* Surfaces (dark chrome: header + off-canvas panel) */
   --surface-header: var(--black);
@@ -48,11 +56,34 @@
   --shadow-gold: 0 6px 16px rgba(223, 150, 46, 0.28);
 }
 
+
+/* ---- Light mode overrides ---------------------------------------------- */
+html:not(.dark-mode) {
+  --surface-header: var(--white);
+  --surface-panel: var(--white);
+  --surface-panel-alt: #F1EDE4;
+  --ink-on-dark: var(--ink);
+  --ink-on-dark-soft: var(--ink-soft);
+  --line-dark: var(--line);
+  --on-surface: var(--ink);
+  --switch-track-off: rgba(26, 35, 51, 0.12);
+  --gold-dark-grad: #C17F31;
+}
+
+/* ---- Dark mode overrides (page sections outside the header/hero) ------- */
+html.dark-mode {
+  --surface-page: var(--navy-2);
+  --surface-page-alt: var(--surface-panel-alt);
+  --on-page: var(--white);
+  --on-page-soft: var(--ink-on-dark-soft);
+  --line-page: var(--line-dark);
+}
+
 /* ---- Reset ---------------------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
-a, button, .btn, .dropdown-trigger {
+a, button, .btn, .dropdown-trigger, .switch input {
   -webkit-tap-highlight-color: transparent;
 }
 

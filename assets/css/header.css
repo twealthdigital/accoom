@@ -96,7 +96,7 @@
   gap: 6px;
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--white);
+  color: var(--on-surface);
   white-space: nowrap;
 }
 
@@ -118,6 +118,14 @@
   box-shadow: var(--shadow-gold);
 }
 
+.header-theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--on-surface);
+  cursor: pointer;
+}
+
 
 /* ---------------------------------------------------------
    Mobile-only controls (hidden on desktop)
@@ -133,10 +141,10 @@
   width: 40px;
   height: 40px;
   border-radius: var(--radius-s);
-  color: var(--white);
+  color: var(--on-surface);
 }
 
-.hamburger-btn:hover { background: rgba(255, 255, 255, 0.06); }
+.hamburger-btn:hover { background: var(--gold-soft); }
 
 .mobile-search {
   align-items: center;
@@ -178,6 +186,7 @@
   .nav-links,
   .header-actions .location-dropdown,
   .header-actions .action-link,
+  .header-actions .header-theme-toggle,
   .header-actions .btn--primary {
     display: none;
   }
@@ -256,7 +265,7 @@
   height: 32px;
   margin-left: auto;
   margin-bottom: 12px;
-  color: var(--white);
+  color: var(--on-surface);
 }
 
 .panel-brand p {
@@ -322,7 +331,7 @@
   padding: 12px 14px;
   font-size: 0.95rem;
   font-weight: 500;
-  color: var(--white);
+  color: var(--on-surface);
 }
 
 .panel-row .chevron {
@@ -365,7 +374,7 @@
 
 .panel-help h4 {
   font-size: 0.95rem;
-  color: var(--white);
+  color: var(--on-surface);
   margin-bottom: 2px;
 }
 
@@ -394,7 +403,7 @@
   margin-top: auto;
   font-size: 0.95rem;
   font-weight: 500;
-  color: var(--white);
+  color: var(--on-surface);
 }
 
 .panel-toggle-row .left {
@@ -423,7 +432,7 @@
 .switch .track {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--switch-track-off);
   border-radius: var(--radius-pill);
   transition: background var(--dur-fast) var(--ease);
 }
@@ -456,7 +465,7 @@
 .location-badge {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark-grad) 100%);
   color: var(--navy-2);
   border-radius: var(--radius-pill);
   transition: filter var(--dur-med) var(--ease),

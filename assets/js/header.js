@@ -12,10 +12,10 @@
     var closeBtn = document.querySelector("[data-panel-close]");
     var overlay = document.querySelector("[data-panel-overlay]");
     var panel = document.querySelector("[data-panel]");
-    var darkModeToggle = document.querySelector("[data-dark-toggle]");
+    var darkModeToggles = document.querySelectorAll("[data-dark-toggle]");
 
 Accoom.initOffCanvas(hamburgerBtn, panel, overlay, closeBtn);
-    Accoom.initThemeToggle(darkModeToggle);
+    Accoom.initThemeToggle(darkModeToggles);
 
     // Location dropdowns (desktop header + mobile side panel)
     function initLocationDropdown(wrapper) {

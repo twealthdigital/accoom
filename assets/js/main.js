@@ -86,26 +86,29 @@ window.Accoom = window.Accoom || {};
 
   /* Persisted light/dark theme toggle. Sitewide (not header-only) since
      the chosen theme should stick across every page the user visits. */
-  Accoom.initThemeToggle = function (toggleEl, options) {
+Accoom.initThemeToggle = function (toggleEls, options) {
     var storageKey = (options && options.storageKey) || "accoom-theme";
     var themeClass = (options && options.themeClass) || "dark-mode";
     var defaultTheme = (options && options.defaultTheme) || "dark";
 
+    var els = !toggleEls ? [] :
+      (toggleEls.length !== undefined ? Array.prototype.slice.call(toggleEls) : [toggleEls]);
+
     function apply(theme) {
       document.documentElement.classList.toggle(themeClass, theme === "dark");
-      if (toggleEl) toggleEl.checked = theme === "dark";
+      els.forEach(function (el) { el.checked = theme === "dark"; });
     }
 
     var saved = localStorage.getItem(storageKey) || defaultTheme;
     apply(saved);
 
-    if (toggleEl) {
-      toggleEl.addEventListener("change", function () {
-        var theme = toggleEl.checked ? "dark" : "light";
+    els.forEach(function (el) {
+      el.addEventListener("change", function () {
+        var theme = el.checked ? "dark" : "light";
         localStorage.setItem(storageKey, theme);
         apply(theme);
       });
-    }
+    });
 
     return { apply: apply };
   };

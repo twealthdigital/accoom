@@ -48,7 +48,7 @@
 .hero-content > p {
   margin-top: 14px;
   max-width: 480px;
-  color: var(--ink-on-dark);
+  color: #C7CDD6;
   font-size: 0.95rem;
   line-height: 1.5;
 }
@@ -91,7 +91,7 @@
 }
 
 .hero-feature-text small {
-  color: var(--ink-on-dark-soft);
+  color: rgba(199, 205, 214, 0.62);
   font-size: 0.8rem;
 }
 
@@ -101,7 +101,7 @@
 .hero-search {
   margin-top: 24px;
   background: rgba(255, 255, 255, 0.147);
-  border: 1px solid var(--line-dark);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: var(--radius-s);
   padding: 18px;
   display: flex;
@@ -122,7 +122,7 @@
 .hero-search-field label {
   font-size: 0.78rem;
   font-weight: 500;
-  color: var(--ink-on-dark-soft);
+  color: rgba(199, 205, 214, 0.62);
 }
 
 .hero-search-input {
@@ -269,12 +269,12 @@
   .hero-search-field--location { flex: 1.4; min-width: 0; }
   .hero-search-field:not(.hero-search-field--location) { flex: 1.2; min-width: 220px; }
 
-  .hero-search-divider {
+.hero-search-divider {
     display: block;
     width: 1px;
     align-self: center;
     height: 34px;
-    background: var(--line-dark);
+    background: rgba(255, 255, 255, 0.10);
     flex-shrink: 0;
   }
 
