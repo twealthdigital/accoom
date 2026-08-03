@@ -52,6 +52,10 @@
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
+a, button, .btn, .dropdown-trigger {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Global gold scrollbar — same treatment as .dropdown-panel/.panel-scroll */
 html {
   scrollbar-width: thin;
