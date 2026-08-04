@@ -257,6 +257,28 @@
               border var(--dur-fast) var(--ease);
 }
 
+/* Light Mode — give the search field a visible surface/border on white header */
+html:not(.dark-mode) .mobile-search {
+  background: var(--white);
+  border-color: var(--line);
+  box-shadow: 0 2px 8px rgba(17, 31, 53, 0.06);
+  color: var(--ink-soft);
+}
+
+html:not(.dark-mode) .mobile-search input {
+  color: var(--ink);
+}
+
+html:not(.dark-mode) .mobile-search input::placeholder {
+  color: var(--ink-soft);
+}
+
+html:not(.dark-mode) .mobile-search:focus-within {
+  background: var(--white);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
 .mobile-search:focus-within {
   background: rgba(255, 255, 255, 0.14);
   border-color: var(--gold);
