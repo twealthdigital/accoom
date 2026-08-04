@@ -14,11 +14,7 @@ html {
   scroll-behavior: smooth;
 }
 
-a,
-button,
-.btn,
-.dropdown-trigger,
-.switch input {
+* {
   -webkit-tap-highlight-color: transparent;
 }
 
