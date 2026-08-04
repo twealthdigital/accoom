@@ -1,12 +1,8 @@
 /* ==========================================================================
-   ACCOOM — home.css
-   Home page only: hero + quick search. Depends on tokens/components
-   from base.css and header.css.
+   ACCOOM — Home Page
    ========================================================================== */
 
-/* ---------------------------------------------------------
-   Hero
-   --------------------------------------------------------- */
+/* Hero */
 .hero {
   position: relative;
   background: var(--navy-2);
@@ -27,7 +23,7 @@
 .hero-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.62) 45%, rgba(0,0,0,0.25) 100%);
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.62) 45%, rgba(0, 0, 0, 0.25) 100%);
 }
 
 .hero-inner {
@@ -43,7 +39,9 @@
   letter-spacing: -0.01em;
 }
 
-.hero-content h1 .accent { color: var(--gold); }
+.hero-content h1 .accent {
+  color: var(--gold);
+}
 
 .hero-content > p {
   margin-top: 14px;
@@ -53,7 +51,7 @@
   line-height: 1.5;
 }
 
-/* Feature badges */
+/* Features */
 .hero-features {
   display: flex;
   flex-direction: column;
@@ -63,8 +61,18 @@
 
 .hero-features li {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.hero-features li .hero-feature-icon {
+  flex-shrink: 0;
+}
+
+.hero-features li .hero-feature-text {
+  min-width: 0;
 }
 
 .hero-feature-icon {
@@ -95,28 +103,58 @@
   font-size: 0.8rem;
 }
 
-/* ---------------------------------------------------------
-   Hero search card
-   --------------------------------------------------------- */
+/* ============================================================
+   HERO SEARCH - DESKTOP FIRST (HORIZONTAL)
+   ============================================================ */
 .hero-search {
   margin-top: 24px;
   background: rgba(255, 255, 255, 0.147);
   border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: var(--radius-s);
-  padding: 18px;
+  padding: 10px 10px 10px 20px;
   display: flex;
-  flex-direction: column;
-  gap: 14px;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.hero-search.is-visible {
+  display: flex !important;
+}
+
+.hero-features li.is-visible {
+  display: flex !important;
 }
 
 .hero-search-divider {
-  display: none;
+  display: block;
+  width: 1px;
+  align-self: center;
+  height: 34px;
+  background: rgba(255, 255, 255, 0.10);
+  flex-shrink: 0;
+  margin-inline: 4px; 
 }
 
 .hero-search-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  justify-content: center;
+  padding-block: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-search-field--location {
+  flex: 1.4;
+  min-width: 0;
+  padding-left: 0;
+}
+
+.hero-search-field:not(.hero-search-field--location) {
+  flex: 1.2;
+  min-width: 220px;
 }
 
 .hero-search-field label {
@@ -150,11 +188,23 @@
   font-weight: 400;
 }
 
-.hero-search-input input:focus { outline: none; }
+.hero-search-input input:focus {
+  outline: none;
+}
 
 .hero-locate-btn {
   flex-shrink: 0;
   color: var(--gold);
+  padding: 4px;
+  border-radius: 50%;
+  transition: background var(--dur-fast) var(--ease);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.hero-locate-btn:hover {
+  background: var(--gold-soft);
 }
 
 .hero-search-select {
@@ -169,18 +219,30 @@
   font-size: 0.95rem;
   font-weight: 600;
   width: 100%;
+  border: none;
+  cursor: pointer;
 }
 
+.hero-search-select .chevron {
+  transition: transform var(--dur-fast) var(--ease);
+  flex-shrink: 0;
+}
+
+.hero-search-select[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
 
 .hero-search-submit {
-  width: 100%;
-  padding: 14px;
+  width: auto;
+  flex-shrink: 0;
+  padding: 14px 28px;
   font-size: 0.95rem;
+  margin-left: 4px;
 }
 
-/* ---------------------------------------------------------
-   Quick search (below hero)
-   --------------------------------------------------------- */
+/* ============================================================
+   QUICK SEARCH
+   ============================================================ */
 .quick-search {
   background: var(--white);
   padding-block: 20px 8px;
@@ -207,14 +269,20 @@
   color: var(--ink);
 }
 
-.quick-search-bar input::placeholder { color: var(--ink-soft); }
-.quick-search-bar input:focus { outline: none; }
+.quick-search-bar input::placeholder {
+  color: var(--ink-soft);
+}
+
+.quick-search-bar input:focus {
+  outline: none;
+}
 
 .quick-search-bar .btn {
   flex-shrink: 0;
   padding: 10px 20px;
 }
 
+/* Popular Searches */
 .popular-searches {
   display: flex;
   flex-wrap: wrap;
@@ -238,7 +306,9 @@
   font-weight: 500;
   color: var(--ink-soft);
   white-space: nowrap;
-  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+  transition: background var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease);
 }
 
 .pill:hover {
@@ -247,53 +317,21 @@
   color: var(--gold-dark);
 }
 
-@media (min-width: 768px) {
-  .hero-features {
-    flex-direction: row;
-    gap: 24px;
-    margin-top: 24px;
-  }
-
-  .hero-search {
-    flex-direction: row;
-    align-items: stretch;
-    padding: 10px 10px 10px 20px;
-    border-radius: var(--radius-s);
-  }
-
-  .hero-search-field {
-    justify-content: center;
-    padding-block: 4px;
-  }
-
-  .hero-search-field--location { flex: 1.4; min-width: 0; }
-  .hero-search-field:not(.hero-search-field--location) { flex: 1.2; min-width: 220px; }
-
-.hero-search-divider {
-    display: block;
-    width: 1px;
-    align-self: center;
-    height: 34px;
-    background: rgba(255, 255, 255, 0.10);
-    flex-shrink: 0;
-  }
-
-  .hero-search-submit {
-    width: auto;
-    flex-shrink: 0;
-    padding-inline: 28px;
-  }
-}
-
-/* ---------------------------------------------------------
-   Breakpoint: desktop
-   --------------------------------------------------------- */
+/* ============================================================
+   DESKTOP LARGE (992px+)
+   ============================================================ */
 @media (min-width: 992px) {
-  .hero-inner { padding-block: 100px 88px; }
+  .hero-inner {
+    padding-block: 100px 88px;
+  }
 
-  .hero-content h1 { font-size: 2.75rem; }
+  .hero-content h1 {
+    font-size: 2.75rem;
+  }
 
-  .hero-content > p { font-size: 1rem; }
+  .hero-content > p {
+    font-size: 1rem;
+  }
 
   .hero-features {
     flex-direction: row;
@@ -301,12 +339,65 @@
     margin-top: 28px;
   }
 
-  .hero-search { margin-top: 32px; max-width: 1080px; }
-  .hero-search-field:not(.hero-search-field--location) { min-width: 260px; }
+  .hero-search {
+    margin-top: 32px;
+    max-width: 1080px;
+  }
 
-  .quick-search { padding-block: 28px 8px; }
+  .hero-search-field:not(.hero-search-field--location) {
+    min-width: 260px;
+  }
 
-  .quick-search-bar { max-width: 900px; }
+  .quick-search {
+    padding-block: 28px 8px;
+  }
 
-  .popular-searches { margin-top: 18px; }
+  .quick-search-bar {
+    max-width: 900px;
+  }
+
+  .popular-searches {
+    margin-top: 18px;
+  }
+}
+
+/* ============================================================
+   MOBILE ONLY - STACK VERTICALLY
+   ============================================================ */
+@media (max-width: 767px) {
+  .hero-search {
+    flex-direction: column;
+    padding: 18px;
+    gap: 16px;
+  }
+
+  .hero-search-divider {
+    display: none;
+  }
+
+  .hero-search-field {
+    flex: none;
+    width: 100%;
+    padding-block: 0;
+  }
+
+  .hero-search-field--location {
+    flex: none;
+    width: 100%;
+  }
+
+  .hero-search-field:not(.hero-search-field--location) {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .hero-search-submit {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .hero-features {
+    flex-direction: column;
+  }
 }

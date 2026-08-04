@@ -1,0 +1,117 @@
+/* ==========================================================================
+   ACCOOM — Buttons
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: var(--radius-s);
+  font-size: 14px;
+  font-weight: 600;
+  transition: background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease),
+              box-shadow var(--dur-med) var(--ease),
+              transform var(--dur-med) var(--ease);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* Primary Button */
+.btn--primary {
+  background: var(--gold);
+  color: var(--navy-2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn--primary:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 8px 22px rgba(223, 150, 46, 0.35);
+  transform: scale(1.04);
+}
+
+.btn--primary::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transition: left var(--dur-med) var(--ease);
+}
+
+.btn--primary:hover::after {
+  left: 120%;
+}
+
+.btn--primary svg,
+.btn--primary i {
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.btn--primary:hover svg,
+.btn--primary:hover i {
+  animation: btnIconSlideBounce 0.7s ease-out;
+}
+
+.btn--primary span,
+.btn--primary > :not(svg):not(i) {
+  transition: letter-spacing var(--dur-med) var(--ease);
+}
+
+.btn--primary:hover span,
+.btn--primary:hover > :not(svg):not(i) {
+  letter-spacing: 0.5px;
+}
+
+/* Variants */
+.btn--block {
+  display: flex;
+  width: 100%;
+}
+
+.btn--sm {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+
+.btn--lg {
+  padding: 16px 32px;
+  font-size: 1rem;
+}
+
+.btn--ghost {
+  background: transparent;
+  border: 1px solid var(--line);
+}
+
+.btn--ghost:hover {
+  background: var(--gold-soft);
+  border-color: var(--gold);
+}
+
+/* Ripple Effect */
+.btn-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  animation: ripple-animation 0.6s ease-out;
+  pointer-events: none;
+}
+
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}

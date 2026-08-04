@@ -1,0 +1,79 @@
+/* ==========================================================================
+   ACCOOM — Design Tokens
+   All variables and design system values
+   ========================================================================== */
+
+:root {
+  /* Brand Colors */
+  --gold: #DF962E;
+  --gold-dark: #9D5F16;
+  --gold-dark-grad: var(--gold-dark);
+  --gold-soft: rgba(223, 150, 46, 0.14);
+  --navy: #111F35;
+  --navy-2: #0B1220;
+  --black: #000000;
+
+  /* Neutrals */
+  --white: #FFFFFF;
+  --ink: #1A2333;
+  --ink-soft: #5B6472;
+  --ink-on-dark: #C7CDD6;
+  --ink-on-dark-soft: rgba(199, 205, 214, 0.62);
+  --line: #E7E2D9;
+  --line-dark: rgba(255, 255, 255, 0.10);
+  --surface-page: var(--white);
+  --surface-page-alt: var(--white);
+  --on-page: var(--ink);
+  --on-page-soft: var(--ink-soft);
+  --line-page: var(--line);
+  --on-surface: var(--white);
+  --switch-track-off: rgba(255, 255, 255, 0.15);
+
+  /* Surfaces */
+  --surface-header: var(--black);
+  --surface-panel: var(--black);
+  --surface-panel-alt: #16233B;
+
+  /* Typography */
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Layout */
+  --container: 1320px;
+  --gutter: 24px;
+  --radius-s: 6px;
+  --radius-m: 10px;
+  --radius-pill: 999px;
+  --header-h: 84px;
+  --header-h-mobile: 64px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 180ms;
+  --dur-med: 300ms;
+  --dur-slow: 500ms;
+
+  /* Shadows */
+  --shadow-gold: 0 6px 16px rgba(223, 150, 46, 0.28);
+}
+
+/* Light Mode Overrides */
+html:not(.dark-mode) {
+  --surface-header: var(--white);
+  --surface-panel: var(--white);
+  --surface-panel-alt: #F1EDE4;
+  --ink-on-dark: var(--ink);
+  --ink-on-dark-soft: var(--ink-soft);
+  --line-dark: var(--line);
+  --on-surface: var(--ink);
+  --switch-track-off: rgba(26, 35, 51, 0.12);
+  --gold-dark-grad: #C17F31;
+}
+
+/* Dark Mode Overrides */
+html.dark-mode {
+  --surface-page: var(--navy-2);
+  --surface-page-alt: var(--surface-panel-alt);
+  --on-page: var(--white);
+  --on-page-soft: var(--ink-on-dark-soft);
+  --line-page: var(--line-dark);
+}

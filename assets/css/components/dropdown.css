@@ -1,0 +1,92 @@
+/* ==========================================================================
+   ACCOOM — Dropdown Component
+   ========================================================================== */
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-trigger {
+  border: 1px solid transparent;
+  transition: border-color var(--dur-fast) var(--ease),
+              box-shadow var(--dur-fast) var(--ease);
+}
+
+.dropdown-trigger[aria-expanded="true"] {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
+.dropdown-trigger[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+.dropdown-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: var(--white);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-m);
+  box-shadow: 0 16px 40px rgba(17, 31, 53, 0.18);
+  padding: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease),
+              visibility var(--dur-fast) var(--ease);
+}
+
+.dropdown-panel.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-panel li {
+  position: relative;
+  padding: 13px 30px 13px 14px;
+  border-radius: var(--radius-s);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease);
+}
+
+.dropdown-panel li:hover {
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+}
+
+.dropdown-panel li.is-active {
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+  font-weight: 700;
+}
+
+.dropdown-panel li.is-active::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  transform: translateY(-50%);
+}
+
+.dropdown-panel a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: inherit;
+}

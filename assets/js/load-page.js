@@ -1,7 +1,0 @@
-(function () {
-  "use strict";
-
-  window.setTimeout(function () {
-    window.location.href = "home.html";
-  }, 3000);
-})();

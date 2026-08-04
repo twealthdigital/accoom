@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ACCOOM — Find Accommodation. Connect. Secure. Move in.</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
 
-  <link rel="stylesheet" href="assets/css/base.css" />
-  <link rel="stylesheet" href="assets/css/header.css" />
-  <link rel="stylesheet" href="assets/css/home.css" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/home.css" />
 </head>
 <body>
 
@@ -28,7 +28,7 @@
 
       <!-- Logo -->
       <a href="home.html" class="logo-link">
-        <img src="assets/images/accoom-logo.png" alt="ACCOOM LOGO" />
+        <img src="assets/images/accoom-logo.png" alt="ACCOOM Logo" />
       </a>
 
       <!-- Desktop nav -->
@@ -43,22 +43,30 @@
       <!-- Right side -->
       <div class="header-actions">
 
-<!-- Desktop location -->
-<div class="dropdown location-dropdown" data-dropdown>
-  <button type="button" class="location-select location-badge dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
-      <circle cx="12" cy="10" r="2.5"></circle>
-    </svg>
-    <span>Lagos</span>
-    <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="6 9 12 15 18 9"></polyline>
-    </svg>
-  </button>
-  <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Country">
-    <li role="option"><a href="#">Nigeria</a></li>
-  </ul>
-</div>
+        <!-- Desktop location -->
+        <div class="dropdown location-dropdown">
+          <button type="button" class="location-select location-badge dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
+              <circle cx="12" cy="10" r="2.5"></circle>
+            </svg>
+            <span>Lagos</span>
+            <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+<ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Country">
+            <li role="option">
+              <a href="#">
+                <span>Nigeria</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </a>
+            </li>
+          </ul>
+        </div>
 
         <!-- Mobile search bar -->
         <form class="mobile-search" role="search" action="#">
@@ -69,13 +77,14 @@
           <input type="search" placeholder="Search location or property" aria-label="Search location or property" />
         </form>
 
-<a href="#" class="action-link">
+        <a href="#" class="action-link">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
           <span>Sign in</span>
         </a>
+
         <label class="header-theme-toggle" aria-label="Toggle dark mode">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path>
@@ -86,13 +95,14 @@
             <span class="thumb"></span>
           </span>
         </label>
+
         <a href="#" class="btn btn--primary">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M3 11.5 12 4l9 7.5"></path>
-    <path d="M5 10v10h14V10"></path>
-  </svg>
-  Find Accommodation
-</a>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11.5 12 4l9 7.5"></path>
+            <path d="M5 10v10h14V10"></path>
+          </svg>
+          Find Accommodation
+        </a>
 
       </div>
     </div>
@@ -120,117 +130,123 @@
 
     <div class="panel-scroll">
 
-    <nav class="panel-nav" aria-label="Mobile primary">
-      <a href="home.html" class="active">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <nav class="panel-nav" aria-label="Mobile primary">
+        <a href="home.html" class="active">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11.5 12 4l9 7.5"></path>
+            <path d="M5 10v10h14V10"></path>
+          </svg>
+          Home
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
+          </svg>
+          Browse
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"></path>
+          </svg>
+          Agents
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.6 12.6 12.7 20.5a2 2 0 0 1-2.8 0L3 13.6V4h9.6l8 8.6z"></path>
+            <circle cx="7.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"></circle>
+          </svg>
+          Deals
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <line x1="12" y1="11" x2="12" y2="16"></line>
+            <circle cx="12" cy="7.7" r="0.9" fill="currentColor" stroke="none"></circle>
+          </svg>
+          About Us
+        </a>
+      </nav>
+
+      <div class="panel-divider"></div>
+
+      <div class="dropdown panel-location-dropdown">
+        <button type="button" class="panel-row location-badge dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
+            <circle cx="12" cy="10" r="2.5"></circle>
+          </svg>
+          <span>Lagos</span>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+<ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Country">
+          <li role="option">
+            <a href="#">
+              <span>Nigeria</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </a>
+          </li>
+        </ul>
+
+      <a href="#" class="panel-row">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>Sign in</span>
+      </a>
+
+      <div class="panel-divider"></div>
+
+      <a href="#" class="btn btn--primary panel-cta">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 11.5 12 4l9 7.5"></path>
           <path d="M5 10v10h14V10"></path>
         </svg>
-        Home
-      </a>
-      <a href="#">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="7"></circle>
-          <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
-        </svg>
-        Browse
-      </a>
-      <a href="#">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="8" r="4"></circle>
-          <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"></path>
-        </svg>
-        Agents
-      </a>
-      <a href="#">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20.6 12.6 12.7 20.5a2 2 0 0 1-2.8 0L3 13.6V4h9.6l8 8.6z"></path>
-          <circle cx="7.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"></circle>
-        </svg>
-        Deals
-      </a>
-      <a href="#">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="9"></circle>
-          <line x1="12" y1="11" x2="12" y2="16"></line>
-          <circle cx="12" cy="7.7" r="0.9" fill="currentColor" stroke="none"></circle>
-        </svg>
-        About Us
+        Find Accommodation
       </a>
 
-    </nav>
-
-    <div class="panel-divider"></div>
-
-<div class="dropdown panel-location-dropdown" data-dropdown>
-      <button type="button" class="panel-row location-badge dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
-          <circle cx="12" cy="10" r="2.5"></circle>
-        </svg>
-        <span>Lagos</span>
-        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </button>
-      <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Country">
-        <li role="option"><a href="#">Nigeria</a></li>
-      </ul>
-    </div>
-
-    <a href="#" class="panel-row">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
-      </svg>
-      <span>Sign in</span>
-    </a>
-
-    <div class="panel-divider"></div>
-
-    <a href="#" class="btn btn--primary panel-cta">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 11.5 12 4l9 7.5"></path>
-        <path d="M5 10v10h14V10"></path>
-      </svg>
-      Find Accommodation
-    </a>
-
-    <div class="panel-help">
-      <div class="panel-help-top">
-        <div class="panel-help-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 12a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1v-7h3"></path>
-            <path d="M3 17v-5h3v7H5a2 2 0 0 1-2-2z"></path>
+      <div class="panel-help">
+        <div class="panel-help-top">
+          <div class="panel-help-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1v-7h3"></path>
+              <path d="M3 17v-5h3v7H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+          </div>
+          <div>
+            <h4>Need help finding the right place?</h4>
+            <p>Chat directly with verified agents near you.</p>
+          </div>
+        </div>
+        <a href="#" class="panel-help-link">
+          Chat with an Agent
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
           </svg>
-        </div>
-        <div>
-          <h4>Need help finding the right place?</h4>
-          <p>Chat directly with verified agents near you.</p>
-        </div>
+        </a>
       </div>
-      <a href="#" class="panel-help-link">
-        Chat with an Agent
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-          <polyline points="12 5 19 12 12 19"></polyline>
-        </svg>
-      </a>
-    </div>
 
-    <label class="panel-toggle-row">
-      <span class="left">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
-        </svg>
-        Dark Mode
-      </span>
-      <span class="switch">
-        <input type="checkbox" data-dark-toggle />
-        <span class="track"></span>
-        <span class="thumb"></span>
-      </span>
-    </label>
+      <label class="panel-toggle-row">
+        <span class="left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+          </svg>
+          Dark Mode
+        </span>
+        <span class="switch">
+          <input type="checkbox" data-dark-toggle />
+          <span class="track"></span>
+          <span class="thumb"></span>
+        </span>
+      </label>
 
     </div>
   </aside>
@@ -240,18 +256,18 @@
   ========================================================= -->
   <section class="hero">
     <div class="hero-bg">
-      <img src="assets/images/home images/home-hero.png" alt="" />
+      <img src="assets/images/home-images/home-hero.png" alt="" />
       <div class="hero-scrim"></div>
     </div>
 
     <div class="container hero-inner">
 
-      <div class="hero-content">
+      <div class="hero-content" data-animate>
         <h1>Find <span class="accent">Accommodation</span>. <br>Connect. Secure. <span class="accent">Move in.</span></h1>
         <p>Connect with verified agents and secure your next apartment or house without stress.</p>
 
         <ul class="hero-features">
-          <li>
+          <li data-animate data-delay="100">
             <span class="hero-feature-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="8" r="4"></circle>
@@ -264,7 +280,7 @@
             </span>
           </li>
 
-          <li>
+          <li data-animate data-delay="200">
             <span class="hero-feature-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
@@ -277,7 +293,7 @@
             </span>
           </li>
 
-          <li>
+          <li data-animate data-delay="300">
             <span class="hero-feature-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20.6 12.6 12.7 20.5a2 2 0 0 1-2.8 0L3 13.6V4h9.6l8 8.6z"></path>
@@ -292,64 +308,68 @@
         </ul>
       </div>
 
-      <form class="hero-search" action="#">
-
-        <div class="hero-search-field hero-search-field--location">
-          <label for="hs-location">Location</label>
-          <div class="hero-search-input">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
-              <circle cx="12" cy="10" r="2.5"></circle>
-            </svg>
-            <input id="hs-location" type="text" placeholder="Where do you want to stay?" />
-            <button type="button" class="hero-locate-btn" aria-label="Use current location">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="hero-search-divider"></div>
-
-<div class="hero-search-field">
-  <label>Accommodation Type</label>
-  <div class="dropdown" data-dropdown>
-    <button type="button" class="hero-search-select dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
-      <span data-dropdown-label>Any Type</span>
-      <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="6 9 12 15 18 9"></polyline>
+<form class="hero-search" data-animate data-delay="200">
+  
+  <!-- Location Field -->
+  <div class="hero-search-field hero-search-field--location">
+    <label for="hs-location">Location</label>
+    <div class="hero-search-input">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
+        <circle cx="12" cy="10" r="2.5"></circle>
       </svg>
-    </button>
-    <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Accommodation Type">
-      <li role="option" data-value="">Any Type</li>
-      <li role="option" data-value="room">A Room</li>
-      <li role="option" data-value="self-con">Self Contained</li>
-      <li role="option" data-value="1bed">1 Bedroom Flat</li>
-      <li role="option" data-value="2bed">2 Bedroom Flat</li>
-      <li role="option" data-value="3bed">3 Bedroom Flat</li>
-      <li role="option" data-value="mini-flat">Mini Flat</li>
-      <li role="option" data-value="duplex">Duplex</li>
-      <li role="option" data-value="bungalow">Bungalow</li>
-      <li role="option" data-value="hostel">Hostel</li>
-      <li role="option" data-value="shared">Shared Apartment</li>
-    </ul>
-    <input type="hidden" name="accommodation_type" id="hs-type" value="" />
+      <input id="hs-location" type="text" placeholder="Where do you want to stay?" />
+      <button type="button" class="hero-locate-btn" aria-label="Use current location">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path>
+        </svg>
+      </button>
+    </div>
   </div>
-</div>
 
-        <div class="hero-search-divider"></div>
+  <!-- DIVIDER -->
+  <div class="hero-search-divider"></div>
 
+  <!-- Accommodation Type Field -->
+  <div class="hero-search-field">
+    <label>Accommodation Type</label>
+    <div class="dropdown" data-dropdown>
+      <button type="button" class="hero-search-select dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+        <span data-dropdown-label>Any Type</span>
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Accommodation Type">
+        <li role="option" data-value="">Any Type</li>
+        <li role="option" data-value="room">A Room</li>
+        <li role="option" data-value="self-con">Self Contained</li>
+        <li role="option" data-value="1bed">1 Bedroom Flat</li>
+        <li role="option" data-value="2bed">2 Bedroom Flat</li>
+        <li role="option" data-value="3bed">3 Bedroom Flat</li>
+        <li role="option" data-value="mini-flat">Mini Flat</li>
+        <li role="option" data-value="duplex">Duplex</li>
+        <li role="option" data-value="bungalow">Bungalow</li>
+        <li role="option" data-value="hostel">Hostel</li>
+        <li role="option" data-value="shared">Shared Apartment</li>
+      </ul>
+      <input type="hidden" name="accommodation_type" id="hs-type" value="" />
+    </div>
+  </div>
 
-        <button type="submit" class="btn btn--primary hero-search-submit">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="7"></circle>
-            <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
-          </svg>
-          Search
-        </button>
-      </form>
+  <!-- DIVIDER -->
+  <div class="hero-search-divider"></div>
+
+  <!-- Search Button -->
+  <button type="submit" class="btn btn--primary hero-search-submit">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"></circle>
+      <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
+    </svg>
+    Search
+  </button>
+</form>
 
     </div>
   </section>
@@ -381,8 +401,28 @@
     </div>
   </section>
 
-<script src="assets/js/main.js"></script>
-<script src="assets/js/home.js"></script>
-<script src="assets/js/header.js"></script>
+  <!-- =========================================================
+       SCRIPTS
+  ========================================================= -->
+  <!-- Core -->
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+
+  <!-- Modules -->
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+
+  <!-- Animations -->
+  <script src="assets/js/animations/hero.js"></script>
+  <script src="assets/js/animations/buttons.js"></script>
+  <script src="assets/js/animations/transitions.js"></script>
+
+  <!-- Main & Page -->
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/home.js"></script>
+
 </body>
 </html>

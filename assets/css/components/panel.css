@@ -1,0 +1,363 @@
+/* ==========================================================================
+   ACCOOM — Off-Canvas Panel
+   ========================================================================== */
+
+/* Overlay */
+.panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--dur-med) var(--ease),
+              visibility var(--dur-med) var(--ease);
+  z-index: 199;
+  cursor: pointer;
+}
+
+.panel-overlay.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Side Panel */
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  height: 100dvh;
+  width: 86%;
+  max-width: 340px;
+  background: var(--surface-panel);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  transform: translateX(100%);
+  transition: transform var(--dur-med) var(--ease);
+  box-shadow: -4px 0 30px rgba(0, 0, 0, 0.3);
+}
+
+.side-panel.is-open {
+  transform: translateX(0);
+}
+
+/* Fixed Header */
+.panel-fixed-top {
+  flex-shrink: 0;
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid var(--line-dark);
+}
+
+.panel-close {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+  margin-bottom: 12px;
+  color: var(--on-surface);
+  border-radius: var(--radius-s);
+  transition: background var(--dur-fast) var(--ease);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.panel-close:hover {
+  background: var(--gold-soft);
+}
+
+.panel-brand p {
+  font-size: 0.85rem;
+  color: var(--ink-on-dark-soft);
+  line-height: 1.4;
+}
+
+.panel-brand p .accent {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* Scrollable Body */
+.panel-scroll {
+  flex: 1;
+  min-height: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px calc(56px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Navigation */
+.panel-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+  margin-bottom: 16px;
+}
+
+.panel-nav a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-m);
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: var(--ink-on-dark-soft);
+  transition: background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease);
+}
+
+.panel-nav a:hover {
+  background: var(--gold-soft);
+  color: var(--on-surface);
+}
+
+.panel-nav a.active {
+  background: var(--gold-soft);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* Dividers */
+.panel-divider {
+  height: 1px;
+  background: var(--line-dark);
+  margin: 12px 0;
+}
+
+/* Rows - Same style as desktop location badge */
+.panel-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--on-surface);
+  border-radius: var(--radius-m);
+  transition: background var(--dur-fast) var(--ease);
+  cursor: pointer;
+  width: 100%;
+  border: none;
+  background: transparent;
+}
+
+.panel-row:hover {
+  background: var(--gold-soft);
+}
+
+.panel-row .chevron {
+  margin-left: auto;
+  color: var(--ink-on-dark-soft);
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+/* Mobile Location Dropdown - SAME STYLE AS DESKTOP */
+.panel-location-dropdown {
+  width: 100%;
+}
+
+/* This makes the mobile location badge look exactly like desktop */
+.panel-location-dropdown .panel-row.location-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px 8px 12px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark-grad) 100%);
+  border-radius: var(--radius-pill);
+  color: var(--navy-2);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: filter var(--dur-med) var(--ease),
+              box-shadow var(--dur-med) var(--ease),
+              transform var(--dur-med) var(--ease);
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.panel-location-dropdown .panel-row.location-badge svg {
+  color: var(--navy-2);
+  flex-shrink: 0;
+}
+
+.panel-location-dropdown .panel-row.location-badge .chevron {
+  color: var(--navy-2);
+  opacity: 0.75;
+  margin-left: auto;
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.panel-location-dropdown .panel-row.location-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.panel-location-dropdown .panel-row.location-badge::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transition: left var(--dur-med) var(--ease);
+  pointer-events: none;
+}
+
+.panel-location-dropdown .panel-row.location-badge:hover,
+.panel-location-dropdown .panel-row.location-badge:active {
+  filter: brightness(1.12);
+  box-shadow: 0 8px 22px rgba(223, 150, 46, 0.35);
+  transform: scale(1.04);
+}
+
+.panel-location-dropdown .panel-row.location-badge:hover::after,
+.panel-location-dropdown .panel-row.location-badge:active::after {
+  left: 120%;
+}
+
+.panel-location-dropdown .panel-row.location-badge:hover svg:not(.chevron),
+.panel-location-dropdown .panel-row.location-badge:active svg:not(.chevron) {
+  animation: btnIconSlideBounce 0.7s ease-out;
+}
+
+.panel-location-dropdown .panel-row.location-badge[aria-expanded="true"] {
+  border-color: var(--navy-2);
+  box-shadow: 0 0 0 3px rgba(223, 150, 46, 0.35);
+}
+
+.panel-location-dropdown .panel-row.location-badge[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+.panel-location-dropdown .dropdown-panel {
+  position: relative;
+  top: 4px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: var(--surface-panel-alt);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-m);
+  z-index: 20;
+}
+
+/* CTA */
+.panel-cta {
+  margin-top: 4px;
+  margin-bottom: 16px;
+  padding-block: 30px;
+}
+
+/* Help Card */
+.panel-help {
+  background: var(--surface-panel-alt);
+  border-radius: var(--radius-m);
+  padding: 16px;
+  margin-bottom: 8px;
+}
+
+.panel-help-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.panel-help-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.panel-help h4 {
+  font-size: 0.95rem;
+  color: var(--on-surface);
+  margin-bottom: 2px;
+}
+
+.panel-help p {
+  font-size: 0.82rem;
+  color: var(--ink-on-dark-soft);
+  line-height: 1.4;
+}
+
+.panel-help-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gold);
+  transition: gap var(--dur-fast) var(--ease);
+}
+
+.panel-help-link:hover {
+  gap: 10px;
+}
+
+/* Toggle Row */
+.panel-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 14px 4px;
+  margin-top: 8px;
+  margin-bottom: 100px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+
+.panel-toggle-row .left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Hide on Desktop */
+@media (min-width: 992px) {
+  .side-panel,
+  .panel-overlay {
+    display: none !important;
+  }
+}
+
+@media (max-width: 991px) {
+  .panel-location-dropdown .panel-row.location-badge {
+    width: 50%;
+    justify-content: center;
+  }
+}
+
+html.dark-mode .panel-location-dropdown .dropdown-panel {
+  background: var(--black);
+  border-color: var(--gold);
+}
+
+html.dark-mode .panel-location-dropdown .dropdown-panel li,
+html.dark-mode .panel-location-dropdown .dropdown-panel a {
+  color: var(--gold);
+}
+
+html.dark-mode .panel-location-dropdown .dropdown-panel li:hover,
+html.dark-mode .panel-location-dropdown .dropdown-panel li.is-active {
+  background: rgba(223, 150, 46, 0.14);
+}

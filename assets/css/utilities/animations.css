@@ -1,0 +1,104 @@
+/* ==========================================================================
+   ACCOOM — Animation Utilities
+   ========================================================================== */
+
+/* Button Icon Slide Bounce */
+@keyframes btnIconSlideBounce {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  30% {
+    transform: translateY(30%);
+    opacity: 0;
+  }
+  35% {
+    transform: translateY(-25%);
+    opacity: 0;
+  }
+  55% {
+    transform: translateY(15%);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(-8%);
+  }
+  85% {
+    transform: translateY(5%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Fade In */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Slide In */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Shimmer / Sweep */
+@keyframes shimmerSweep {
+  0% {
+    background-position: 200% 0;
+    opacity: 0.4;
+  }
+  50% {
+    background-position: 0% 0;
+    opacity: 1;
+  }
+  100% {
+    background-position: -200% 0;
+    opacity: 0.4;
+  }
+}
+
+/* Utility Classes */
+.animate-fade-in {
+  animation: fadeIn var(--dur-med) var(--ease) forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale var(--dur-med) var(--ease) forwards;
+}
+
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmerSweep 1.6s var(--ease) infinite;
+}
