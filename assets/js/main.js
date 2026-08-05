@@ -32,10 +32,21 @@ window.Accoom = window.Accoom || {};
       Accoom.initLocationDropdown(desktopLocation);
     }
 
-    // Mobile panel location
+// Mobile panel location
     var panelLocation = document.querySelector('.panel-location-dropdown');
     if (panelLocation) {
       Accoom.initLocationDropdown(panelLocation);
+    }
+
+    // Desktop menu dropdown (hamburger: Account / Location / Theme / Help)
+    var desktopMenu = document.querySelector('.desktop-menu-dropdown');
+    if (desktopMenu) {
+      Accoom.initDropdown(desktopMenu);
+
+      // Nested dropdowns inside it (Account sign in/up, Location/country)
+      Accoom.$$('.desktop-menu-panel > .dropdown', desktopMenu).forEach(function (nestedDropdown) {
+        Accoom.initDropdown(nestedDropdown);
+      });
     }
 
     console.log('ACCOOM initialized');

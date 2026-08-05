@@ -28,7 +28,8 @@
 
       <!-- Logo -->
       <a href="home.html" class="logo-link">
-        <img src="assets/images/accoom-logo.png" alt="ACCOOM Logo" />
+        <img src="assets/images/accoom-logo.png" alt="ACCOOM Logo" class="logo-dark" />
+        <img src="assets/images/accoom-white-logo.png" alt="ACCOOM Logo" class="logo-light" />
       </a>
 
       <!-- Desktop nav -->
@@ -41,32 +42,7 @@
       </nav>
 
       <!-- Right side -->
-      <div class="header-actions">
-
-        <!-- Desktop location -->
-        <div class="dropdown location-dropdown">
-          <button type="button" class="location-select location-badge dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
-              <circle cx="12" cy="10" r="2.5"></circle>
-            </svg>
-            <span>Lagos</span>
-            <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
-
-<ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Country">
-            <li role="option">
-              <a href="#">
-                <span>Nigeria</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </a>
-            </li>
-          </ul>
-        </div>
+<div class="header-actions">
 
         <!-- Mobile search bar -->
         <form class="mobile-search" role="search" action="#">
@@ -77,32 +53,114 @@
           <input type="search" placeholder="Search location or property" aria-label="Search location or property" />
         </form>
 
-        <a href="#" class="action-link">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          <span>Sign in</span>
-        </a>
-
-        <label class="header-theme-toggle" aria-label="Toggle dark mode">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path>
-          </svg>
-          <span class="switch">
-            <input type="checkbox" data-dark-toggle />
-            <span class="track"></span>
-            <span class="thumb"></span>
-          </span>
-        </label>
-
-        <a href="#" class="btn btn--primary">
+                <a href="#" class="btn btn--primary">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 11.5 12 4l9 7.5"></path>
             <path d="M5 10v10h14V10"></path>
           </svg>
           Find Accommodation
         </a>
+
+        <!-- Desktop hamburger menu: Account / Location / Theme / Help -->
+        <div class="dropdown desktop-menu-dropdown">
+          <button type="button" class="desktop-hamburger-btn dropdown-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Open menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
+          <div class="dropdown-panel desktop-menu-panel" data-dropdown-panel>
+
+            <!-- Account -->
+            <div class="dropdown">
+              <button type="button" class="panel-row dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Account</span>
+                <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Account">
+                <li role="option"><a href="#"><span>Sign in</span></a></li>
+                <li role="option"><a href="#"><span>Sign up</span></a></li>
+              </ul>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Location -->
+            <div class="dropdown">
+              <button type="button" class="panel-row location-badge dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
+                  <circle cx="12" cy="10" r="2.5"></circle>
+                </svg>
+                <span>Lagos</span>
+                <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Country">
+                <li role="option">
+                  <a href="#">
+                    <span>Nigeria</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Theme toggle -->
+            <label class="panel-toggle-row">
+              <span class="left">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+                </svg>
+                Dark Mode
+              </span>
+              <span class="switch">
+                <input type="checkbox" data-dark-toggle />
+                <span class="track"></span>
+                <span class="thumb"></span>
+              </span>
+            </label>
+
+            <!-- Help -->
+            <div class="panel-help">
+              <div class="panel-help-top">
+                <div class="panel-help-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1v-7h3"></path>
+                    <path d="M3 17v-5h3v7H5a2 2 0 0 1-2-2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h4>Need help finding the right place?</h4>
+                  <p>Chat directly with verified agents near you.</p>
+                </div>
+              </div>
+              <a href="http://127.0.0.1:5500/home.html#" class="panel-help-link">
+                Chat with an Agent
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+            </div>
+
+          </div>
+        </div>
 
       </div>
     </div>
@@ -374,32 +432,158 @@
     </div>
   </section>
 
-  <!-- =========================================================
-       QUICK SEARCH
-  ========================================================= -->
-  <section class="quick-search">
-    <div class="container">
-
-      <form class="quick-search-bar" action="#">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="7"></circle>
-          <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
-        </svg>
-        <input type="search" placeholder='Search for apartments, rooms or areas e.g. "Apartment near AAUA"' />
-        <button type="submit" class="btn btn--primary">Search</button>
-      </form>
-
-      <div class="popular-searches">
-        <span class="popular-searches-label">Popular searches:</span>
+<!-- =========================================================
+     QUICK SEARCH
+============================================================= -->
+<section class="quick-search">
+  <div class="container">
+    <div class="popular-searches">
+      <span class="popular-searches-label">Popular searches:</span>
+      <div class="popular-searches-scroll">
         <a href="#" class="pill">Apartment in Ikeja</a>
         <a href="#" class="pill">Room in Yaba</a>
         <a href="#" class="pill">Self-contained in Surulere</a>
         <a href="#" class="pill">Mini flat in Lekki</a>
         <a href="#" class="pill">Hostel in Akoka</a>
+        <a href="#" class="pill">Apartment in Victoria Island</a>
+        <a href="#" class="pill">Room in Ajah</a>
+        <a href="#" class="pill">Self-contained in Ikeja</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="popular-accommodation">
+  <div class="container">
+    <div class="popular-header">
+      <h2 class="section-title">Popular Accommodation</h2>
+      <a href="#" class="view-all">
+        View all
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+    </div>
+
+    <div class="popular-scroll">
+
+      <div class="popular-card">
+        <span class="popular-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 21h16"/>
+            <path d="M6 21V9l6-5 6 5v12"/>
+            <path d="M10 15v-2a2 2 0 0 1 4 0v2"/>
+          </svg>
+        </span>
+        <div class="popular-text">
+          <h3>Single Rooms</h3>
+          <p>12,450+ available</p>
+        </div>
+      </div>
+
+      <div class="popular-card">
+        <span class="popular-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+        </span>
+        <div class="popular-text">
+          <h3>Self Contained</h3>
+          <p>8,230+ available</p>
+        </div>
+      </div>
+
+      <div class="popular-card">
+        <span class="popular-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+        </span>
+        <div class="popular-text">
+          <h3>Mini Flats</h3>
+          <p>6,120+ available</p>
+        </div>
+      </div>
+
+      <div class="popular-card">
+        <span class="popular-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </span>
+        <div class="popular-text">
+          <h3>Shared Apartments</h3>
+          <p>4,530+ available</p>
+        </div>
+      </div>
+
+      <div class="popular-card">
+        <span class="popular-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 21v-6h8v6"/>
+            <rect x="2" y="9" width="20" height="12" rx="2"/>
+            <path d="M18 9V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v3"/>
+          </svg>
+        </span>
+        <div class="popular-text">
+          <h3>Beds in Hostel</h3>
+          <p>3,210+ available</p>
+        </div>
+      </div>
+
+      <div class="popular-card">
+        <span class="popular-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="6" width="16" height="12" rx="1"/>
+            <path d="M8 10h8"/>
+            <path d="M8 14h4"/>
+          </svg>
+        </span>
+        <div class="popular-text">
+          <h3>Studio Apartments</h3>
+          <p>2,980+ available</p>
+        </div>
       </div>
 
     </div>
-  </section>
+  </div>
+</section>
+
+
+
+<!-- =========================================================
+     ALL LISTINGS
+============================================================= -->
+<section class="all-listings" id="all-listings">
+  <div class="container">
+
+    <div class="listings-header">
+      <div>
+        <h2 class="section-title">All Listings</h2>
+        <p class="listings-subtitle">Browse through verified properties from top agents</p>
+      </div>
+    </div>
+
+    <div class="listings-grid" data-listings-grid aria-live="polite">
+      <!-- Property cards rendered by home.js -->
+    </div>
+
+    <nav class="pagination" data-listings-pagination aria-label="Listings pagination">
+      <!-- Page controls rendered by home.js -->
+    </nav>
+
+  </div>
+</section>
+
+  
+
+  
 
   <!-- =========================================================
        SCRIPTS

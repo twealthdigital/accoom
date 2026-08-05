@@ -28,7 +28,7 @@
 
 .hero-inner {
   position: relative;
-  z-index: 1;
+  z-index: 5;
   padding-block: 64px 56px;
 }
 
@@ -116,6 +116,24 @@
   flex-direction: row;
   align-items: stretch;
   gap: 10px;
+}
+
+/* Dark Mode — Hero "Accommodation Type" dropdown only */
+
+
+html.dark-mode .hero-search .dropdown-panel {
+  background: var(--black);
+  border-color: var(--gold);
+}
+
+html.dark-mode .hero-search .dropdown-panel li {
+  color: var(--on-surface);
+}
+
+html.dark-mode .hero-search .dropdown-panel li:hover,
+html.dark-mode .hero-search .dropdown-panel li.is-active {
+  background: rgba(223, 150, 46, 0.14);
+  color: var(--gold);
 }
 
 .hero-search.is-visible {
@@ -244,77 +262,107 @@
    QUICK SEARCH
    ============================================================ */
 .quick-search {
-  background: var(--white);
-  padding-block: 20px 8px;
+  background: #f5f5f5;
+  padding-block: 20px 20px;
+  width: 100%;
 }
 
+html.dark-mode .quick-search {
+  background: #0a0a0a;
+}
+
+/* HIDE THE SEARCH BAR ON ALL VIEWS */
 .quick-search-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  padding: 6px 6px 6px 18px;
-  color: var(--ink-soft);
-  box-shadow: 0 8px 24px rgba(17, 31, 53, 0.08);
+  display: none !important;
 }
 
-.quick-search-bar input {
-  flex: 1;
-  min-width: 0;
-  background: none;
-  border: 0;
-  font-size: 0.9rem;
-  color: var(--ink);
-}
-
-.quick-search-bar input::placeholder {
-  color: var(--ink-soft);
-}
-
-.quick-search-bar input:focus {
-  outline: none;
-}
-
-.quick-search-bar .btn {
-  flex-shrink: 0;
-  padding: 10px 20px;
-}
-
-/* Popular Searches */
+/* Popular Searches Container */
 .popular-searches {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-top: 14px;
+  margin-top: 0;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  max-width: 100%;
 }
 
 .popular-searches-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--ink);
-  margin-right: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #999;
+  margin-right: 4px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  position: relative;
+  z-index: 2;
+  padding-right: 12px;
+  background: #f5f5f5;
+}
+
+html.dark-mode .popular-searches-label {
+  color: rgba(255, 255, 255, 0.3);
+  background: #0a0a0a;
+}
+
+/* Scrollable wrapper for pills - HIDE SCROLLBAR */
+.popular-searches-scroll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex: 1;
+  padding: 4px 0 4px 16px; /* Added padding-left for spacing at the beginning */
+  position: relative;
+  /* Fade on both ends */
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+/* HIDE SCROLLBAR - Webkit (Chrome, Safari, Edge) */
+.popular-searches-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* HIDE SCROLLBAR - Firefox */
+.popular-searches-scroll {
+  scrollbar-width: none;
 }
 
 .pill {
-  padding: 7px 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  font-size: 0.82rem;
+  padding: 6px 16px;
+  background: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--ink-soft);
+  color: #555;
+  transition: all 0.2s ease;
   white-space: nowrap;
-  transition: background var(--dur-fast) var(--ease),
-              border-color var(--dur-fast) var(--ease),
-              color var(--dur-fast) var(--ease);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+html.dark-mode .pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .pill:hover {
-  background: var(--gold-soft);
+  background: var(--gold);
   border-color: var(--gold);
-  color: var(--gold-dark);
+  color: #ffffff;
+}
+
+html.dark-mode .pill:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #ffffff;
 }
 
 /* ============================================================
@@ -349,20 +397,41 @@
   }
 
   .quick-search {
-    padding-block: 28px 8px;
+    padding-block: 20px 20px;
   }
 
-  .quick-search-bar {
-    max-width: 900px;
+  .popular-searches-scroll {
+    gap: 10px;
+    padding: 4px 0 4px 20px; /* More spacing on desktop */
+    mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
   }
 
-  .popular-searches {
-    margin-top: 18px;
+  .pill {
+    padding: 8px 20px;
+    font-size: 14px;
   }
 }
 
 /* ============================================================
-   MOBILE ONLY - STACK VERTICALLY
+   TABLET (768px – 991px)
+   ============================================================ */
+@media (min-width: 768px) and (max-width: 991px) {
+  .popular-searches-scroll {
+    gap: 8px;
+    padding: 4px 0 4px 16px;
+    mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  }
+
+  .pill {
+    padding: 6px 16px;
+    font-size: 13px;
+  }
+}
+
+/* ============================================================
+   MOBILE ONLY
    ============================================================ */
 @media (max-width: 767px) {
   .hero-search {
@@ -399,5 +468,426 @@
 
   .hero-features {
     flex-direction: column;
+  }
+
+  .quick-search {
+    padding-block: 16px 16px;
+  }
+
+  .popular-searches {
+    gap: 6px;
+  }
+
+  .popular-searches-label {
+    font-size: 12px;
+    padding-right: 8px;
+  }
+
+  .popular-searches-scroll {
+    gap: 6px;
+    padding: 2px 0 2px 12px; /* Less spacing on mobile */
+    mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  }
+
+  .pill {
+    font-size: 12px;
+    padding: 4px 12px;
+  }
+}
+
+
+
+
+/* ============================================================
+   POPULAR ACCOMMODATION
+   ============================================================ */
+.popular-accommodation {
+  background: #f8f8f8;
+  padding: 60px 0 50px;
+}
+
+html.dark-mode .popular-accommodation {
+  background: #0a0a0a;
+}
+
+.popular-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.popular-header .section-title {
+  color: #1a2333;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+html.dark-mode .popular-header .section-title {
+  color: #ffffff;
+}
+
+.popular-header .view-all {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gold);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: gap 0.3s ease;
+}
+
+.popular-header .view-all:hover { gap: 10px; }
+.popular-header .view-all svg { stroke: var(--gold); }
+
+.popular-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 14px 24px 8px 4px;
+  mask-image: linear-gradient(to right, black 0, black calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 24px), transparent 100%);
+  transition: mask-image var(--dur-fast) var(--ease);
+}
+
+.popular-scroll.has-scrolled-left {
+  mask-image: linear-gradient(to right, transparent 0, black 24px, black calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, black 24px, black calc(100% - 24px), transparent 100%);
+}
+
+.popular-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.popular-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+  width: 260px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: left;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+html.dark-mode .popular-card {
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: none;
+}
+
+.popular-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.10);
+}
+
+html.dark-mode .popular-card:hover {
+  box-shadow: 0 6px 14px rgba(255, 255, 255, 0.05);
+}
+
+.popular-card .popular-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  background: rgba(223, 150, 46, 0.10);
+  border-radius: 10px;
+  color: var(--gold);
+}
+
+.popular-card .popular-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--gold);
+}
+
+.popular-card .popular-text {
+  min-width: 0;
+}
+
+.popular-card h3 {
+  color: #1a2333;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+html.dark-mode .popular-card h3 { color: #ffffff; }
+
+.popular-card p {
+  color: #888;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+html.dark-mode .popular-card p { color: rgba(255, 255, 255, 0.4); }
+
+/* ============================================================
+   POPULAR ACCOMMODATION RESPONSIVE
+   ============================================================ */
+@media (max-width: 767px) {
+  .popular-accommodation {
+    padding: 40px 0 30px;
+  }
+
+  .popular-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .popular-header .section-title {
+    font-size: 22px;
+  }
+
+  .popular-card {
+    width: 220px;
+  }
+}
+
+/* ============================================================
+   ALL LISTINGS
+   ============================================================ */
+.all-listings {
+  padding: 50px 0 60px;
+  background: var(--surface-page);
+}
+
+.listings-header {
+  margin-bottom: 24px;
+}
+
+.listings-header .section-title {
+  color: var(--on-page);
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.listings-subtitle {
+  color: var(--on-page-soft);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* Grid: mobile default = 2 columns */
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.listing-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-page-alt);
+  border: 1px solid transparent;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform var(--dur-fast) var(--ease),
+              box-shadow var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+}
+
+html.dark-mode .listing-card {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.listing-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.10);
+}
+
+.listing-card-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--line);
+}
+
+.listing-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.listing-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  border-radius: var(--radius-s);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--white);
+  background: var(--ink-soft);
+}
+
+.listing-badge[data-type="self-contained"]   { background: #0F8A5F; }
+.listing-badge[data-type="mini-flat"]        { background: #2F6FED; }
+.listing-badge[data-type="shared-apartment"] { background: #E2572B; }
+.listing-badge[data-type="single-room"]      { background: #6C4CE0; }
+.listing-badge[data-type="studio-apartment"] { background: #1E7A46; }
+.listing-badge[data-type="standard-room"]    { background: #9D5F16; }
+
+.listing-save {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  transition: background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease);
+}
+
+.listing-save:hover,
+.listing-save.is-saved {
+  background: var(--gold);
+  color: var(--navy-2);
+}
+
+.listing-card-body {
+  padding: 12px 14px 14px;
+}
+
+.listing-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--on-page);
+}
+
+.listing-price small {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--on-page-soft);
+}
+
+.listing-location {
+  font-size: 12px;
+  color: var(--on-page-soft);
+  margin-top: 2px;
+}
+
+.listing-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--on-page-soft);
+}
+
+.listing-agent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-page);
+}
+
+.listing-agent-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--on-page);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listing-agent-name svg {
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.listing-rating {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--on-page-soft);
+  flex-shrink: 0;
+}
+
+.listing-rating svg {
+  color: var(--gold);
+  fill: var(--gold);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+.pagination button {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 8px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-page-soft);
+  background: transparent;
+  transition: background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease);
+}
+
+.pagination button:hover:not(:disabled):not(.is-active) {
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+}
+
+.pagination button.is-active {
+  background: var(--gold);
+  color: var(--navy-2);
+}
+
+.pagination button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Tablet: 4 columns */
+@media (min-width: 768px) and (max-width: 991px) {
+  .listings-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Desktop: 5 columns */
+@media (min-width: 992px) {
+  .listings-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
   }
 }

@@ -44,8 +44,11 @@ window.Accoom = window.Accoom || {};
       isOpen() ? close() : open();
     });
 
-    // Option selection
+// Option selection
     Accoom.delegate(panel, 'click', '[role="option"]', function (e) {
+      // Ignore options that belong to a nested dropdown's own panel
+      if (this.closest('[data-dropdown-panel]') !== panel) return;
+
       e.preventDefault();
       var item = this;
       var value = item.getAttribute('data-value') || '';

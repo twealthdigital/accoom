@@ -399,3 +399,96 @@ html:not(.dark-mode) .mobile-search:focus-within {
     display: inline-flex !important;
   }
 }
+
+/* Logo visibility */
+.logo-link .logo-light {
+  display: block; /* White logo visible in light mode */
+}
+
+.logo-link .logo-dark {
+  display: none; /* Dark logo hidden in light mode */
+}
+
+/* Dark mode - swap logos */
+html.dark-mode .logo-link .logo-light {
+  display: none; /* Hide white logo in dark mode */
+}
+
+html.dark-mode .logo-link .logo-dark {
+  display: block; /* Show dark logo in dark mode */
+}
+
+
+/* ============================================================
+   DESKTOP MENU (Account / Location / Theme / Help)
+   Desktop only — hidden below 992px
+   ============================================================ */
+.desktop-menu-dropdown {
+  display: none;
+}
+
+.desktop-hamburger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-s);
+  color: var(--on-surface);
+  flex-shrink: 0;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.desktop-hamburger-btn:hover {
+  background: var(--gold-soft);
+}
+
+.desktop-menu-panel {
+  left: auto;
+  right: 0;
+  width: 300px;
+  max-height: none;
+  overflow: visible;
+  padding: 10px;
+  background: var(--surface-page);
+}
+
+.desktop-menu-panel .panel-row {
+  color: var(--on-page);
+}
+
+.desktop-menu-panel .dropdown-panel {
+  border-color: var(--line-page);
+}
+
+.desktop-menu-panel .panel-divider {
+  background: var(--line-page);
+}
+
+.desktop-menu-panel .panel-toggle-row {
+  color: var(--on-page);
+  padding: 10px 14px;
+  margin: 4px 0;
+}
+
+.desktop-menu-panel .panel-help {
+  background: var(--surface-panel-alt);
+}
+
+.desktop-menu-panel .panel-help h4 {
+  color: var(--on-page);
+}
+
+.desktop-menu-panel .panel-help p {
+  color: var(--on-page-soft);
+}
+
+@media (min-width: 992px) {
+  .desktop-menu-dropdown {
+    display: block;
+  }
+
+  .desktop-hamburger-btn {
+    display: flex;
+  }
+}

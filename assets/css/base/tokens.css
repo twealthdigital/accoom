@@ -71,8 +71,8 @@ html:not(.dark-mode) {
 
 /* Dark Mode Overrides */
 html.dark-mode {
-  --surface-page: var(--navy-2);
-  --surface-page-alt: var(--surface-panel-alt);
+  --surface-page: var(--black);
+  --surface-page-alt: #1A1A1A;
   --on-page: var(--white);
   --on-page-soft: var(--ink-on-dark-soft);
   --line-page: var(--line-dark);

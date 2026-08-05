@@ -362,3 +362,13 @@ html.dark-mode .panel-location-dropdown .dropdown-panel li:hover,
 html.dark-mode .panel-location-dropdown .dropdown-panel li.is-active {
   background: rgba(223, 150, 46, 0.14);
 }
+
+/* Help card — dark mode only: match property-card surface treatment */
+html.dark-mode .panel-help {
+  background: var(--surface-page-alt);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+html.dark-mode .panel-help-link {
+  color: var(--gold);
+}
