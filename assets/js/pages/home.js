@@ -103,13 +103,13 @@
     // — the return shape { items, total } is all the rendering code needs,
     // so nothing else below has to change.
     var PropertyService = (function () {
-      var TYPES = {
-        'self-contained':   'Self Contained',
-        'mini-flat':        'Mini Flat',
-        'shared-apartment': 'Shared Apartment',
-        'single-room':      'Single Room',
-        'studio-apartment': 'Studio Apartment',
-        'standard-room':    'Standard Room'
+    var TYPES = {
+        '2-bedroom-flat':   '2 Bedroom Flat',
+        '3-bedroom-flat':   '3 Bedroom Flat',
+        '4-bedroom-flat':   '4 Bedroom Flat',
+        'commercial-space': 'Commercial Space',
+        'land':             'Land',
+        'hall':             'Hall'
       };
 
       var AGENTS = [
@@ -134,14 +134,59 @@
 
       var typeKeys = Object.keys(TYPES);
 
+      // EDIT THESE 25 NAMES to match your real files in assets/images/home-properties/
+      var IMAGES = [
+        'assets/images/home-properties/selfcon1.png',
+        'assets/images/home-properties/selfcon2.png',//not working
+        'assets/images/home-properties/selfcon2.png',
+        'assets/images/home-properties/commercialspace.png',
+        'assets/images/home-properties/selfcon2.png',
+        'assets/images/home-properties/hall-1.jpg',
+        'assets/images/home-properties/land2.png',
+        'assets/images/home-properties/miniflat1.png',
+        'assets/images/home-properties/4-bedroom-flat-2.jpg',
+        'assets/images/home-properties/commercialspace2.png',
+        'assets/images/home-properties/land3.png',
+        'assets/images/home-properties/hall-2.jpg',
+        'assets/images/home-properties/2-bedroom-flat-3.jpg',
+        'assets/images/home-properties/3-bedroom-flat-3.jpg',
+        'assets/images/home-properties/4-bedroom-flat-3.jpg',
+        'assets/images/home-properties/commercial-space-3.jpg',
+        'assets/images/home-properties/land-3.jpg',
+        'assets/images/home-properties/hall-3.jpg',
+        'assets/images/home-properties/2-bedroom-flat-4.jpg',
+        'assets/images/home-properties/3-bedroom-flat-4.jpg',
+        'assets/images/home-properties/4-bedroom-flat-4.jpg',
+        'assets/images/home-properties/commercial-space-4.jpg',
+        'assets/images/home-properties/land-4.jpg',
+        'assets/images/home-properties/hall-4.jpg',
+        'assets/images/home-properties/2-bedroom-flat-5.jpg'
+      ];
+
+      // EDIT THESE to add a video for that listing (same order as IMAGES above), or leave null
+var VIDEOS = [
+        null,
+        'assets/videos/home-properties/2bedroomflat.mp4',
+        'assets/videos/home-properties/2bedroomflat.mp',
+        'assets/videos/home-properties/2bedroomflat.mp',
+        'assets/videos/home-properties/2bedroomflat.mp',
+        'assets/videos/home-properties/selfcon2.mp4',
+        'assets/videos/home-properties/selfcon2.mp',
+        'assets/videos/home-properties/selfcon2.mp',
+        'assets/videos/home-properties/miniflat3.mp4',
+        null, null, null, null, null, null, null, null, null, null,
+        null, null, null, null, null, null, null, null, null, null, null, null, null
+      ];
+
       // Mock 25-item catalogue for now. In production this array goes away
       // entirely and fetchPage() below hits your real endpoint instead.
-      var ALL = [];
+var ALL = [];
       for (var i = 0; i < 25; i++) {
         var type = typeKeys[i % typeKeys.length];
         ALL.push({
           id: i + 1,
-          image: 'assets/images/home-properties/propertyimg' + (i + 1) + '.jpg',
+          image: IMAGES[i],
+          video: VIDEOS[i],
           typeKey: type,
           typeLabel: TYPES[type],
           price: 120000 + (i % 10) * 35000,
@@ -184,7 +229,10 @@
         return (
           '<article class="listing-card" data-listing-id="' + item.id + '">' +
             '<div class="listing-card-media">' +
-              '<img src="' + item.image + '" alt="' + item.typeLabel + ' in ' + item.location + '" loading="lazy" />' +
+(item.video
+                ? '<video src="' + item.video + '" muted loop autoplay playsinline preload="metadata" poster="' + item.image + '"></video>'
+                : '<img src="' + item.image + '" alt="' + item.typeLabel + ' in ' + item.location + '" loading="lazy" />'
+              ) +
               '<span class="listing-badge" data-type="' + item.typeKey + '">' + item.typeLabel + '</span>' +
               '<button type="button" class="listing-save" aria-label="Save listing" data-save-listing>' +
                 '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
@@ -266,7 +314,7 @@
       loadPage(1);
     }
 
-    
+
 
     console.log('Home page initialized');
   });
