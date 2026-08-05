@@ -6,6 +6,7 @@ html.is-loading,
 html.is-loading body {
   overflow: hidden;
   height: 100%;
+  background: var(--black);
 }
 
 #load-page {

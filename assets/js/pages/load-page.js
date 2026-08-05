@@ -7,28 +7,27 @@
 
   var loadPage = document.getElementById('load-page');
 
-  if (loadPage) {
-    // Hide load page after 3 seconds
+if (loadPage) {
+    function goHome() {
+      window.location.href = 'home.html';
+    }
+
+    // Hide load page after 3 seconds, then move to home.html
     setTimeout(function () {
       loadPage.classList.add('is-hidden');
 
-      // Remove from DOM after transition
+      // Navigate after the fade-out transition finishes
       setTimeout(function () {
-        loadPage.style.display = 'none';
-        document.documentElement.classList.remove('is-loading');
+        goHome();
       }, 500);
     }, 3000);
 
-    // Fallback: hide if user interacts early
+    // Fallback: skip ahead if user interacts early
     document.addEventListener('click', function () {
       if (!loadPage.classList.contains('is-hidden')) {
         loadPage.classList.add('is-hidden');
-        setTimeout(function () {
-          loadPage.style.display = 'none';
-          document.documentElement.classList.remove('is-loading');
-        }, 500);
+        setTimeout(goHome, 500);
       }
     }, { once: true });
   }
-
 })();
