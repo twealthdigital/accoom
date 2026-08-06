@@ -112,14 +112,14 @@
         'hall':             'Hall'
       };
 
-      var AGENTS = [
-        { name: 'DreamShelter',    verified: true,  rating: 4.6, reviews: 64  },
-        { name: 'UrbanSpace',      verified: true,  rating: 4.7, reviews: 98  },
-        { name: 'City Stay',       verified: false, rating: 4.5, reviews: 45  },
-        { name: 'StayWell Agents', verified: true,  rating: 4.9, reviews: 210 },
-        { name: 'Lekki Homes',     verified: true,  rating: 4.8, reviews: 147 },
-        { name: 'Comfort Homes',   verified: true,  rating: 4.8, reviews: 120 },
-        { name: 'EasyRent NG',     verified: true,  rating: 4.6, reviews: 87  }
+var AGENTS = [
+        { name: 'DreamShelter',    verified: true,  rating: 4.6, reviews: 64,  online: true  },
+        { name: 'UrbanSpace',      verified: true,  rating: 4.7, reviews: 98,  online: false },
+        { name: 'City Stay',       verified: false, rating: 4.5, reviews: 45,  online: true  },
+        { name: 'StayWell Agents', verified: true,  rating: 4.9, reviews: 210, online: true  },
+        { name: 'Lekki Homes',     verified: true,  rating: 4.8, reviews: 147, online: false },
+        { name: 'Comfort Homes',   verified: true,  rating: 4.8, reviews: 120, online: true  },
+        { name: 'EasyRent NG',     verified: true,  rating: 4.6, reviews: 87,  online: false }
       ];
 
       var LOCATIONS = [
@@ -135,34 +135,34 @@
       var typeKeys = Object.keys(TYPES);
 
 // EDIT THESE 25 entries to match your real files.
-      // Each listing owns ONE object: its image (required) + its video (optional, null if none).
-      // This keeps image/video locked together per listing — no more two arrays drifting out of sync.
+      // Each listing owns an `images` array (2 images if it has a video, 3 if it doesn't)
+      // plus an optional `video`. Video always plays as the first slide.
       var MEDIA = [
-        { image: 'assets/images/home-properties/selfcon1.png',         video: null },
-        { image: 'assets/images/home-properties/selfcon2.png',         video: 'assets/videos/home-properties/2bedroomflat.mp4' },
-        { image: 'assets/images/home-properties/selfcon3.png',         video: null },
-        { image: 'assets/images/home-properties/commercialspace.png',  video: null },
-        { image: 'assets/images/home-properties/land2.png',            video: null },
-        { image: 'assets/images/home-properties/hall-1.jpg',           video: 'assets/videos/home-properties/selfcon2.mp4' },
-        { image: 'assets/images/home-properties/selfcon2.png',         video: null },
-        { image: 'assets/images/home-properties/miniflat1.png',        video: null },
-        { image: 'assets/images/home-properties/4-bedroom-flat-2.jpg', video: 'assets/videos/home-properties/miniflat3.mp4' },
-        { image: 'assets/images/home-properties/commercialspace2.png', video: null },
-        { image: 'assets/images/home-properties/land3.png',            video: null },
-        { image: 'assets/images/home-properties/hall2.png',            video: null },
-        { image: 'assets/images/home-properties/bedroomflat3.png',     video: null },
-        { image: 'assets/images/home-properties/bedroomflat4.png',     video: null },
-        { image: 'assets/images/home-properties/singleroom3.png',      video: 'assets/videos/home-properties/selfcon3.mp4' },
-        { image: 'assets/images/home-properties/singleroom3.png',      video: null },
-        { image: 'assets/images/home-properties/land1.png',            video: null },
-        { image: 'assets/images/home-properties/hall3.png',            video: null },
-        { image: 'assets/images/home-properties/selfcon4.png',         video: null },
-        { image: 'assets/images/home-properties/selfcon3.png',         video: 'assets/videos/home-properties/selfcon3.mp4' },
-        { image: 'assets/images/home-properties/bedroomflat3.png',     video: null },
-        { image: 'assets/images/home-properties/commercialspace.png',  video: null },
-        { image: 'assets/images/home-properties/land3.png',            video: null },
-        { image: 'assets/images/home-properties/hall2.png',            video: null },
-        { image: 'assets/images/home-properties/selfcon2.png',         video: null }
+        { images: ['assets/images/home-properties/selfcon1.png','assets/images/home-properties/selfcon2.png','assets/images/home-properties/selfcon3.png'], video: null },
+        { images: ['assets/images/home-properties/selfcon2.png','assets/images/home-properties/hall2.png'], video: 'assets/videos/home-properties/2bedroomflat.mp4' },
+        { images: ['assets/images/home-properties/selfcon3.png','assets/images/home-properties/selfcon4.png','assets/images/home-properties/selfcon1.png'], video: null },
+        { images: ['assets/images/home-properties/commercialspace.png','assets/images/home-properties/commercialspace2.png','assets/images/home-properties/land1.png'], video: null },
+        { images: ['assets/images/home-properties/land2.png','assets/images/home-properties/land3.png','assets/images/home-properties/land1.png'], video: null },
+        { images: ['assets/images/home-properties/hall1.png','assets/images/home-properties/hall2.png'], video: 'assets/videos/home-properties/selfcon2.mp4' },
+        { images: ['assets/images/home-properties/selfcon2.png','assets/images/home-properties/selfcon3.png','assets/images/home-properties/selfcon4.png'], video: null },
+        { images: ['assets/images/home-properties/miniflat1.png','assets/images/home-properties/singleroom3.png','assets/images/home-properties/bedroomflat3.png'], video: null },
+        { images: ['assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/bedroomflat4.png'], video: 'assets/videos/home-properties/miniflat3.mp4' },
+        { images: ['assets/images/home-properties/commercialspace2.png','assets/images/home-properties/commercialspace.png','assets/images/home-properties/land2.png'], video: null },
+        { images: ['assets/images/home-properties/land3.png','assets/images/home-properties/land1.png','assets/images/home-properties/land2.png'], video: null },
+        { images: ['assets/images/home-properties/hall2.png','assets/images/home-properties/hall3.png','assets/images/home-properties/hall3.png'], video: null },
+        { images: ['assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/bedroomflat4.png','assets/images/home-properties/miniflat1.png'], video: null },
+        { images: ['assets/images/home-properties/bedroomflat4.png','assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/singleroom3.png'], video: null },
+        { images: ['assets/images/home-properties/singleroom3.png','assets/images/home-properties/miniflat1.png'], video: 'assets/videos/home-properties/selfcon3.mp4' },
+        { images: ['assets/images/home-properties/singleroom3.png','assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/bedroomflat4.png'], video: null },
+        { images: ['assets/images/home-properties/land1.png','assets/images/home-properties/land2.png','assets/images/home-properties/land3.png'], video: null },
+        { images: ['assets/images/home-properties/hall3.png','assets/images/home-properties/hall2.png','assets/images/home-properties/hall1.png'], video: null },
+        { images: ['assets/images/home-properties/selfcon4.png','assets/images/home-properties/selfcon1.png','assets/images/home-properties/selfcon2.png'], video: null },
+        { images: ['assets/images/home-properties/selfcon3.png','assets/images/home-properties/selfcon4.png'], video: 'assets/videos/home-properties/selfcon3.mp4' },
+        { images: ['assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/miniflat1.png','assets/images/home-properties/singleroom3.png'], video: null },
+        { images: ['assets/images/home-properties/commercialspace.png','assets/images/home-properties/land1.png','assets/images/home-properties/land2.png'], video: null },
+        { images: ['assets/images/home-properties/land3.png','assets/images/home-properties/commercialspace2.png','assets/images/home-properties/hall2.png'], video: null },
+        { images: ['assets/images/home-properties/hall2.png','assets/images/home-properties/hall3.png','assets/images/home-properties/bedroomflat4.png'], video: null },
+        { images: ['assets/images/home-properties/selfcon2.png','assets/images/home-properties/selfcon1.png','assets/images/home-properties/selfcon3.png'], video: null }
       ];
 
       // Mock 25-item catalogue for now. In production this array goes away
@@ -172,7 +172,7 @@ var ALL = [];
         var type = typeKeys[i % typeKeys.length];
 ALL.push({
           id: i + 1,
-          image: MEDIA[i].image,
+          images: MEDIA[i].images,
           video: MEDIA[i].video,
           typeKey: type,
           typeLabel: TYPES[type],
@@ -213,14 +213,47 @@ ALL.push({
         return '₦' + n.toLocaleString('en-NG');
       }
 
-      function cardTemplate(item) {
+      function mediaSlidesTemplate(item) {
+        var html = '';
+        if (item.video) {
+          html += '<video class="media-slide is-active" src="' + item.video + '" muted loop autoplay playsinline preload="metadata" poster="' + item.images[0] + '" data-slide="0"></video>';
+        }
+        item.images.forEach(function (src, idx) {
+          var slideIndex = item.video ? idx + 1 : idx;
+          var activeClass = (!item.video && idx === 0) ? ' is-active' : '';
+          html += '<img class="media-slide' + activeClass + '" src="' + src + '" alt="' + item.typeLabel + ' in ' + item.location + '" loading="lazy" data-slide="' + slideIndex + '" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.png\';" />';
+        });
+        return html;
+      }
+
+      function mediaNavTemplate() {
         return (
-          '<article class="listing-card" data-listing-id="' + item.id + '">' +
-            '<div class="listing-card-media">' +
-(item.video
-                ? '<video src="' + item.video + '" muted loop autoplay playsinline preload="metadata" poster="' + item.image + '"></video>'
-                : '<img src="' + item.image + '" alt="' + item.typeLabel + ' in ' + item.location + '" loading="lazy" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.png\';" />'
-              ) +
+          '<button type="button" class="media-nav media-nav-prev" data-media-prev aria-label="Previous photo">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+          '</button>' +
+          '<button type="button" class="media-nav media-nav-next" data-media-next aria-label="Next photo">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+          '</button>'
+        );
+      }
+
+      function mediaDotsTemplate(total) {
+        var dots = '';
+        for (var d = 0; d < total; d++) {
+          dots += '<button type="button" class="media-dot' + (d === 0 ? ' is-active' : '') + '" data-dot="' + d + '" aria-label="View photo ' + (d + 1) + '"></button>';
+        }
+        return '<div class="media-dots">' + dots + '</div>';
+      }
+
+function cardTemplate(item) {
+        var totalSlides = item.images.length + (item.video ? 1 : 0);
+        return (
+          '<article class="listing-card" data-listing-id="' + item.id + '" data-share-image="' + item.images[0] + '">' +
+            '<div class="listing-card-media" data-media>' +
+              mediaSlidesTemplate(item) +
+              (totalSlides > 1 ? mediaNavTemplate() : '') +
+              (totalSlides > 1 ? mediaDotsTemplate(totalSlides) : '') +
+              '<span class="listing-tag">Available Now</span>' +
               '<button type="button" class="listing-save" aria-label="Save listing" data-save-listing>' +
                 '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                   '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path>' +
@@ -231,13 +264,30 @@ ALL.push({
             '<p class="listing-name">' + item.name + '</p>' +
               '<p class="listing-price">' + formatPrice(item.price) + ' <small>/ year</small></p>' +
               '<p class="listing-location">' + item.location + '</p>' +
-              '<div class="listing-meta"><span>' + item.beds + ' Bed</span><span>' + item.baths + ' Bath</span></div>' +
+              '<div class="listing-meta">' +
+                '<span>' + item.beds + ' Bed</span><span>' + item.baths + ' Bath</span>' +
+'<button type="button" class="listing-share" aria-label="Share listing" data-share-listing>' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                    '<circle cx="18" cy="5" r="3"></circle>' +
+                    '<circle cx="6" cy="12" r="3"></circle>' +
+                    '<circle cx="18" cy="19" r="3"></circle>' +
+                    '<line x1="8.6" y1="10.6" x2="15.4" y2="6.4"></line>' +
+                    '<line x1="8.6" y1="13.4" x2="15.4" y2="17.6"></line>' +
+                  '</svg>' +
+                '</button>' +
+              '</div>' +
               '<div class="listing-agent">' +
-                '<span class="listing-agent-name">' + item.agent.name +
-                  (item.agent.verified
-                    ? ' <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 2.4 3.3-.4.6 3.3 3 1.6-1.6 3 1.6 3-3 1.6-.6 3.3-3.3-.4L12 22l-2.4-2.4-3.3.4-.6-3.3-3-1.6 1.6-3-1.6-3 3-1.6.6-3.3 3.3.4L12 2z"/></svg>'
-                    : '') +
-                '</span>' +
+                '<div class="listing-agent-id">' +
+                  '<span class="listing-agent-avatar">' +
+                    '<img src="assets/images/agenticonimg.png" alt="" loading="lazy" />' +
+                    (item.agent.verified
+                      ? '<svg class="listing-agent-verified" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 2.4 3.3-.4.6 3.3 3 1.6-1.6 3 1.6 3-3 1.6-.6 3.3-3.3-.4L12 22l-2.4-2.4-3.3.4-.6-3.3-3-1.6 1.6-3-1.6-3 3-1.6.6-3.3 3.3.4L12 2z"/></svg>'
+                      : '') +
+                  '</span>' +
+                  '<span class="listing-agent-name">' + item.agent.name +
+                    '<i class="listing-agent-status ' + (item.agent.online ? 'is-online' : 'is-offline') + '" aria-label="' + (item.agent.online ? 'Online' : 'Offline') + '"></i>' +
+                  '</span>' +
+                '</div>' +
                 '<span class="listing-rating">' +
                   '<svg width="12" height="12" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/></svg>' +
                   item.agent.rating + ' (' + item.agent.reviews + ')' +
@@ -287,6 +337,46 @@ ALL.push({
         listingsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
 
+
+      function setActiveSlide(mediaEl, index) {
+        var slides = Accoom.$$('.media-slide', mediaEl);
+        slides.forEach(function (s, i) {
+          var active = i === index;
+          s.classList.toggle('is-active', active);
+          if (s.tagName === 'VIDEO') {
+            if (active) { s.play && s.play().catch(function () {}); }
+            else { s.pause(); }
+          }
+        });
+        Accoom.$$('.media-dot', mediaEl).forEach(function (d, i) {
+          d.classList.toggle('is-active', i === index);
+        });
+      }
+
+      Accoom.delegate(listingsGrid, 'click', '[data-dot]', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setActiveSlide(this.closest('[data-media]'), parseInt(this.getAttribute('data-dot'), 10));
+      });
+
+      Accoom.delegate(listingsGrid, 'click', '[data-media-prev]', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var mediaEl = this.closest('[data-media]');
+        var slides = Accoom.$$('.media-slide', mediaEl);
+        var current = slides.findIndex(function (s) { return s.classList.contains('is-active'); });
+        setActiveSlide(mediaEl, (current - 1 + slides.length) % slides.length);
+      });
+
+      Accoom.delegate(listingsGrid, 'click', '[data-media-next]', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var mediaEl = this.closest('[data-media]');
+        var slides = Accoom.$$('.media-slide', mediaEl);
+        var current = slides.findIndex(function (s) { return s.classList.contains('is-active'); });
+        setActiveSlide(mediaEl, (current + 1) % slides.length);
+      });
+
       var resizeTimer;
       window.addEventListener('resize', function () {
         clearTimeout(resizeTimer);
@@ -303,6 +393,148 @@ ALL.push({
     }
 
 
+
+    // ============================================================
+    // SHARE MODAL — bounce-in dialog opened by the share icon on each card
+    // ============================================================
+    (function initShareModal() {
+      var modal = document.createElement('div');
+      modal.className = 'share-modal-overlay';
+      modal.setAttribute('data-share-modal', '');
+      modal.innerHTML =
+        '<div class="share-modal" role="dialog" aria-modal="true" aria-label="Share this property">' +
+          '<button type="button" class="share-modal-close" data-share-close aria-label="Close">' +
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+          '</button>' +
+          '<h3 class="share-modal-title">Share this property</h3>' +
+          '<p class="share-modal-subtitle">Send this listing to someone who needs it.</p>' +
+'<div class="share-modal-preview">' +
+            '<img data-share-preview-img src="" alt="" />' +
+            '<video data-share-preview-video muted playsinline preload="metadata"></video>' +
+            '<div class="share-modal-preview-text">' +
+              '<p data-share-preview-name class="share-modal-preview-name"></p>' +
+              '<p data-share-preview-meta class="share-modal-preview-meta"></p>' +
+            '</div>' +
+          '</div>' +
+          '<div class="share-modal-options">' +
+            '<a class="share-option" data-share-whatsapp target="_blank" rel="noopener">' +
+              '<span class="share-option-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.5-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.2 3.3 5.3 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.6.2-1.2.2-1.3-.1-.1-.3-.2-.5-.3z"/><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .9.9-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z"/></svg></span>' +
+              '<span>WhatsApp</span>' +
+            '</a>' +
+            '<a class="share-option" data-share-twitter target="_blank" rel="noopener">' +
+              '<span class="share-option-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23.3 22h-7.1l-5.6-6.9L4 22H1l8.1-9.3L1 2h7.3l5 6.3L18.9 2zm-1.2 18h1.9L7.4 4H5.4l12.3 16z"/></svg></span>' +
+              '<span>X</span>' +
+            '</a>' +
+            '<a class="share-option" data-share-facebook target="_blank" rel="noopener">' +
+              '<span class="share-option-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-8h2.7l.4-3.2h-3.1V7.7c0-.9.3-1.6 1.6-1.6h1.7V3.2C16.5 3.1 15.4 3 14.2 3c-2.6 0-4.4 1.6-4.4 4.5V9.8H7v3.2h2.8v8h3.7z"/></svg></span>' +
+              '<span>Facebook</span>' +
+            '</a>' +
+            '<a class="share-option" data-share-telegram target="_blank" rel="noopener">' +
+              '<span class="share-option-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.3 2.7 11.6c-1 .4-1 1.6.1 1.9l4.9 1.5 1.9 5.8c.2.7 1.1.9 1.6.3l2.6-2.8 5 3.7c.7.5 1.7.2 1.9-.7l3.2-15c.2-.9-.7-1.6-1.5-1.3zM8.6 14l9.4-5.8c.2-.1.4.1.2.3l-7.6 6.9-.3 3.2-1.4-4.1z"/></svg></span>' +
+              '<span>Telegram</span>' +
+            '</a>' +
+            '<a class="share-option" data-share-email>' +
+              '<span class="share-option-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg></span>' +
+              '<span>Email</span>' +
+            '</a>' +
+          '</div>' +
+          '<div class="share-modal-link">' +
+            '<input type="text" readonly data-share-link-input />' +
+            '<button type="button" data-share-copy>' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>' +
+              '<span data-share-copy-label>Copy</span>' +
+            '</button>' +
+          '</div>' +
+        '</div>';
+
+      document.body.appendChild(modal);
+
+      var closeBtn = modal.querySelector('[data-share-close]');
+      var previewImg = modal.querySelector('[data-share-preview-img]');
+      var previewVideo = modal.querySelector('[data-share-preview-video]');
+      var previewName = modal.querySelector('[data-share-preview-name]');
+      var previewMeta = modal.querySelector('[data-share-preview-meta]');
+      var linkInput = modal.querySelector('[data-share-link-input]');
+      var copyBtn = modal.querySelector('[data-share-copy]');
+      var copyLabel = modal.querySelector('[data-share-copy-label]');
+
+function openModal(data) {
+        if (data.video) {
+          previewVideo.poster = data.image;
+          previewVideo.src = data.video;
+          previewVideo.load();
+          previewVideo.style.display = 'block';
+          previewImg.style.display = 'none';
+        } else {
+          previewVideo.pause();
+          previewVideo.removeAttribute('src');
+          previewVideo.load();
+          previewVideo.style.display = 'none';
+          previewImg.src = data.image;
+          previewImg.style.display = 'block';
+        }
+        previewName.textContent = data.name;
+        previewMeta.textContent = data.price + ' · ' + data.location;
+
+        var shareUrl = window.location.origin + window.location.pathname + '#listing-' + data.id;
+        linkInput.value = shareUrl;
+
+        var shareText = encodeURIComponent(data.name + ' - ' + data.price + ' · ' + data.location);
+        var encodedUrl = encodeURIComponent(shareUrl);
+
+        modal.querySelector('[data-share-whatsapp]').href = 'https://wa.me/?text=' + shareText + '%20' + encodedUrl;
+        modal.querySelector('[data-share-twitter]').href = 'https://twitter.com/intent/tweet?text=' + shareText + '&url=' + encodedUrl;
+        modal.querySelector('[data-share-facebook]').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodedUrl;
+        modal.querySelector('[data-share-telegram]').href = 'https://t.me/share/url?url=' + encodedUrl + '&text=' + shareText;
+        modal.querySelector('[data-share-email]').href = 'mailto:?subject=' + shareText + '&body=' + encodedUrl;
+
+        modal.classList.add('is-open');
+        document.body.classList.add('no-scroll');
+      }
+
+function closeModal() {
+        modal.classList.remove('is-open');
+        document.body.classList.remove('no-scroll');
+        previewVideo.pause();
+      }
+
+Accoom.delegate(document, 'click', '[data-share-listing]', function (e) {
+        e.preventDefault();
+        var card = this.closest('.listing-card');
+        if (!card) return;
+
+var nameEl = card.querySelector('.listing-name');
+        var priceEl = card.querySelector('.listing-price');
+        var locationEl = card.querySelector('.listing-location');
+
+        openModal({
+          id: card.getAttribute('data-listing-id') || '',
+          name: nameEl ? nameEl.textContent.trim() : '',
+          price: priceEl ? priceEl.textContent.trim() : '',
+          location: locationEl ? locationEl.textContent.trim() : '',
+          image: card.getAttribute('data-share-image') || '',
+          video: ''
+        });
+      });
+
+      Accoom.on(closeBtn, 'click', closeModal);
+
+      Accoom.on(modal, 'click', function (e) {
+        if (e.target === modal) closeModal();
+      });
+
+      Accoom.on(document, 'keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+      });
+
+      Accoom.on(copyBtn, 'click', function () {
+        linkInput.select();
+        navigator.clipboard && navigator.clipboard.writeText(linkInput.value).then(function () {
+          copyLabel.textContent = 'Copied!';
+          setTimeout(function () { copyLabel.textContent = 'Copy'; }, 1500);
+        });
+      });
+    })();
 
     console.log('Home page initialized');
   });
