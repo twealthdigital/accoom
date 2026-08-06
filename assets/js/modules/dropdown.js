@@ -10,6 +10,8 @@ window.Accoom = window.Accoom || {};
   /**
    * Initialize a dropdown
    */
+Accoom._dropdownRegistry = Accoom._dropdownRegistry || [];
+
   Accoom.initDropdown = function (rootEl, options) {
     if (!rootEl) return;
 
@@ -28,7 +30,10 @@ window.Accoom = window.Accoom || {};
       trigger.setAttribute('aria-expanded', 'false');
     }
 
-    function open() {
+function open() {
+      Accoom._dropdownRegistry.forEach(function (d) {
+        if (d.close !== close) d.close();
+      });
       panel.classList.add(openClass);
       trigger.setAttribute('aria-expanded', 'true');
     }
@@ -86,6 +91,8 @@ window.Accoom = window.Accoom || {};
         close();
       }
     });
+
+Accoom._dropdownRegistry.push({ close: close, isOpen: isOpen });
 
     return {
       open: open,

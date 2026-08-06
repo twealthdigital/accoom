@@ -10,6 +10,8 @@ window.Accoom = window.Accoom || {};
   /**
    * Initialize location dropdowns
    */
+Accoom._dropdownRegistry = Accoom._dropdownRegistry || [];
+
   Accoom.initLocationDropdown = function (wrapper) {
     if (!wrapper) return;
 
@@ -18,7 +20,10 @@ window.Accoom = window.Accoom || {};
 
     if (!trigger || !menu) return;
 
-    function open() {
+function open() {
+      Accoom._dropdownRegistry.forEach(function (d) {
+        if (d.close !== close) d.close();
+      });
       menu.classList.add('is-open');
       trigger.setAttribute('aria-expanded', 'true');
     }
@@ -73,6 +78,8 @@ window.Accoom = window.Accoom || {};
       }
     });
 
+Accoom._dropdownRegistry.push({ close: close, isOpen: isOpen });
+
     return {
       open: open,
       close: close,
@@ -83,6 +90,7 @@ window.Accoom = window.Accoom || {};
   /**
    * Get user's location (geolocation)
    */
+  
   Accoom.getUserLocation = function () {
     return new Promise(function (resolve, reject) {
       if (!navigator.geolocation) {

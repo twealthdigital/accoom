@@ -759,6 +759,264 @@ html.dark-mode .popular-card p { color: rgba(255, 255, 255, 0.4); }
   min-width: 200px;
 }
 
+/* ============================================================
+   FILTERS PANEL — price slider, level/bed checkboxes, toggles
+   ============================================================ */
+.filters-panel {
+  left: 0;
+  right: auto;
+  box-sizing: border-box;
+  width: 260px;
+  padding: 16px;
+  overflow-x: hidden;
+}
+
+.filter-group {
+  margin-bottom: 18px;
+}
+
+.filter-group:last-of-type {
+  margin-bottom: 0;
+}
+
+.filter-group-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--on-page);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Price range slider */
+.price-range-values {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.price-range-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.price-range-sep {
+  color: var(--on-page-soft);
+  font-size: 0.8rem;
+}
+
+.price-range-track-wrap {
+  position: relative;
+  height: 24px;
+  margin-bottom: 8px;
+  margin-inline: 9px;
+}
+
+.price-range-track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--line-page);
+  transform: translateY(-50%);
+}
+
+.price-range-fill {
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--gold);
+  transform: translateY(-50%);
+  transition: left 0.08s ease, width 0.08s ease;
+}
+
+.price-range-thumb {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 2px solid var(--gold);
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: left 0.08s ease, box-shadow var(--dur-fast) var(--ease);
+  touch-action: none;
+  z-index: 2;
+}
+
+.price-range-thumb:active {
+  cursor: grabbing;
+  box-shadow: 0 0 0 6px var(--gold-soft);
+}
+
+.price-range-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px) scale(0.9);
+  background: var(--navy-2);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: var(--radius-s);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease),
+              visibility var(--dur-fast) var(--ease);
+}
+
+.price-range-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--navy-2);
+}
+
+.price-range-thumb.is-dragging .price-range-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* Level checkboxes */
+.filter-checkbox-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-page);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--on-page-soft);
+  transition: border-color var(--dur-fast) var(--ease),
+              background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease);
+}
+
+.filter-checkbox input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.filter-checkbox-box {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.filter-checkbox.level-al1 .filter-checkbox-box { background: #9C6B3E; }
+.filter-checkbox.level-al2 .filter-checkbox-box { background: #B0B7C0; }
+.filter-checkbox.level-al3 .filter-checkbox-box { background: #3E7FD9; }
+.filter-checkbox.level-al4 .filter-checkbox-box { background: #8B5CF6; }
+.filter-checkbox.level-al5 .filter-checkbox-box { background: var(--gold); }
+
+.filter-checkbox.is-checked {
+  border-color: var(--gold);
+  background: var(--gold-soft);
+  color: var(--on-page);
+}
+
+/* Bedroom pills */
+.filter-pill-list {
+  display: flex;
+  gap: 8px;
+}
+
+.filter-pill-btn {
+  width: 36px;
+  height: 32px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--line-page);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--on-page-soft);
+  transition: border-color var(--dur-fast) var(--ease),
+              background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease);
+}
+
+.filter-pill-btn:hover {
+  border-color: var(--gold);
+}
+
+.filter-pill-btn.is-active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--navy-2);
+}
+
+/* Toggle rows */
+.filter-group-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filter-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--on-page);
+  cursor: pointer;
+}
+
+/* Actions */
+.filter-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-page);
+}
+
+.filter-clear {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--on-page-soft);
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.filter-clear:hover {
+  color: var(--gold-dark);
+}
+
+@media (max-width: 480px) {
+  .filters-panel {
+    width: 88vw;
+    max-width: 300px;
+  }
+}
+
 /* Active filter pills */
 .active-filters {
   display: flex;
@@ -842,7 +1100,7 @@ html.dark-mode .popular-card p { color: rgba(255, 255, 255, 0.4); }
 /* Grid: mobile default = 2 columns */
 .listings-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   gap: 16px;
 }
 
@@ -873,6 +1131,7 @@ html.dark-mode .listing-card {
   aspect-ratio: 4 / 3;
   background: var(--line);
   overflow: hidden;
+  touch-action: pan-y;
 }
 
 .media-slide {
@@ -970,6 +1229,7 @@ html.dark-mode .listing-card {
   position: absolute;
   top: 10px;
   right: 10px;
+  z-index: 3;
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -1047,8 +1307,8 @@ html.dark-mode .listing-card {
 
 .listing-agent-avatar {
   position: relative;
-  width: 22px;
-  height: 22px;
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
 }
 
@@ -1061,20 +1321,25 @@ html.dark-mode .listing-card {
   background: var(--line-page);
 }
 
-/* Verified badge — overlaps the corner of the avatar, only rendered if agent.verified */
+/* Verified badge — now sits inline next to the agent name, only rendered if agent.verified */
 .listing-agent-verified {
   position: absolute;
-  bottom: -2px;
-  right: -2px;
-  width: 11px;
-  height: 11px;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: var(--gold);
-  color: var(--navy-2);
-  padding: 1px;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
   box-shadow: 0 0 0 2px var(--surface-page-alt);
+  flex-shrink: 0;
 }
-
 .listing-agent-name {
   display: flex;
   align-items: center;
@@ -1089,13 +1354,16 @@ html.dark-mode .listing-card {
   white-space: nowrap;
 }
 
-/* Status dot — green when online, gray when not */
+/* Status dot — now overlaps the corner of the avatar. Green when online, gray when not */
 .listing-agent-status {
-  flex-shrink: 0;
-  width: 6px;
-  height: 6px;
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #9AA3AF;
+  box-shadow: 0 0 0 2px var(--surface-page-alt);
 }
 
 .listing-agent-status.is-online {
@@ -1115,6 +1383,72 @@ html.dark-mode .listing-card {
 .listing-rating svg {
   color: var(--gold);
   fill: var(--gold);
+}
+
+.listing-agent-level-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.listing-agent-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  animation: levelPulse 1.8s ease-in-out infinite;
+}
+
+.listing-agent-level-dots {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.listing-agent-level-dots .level-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.35;
+}
+
+.listing-agent-level-dots .level-dot.is-filled {
+  opacity: 1;
+}
+
+@keyframes levelPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.listing-agent-level.level-al1 {
+  background: #9C6B3E;
+  color: #FFFFFF;
+}
+
+.listing-agent-level.level-al2 {
+  background: #37abc8;
+  color: #FFFFFF;
+}
+
+.listing-agent-level.level-al3 {
+  background: #da2815;
+  color: #FFFFFF;
+}
+
+.listing-agent-level.level-al4 {
+  background: #8B5CF6;
+  color: #FFFFFF;
+}
+
+.listing-agent-level.level-al5 {
+  background: #068b1c;
+  color: #FFFFFF;
 }
 
 /* Pagination */
@@ -1158,14 +1492,14 @@ html.dark-mode .listing-card {
 /* Tablet: 4 columns */
 @media (min-width: 768px) and (max-width: 991px) {
   .listings-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 /* Desktop: 5 columns */
 @media (min-width: 992px) {
   .listings-grid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
   }
 }
@@ -1186,8 +1520,14 @@ html.dark-mode .listing-card {
   backdrop-filter: blur(2px);
 }
 
-.listing-share {
+.listing-share-wrap {
+  position: relative;
   margin-left: auto;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.listing-share {
   width: 24px;
   height: 24px;
   border-radius: 50%;

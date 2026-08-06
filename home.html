@@ -584,8 +584,94 @@
           </svg>
         </button>
 
-        <div class="dropdown-panel filters-panel" data-dropdown-panel>
-          <!-- Filter fields (location, price, bedrooms, etc.) go here -->
+<div class="dropdown-panel filters-panel" data-dropdown-panel>
+
+          <div class="filter-group">
+            <h4 class="filter-group-title">Price Range</h4>
+            <div class="price-range">
+              <div class="price-range-values">
+                <span class="price-range-value" data-price-min-label>₦100,000</span>
+                <span class="price-range-sep">–</span>
+                <span class="price-range-value" data-price-max-label>₦1,000,000</span>
+              </div>
+              <div class="price-range-track-wrap">
+                <div class="price-range-track"></div>
+                <div class="price-range-fill" data-price-fill></div>
+                <button type="button" class="price-range-thumb" data-price-thumb="min" role="slider" aria-label="Minimum price" aria-valuemin="100000" aria-valuemax="1000000" aria-valuenow="100000">
+                  <span class="price-range-tooltip" data-price-tooltip="min">₦100,000</span>
+                </button>
+                <button type="button" class="price-range-thumb" data-price-thumb="max" role="slider" aria-label="Maximum price" aria-valuemin="100000" aria-valuemax="1000000" aria-valuenow="1000000">
+                  <span class="price-range-tooltip" data-price-tooltip="max">₦1,000,000</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <h4 class="filter-group-title">Agent Level</h4>
+            <div class="filter-checkbox-list">
+              <label class="filter-checkbox level-al5">
+                <input type="checkbox" value="AL5" />
+                <span class="filter-checkbox-box"></span>
+                <span>AL5</span>
+              </label>
+              <label class="filter-checkbox level-al4">
+                <input type="checkbox" value="AL4" />
+                <span class="filter-checkbox-box"></span>
+                <span>AL4</span>
+              </label>
+              <label class="filter-checkbox level-al3">
+                <input type="checkbox" value="AL3" />
+                <span class="filter-checkbox-box"></span>
+                <span>AL3</span>
+              </label>
+              <label class="filter-checkbox level-al2">
+                <input type="checkbox" value="AL2" />
+                <span class="filter-checkbox-box"></span>
+                <span>AL2</span>
+              </label>
+              <label class="filter-checkbox level-al1">
+                <input type="checkbox" value="AL1" />
+                <span class="filter-checkbox-box"></span>
+                <span>AL1</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <h4 class="filter-group-title">Bedrooms</h4>
+            <div class="filter-pill-list">
+              <button type="button" class="filter-pill-btn" data-bed="1">1</button>
+              <button type="button" class="filter-pill-btn" data-bed="2">2</button>
+              <button type="button" class="filter-pill-btn" data-bed="3">3</button>
+              <button type="button" class="filter-pill-btn" data-bed="4">4+</button>
+            </div>
+          </div>
+
+          <div class="filter-group filter-group-toggles">
+            <label class="filter-toggle-row">
+              <span>Verified agents only</span>
+              <span class="switch">
+                <input type="checkbox" data-filter-verified />
+                <span class="track"></span>
+                <span class="thumb"></span>
+              </span>
+            </label>
+            <label class="filter-toggle-row">
+              <span>Online agents only</span>
+              <span class="switch">
+                <input type="checkbox" data-filter-online />
+                <span class="track"></span>
+                <span class="thumb"></span>
+              </span>
+            </label>
+          </div>
+
+          <div class="filter-actions">
+            <button type="button" class="filter-clear" data-filter-clear>Clear all</button>
+            <button type="button" class="btn btn--primary btn--sm" data-filter-apply>Apply Filters</button>
+          </div>
+
         </div>
       </div>
 
@@ -597,16 +683,17 @@
             <path d="M16 21V7"></path>
             <path d="M20 17l-4 4-4-4"></path>
           </svg>
-          <span data-dropdown-label>Sort: Newest</span>
+          <span data-dropdown-label>Sort: Newly Listed</span>
           <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </button>
 
-        <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Sort by">
-          <li role="option" class="is-active" data-value="newest"><a href="#"><span>Newest</span></a></li>
-          <li role="option" data-value="price-low"><a href="#"><span>Price: Low to High</span></a></li>
-          <li role="option" data-value="price-high"><a href="#"><span>Price: High to Low</span></a></li>
+<ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Sort by">
+          <li role="option" data-value="nearby"><a href="#"><span>Near By</span></a></li>
+          <li role="option" class="is-active" data-value="newest"><a href="#"><span>Newly Listed</span></a></li>
+          <li role="option" data-value="online"><a href="#"><span>Online</span></a></li>
+          <li role="option" data-value="verified"><a href="#"><span>Verified</span></a></li>
 </ul>
       </div>
     </div>

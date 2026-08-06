@@ -113,13 +113,13 @@
       };
 
 var AGENTS = [
-        { name: 'DreamShelter',    verified: true,  rating: 4.6, reviews: 64,  online: true  },
-        { name: 'UrbanSpace',      verified: true,  rating: 4.7, reviews: 98,  online: false },
-        { name: 'City Stay',       verified: false, rating: 4.5, reviews: 45,  online: true  },
-        { name: 'StayWell Agents', verified: true,  rating: 4.9, reviews: 210, online: true  },
-        { name: 'Lekki Homes',     verified: true,  rating: 4.8, reviews: 147, online: false },
-        { name: 'Comfort Homes',   verified: true,  rating: 4.8, reviews: 120, online: true  },
-        { name: 'EasyRent NG',     verified: true,  rating: 4.6, reviews: 87,  online: false }
+        { name: 'DreamShelter',    verified: true,  rating: 4.6, reviews: 64,  online: true,  level: 'AL1' },
+        { name: 'UrbanSpace',      verified: true,  rating: 4.7, reviews: 98,  online: false, level: 'AL2' },
+        { name: 'City Stay',       verified: false, rating: 4.5, reviews: 45,  online: true,  level: 'AL3' },
+        { name: 'StayWell Agents', verified: true,  rating: 4.9, reviews: 210, online: true,  level: 'AL4' },
+        { name: 'Lekki Homes',     verified: true,  rating: 4.8, reviews: 147, online: false, level: 'AL5' },
+        { name: 'Comfort Homes',   verified: true,  rating: 4.8, reviews: 120, online: true,  level: 'AL1' },
+        { name: 'EasyRent NG',     verified: true,  rating: 4.6, reviews: 87,  online: false, level: 'AL2' }
       ];
 
       var LOCATIONS = [
@@ -177,18 +177,60 @@ ALL.push({
           typeKey: type,
           typeLabel: TYPES[type],
           name: TYPES[type] + ', ' + LOCATIONS[i % LOCATIONS.length],
-          price: 120000 + (i % 10) * 35000,
+price: 120000 + (i % 10) * 85000,
           location: LOCATIONS[i % LOCATIONS.length],
-          beds: 1,
+          beds: (i % 4) + 1,
           baths: 1,
           agent: AGENTS[i % AGENTS.length]
         });
       }
 
-      function fetchPage(page, perPage) {
+// sortBy: 'nearby' | 'newest' | 'online' | 'verified'
+      // filters: { priceMin, priceMax, levels: [], beds: [], verifiedOnly, onlineOnly }
+      // Swap this whole function for a real API call when ready —
+      // e.g. fetch('/api/properties?page=' + page + '&perPage=' + perPage + '&sort=' + sortBy + '&' + serializeFilters(filters))
+      function fetchPage(page, perPage, sortBy, filters) {
+        var list = ALL.slice();
+        filters = filters || {};
+
+        if (filters.priceMin != null) {
+          list = list.filter(function (item) { return item.price >= filters.priceMin; });
+        }
+        if (filters.priceMax != null) {
+          list = list.filter(function (item) { return item.price <= filters.priceMax; });
+        }
+        if (filters.levels && filters.levels.length) {
+          list = list.filter(function (item) { return filters.levels.indexOf(item.agent.level) !== -1; });
+        }
+        if (filters.beds && filters.beds.length) {
+          list = list.filter(function (item) {
+            var b = item.beds >= 4 ? 4 : item.beds;
+            return filters.beds.indexOf(b) !== -1;
+          });
+        }
+        if (filters.verifiedOnly) {
+          list = list.filter(function (item) { return item.agent.verified; });
+        }
+        if (filters.onlineOnly) {
+          list = list.filter(function (item) { return item.agent.online; });
+        }
+
+        if (sortBy === 'online') {
+          list.sort(function (a, b) { return (b.agent.online ? 1 : 0) - (a.agent.online ? 1 : 0); });
+        } else if (sortBy === 'verified') {
+          list.sort(function (a, b) { return (b.agent.verified ? 1 : 0) - (a.agent.verified ? 1 : 0); });
+        } else if (sortBy === 'nearby') {
+          // Placeholder until real geolocation/distance data is available from the backend —
+          // once each listing has lat/lng, sort by distance from Accoom.getUserLocation() here.
+          list.sort(function (a, b) { return a.id - b.id; });
+        } else {
+          // 'newest' (default)
+          list.sort(function (a, b) { return b.id - a.id; });
+        }
+
         var start = (page - 1) * perPage;
-        var items = ALL.slice(start, start + perPage);
-        return Promise.resolve({ items: items, total: ALL.length });
+        var items = list.slice(start, start + perPage);
+        return Promise.resolve({ items: items, total: list.length });
       }
 
       return { fetchPage: fetchPage };
@@ -199,14 +241,16 @@ ALL.push({
 
     if (listingsGrid && listingsPagination) {
 
-      var currentPage = 1;
+var currentPage = 1;
       var currentPerPage = getPerPage();
+      var currentSort = 'newest';
+      var currentFilters = { priceMin: 100000, priceMax: 1000000, levels: [], beds: [], verifiedOnly: false, onlineOnly: false };
 
-      function getPerPage() {
+function getPerPage() {
         var w = window.innerWidth;
-        if (w >= 992) return 20; // desktop: 5 x 4
-        if (w >= 768) return 16; // tablet: 4 x 4
-        return 10;               // mobile: 2 x 5
+        if (w >= 992) return 20; // desktop: 4 x 5
+        if (w >= 768) return 15; // tablet: 3 x 5
+        return 5;                // mobile: 1 x 5
       }
 
       function formatPrice(n) {
@@ -235,6 +279,14 @@ ALL.push({
             '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
           '</button>'
         );
+      }
+
+      function levelDotsTemplate(rank) {
+        var dots = '';
+        for (var d = 1; d <= 5; d++) {
+          dots += '<span class="level-dot' + (d <= rank ? ' is-filled' : '') + '"></span>';
+        }
+        return '<span class="listing-agent-level-dots">' + dots + '</span>';
       }
 
       function mediaDotsTemplate(total) {
@@ -266,31 +318,39 @@ function cardTemplate(item) {
               '<p class="listing-location">' + item.location + '</p>' +
               '<div class="listing-meta">' +
                 '<span>' + item.beds + ' Bed</span><span>' + item.baths + ' Bath</span>' +
-'<button type="button" class="listing-share" aria-label="Share listing" data-share-listing>' +
-                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-                    '<circle cx="18" cy="5" r="3"></circle>' +
-                    '<circle cx="6" cy="12" r="3"></circle>' +
-                    '<circle cx="18" cy="19" r="3"></circle>' +
-                    '<line x1="8.6" y1="10.6" x2="15.4" y2="6.4"></line>' +
-                    '<line x1="8.6" y1="13.4" x2="15.4" y2="17.6"></line>' +
-                  '</svg>' +
-                '</button>' +
+'<span class="listing-share-wrap">' +
+                  '<button type="button" class="listing-share" aria-label="Share listing" data-share-listing>' +
+                    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                      '<circle cx="18" cy="5" r="3"></circle>' +
+                      '<circle cx="6" cy="12" r="3"></circle>' +
+                      '<circle cx="18" cy="19" r="3"></circle>' +
+                      '<line x1="8.6" y1="10.6" x2="15.4" y2="6.4"></line>' +
+                      '<line x1="8.6" y1="13.4" x2="15.4" y2="17.6"></line>' +
+                    '</svg>' +
+                  '</button>' +
+                  (item.agent.verified
+                    ? '<svg class="listing-agent-verified" width="8" height="8" viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="Verified"><title>Verified</title><path d="M3 17l2-9 5 4 2-6 2 6 5-4 2 9H3z M3 19h18v2H3z"/></svg>'
+                    : '') +
+                '</span>' +
               '</div>' +
               '<div class="listing-agent">' +
-                '<div class="listing-agent-id">' +
+'<div class="listing-agent-id">' +
                   '<span class="listing-agent-avatar">' +
                     '<img src="assets/images/agent-images/agenticonimg.webp" alt="" loading="lazy" />' +
-                    (item.agent.verified
-                      ? '<svg class="listing-agent-verified" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 2.4 3.3-.4.6 3.3 3 1.6-1.6 3 1.6 3-3 1.6-.6 3.3-3.3-.4L12 22l-2.4-2.4-3.3.4-.6-3.3-3-1.6 1.6-3-1.6-3 3-1.6.6-3.3 3.3.4L12 2z"/></svg>'
-                      : '') +
-                  '</span>' +
-                  '<span class="listing-agent-name">' + item.agent.name +
                     '<i class="listing-agent-status ' + (item.agent.online ? 'is-online' : 'is-offline') + '" aria-label="' + (item.agent.online ? 'Online' : 'Offline') + '"></i>' +
                   '</span>' +
+'<span class="listing-agent-name">' + item.agent.name +
+                  '</span>' +
                 '</div>' +
-                '<span class="listing-rating">' +
+'<span class="listing-rating">' +
                   '<svg width="12" height="12" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/></svg>' +
                   item.agent.rating + ' (' + item.agent.reviews + ')' +
+                '</span>' +
+              '</div>' +
+'<div class="listing-agent-level-row">' +
+                '<span class="listing-agent-level level-' + item.agent.level.toLowerCase() + '">' +
+                  levelDotsTemplate(parseInt(item.agent.level.replace('AL', ''), 10)) +
+                  item.agent.level +
                 '</span>' +
               '</div>' +
             '</div>' +
@@ -314,13 +374,170 @@ function cardTemplate(item) {
         listingsPagination.innerHTML = html;
       }
 
-      function loadPage(page) {
+function loadPage(page) {
         var perPage = getPerPage();
-        PropertyService.fetchPage(page, perPage).then(function (res) {
+        PropertyService.fetchPage(page, perPage, currentSort, currentFilters).then(function (res) {
           var totalPages = Math.max(1, Math.ceil(res.total / perPage));
           currentPage = Math.min(page, totalPages);
           renderGrid(res.items);
           renderPagination(currentPage, totalPages);
+        });
+      }
+
+var listingsSortEl = document.querySelector('.listings-sort-dropdown');
+      if (listingsSortEl) {
+        Accoom.on(listingsSortEl, 'dropdown:select', function (e) {
+          currentSort = e.detail.value;
+          loadPage(1);
+        });
+      }
+
+      // ============================================================
+      // FILTERS PANEL
+      // ============================================================
+      var filtersPanel = document.querySelector('.filters-panel');
+
+      if (filtersPanel) {
+        var PRICE_MIN = 100000;
+        var PRICE_MAX = 1000000;
+        var PRICE_STEP = 100000;
+        var priceValues = { min: PRICE_MIN, max: PRICE_MAX };
+
+        var trackWrap = filtersPanel.querySelector('.price-range-track-wrap');
+        var fillEl = filtersPanel.querySelector('[data-price-fill]');
+        var thumbMin = filtersPanel.querySelector('[data-price-thumb="min"]');
+        var thumbMax = filtersPanel.querySelector('[data-price-thumb="max"]');
+        var tooltipMin = filtersPanel.querySelector('[data-price-tooltip="min"]');
+        var tooltipMax = filtersPanel.querySelector('[data-price-tooltip="max"]');
+        var labelMin = filtersPanel.querySelector('[data-price-min-label]');
+        var labelMax = filtersPanel.querySelector('[data-price-max-label]');
+
+        function valueToPercent(v) {
+          return ((v - PRICE_MIN) / (PRICE_MAX - PRICE_MIN)) * 100;
+        }
+
+        function renderPriceRange() {
+          var minPct = valueToPercent(priceValues.min);
+          var maxPct = valueToPercent(priceValues.max);
+
+          thumbMin.style.left = minPct + '%';
+          thumbMax.style.left = maxPct + '%';
+          fillEl.style.left = minPct + '%';
+          fillEl.style.width = (maxPct - minPct) + '%';
+
+          var minText = formatPrice(priceValues.min);
+          var maxText = formatPrice(priceValues.max);
+
+          labelMin.textContent = minText;
+          labelMax.textContent = maxText;
+          tooltipMin.textContent = minText;
+          tooltipMax.textContent = maxText;
+
+          thumbMin.setAttribute('aria-valuenow', priceValues.min);
+          thumbMax.setAttribute('aria-valuenow', priceValues.max);
+        }
+
+        function snapToStep(v) {
+          return Math.round(v / PRICE_STEP) * PRICE_STEP;
+        }
+
+        function dragThumb(thumbEl, which) {
+          Accoom.on(thumbEl, 'pointerdown', function (e) {
+            e.preventDefault();
+            thumbEl.setPointerCapture(e.pointerId);
+            thumbEl.classList.add('is-dragging');
+
+            function onMove(ev) {
+              var rect = trackWrap.getBoundingClientRect();
+              var pct = (ev.clientX - rect.left) / rect.width;
+              pct = Math.max(0, Math.min(1, pct));
+              var raw = PRICE_MIN + pct * (PRICE_MAX - PRICE_MIN);
+              var snapped = snapToStep(raw);
+
+              if (which === 'min') {
+                snapped = Math.max(PRICE_MIN, Math.min(snapped, priceValues.max - PRICE_STEP));
+                priceValues.min = snapped;
+              } else {
+                snapped = Math.min(PRICE_MAX, Math.max(snapped, priceValues.min + PRICE_STEP));
+                priceValues.max = snapped;
+              }
+
+              renderPriceRange();
+            }
+
+            function onUp() {
+              thumbEl.classList.remove('is-dragging');
+              Accoom.off(document, 'pointermove', onMove);
+              Accoom.off(document, 'pointerup', onUp);
+            }
+
+            Accoom.on(document, 'pointermove', onMove);
+            Accoom.on(document, 'pointerup', onUp);
+          });
+        }
+
+        dragThumb(thumbMin, 'min');
+        dragThumb(thumbMax, 'max');
+        renderPriceRange();
+
+        Accoom.$$('.filter-checkbox input', filtersPanel).forEach(function (input) {
+          Accoom.on(input, 'change', function () {
+            this.closest('.filter-checkbox').classList.toggle('is-checked', this.checked);
+          });
+        });
+
+        Accoom.$$('.filter-pill-btn', filtersPanel).forEach(function (btn) {
+          Accoom.on(btn, 'click', function () {
+            this.classList.toggle('is-active');
+          });
+        });
+
+        var filterApplyBtn = filtersPanel.querySelector('[data-filter-apply]');
+        var filterClearBtn = filtersPanel.querySelector('[data-filter-clear]');
+        var filterVerifiedInput = filtersPanel.querySelector('[data-filter-verified]');
+        var filterOnlineInput = filtersPanel.querySelector('[data-filter-online]');
+
+        Accoom.on(filterApplyBtn, 'click', function () {
+          var levels = Accoom.$$('.filter-checkbox input:checked', filtersPanel).map(function (i) { return i.value; });
+          var beds = Accoom.$$('.filter-pill-btn.is-active', filtersPanel).map(function (b) { return parseInt(b.getAttribute('data-bed'), 10); });
+
+          currentFilters = {
+            priceMin: priceValues.min,
+            priceMax: priceValues.max,
+            levels: levels,
+            beds: beds,
+            verifiedOnly: filterVerifiedInput.checked,
+            onlineOnly: filterOnlineInput.checked
+          };
+
+          var activeCount = levels.length + beds.length +
+            (filterVerifiedInput.checked ? 1 : 0) +
+            (filterOnlineInput.checked ? 1 : 0) +
+            ((priceValues.min !== PRICE_MIN || priceValues.max !== PRICE_MAX) ? 1 : 0);
+
+          var countEl = document.querySelector('[data-filter-count]');
+          if (countEl) countEl.textContent = activeCount;
+
+          loadPage(1);
+
+          var filterDropdownEl = document.querySelector('.listings-filter-dropdown');
+          if (filterDropdownEl) {
+            filterDropdownEl.querySelector('[data-dropdown-panel]').classList.remove('is-open');
+            filterDropdownEl.querySelector('.dropdown-trigger').setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        Accoom.on(filterClearBtn, 'click', function () {
+          Accoom.$$('.filter-checkbox input', filtersPanel).forEach(function (i) {
+            i.checked = false;
+            i.closest('.filter-checkbox').classList.remove('is-checked');
+          });
+          Accoom.$$('.filter-pill-btn', filtersPanel).forEach(function (b) { b.classList.remove('is-active'); });
+          filterVerifiedInput.checked = false;
+          filterOnlineInput.checked = false;
+          priceValues.min = PRICE_MIN;
+          priceValues.max = PRICE_MAX;
+          renderPriceRange();
         });
       }
 
@@ -348,10 +565,54 @@ function cardTemplate(item) {
             else { s.pause(); }
           }
         });
-        Accoom.$$('.media-dot', mediaEl).forEach(function (d, i) {
+Accoom.$$('.media-dot', mediaEl).forEach(function (d, i) {
           d.classList.toggle('is-active', i === index);
         });
       }
+
+      // Touch swipe for media slider — horizontal only, doesn't hijack page scroll
+      var swipeState = null;
+
+      Accoom.on(listingsGrid, 'touchstart', function (e) {
+        var mediaEl = e.target.closest('[data-media]');
+        if (!mediaEl) return;
+        var touch = e.touches[0];
+        swipeState = { mediaEl: mediaEl, startX: touch.clientX, startY: touch.clientY, dx: 0, locked: null };
+      }, { passive: true });
+
+      Accoom.on(listingsGrid, 'touchmove', function (e) {
+        if (!swipeState) return;
+        var touch = e.touches[0];
+        swipeState.dx = touch.clientX - swipeState.startX;
+        var dy = touch.clientY - swipeState.startY;
+
+        if (swipeState.locked === null && (Math.abs(swipeState.dx) > 6 || Math.abs(dy) > 6)) {
+          swipeState.locked = Math.abs(swipeState.dx) > Math.abs(dy) ? 'x' : 'y';
+        }
+
+        if (swipeState.locked === 'x') {
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      function endSwipe() {
+        if (!swipeState) return;
+        var mediaEl = swipeState.mediaEl;
+        var dx = swipeState.dx;
+        var locked = swipeState.locked;
+        swipeState = null;
+
+        if (locked !== 'x' || Math.abs(dx) < 40) return;
+
+        var slides = Accoom.$$('.media-slide', mediaEl);
+        if (slides.length < 2) return;
+        var current = slides.findIndex(function (s) { return s.classList.contains('is-active'); });
+        var next = dx < 0 ? (current + 1) % slides.length : (current - 1 + slides.length) % slides.length;
+        setActiveSlide(mediaEl, next);
+      }
+
+      Accoom.on(listingsGrid, 'touchend', endSwipe);
+      Accoom.on(listingsGrid, 'touchcancel', function () { swipeState = null; });
 
       Accoom.delegate(listingsGrid, 'click', '[data-dot]', function (e) {
         e.preventDefault();
