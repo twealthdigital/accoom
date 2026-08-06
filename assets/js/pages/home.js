@@ -306,11 +306,18 @@ function cardTemplate(item) {
               (totalSlides > 1 ? mediaNavTemplate() : '') +
               (totalSlides > 1 ? mediaDotsTemplate(totalSlides) : '') +
               '<span class="listing-tag">Available Now</span>' +
-              '<button type="button" class="listing-save" aria-label="Save listing" data-save-listing>' +
+'<button type="button" class="listing-save" aria-label="Save listing" data-save-listing>' +
                 '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                   '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path>' +
                 '</svg>' +
               '</button>' +
+              '<span class="media-count-badge">' +
+                '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                  '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>' +
+                  '<circle cx="12" cy="13" r="4"></circle>' +
+                '</svg>' +
+                '<span>' + totalSlides + '</span>' +
+              '</span>' +
             '</div>' +
             '<div class="listing-card-body">' +
             '<p class="listing-name">' + item.name + '</p>' +

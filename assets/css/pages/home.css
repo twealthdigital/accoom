@@ -1248,6 +1248,23 @@ html.dark-mode .listing-card {
   color: var(--navy-2);
 }
 
+.media-count-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  backdrop-filter: blur(2px);
+}
+
 .listing-card-body {
   padding: 12px 14px 14px;
 }
