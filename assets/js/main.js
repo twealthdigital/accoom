@@ -38,6 +38,17 @@ window.Accoom = window.Accoom || {};
       Accoom.initLocationDropdown(panelLocation);
     }
 
+// Listings filters/sort dropdowns
+    var listingsFilters = document.querySelector('.listings-filter-dropdown');
+    if (listingsFilters) {
+      Accoom.initDropdown(listingsFilters);
+    }
+
+    var listingsSort = document.querySelector('.listings-sort-dropdown');
+    if (listingsSort) {
+      Accoom.initDropdown(listingsSort);
+    }
+
     // Desktop menu dropdown (hamburger: Account / Location / Theme / Help)
     var desktopMenu = document.querySelector('.desktop-menu-dropdown');
     if (desktopMenu) {

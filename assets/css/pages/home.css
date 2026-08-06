@@ -667,6 +667,23 @@ html.dark-mode .popular-card p { color: rgba(255, 255, 255, 0.4); }
 
 .listings-header {
   margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .listings-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .listings-filters-bar {
+    margin-bottom: 0;
+    flex-wrap: nowrap;
+  }
 }
 
 .listings-header .section-title {
@@ -680,6 +697,146 @@ html.dark-mode .popular-card p { color: rgba(255, 255, 255, 0.4); }
   color: var(--on-page-soft);
   font-size: 14px;
   margin-top: 4px;
+}
+
+/* ============================================================
+   FILTERS BAR
+   ============================================================ */
+.listings-filters-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-pill);
+  background: var(--surface-page-alt);
+  color: var(--on-page);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: border-color var(--dur-fast) var(--ease),
+              box-shadow var(--dur-fast) var(--ease);
+}
+
+.filter-btn .chevron {
+  margin-left: 2px;
+  color: var(--on-page-soft);
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.filter-btn[aria-expanded="true"] {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
+.filter-btn[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+.filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--gold);
+  color: var(--navy-2);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.listings-sort-dropdown .dropdown-panel {
+  min-width: 200px;
+}
+
+/* Active filter pills */
+.active-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 6px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.filter-pill button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  color: var(--gold-dark);
+  font-size: 0.85rem;
+  line-height: 1;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.filter-pill button:hover {
+  background: rgba(223, 150, 46, 0.25);
+}
+
+.clear-filters {
+  margin-left: auto;
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.clear-filters:hover {
+  text-decoration: underline;
+}
+
+.results-count {
+  color: var(--on-page-soft);
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+
+/* Responsive: mobile — buttons split 50/50, pills wrap */
+@media (max-width: 480px) {
+  .listings-filters-bar {
+    gap: 8px;
+  }
+
+  .filter-btn {
+    flex: 1 1 0;
+    justify-content: center;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .listings-sort-dropdown .dropdown-panel {
+    left: auto;
+    right: 0;
+  }
+
+  .clear-filters {
+    margin-left: 0;
+    flex-basis: 100%;
+    text-align: right;
+  }
 }
 
 /* Grid: mobile default = 2 columns */

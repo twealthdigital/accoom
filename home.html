@@ -563,12 +563,63 @@
 <section class="all-listings" id="all-listings">
   <div class="container">
 
-    <div class="listings-header">
+<div class="listings-header">
       <div>
         <h2 class="section-title">All Property Listings</h2>
         <p class="listings-subtitle">Browse through verified properties from top agents</p>
       </div>
+
+      <div class="listings-filters-bar">
+      <div class="dropdown listings-filter-dropdown">
+        <button type="button" class="filter-btn dropdown-trigger" aria-haspopup="true" aria-expanded="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="6" x2="20" y2="6"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+            <line x1="11" y1="18" x2="13" y2="18"></line>
+          </svg>
+          <span>Filters</span>
+          <span class="filter-count" data-filter-count>3</span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <div class="dropdown-panel filters-panel" data-dropdown-panel>
+          <!-- Filter fields (location, price, bedrooms, etc.) go here -->
+        </div>
+      </div>
+
+      <div class="dropdown listings-sort-dropdown">
+        <button type="button" class="filter-btn dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3v14"></path>
+            <path d="M4 7l4-4 4 4"></path>
+            <path d="M16 21V7"></path>
+            <path d="M20 17l-4 4-4-4"></path>
+          </svg>
+          <span data-dropdown-label>Sort: Newest</span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Sort by">
+          <li role="option" class="is-active" data-value="newest"><a href="#"><span>Newest</span></a></li>
+          <li role="option" data-value="price-low"><a href="#"><span>Price: Low to High</span></a></li>
+          <li role="option" data-value="price-high"><a href="#"><span>Price: High to Low</span></a></li>
+</ul>
+      </div>
     </div>
+    </div>
+
+    <div class="active-filters" data-active-filters>
+      <span class="filter-pill">Lagos <button type="button" aria-label="Remove Lagos filter">&times;</button></span>
+      <span class="filter-pill">Min: &#8358;100,000 <button type="button" aria-label="Remove minimum price filter">&times;</button></span>
+      <span class="filter-pill">2+ Bedrooms <button type="button" aria-label="Remove bedrooms filter">&times;</button></span>
+      <button type="button" class="clear-filters" data-clear-filters>Clear all</button>
+    </div>
+
+    <p class="results-count" data-results-count>120+ properties found</p>
 
     <div class="listings-grid" data-listings-grid aria-live="polite">
       <!-- Property cards rendered by home.js -->
