@@ -725,26 +725,6 @@ html.dark-mode .listing-card {
   display: block;
 }
 
-.listing-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 4px 10px;
-  border-radius: var(--radius-s);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--white);
-  background: var(--ink-soft);
-}
-
-.listing-badge[data-type="2-bedroom-flat"]   { background: #2F6FED; }
-.listing-badge[data-type="3-bedroom-flat"]   { background: #0F8A5F; }
-.listing-badge[data-type="4-bedroom-flat"]   { background: #1E7A46; }
-.listing-badge[data-type="commercial-space"] { background: #9D5F16; }
-.listing-badge[data-type="land"]             { background: #6C4CE0; }
-.listing-badge[data-type="hall"]             { background: #E2572B; }
 
 .listing-save {
   position: absolute;
@@ -772,10 +752,19 @@ html.dark-mode .listing-card {
   padding: 12px 14px 14px;
 }
 
+.listing-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-page);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .listing-price {
   font-size: 15px;
   font-weight: 700;
-  color: var(--on-page);
+  color: var(--gold);
 }
 
 .listing-price small {

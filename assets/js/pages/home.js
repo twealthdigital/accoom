@@ -134,48 +134,35 @@
 
       var typeKeys = Object.keys(TYPES);
 
-      // EDIT THESE 25 NAMES to match your real files in assets/images/home-properties/
-      var IMAGES = [
-        'assets/images/home-properties/selfcon1.png',
-        'assets/images/home-properties/selfcon2.png',//not working
-        'assets/images/home-properties/selfcon2.png',
-        'assets/images/home-properties/commercialspace.png',
-        'assets/images/home-properties/selfcon2.png',
-        'assets/images/home-properties/hall-1.jpg',
-        'assets/images/home-properties/land2.png',
-        'assets/images/home-properties/miniflat1.png',
-        'assets/images/home-properties/4-bedroom-flat-2.jpg',
-        'assets/images/home-properties/commercialspace2.png',
-        'assets/images/home-properties/land3.png',
-        'assets/images/home-properties/hall-2.jpg',
-        'assets/images/home-properties/2-bedroom-flat-3.jpg',
-        'assets/images/home-properties/3-bedroom-flat-3.jpg',
-        'assets/images/home-properties/4-bedroom-flat-3.jpg',
-        'assets/images/home-properties/commercial-space-3.jpg',
-        'assets/images/home-properties/land-3.jpg',
-        'assets/images/home-properties/hall-3.jpg',
-        'assets/images/home-properties/2-bedroom-flat-4.jpg',
-        'assets/images/home-properties/3-bedroom-flat-4.jpg',
-        'assets/images/home-properties/4-bedroom-flat-4.jpg',
-        'assets/images/home-properties/commercial-space-4.jpg',
-        'assets/images/home-properties/land-4.jpg',
-        'assets/images/home-properties/hall-4.jpg',
-        'assets/images/home-properties/2-bedroom-flat-5.jpg'
-      ];
-
-      // EDIT THESE to add a video for that listing (same order as IMAGES above), or leave null
-var VIDEOS = [
-        null,
-        'assets/videos/home-properties/2bedroomflat.mp4',
-        'assets/videos/home-properties/2bedroomflat.mp',
-        'assets/videos/home-properties/2bedroomflat.mp',
-        'assets/videos/home-properties/2bedroomflat.mp',
-        'assets/videos/home-properties/selfcon2.mp4',
-        'assets/videos/home-properties/selfcon2.mp',
-        'assets/videos/home-properties/selfcon2.mp',
-        'assets/videos/home-properties/miniflat3.mp4',
-        null, null, null, null, null, null, null, null, null, null,
-        null, null, null, null, null, null, null, null, null, null, null, null, null
+// EDIT THESE 25 entries to match your real files.
+      // Each listing owns ONE object: its image (required) + its video (optional, null if none).
+      // This keeps image/video locked together per listing — no more two arrays drifting out of sync.
+      var MEDIA = [
+        { image: 'assets/images/home-properties/selfcon1.png',         video: null },
+        { image: 'assets/images/home-properties/selfcon2.png',         video: 'assets/videos/home-properties/2bedroomflat.mp4' },
+        { image: 'assets/images/home-properties/selfcon3.png',         video: null },
+        { image: 'assets/images/home-properties/commercialspace.png',  video: null },
+        { image: 'assets/images/home-properties/land2.png',            video: null },
+        { image: 'assets/images/home-properties/hall-1.jpg',           video: 'assets/videos/home-properties/selfcon2.mp4' },
+        { image: 'assets/images/home-properties/selfcon2.png',         video: null },
+        { image: 'assets/images/home-properties/miniflat1.png',        video: null },
+        { image: 'assets/images/home-properties/4-bedroom-flat-2.jpg', video: 'assets/videos/home-properties/miniflat3.mp4' },
+        { image: 'assets/images/home-properties/commercialspace2.png', video: null },
+        { image: 'assets/images/home-properties/land3.png',            video: null },
+        { image: 'assets/images/home-properties/hall2.png',            video: null },
+        { image: 'assets/images/home-properties/bedroomflat3.png',     video: null },
+        { image: 'assets/images/home-properties/bedroomflat4.png',     video: null },
+        { image: 'assets/images/home-properties/singleroom3.png',      video: 'assets/videos/home-properties/selfcon3.mp4' },
+        { image: 'assets/images/home-properties/singleroom3.png',      video: null },
+        { image: 'assets/images/home-properties/land1.png',            video: null },
+        { image: 'assets/images/home-properties/hall3.png',            video: null },
+        { image: 'assets/images/home-properties/selfcon4.png',         video: null },
+        { image: 'assets/images/home-properties/selfcon3.png',         video: 'assets/videos/home-properties/selfcon3.mp4' },
+        { image: 'assets/images/home-properties/bedroomflat3.png',     video: null },
+        { image: 'assets/images/home-properties/commercialspace.png',  video: null },
+        { image: 'assets/images/home-properties/land3.png',            video: null },
+        { image: 'assets/images/home-properties/hall2.png',            video: null },
+        { image: 'assets/images/home-properties/selfcon2.png',         video: null }
       ];
 
       // Mock 25-item catalogue for now. In production this array goes away
@@ -183,12 +170,13 @@ var VIDEOS = [
 var ALL = [];
       for (var i = 0; i < 25; i++) {
         var type = typeKeys[i % typeKeys.length];
-        ALL.push({
+ALL.push({
           id: i + 1,
-          image: IMAGES[i],
-          video: VIDEOS[i],
+          image: MEDIA[i].image,
+          video: MEDIA[i].video,
           typeKey: type,
           typeLabel: TYPES[type],
+          name: TYPES[type] + ', ' + LOCATIONS[i % LOCATIONS.length],
           price: 120000 + (i % 10) * 35000,
           location: LOCATIONS[i % LOCATIONS.length],
           beds: 1,
@@ -231,9 +219,8 @@ var ALL = [];
             '<div class="listing-card-media">' +
 (item.video
                 ? '<video src="' + item.video + '" muted loop autoplay playsinline preload="metadata" poster="' + item.image + '"></video>'
-                : '<img src="' + item.image + '" alt="' + item.typeLabel + ' in ' + item.location + '" loading="lazy" />'
+                : '<img src="' + item.image + '" alt="' + item.typeLabel + ' in ' + item.location + '" loading="lazy" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.png\';" />'
               ) +
-              '<span class="listing-badge" data-type="' + item.typeKey + '">' + item.typeLabel + '</span>' +
               '<button type="button" class="listing-save" aria-label="Save listing" data-save-listing>' +
                 '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                   '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path>' +
@@ -241,6 +228,7 @@ var ALL = [];
               '</button>' +
             '</div>' +
             '<div class="listing-card-body">' +
+            '<p class="listing-name">' + item.name + '</p>' +
               '<p class="listing-price">' + formatPrice(item.price) + ' <small>/ year</small></p>' +
               '<p class="listing-location">' + item.location + '</p>' +
               '<div class="listing-meta"><span>' + item.beds + ' Bed</span><span>' + item.baths + ' Bath</span></div>' +
