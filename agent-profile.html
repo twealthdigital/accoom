@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-ap-doctitle>Agent Profile — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/home.css" />
+  <link rel="stylesheet" href="assets/css/pages/agent-profile.css" />
+</head>
+<body>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================= -->
+  <header class="site-header">
+    <div class="container header-inner">
+
+      <button class="hamburger-btn" data-panel-open aria-label="Open menu" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <a href="home.html" class="logo-link">
+        <img src="assets/images/accoom-logo.png" alt="ACCOOM Logo" class="logo-dark" />
+        <img src="assets/images/accoom-white-logo.png" alt="ACCOOM Logo" class="logo-light" />
+      </a>
+
+      <nav class="nav-links" aria-label="Primary">
+        <a href="home.html">Home</a>
+        <a href="#">Browse</a>
+        <a href="#">Agents</a>
+        <a href="#">Deals</a>
+        <a href="#">About Us</a>
+      </nav>
+
+      <div class="header-actions">
+
+        <form class="mobile-search" role="search" action="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
+          </svg>
+          <input type="search" placeholder="Search location or property" aria-label="Search location or property" />
+        </form>
+
+        <a href="#" class="btn btn--primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11.5 12 4l9 7.5"></path>
+            <path d="M5 10v10h14V10"></path>
+          </svg>
+          Find Accommodation
+        </a>
+
+        <div class="dropdown desktop-menu-dropdown">
+          <button type="button" class="desktop-hamburger-btn dropdown-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Open menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
+          <div class="dropdown-panel desktop-menu-panel" data-dropdown-panel>
+
+            <div class="dropdown">
+              <button type="button" class="panel-row dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Account</span>
+                <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Account">
+                <li role="option"><a href="#"><span>Sign in</span></a></li>
+                <li role="option"><a href="#"><span>Sign up</span></a></li>
+              </ul>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <div class="dropdown">
+              <button type="button" class="panel-row location-badge dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
+                  <circle cx="12" cy="10" r="2.5"></circle>
+                </svg>
+                <span>Lagos</span>
+                <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Country">
+                <li role="option">
+                  <a href="#">
+                    <span>Nigeria</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <label class="panel-toggle-row">
+              <span class="left">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+                </svg>
+                Dark Mode
+              </span>
+              <span class="switch">
+                <input type="checkbox" data-dark-toggle />
+                <span class="track"></span>
+                <span class="thumb"></span>
+              </span>
+            </label>
+
+            <div class="panel-help">
+              <div class="panel-help-top">
+                <div class="panel-help-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1v-7h3"></path>
+                    <path d="M3 17v-5h3v7H5a2 2 0 0 1-2-2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h4>Need help finding the right place?</h4>
+                  <p>Chat directly with verified agents near you.</p>
+                </div>
+              </div>
+              <a href="#" class="panel-help-link">
+                Chat with an Agent
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       MOBILE SIDE PANEL
+  ========================================================= -->
+  <div class="panel-overlay" data-panel-overlay></div>
+
+  <aside class="side-panel" data-panel aria-label="Mobile menu">
+    <div class="panel-fixed-top">
+      <button class="panel-close" data-panel-close aria-label="Close menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="panel-brand">
+        <p>Find Accommodation. Connect. Secure. <span class="accent">Move in.</span></p>
+      </div>
+    </div>
+
+    <div class="panel-scroll">
+      <nav class="panel-nav" aria-label="Mobile primary">
+        <a href="home.html">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11.5 12 4l9 7.5"></path>
+            <path d="M5 10v10h14V10"></path>
+          </svg>
+          Home
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
+          </svg>
+          Browse
+        </a>
+        <a href="#" class="active">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"></path>
+          </svg>
+          Agents
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.6 12.6 12.7 20.5a2 2 0 0 1-2.8 0L3 13.6V4h9.6l8 8.6z"></path>
+            <circle cx="7.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"></circle>
+          </svg>
+          Deals
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <line x1="12" y1="11" x2="12" y2="16"></line>
+            <circle cx="12" cy="7.7" r="0.9" fill="currentColor" stroke="none"></circle>
+          </svg>
+          About Us
+        </a>
+      </nav>
+
+      <div class="panel-divider"></div>
+
+      <div class="dropdown panel-location-dropdown">
+        <button type="button" class="panel-row location-badge dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
+            <circle cx="12" cy="10" r="2.5"></circle>
+          </svg>
+          <span>Lagos</span>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Country">
+          <li role="option">
+            <a href="#">
+              <span>Nigeria</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <a href="#" class="panel-row">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>Sign in</span>
+      </a>
+
+      <div class="panel-divider"></div>
+
+      <a href="#" class="btn btn--primary panel-cta">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11.5 12 4l9 7.5"></path>
+          <path d="M5 10v10h14V10"></path>
+        </svg>
+        Find Accommodation
+      </a>
+
+      <div class="panel-help">
+        <div class="panel-help-top">
+          <div class="panel-help-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1v-7h3"></path>
+              <path d="M3 17v-5h3v7H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+          </div>
+          <div>
+            <h4>Need help finding the right place?</h4>
+            <p>Chat directly with verified agents near you.</p>
+          </div>
+        </div>
+        <a href="#" class="panel-help-link">
+          Chat with an Agent
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+
+      <label class="panel-toggle-row">
+        <span class="left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+          </svg>
+          Dark Mode
+        </span>
+        <span class="switch">
+          <input type="checkbox" data-dark-toggle />
+          <span class="track"></span>
+          <span class="thumb"></span>
+        </span>
+      </label>
+    </div>
+  </aside>
+
+  <!-- =========================================================
+       BREADCRUMB
+  ========================================================= -->
+  <div class="pd-page">
+    <div class="container pd-breadcrumb-wrap">
+      <nav class="pd-breadcrumb" aria-label="Breadcrumb">
+        <a href="home.html">Home</a>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <a href="property.html" data-ap-breadcrumb-property>Hall, Ajah, Lagos</a>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <span class="pd-breadcrumb-current">Agent Profile</span>
+      </nav>
+    </div>
+
+    <!-- =========================================================
+         AGENT HEADER
+    ========================================================= -->
+    <section class="ap-header">
+      <div class="container">
+        <div class="ap-header-card">
+          <div class="ap-header-icons">
+            <button type="button" class="ap-wishlist-btn" data-ap-wishlist aria-label="Save agent" aria-pressed="false">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
+            </button>
+            <button type="button" class="ap-share-btn" data-ap-share aria-label="Share agent profile">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"></line></svg>
+            </button>
+          </div>
+
+          <div class="ap-header-top">
+            <img class="ap-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="" data-ap-avatar />
+            <div class="ap-header-info">
+              <h1 class="ap-name">
+                <span data-ap-name>David O.</span>
+                <span class="pd-agent-verified-badge" data-ap-verified-badge title="Verified Agent">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+              </h1>
+              <p class="ap-stats" data-ap-stats>12 Properties &middot; 24 Deals</p>
+              <p class="ap-rating">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                <span data-ap-rating>4.8 (120 reviews)</span>
+                <span class="pd-agent-level pd-agent-level--al5" data-ap-level>
+                  <span class="pd-agent-level-dots">
+                    <span class="pd-level-dot is-filled"></span>
+                    <span class="pd-level-dot is-filled"></span>
+                    <span class="pd-level-dot is-filled"></span>
+                    <span class="pd-level-dot is-filled"></span>
+                    <span class="pd-level-dot is-filled"></span>
+                  </span>
+                  AL5
+                </span>
+              </p>
+            </div>
+            <p class="ap-about" data-ap-about>
+              Dedicated to helping you find a safe, comfortable home without stress. Verified and active on ACCOOM, responding to enquiries fast.
+            </p>
+
+            <div class="ap-actions">
+              <a href="#" class="btn btn--primary" data-ap-contact>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              Contact Agent
+            </a>
+          </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         PROPERTIES TABS
+    ========================================================= -->
+    <section class="ap-tabs-section">
+      <div class="container">
+
+        <div class="ap-tabs" role="tablist" data-ap-tabs>
+          <button type="button" class="ap-tab is-active" role="tab" aria-selected="true" data-ap-tab="available">Available Properties <span class="ap-tab-count" data-ap-tab-count="available">0</span></button>
+          <button type="button" class="ap-tab" role="tab" aria-selected="false" data-ap-tab="inprogress">In Progress <span class="ap-tab-count" data-ap-tab-count="inprogress">0</span></button>
+          <button type="button" class="ap-tab" role="tab" aria-selected="false" data-ap-tab="sold">Sold Properties <span class="ap-tab-count" data-ap-tab-count="sold">0</span></button>
+        </div>
+
+        <div class="ap-tab-panels">
+
+          <div class="ap-tab-panel is-active" data-ap-panel="available">
+            <div class="ap-listing-scroll">
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/miniflat1.png" alt="2 Bedroom Detached Duplex" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--available">Available</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">2 Bedroom Detached Duplex</p>
+                  <p class="listing-price">&#8358;460,000 <small>/ year</small></p>
+                  <p class="listing-location">Lekki Phase 1, Lagos</p>
+                  <div class="listing-meta"><span>2 Bed</span><span>3 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/hall2.png" alt="Mini Flat Apartment" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--available">Available</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">Mini Flat Apartment</p>
+                  <p class="listing-price">&#8358;350,000 <small>/ year</small></p>
+                  <p class="listing-location">Ajah, Lagos</p>
+                  <div class="listing-meta"><span>1 Bed</span><span>1 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/bedroomflat3.png" alt="3 Bedroom Bungalow" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--available">Available</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">3 Bedroom Bungalow</p>
+                  <p class="listing-price">&#8358;700,000 <small>/ year</small></p>
+                  <p class="listing-location">Ikeja GRA, Lagos</p>
+                  <div class="listing-meta"><span>3 Bed</span><span>3 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/miniflat.png" alt="Self Contained Room" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--available">Available</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">Self Contained Room</p>
+                  <p class="listing-price">&#8358;280,000 <small>/ year</small></p>
+                  <p class="listing-location">Egbeda, Lagos</p>
+                  <div class="listing-meta"><span>1 Bed</span><span>1 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/selfcon1.png" alt="Luxury 2 Bedroom Flat" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--available">Available</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">Luxury 2 Bedroom Flat</p>
+                  <p class="listing-price">&#8358;900,000 <small>/ year</small></p>
+                  <p class="listing-location">Victoria Island, Lagos</p>
+                  <div class="listing-meta"><span>2 Bed</span><span>2 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/selfcon4.png" alt="Shortlet Studio Apartment" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--available">Available</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">Shortlet Studio Apartment</p>
+                  <p class="listing-price">&#8358;45,000 <small>/ year</small></p>
+                  <p class="listing-location">Ikoyi, Lagos</p>
+                  <div class="listing-meta"><span>1 Bed</span><span>1 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/singleroom3.png" alt="4 Bedroom Semi-Detached" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--available">Available</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">4 Bedroom Semi-Detached</p>
+                  <p class="listing-price">&#8358;1,200,000 <small>/ year</small></p>
+                  <p class="listing-location">Magodo, Lagos</p>
+                  <div class="listing-meta"><span>4 Bed</span><span>4 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="ap-tab-panel" data-ap-panel="inprogress">
+            <div class="ap-listing-scroll">
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/miniflat1.png" alt="Self Contained Studio" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--inprogress">In Progress</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">Self Contained Studio</p>
+                  <p class="listing-price">&#8358;600,000 <small>/ year</small></p>
+                  <p class="listing-location">Yaba, Lagos</p>
+                  <div class="listing-meta"><span>1 Bed</span><span>1 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/hall2.png" alt="2 Bedroom Flat (Renovation)" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--inprogress">In Progress</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">2 Bedroom Flat (Renovation)</p>
+                  <p class="listing-price">&#8358;520,000 <small>/ year</small></p>
+                  <p class="listing-location">Surulere, Lagos</p>
+                  <div class="listing-meta"><span>2 Bed</span><span>2 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/bedroomflat3.png" alt="Mini Flat Under Inspection" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--inprogress">In Progress</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">Mini Flat Under Inspection</p>
+                  <p class="listing-price">&#8358;380,000 <small>/ year</small></p>
+                  <p class="listing-location">Ojodu, Lagos</p>
+                  <div class="listing-meta"><span>1 Bed</span><span>1 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/miniflat.png" alt="3 Bedroom Duplex (Docs Pending)" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--inprogress">In Progress</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">3 Bedroom Duplex (Docs Pending)</p>
+                  <p class="listing-price">&#8358;850,000 <small>/ year</small></p>
+                  <p class="listing-location">Gbagada, Lagos</p>
+                  <div class="listing-meta"><span>3 Bed</span><span>3 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/selfcon1.png" alt="Room & Parlour Self-Con" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--inprogress">In Progress</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">Room & Parlour Self-Con</p>
+                  <p class="listing-price">&#8358;310,000 <small>/ year</small></p>
+                  <p class="listing-location">Egbeda, Lagos</p>
+                  <div class="listing-meta"><span>1 Bed</span><span>1 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/selfcon4.png" alt="Shortlet Apartment (Handover Soon)" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--inprogress">In Progress</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">Shortlet Apartment (Handover Soon)</p>
+                  <p class="listing-price">&#8358;60,000 <small>/ year</small></p>
+                  <p class="listing-location">Lekki, Lagos</p>
+                  <div class="listing-meta"><span>1 Bed</span><span>1 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/singleroom3.png" alt="Studio Apartment (Verification)" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--inprogress">In Progress</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">Studio Apartment (Verification)</p>
+                  <p class="listing-price">&#8358;400,000 <small>/ year</small></p>
+                  <p class="listing-location">Ikeja, Lagos</p>
+                  <div class="listing-meta"><span>1 Bed</span><span>1 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="ap-tab-panel" data-ap-panel="sold">
+            <div class="ap-listing-scroll">
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/miniflat1.png" alt="Single Room Apartment" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--sold">Sold</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">Single Room Apartment</p>
+                  <p class="listing-price">&#8358;600,000 <small>/ year</small></p>
+                  <p class="listing-location">Surulere, Lagos</p>
+                  <div class="listing-meta"><span>1 Bed</span><span>1 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/hall2.png" alt="2 Bedroom Flat" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--sold">Sold</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">2 Bedroom Flat</p>
+                  <p class="listing-price">&#8358;550,000 <small>/ year</small></p>
+                  <p class="listing-location">Ogudu, Lagos</p>
+                  <div class="listing-meta"><span>2 Bed</span><span>2 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/bedroomflat3.png" alt="Mini Flat Apartment" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--sold">Sold</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">Mini Flat Apartment</p>
+                  <p class="listing-price">&#8358;400,000 <small>/ year</small></p>
+                  <p class="listing-location">Ketu, Lagos</p>
+                  <div class="listing-meta"><span>1 Bed</span><span>1 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/miniflat.png" alt="3 Bedroom Terrace" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--sold">Sold</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">3 Bedroom Terrace</p>
+                  <p class="listing-price">&#8358;950,000 <small>/ year</small></p>
+                  <p class="listing-location">Ilupeju, Lagos</p>
+                  <div class="listing-meta"><span>3 Bed</span><span>3 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/selfcon1.png" alt="Self Contained Studio" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--sold">Sold</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">Self Contained Studio</p>
+                  <p class="listing-price">&#8358;320,000 <small>/ year</small></p>
+                  <p class="listing-location">Bariga, Lagos</p>
+                  <div class="listing-meta"><span>1 Bed</span><span>1 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/selfcon4.png" alt="4 Bedroom Duplex" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--sold">Sold</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">4 Bedroom Duplex</p>
+                  <p class="listing-price">&#8358;1,500,000 <small>/ year</small></p>
+                  <p class="listing-location">Omole, Lagos</p>
+                  <div class="listing-meta"><span>4 Bed</span><span>4 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+
+              <article class="listing-card ap-listing-card">
+                <div class="listing-card-media">
+                  <img src="assets/images/home-properties/singleroom3.png" alt="Room & Parlour" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+                  <span class="listing-tag ap-status-tag ap-status-tag--sold">Sold</span>
+                </div>
+                <div class="listing-card-body">
+                  <p class="listing-name">Room & Parlour</p>
+                  <p class="listing-price">&#8358;300,000 <small>/ year</small></p>
+                  <p class="listing-location">Iyana Ipaja, Lagos</p>
+                  <div class="listing-meta"><span>1 Bed</span><span>1 Bath</span></div>
+                  <a href="property.html" class="btn btn--ghost btn--sm ap-card-link">View Property</a>
+                </div>
+              </article>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         ABOUT + REVIEWS
+    ========================================================= -->
+    <section class="ap-details">
+      <div class="container ap-details-grid">
+
+        <div class="ap-about-card">
+          <h2 data-ap-about-title>About David O.</h2>
+          <p class="ap-bio-text" data-ap-bio>
+            I am a professional real estate agent with years of experience helping clients find quality homes and investment properties across Lagos. My goal is to make the process simple, transparent, and stress-free for you.
+          </p>
+
+          <div class="ap-detail-row">
+            <span class="ap-detail-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </span>
+            <span>
+              <strong>Specialization</strong>
+              <span data-ap-specialization>Apartments, Duplexes, Shortlets</span>
+            </span>
+          </div>
+
+          <div class="ap-detail-row">
+            <span class="ap-detail-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            </span>
+            <span>
+              <strong>Areas Covered</strong>
+              <span data-ap-areas>Lekki, Ajah, Victoria Island, Ikoyi</span>
+            </span>
+          </div>
+
+          <div class="ap-detail-row">
+            <span class="ap-detail-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            </span>
+            <span>
+              <strong>Languages</strong>
+              <span data-ap-languages>English</span>
+            </span>
+          </div>
+
+          <div class="ap-detail-row">
+            <span class="ap-detail-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </span>
+            <span>
+              <strong>Availability</strong>
+              <span data-ap-availability>Mon &ndash; Sat (8:00 AM &ndash; 8:00 PM)</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="ap-reviews-card">
+          <h2>What Clients Say</h2>
+
+          <div class="ap-reviews-list">
+          <div class="ap-review">
+            <img class="ap-review-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="" />
+            <div class="ap-review-body">
+              <div class="ap-review-top">
+                <span class="ap-review-name">Akin M.</span>
+                <span class="ap-review-stars">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                </span>
+                <span class="ap-review-time">2 weeks ago</span>
+              </div>
+              <p class="ap-review-text">David was patient, honest and very professional. He helped me find the perfect apartment.</p>
+            </div>
+          </div>
+
+          <div class="ap-review-divider"></div>
+
+          <div class="ap-review">
+            <img class="ap-review-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="" />
+            <div class="ap-review-body">
+              <div class="ap-review-top">
+                <span class="ap-review-name">Tolu B.</span>
+                <span class="ap-review-stars">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                </span>
+                <span class="ap-review-time">1 month ago</span>
+              </div>
+              <p class="ap-review-text">Great experience! He responds fast and knows the best areas.</p>
+            </div>
+          </div>
+
+          <div class="ap-review-divider"></div>
+
+          <div class="ap-review">
+            <img class="ap-review-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="" />
+            <div class="ap-review-body">
+              <div class="ap-review-top">
+                <span class="ap-review-name">Grace I.</span>
+                <span class="ap-review-stars">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                </span>
+                <span class="ap-review-time">2 months ago</span>
+              </div>
+              <p class="ap-review-text">Very reliable and transparent. I highly recommend his services.</p>
+            </div>
+          </div>
+
+          <div class="ap-review-divider"></div>
+
+          <div class="ap-review">
+            <img class="ap-review-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="" />
+            <div class="ap-review-body">
+              <div class="ap-review-top">
+                <span class="ap-review-name">Bola A.</span>
+                <span class="ap-review-stars">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                </span>
+                <span class="ap-review-time">3 months ago</span>
+              </div>
+              <p class="ap-review-text">Smooth process from start to finish. He negotiated a great price for me.</p>
+            </div>
+          </div>
+
+          <div class="ap-review-divider"></div>
+
+          <div class="ap-review">
+            <img class="ap-review-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="" />
+            <div class="ap-review-body">
+              <div class="ap-review-top">
+                <span class="ap-review-name">Chidera N.</span>
+                <span class="ap-review-stars">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                </span>
+                <span class="ap-review-time">4 months ago</span>
+              </div>
+              <p class="ap-review-text">Good agent, communicates clearly. Would use his services again.</p>
+            </div>
+          </div>
+
+          <div class="ap-review-divider"></div>
+
+          <div class="ap-review">
+            <img class="ap-review-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="" />
+            <div class="ap-review-body">
+              <div class="ap-review-top">
+                <span class="ap-review-name">Emeka U.</span>
+                <span class="ap-review-stars">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                </span>
+                <span class="ap-review-time">5 months ago</span>
+              </div>
+              <p class="ap-review-text">Very knowledgeable about the local market. Made my apartment search stress-free.</p>
+            </div>
+          </div>
+
+          <div class="ap-review-divider"></div>
+
+          <div class="ap-review">
+            <img class="ap-review-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="" />
+            <div class="ap-review-body">
+              <div class="ap-review-top">
+                <span class="ap-review-name">Funke S.</span>
+                <span class="ap-review-stars">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                </span>
+                <span class="ap-review-time">6 months ago</span>
+              </div>
+              <p class="ap-review-text">Trustworthy and efficient. He listened to what I needed and delivered.</p>
+            </div>
+          </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================================
+         CHECK OUT OTHER PROPERTIES
+    ========================================================= -->
+    <section class="ap-more">
+      <div class="container ap-more-inner">
+        <a href="home.html#all-listings" class="btn btn--primary">
+          Check Out Other Properties
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================= -->
+  <div data-partial="partials/footer.html"></div>
+
+  <!-- =========================================================
+       SCRIPTS
+  ========================================================= -->
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+
+  <script src="assets/js/animations/buttons.js"></script>
+  <script src="assets/js/animations/transitions.js"></script>
+
+  <script>Accoom.loadPartials();</script>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/agent-profile.js"></script>
+
+</body>
+</html>

@@ -177,7 +177,37 @@ html.dark-mode .pd-card {
   transform: scale(1.06);
 }
 
+.pd-gallery-zoom-reset {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--dur-fast) var(--ease),
+              background var(--dur-fast) var(--ease);
+  pointer-events: none;
+  backdrop-filter: blur(3px);
+}
 
+.pd-gallery-main.is-zoomed .pd-gallery-zoom-reset {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.pd-gallery-zoom-reset:hover {
+  background: var(--gold);
+  color: #14100a;
+}
 
 .pd-gallery-tag {
   position: absolute;
@@ -441,6 +471,7 @@ html.dark-mode .pd-card {
 
 .pd-lightbox-frame {
   cursor: zoom-in;
+  position: relative;
 }
 
 .pd-lightbox-frame.is-zoomed {
@@ -453,20 +484,27 @@ html.dark-mode .pd-card {
 
 .pd-lightbox-zoom-controls {
   position: absolute;
-  right: 0;
-  bottom: -52px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 5;
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: var(--radius-pill);
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(223, 150, 46, 0.5);
+  backdrop-filter: blur(4px);
 }
 
 .pd-lightbox-zoom-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
   color: #fff;
   transition: background var(--dur-fast) var(--ease),
               color var(--dur-fast) var(--ease);
@@ -479,12 +517,13 @@ html.dark-mode .pd-card {
 
 @media (max-width: 600px) {
   .pd-lightbox-zoom-controls {
-    bottom: -46px;
-    gap: 6px;
+    right: 10px;
+    bottom: 10px;
+    gap: 2px;
   }
   .pd-lightbox-zoom-btn {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
   }
 }
 

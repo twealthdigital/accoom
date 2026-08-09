@@ -692,6 +692,12 @@ Accoom.delegate(listingsGrid, 'click', '.listing-card', function (e) {
           (nameEl ? '&name=' + encodeURIComponent(nameEl.textContent.trim()) : '');
         window.location.href = url;
       });
+
+      Accoom.delegate(listingsGrid, 'click', '[data-save-listing]', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.toggle('is-saved');
+      });
       
       var resizeTimer;
       window.addEventListener('resize', function () {

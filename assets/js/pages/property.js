@@ -33,6 +33,10 @@ var params = new URLSearchParams(window.location.search);
       agent: stored && stored.agent ? stored.agent : { level: 'AL5' }
     };
 
+    // Expose to other modules (e.g. main.js's View Profile handler),
+    // since `property` above is scoped to this Accoom.ready callback.
+    Accoom.currentProperty = property;
+
     // ============================================================
     // Apply dynamic property name across the page
     // ============================================================
@@ -158,6 +162,14 @@ var params = new URLSearchParams(window.location.search);
         mainFrame.classList.toggle('is-zoomed', mainZoom > 1);
       }
 
+      var resetBtn = gallery.querySelector('[data-pd-main-zoom-reset]');
+      if (resetBtn) {
+        Accoom.on(resetBtn, 'click', function (e) {
+          e.stopPropagation();
+          setMainZoom(1);
+        });
+      }
+
       Accoom.on(mainImg, 'click', function () {
         setMainZoom(mainZoom + ZOOM_STEP);
       });
@@ -187,8 +199,7 @@ var params = new URLSearchParams(window.location.search);
         '<div class="pd-lightbox-stage">' +
           '<div class="pd-lightbox-frame" data-pd-lightbox-frame>' +
             '<div class="pd-lightbox-track" data-pd-lightbox-track>' + slidesHtml + '</div>' +
-          '</div>' +
-          '<div class="pd-lightbox-zoom-controls">' +
+            '<div class="pd-lightbox-zoom-controls">' +
             '<button type="button" class="pd-lightbox-zoom-btn" data-pd-zoom-out aria-label="Zoom out">' +
               '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.6" y2="16.6"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>' +
             '</button>' +
@@ -198,6 +209,7 @@ var params = new URLSearchParams(window.location.search);
             '<button type="button" class="pd-lightbox-zoom-btn" data-pd-zoom-in aria-label="Zoom in">' +
               '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.6" y2="16.6"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>' +
             '</button>' +
+            '</div>' +
           '</div>' +
           '<button type="button" class="pd-lightbox-close" data-pd-lightbox-close aria-label="Close">' +
             '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
