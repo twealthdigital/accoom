@@ -22,7 +22,7 @@ Accoom._dropdownRegistry = Accoom._dropdownRegistry || [];
 
 function open() {
       Accoom._dropdownRegistry.forEach(function (d) {
-        if (d.close !== close) d.close();
+        if (d.close !== close && !(d.el && d.el.contains(wrapper))) d.close();
       });
       menu.classList.add('is-open');
       trigger.setAttribute('aria-expanded', 'true');
@@ -78,7 +78,7 @@ function open() {
       }
     });
 
-Accoom._dropdownRegistry.push({ close: close, isOpen: isOpen });
+Accoom._dropdownRegistry.push({ close: close, isOpen: isOpen, el: wrapper });
 
     return {
       open: open,

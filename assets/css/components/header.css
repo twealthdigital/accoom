@@ -269,8 +269,8 @@ html:not(.dark-mode) .mobile-search input {
   color: var(--ink);
 }
 
-html:not(.dark-mode) .mobile-search input::placeholder {
-  color: var(--ink-soft);
+html:not(.dark-mode) .action-link {
+  color: var(--gold);
 }
 
 html:not(.dark-mode) .mobile-search:focus-within {
@@ -457,8 +457,14 @@ html.dark-mode .logo-link .logo-dark {
   color: var(--on-page);
 }
 
+.desktop-menu-panel .panel-row[href*="chat"],
+.desktop-menu-panel .panel-help-link {
+  color: var(--gold) !important;
+}
+
 .desktop-menu-panel .dropdown-panel {
   border-color: var(--line-page);
+  background: var(--surface-page-alt);
 }
 
 .desktop-menu-panel .panel-divider {

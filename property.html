@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-pd-doctitle>2 Bedroom Detached Duplex — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/property.css" />
+</head>
+<body>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================= -->
+  <header class="site-header">
+    <div class="container header-inner">
+
+      <!-- Mobile hamburger -->
+      <button class="hamburger-btn" data-panel-open aria-label="Open menu" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Logo -->
+      <a href="home.html" class="logo-link">
+        <img src="assets/images/accoom-logo.png" alt="ACCOOM Logo" class="logo-dark" />
+        <img src="assets/images/accoom-white-logo.png" alt="ACCOOM Logo" class="logo-light" />
+      </a>
+
+      <!-- Desktop nav -->
+      <nav class="nav-links" aria-label="Primary">
+        <a href="home.html">Home</a>
+        <a href="#">Browse</a>
+        <a href="#">Agents</a>
+        <a href="#">Deals</a>
+        <a href="#">About Us</a>
+      </nav>
+
+      <!-- Right side -->
+      <div class="header-actions">
+
+        <!-- Mobile search bar -->
+        <form class="mobile-search" role="search" action="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
+          </svg>
+          <input type="search" placeholder="Search location or property" aria-label="Search location or property" />
+        </form>
+
+        <a href="#" class="btn btn--primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11.5 12 4l9 7.5"></path>
+            <path d="M5 10v10h14V10"></path>
+          </svg>
+          Find Accommodation
+        </a>
+
+        <!-- Desktop hamburger menu: Account / Location / Theme / Help -->
+        <div class="dropdown desktop-menu-dropdown">
+          <button type="button" class="desktop-hamburger-btn dropdown-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Open menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
+          <div class="dropdown-panel desktop-menu-panel" data-dropdown-panel>
+
+            <!-- Account -->
+            <div class="dropdown">
+              <button type="button" class="panel-row dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Account</span>
+                <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Account">
+                <li role="option"><a href="#"><span>Sign in</span></a></li>
+                <li role="option"><a href="#"><span>Sign up</span></a></li>
+              </ul>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Location -->
+            <div class="dropdown">
+              <button type="button" class="panel-row location-badge dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
+                  <circle cx="12" cy="10" r="2.5"></circle>
+                </svg>
+                <span>Lagos</span>
+                <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Country">
+                <li role="option">
+                  <a href="#">
+                    <span>Nigeria</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Theme toggle -->
+            <label class="panel-toggle-row">
+              <span class="left">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+                </svg>
+                Dark Mode
+              </span>
+              <span class="switch">
+                <input type="checkbox" data-dark-toggle />
+                <span class="track"></span>
+                <span class="thumb"></span>
+              </span>
+            </label>
+
+            <!-- Help -->
+            <div class="panel-help">
+              <div class="panel-help-top">
+                <div class="panel-help-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1v-7h3"></path>
+                    <path d="M3 17v-5h3v7H5a2 2 0 0 1-2-2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h4>Need help finding the right place?</h4>
+                  <p>Chat directly with verified agents near you.</p>
+                </div>
+              </div>
+              <a href="#" class="panel-help-link">
+                Chat with an Agent
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       MOBILE SIDE PANEL
+  ========================================================= -->
+  <div class="panel-overlay" data-panel-overlay></div>
+
+  <aside class="side-panel" data-panel aria-label="Mobile menu">
+
+    <div class="panel-fixed-top">
+      <button class="panel-close" data-panel-close aria-label="Close menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="panel-brand">
+        <p>Find Accommodation. Connect. Secure. <span class="accent">Move in.</span></p>
+      </div>
+    </div>
+
+    <div class="panel-scroll">
+
+      <nav class="panel-nav" aria-label="Mobile primary">
+        <a href="home.html">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11.5 12 4l9 7.5"></path>
+            <path d="M5 10v10h14V10"></path>
+          </svg>
+          Home
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
+          </svg>
+          Browse
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"></path>
+          </svg>
+          Agents
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.6 12.6 12.7 20.5a2 2 0 0 1-2.8 0L3 13.6V4h9.6l8 8.6z"></path>
+            <circle cx="7.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"></circle>
+          </svg>
+          Deals
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <line x1="12" y1="11" x2="12" y2="16"></line>
+            <circle cx="12" cy="7.7" r="0.9" fill="currentColor" stroke="none"></circle>
+          </svg>
+          About Us
+        </a>
+      </nav>
+
+      <div class="panel-divider"></div>
+
+      <div class="dropdown panel-location-dropdown">
+        <button type="button" class="panel-row location-badge dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
+            <circle cx="12" cy="10" r="2.5"></circle>
+          </svg>
+          <span>Lagos</span>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Country">
+          <li role="option">
+            <a href="#">
+              <span>Nigeria</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <a href="#" class="panel-row">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>Sign in</span>
+      </a>
+
+      <div class="panel-divider"></div>
+
+      <a href="#" class="btn btn--primary panel-cta">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11.5 12 4l9 7.5"></path>
+          <path d="M5 10v10h14V10"></path>
+        </svg>
+        Find Accommodation
+      </a>
+
+      <div class="panel-help">
+        <div class="panel-help-top">
+          <div class="panel-help-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1v-7h3"></path>
+              <path d="M3 17v-5h3v7H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+          </div>
+          <div>
+            <h4>Need help finding the right place?</h4>
+            <p>Chat directly with verified agents near you.</p>
+          </div>
+        </div>
+        <a href="#" class="panel-help-link">
+          Chat with an Agent
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+
+      <label class="panel-toggle-row">
+        <span class="left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+          </svg>
+          Dark Mode
+        </span>
+        <span class="switch">
+          <input type="checkbox" data-dark-toggle />
+          <span class="track"></span>
+          <span class="thumb"></span>
+        </span>
+      </label>
+
+    </div>
+  </aside>
+
+  <!-- =========================================================
+       PROPERTY DETAIL
+  ========================================================= -->
+  <main class="pd-page">
+
+    <div class="container pd-breadcrumb-wrap">
+      <nav class="pd-breadcrumb" aria-label="Breadcrumb">
+        <a href="home.html">Home</a>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <span class="pd-breadcrumb-current" data-pd-breadcrumb-current>2 Bedroom Detached Duplex</span>
+      </nav>
+    </div>
+
+    <div class="container pd-layout">
+
+      <!-- ============ GALLERY ============ -->
+      <div class="pd-gallery-col">
+        <section class="pd-gallery-grid" data-pd-gallery>
+          <div class="pd-gallery-main" data-pd-gallery-main>
+            <span class="pd-gallery-tag">Available Now</span>
+            <img data-pd-main-img src="assets/images/home-properties/miniflat1.png" alt="2 Bedroom Detached Duplex" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" />
+            <video data-pd-main-video muted loop autoplay playsinline preload="metadata" style="display:none;"></video>
+            <button type="button" class="pd-gallery-viewphotos" data-pd-open-lightbox>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+              View Photos
+            </button>
+            <span class="pd-gallery-counter" data-pd-counter>1/4</span>
+          </div>
+
+<div class="pd-gallery-thumbs" data-pd-thumbs>
+            <!-- Rendered dynamically by property.js from property.images / property.video -->
+          </div>
+        </section>
+      </div>
+
+      <!-- ============ SIDEBAR ============ -->
+      <aside class="pd-sidebar">
+
+        <div class="pd-card pd-title-card">
+          <div class="pd-title-row">
+            <h1 data-pd-title>2 Bedroom Detached Duplex</h1>
+            <button type="button" class="pd-save-btn" data-pd-save aria-label="Save property">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
+            </button>
+          </div>
+
+          <p class="pd-location">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            Lekki Phase 1, Lagos, Nigeria
+          </p>
+
+          <p class="pd-price" data-pd-price>&#8358;460,000<span> / year</span></p>
+
+          <div class="pd-tags">
+            <span class="pd-tag">2 Beds</span>
+            <span class="pd-tag">3 Baths</span>
+            <span class="pd-tag">Duplex</span>
+            <span class="pd-tag">Newly Built</span>
+          </div>
+        </div>
+
+        <div class="pd-card pd-agent-card">
+          <div class="pd-agent-top">
+            <img class="pd-agent-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="David O." data-pd-agent-avatar />
+            <div>
+              <p class="pd-agent-name" data-pd-agent-name>
+                David O.
+                <span class="pd-agent-verified-badge" title="Verified Agent">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+              </p>
+              <p class="pd-agent-stats" data-pd-agent-stats>12 Properties &middot; 24 Deals</p>
+              <p class="pd-agent-rating">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                <span data-pd-agent-rating>4.8 (120 reviews)</span>
+                <span class="pd-agent-level pd-agent-level--al5" data-pd-agent-level>
+                  <span class="pd-agent-level-dots">
+                    <span class="pd-level-dot is-filled"></span>
+                    <span class="pd-level-dot is-filled"></span>
+                    <span class="pd-level-dot is-filled"></span>
+                    <span class="pd-level-dot is-filled"></span>
+                    <span class="pd-level-dot is-filled"></span>
+                  </span>
+                  AL5
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div class="pd-agent-actions">
+            <a href="#" class="btn btn--primary" data-pd-contact-agent>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              Contact Agent
+            </a>
+            <a href="#" class="btn btn--ghost" data-pd-view-profile>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              View Profile
+            </a>
+          </div>
+        </div>
+
+        <div class="pd-card pd-share-card">
+          <span class="pd-share-label">Share Property</span>
+          <button type="button" class="pd-share-btn" data-pd-share-trigger>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"></line><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"></line></svg>
+            Share
+          </button>
+        </div>
+
+        <div class="pd-card pd-overview-card">
+          <h3>Property Overview</h3>
+          <div class="pd-overview-row"><span>Property ID</span><span>ACCOM-24567</span></div>
+          <div class="pd-overview-row"><span>Property Type</span><span>Detached Duplex</span></div>
+          <div class="pd-overview-row"><span>Status</span><span>Available</span></div>
+          <div class="pd-overview-row"><span>Furnishing</span><span>Semi Furnished</span></div>
+          <div class="pd-overview-row"><span>Year Built</span><span>2024</span></div>
+          <div class="pd-overview-row"><span>Parking Space</span><span>2 Cars</span></div>
+          <div class="pd-overview-row"><span>Date Added</span><span>May 20, 2026</span></div>
+          <div class="pd-overview-row"><span>Views</span><span>245</span></div>
+        </div>
+
+        <div class="pd-card pd-price-details-card">
+          <h3>Price Details</h3>
+          <div class="pd-price-row"><span>Rent (Per Year)</span><span>&#8358;460,000</span></div>
+          <div class="pd-price-row"><span>Service Charge</span><span>&#8358;50,000</span></div>
+          <div class="pd-price-row"><span>Legal Fee</span><span>&#8358;50,000</span></div>
+          <div class="pd-price-row"><span>Agency Fee</span><span>&#8358;460,000</span></div>
+          <div class="pd-price-divider"></div>
+          <div class="pd-price-row pd-price-total"><span>Total (First Year)</span><span>&#8358;1,020,000</span></div>
+
+          <button type="button" class="btn btn--primary pd-payment-btn" data-pd-payment>
+            Make Payment
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+          </button>
+        </div>
+
+      </aside>
+
+      <!-- ============ CONTENT ============ -->
+      <div class="pd-content">
+
+        <section class="pd-block">
+          <h2>About this property</h2>
+          <p class="pd-about-text">This beautifully built 2 bedroom detached duplex is located in a serene and secure environment in Lekki Phase 1. It comes with modern fittings, spacious rooms, and all the comfort you need for a luxurious living.</p>
+
+          <div class="pd-quickfacts">
+            <div class="pd-quickfact">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"></path><path d="M3 18h18"></path><path d="M5 10V7a2 2 0 0 1 2-2h3v5"></path></svg>
+              2 Bedrooms
+            </div>
+            <div class="pd-quickfact">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4z"></path><path d="M6 12V6a2 2 0 0 1 4 0"></path><line x1="2" y1="20" x2="22" y2="20"></line></svg>
+              3 Bathrooms
+            </div>
+            <div class="pd-quickfact">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18v-5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5"></path><path d="M4 18h16v2H4z"></path><path d="M4 13V7h16v6"></path></svg>
+              1 Living Room
+            </div>
+            <div class="pd-quickfact">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v18H4z"></path><path d="M4 9h16"></path><path d="M9 3v6"></path></svg>
+              1 Kitchen
+            </div>
+            <div class="pd-quickfact">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 6 5h12l3 6.5"></path><path d="M3 11.5h18v6a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H6v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path><circle cx="7.5" cy="15" r="1"></circle><circle cx="16.5" cy="15" r="1"></circle></svg>
+              2 Parking Spaces
+            </div>
+            <div class="pd-quickfact">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.4 9-8 11-4.6-2-8-6-8-11V5l8-3z"></path></svg>
+              24/7 Security
+            </div>
+            <div class="pd-quickfact">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"></polygon></svg>
+              Constant Power
+            </div>
+            <div class="pd-quickfact">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path></svg>
+              Borehole Water
+            </div>
+            <div class="pd-quickfact">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4" rx="1"></rect><line x1="12" y1="8" x2="12" y2="20"></line></svg>
+              Pop Ceiling
+            </div>
+            <div class="pd-quickfact">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8"></rect><rect x="13" y="3" width="8" height="8"></rect><rect x="3" y="13" width="8" height="8"></rect><rect x="13" y="13" width="8" height="8"></rect></svg>
+              Tiled Floor
+            </div>
+          </div>
+        </section>
+
+        <section class="pd-block pd-description">
+          <h2>Detailed Description</h2>
+          <p>This property is designed with modern architecture and high-quality finishing. All rooms are en-suite with wardrobes. The kitchen is fully fitted with cabinets, cooker, and heat extractor. The compound is spacious with ample parking space and greenery.</p>
+          <p>Ideal for families or individuals looking for comfort, security, and elegance.</p>
+        </section>
+
+        <section class="pd-block">
+          <h2>Amenities &amp; Features</h2>
+          <div class="pd-amenities-grid">
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Fitted Kitchen</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Wardrobes</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>En-suite Rooms</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Guest Toilet</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Air Conditioning</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Water Heater</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Prepaid Meter</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Balcony</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>CCTV Cameras</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Electric Fence</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Gated Compound</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Security House</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Children Play Area</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Green Area</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Kitchen Cabinets</span>
+            <span class="pd-amenity"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Heat Extractor</span>
+          </div>
+        </section>
+
+        <section class="pd-block">
+          <h2>Property Location</h2>
+          <div class="pd-map">
+<div class="pd-map-visual">
+              <iframe
+                data-pd-map-iframe
+                src="https://www.google.com/maps?q=Lekki+Phase+1%2C+Lagos%2C+Nigeria&output=embed"
+                width="100%"
+                height="100%"
+                style="border:0;"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Property location map"
+              ></iframe>
+            </div>
+            <div class="pd-map-footer">
+              <span class="pd-map-address">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+                Lekki Phase 1, Lagos, Nigeria
+              </span>
+              <a href="https://www.google.com/maps/search/?api=1&amp;query=Lekki+Phase+1%2C+Lagos%2C+Nigeria" target="_blank" rel="noopener">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                View on Google Maps
+              </a>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ============ POPULAR SEARCH ============ -->
+    <div class="container pd-block pd-popular">
+      <div class="popular-header">
+        <h2>Popular Search</h2>
+        <a href="#" class="view-all">
+          View all
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+      </div>
+
+      <div class="popular-scroll">
+        <a href="#" class="popular-card">
+          <span class="popular-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"></path><path d="M3 18h18"></path><path d="M5 10V7a2 2 0 0 1 2-2h3v5"></path></svg>
+          </span>
+          <div class="popular-text">
+            <h4>2 Bedroom Duplex</h4>
+            <p>120+ properties</p>
+          </div>
+        </a>
+        <a href="#" class="popular-card">
+          <span class="popular-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4z"></path><path d="M6 12V6a2 2 0 0 1 4 0"></path><line x1="2" y1="20" x2="22" y2="20"></line></svg>
+          </span>
+          <div class="popular-text">
+            <h4>Mini Flat</h4>
+            <p>90+ properties</p>
+          </div>
+        </a>
+        <a href="#" class="popular-card">
+          <span class="popular-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </span>
+          <div class="popular-text">
+            <h4>Self Contained</h4>
+            <p>150+ properties</p>
+          </div>
+        </a>
+        <a href="#" class="popular-card">
+          <span class="popular-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>
+          <div class="popular-text">
+            <h4>Shared Apartment</h4>
+            <p>80+ properties</p>
+          </div>
+        </a>
+        <a href="#" class="popular-card">
+          <span class="popular-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18v-5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5"></path><path d="M4 18h16v2H4z"></path><path d="M4 13V7h16v6"></path></svg>
+          </span>
+          <div class="popular-text">
+            <h4>3 Bedroom Flat</h4>
+            <p>110+ properties</p>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- ============ SUGGESTED AGENTS ============ -->
+    <div class="container pd-block pd-suggested">
+      <div class="popular-header">
+        <h2>Suggested Agents</h2>
+      </div>
+
+      <div class="pd-agents-carousel">
+        <button type="button" class="pd-carousel-nav pd-carousel-prev" data-pd-agents-prev aria-label="Previous agents">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+
+        <div class="pd-agents-track" data-pd-agents-track>
+
+          <article class="pd-agent-tile">
+            <div class="pd-agent-tile-top">
+              <img class="pd-agent-tile-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="David O." />
+              <div>
+                <p class="pd-agent-name">David O. <span class="pd-agent-verified-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span></p>
+                <p class="pd-agent-tile-stats">12 Properties &middot; 24 Deals</p>
+                <p class="pd-agent-tile-rating">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  4.8 <span>(120 reviews)</span>
+                </p>
+              </div>
+            </div>
+            <div class="pd-agent-tile-photos">
+              <span class="pd-agent-tile-photo"><img src="assets/images/home-properties/miniflat1.png" alt="" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" /><span>&#8358;460k</span></span>
+            </div>
+            <a href="#" class="btn btn--ghost btn--sm">View Profile</a>
+          </article>
+
+          <article class="pd-agent-tile">
+            <div class="pd-agent-tile-top">
+              <img class="pd-agent-tile-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="Sarah M." />
+              <div>
+                <p class="pd-agent-name">Sarah M. <span class="pd-agent-verified-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span></p>
+                <p class="pd-agent-tile-stats">15 Properties &middot; 30 Deals</p>
+                <p class="pd-agent-tile-rating">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  4.9 <span>(85 reviews)</span>
+                </p>
+              </div>
+            </div>
+            <div class="pd-agent-tile-photos">
+              <span class="pd-agent-tile-photo"><img src="assets/images/home-properties/miniflat.png" alt="" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" /><span>&#8358;500k</span></span>
+              </div>
+            <a href="#" class="btn btn--ghost btn--sm">View Profile</a>
+          </article>
+
+          <article class="pd-agent-tile">
+            <div class="pd-agent-tile-top">
+              <img class="pd-agent-tile-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="Michael B." />
+              <div>
+                <p class="pd-agent-name">Michael B. <span class="pd-agent-verified-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span></p>
+                <p class="pd-agent-tile-stats">18 Properties &middot; 45 Deals</p>
+                <p class="pd-agent-tile-rating">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  4.7 <span>(95 reviews)</span>
+                </p>
+              </div>
+            </div>
+            <div class="pd-agent-tile-photos">
+              <span class="pd-agent-tile-photo"><img src="assets/images/home-properties/singleroom3.png" alt="" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" /><span>&#8358;600k</span></span>
+            </div>
+            <a href="#" class="btn btn--ghost btn--sm">View Profile</a>
+          </article>
+
+                    <article class="pd-agent-tile">
+            <div class="pd-agent-tile-top">
+              <img class="pd-agent-tile-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="Michael B." />
+              <div>
+                <p class="pd-agent-name">Michael B. <span class="pd-agent-verified-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span></p>
+                <p class="pd-agent-tile-stats">18 Properties &middot; 45 Deals</p>
+                <p class="pd-agent-tile-rating">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  4.7 <span>(95 reviews)</span>
+                </p>
+              </div>
+            </div>
+            <div class="pd-agent-tile-photos">
+              <span class="pd-agent-tile-photo"><img src="assets/images/home-properties/selfcon4.png" alt="" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" /><span>&#8358;600k</span></span>
+            </div>
+            <a href="#" class="btn btn--ghost btn--sm">View Profile</a>
+          </article>
+
+
+                    <article class="pd-agent-tile">
+            <div class="pd-agent-tile-top">
+              <img class="pd-agent-tile-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="Michael B." />
+              <div>
+                <p class="pd-agent-name">Michael B. <span class="pd-agent-verified-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></span></p>
+                <p class="pd-agent-tile-stats">18 Properties &middot; 45 Deals</p>
+                <p class="pd-agent-tile-rating">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
+                  4.7 <span>(95 reviews)</span>
+                </p>
+              </div>
+            </div>
+            <div class="pd-agent-tile-photos">
+              <span class="pd-agent-tile-photo"><img src="assets/images/home-properties/singleroom.png" alt="" onerror="this.onerror=null;this.src='assets/images/home-properties/placeholder.png';" /><span>&#8358;600k</span></span>
+            </div>
+            <a href="#" class="btn btn--ghost btn--sm">View Profile</a>
+          </article>
+
+        </div>
+
+        <button type="button" class="pd-carousel-nav pd-carousel-next" data-pd-agents-next aria-label="Next agents">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- =========================================================
+       FEEDBACK (reused verbatim from home page)
+  ========================================================= -->
+  <section class="feedback-banner">
+    <div class="container">
+      <div class="feedback-inner">
+        <div class="feedback-text">
+          <h2 class="section-title">Help us serve you <span class="text-gold">better</span></h2>
+          <p>We value your feedback. Let us know your experience so we can keep improving.</p>
+        </div>
+
+        <form class="feedback-form" data-feedback-form>
+          <textarea class="feedback-input" placeholder="Share your feedback..." aria-label="Share your feedback" required></textarea>
+          <button type="submit" class="btn btn--primary feedback-submit">
+            Send Feedback
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================= -->
+  <div data-partial="partials/footer.html"></div>
+
+  <!-- =========================================================
+       SCRIPTS
+  ========================================================= -->
+  <!-- Core -->
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+
+  <!-- Modules -->
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+
+  <!-- Animations -->
+  <script src="assets/js/animations/buttons.js"></script>
+  <script src="assets/js/animations/transitions.js"></script>
+
+  <!-- Partials -->
+  <script>Accoom.loadPartials();</script>
+
+  <!-- Main & Page -->
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/property.js"></script>
+
+</body>
+</html>

@@ -233,7 +233,15 @@ price: 120000 + (i % 10) * 85000,
         return Promise.resolve({ items: items, total: list.length });
       }
 
-      return { fetchPage: fetchPage };
+function getById(id) {
+        var found = null;
+        ALL.forEach(function (item) {
+          if (String(item.id) === String(id)) found = item;
+        });
+        return found;
+      }
+
+      return { fetchPage: fetchPage, getById: getById };
     })();
 
     var listingsGrid = document.querySelector('[data-listings-grid]');
@@ -336,7 +344,7 @@ function cardTemplate(item) {
                     '</svg>' +
                   '</button>' +
                   (item.agent.verified
-                    ? '<svg class="listing-agent-verified" width="8" height="8" viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="Verified"><title>Verified</title><path d="M3 17l2-9 5 4 2-6 2 6 5-4 2 9H3z M3 19h18v2H3z"/></svg>'
+                    ? '<svg class="listing-agent-verified" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Verified"><title>Verified</title><polyline points="20 6 9 17 4 12"></polyline></svg>'
                     : '') +
                 '</span>' +
               '</div>' +
@@ -534,7 +542,7 @@ var listingsSortEl = document.querySelector('.listings-sort-dropdown');
           }
         });
 
-        Accoom.on(filterClearBtn, 'click', function () {
+        function resetFilterInputs() {
           Accoom.$$('.filter-checkbox input', filtersPanel).forEach(function (i) {
             i.checked = false;
             i.closest('.filter-checkbox').classList.remove('is-checked');
@@ -545,7 +553,34 @@ var listingsSortEl = document.querySelector('.listings-sort-dropdown');
           priceValues.min = PRICE_MIN;
           priceValues.max = PRICE_MAX;
           renderPriceRange();
-        });
+        }
+
+        Accoom.on(filterClearBtn, 'click', resetFilterInputs);
+
+        // "Clear all" pill in the active-filters bar — resets everything AND re-applies
+        var clearAllBtn = document.querySelector('[data-clear-filters]');
+        if (clearAllBtn) {
+          Accoom.on(clearAllBtn, 'click', function () {
+            resetFilterInputs();
+
+            currentFilters = {
+              priceMin: PRICE_MIN,
+              priceMax: PRICE_MAX,
+              levels: [],
+              beds: [],
+              verifiedOnly: false,
+              onlineOnly: false
+            };
+
+            var countEl = document.querySelector('[data-filter-count]');
+            if (countEl) countEl.textContent = '0';
+
+            var activeFiltersBar = document.querySelector('[data-active-filters]');
+            if (activeFiltersBar) activeFiltersBar.innerHTML = '';
+
+            loadPage(1);
+          });
+        }
       }
 
       listingsPagination.addEventListener('click', function (e) {
@@ -645,6 +680,19 @@ Accoom.$$('.media-dot', mediaEl).forEach(function (d, i) {
         setActiveSlide(mediaEl, (current + 1) % slides.length);
       });
 
+      // Open the property detail page when a card is clicked
+      // (ignore clicks on the save/share buttons and media nav/dots)
+Accoom.delegate(listingsGrid, 'click', '.listing-card', function (e) {
+        if (e.target.closest('button')) return;
+        var id = this.getAttribute('data-listing-id');
+        var item = PropertyService.getById(id);
+        if (item) Accoom.setStorage('accoom-active-listing', item);
+        var nameEl = this.querySelector('.listing-name');
+        var url = 'property.html?id=' + encodeURIComponent(id) +
+          (nameEl ? '&name=' + encodeURIComponent(nameEl.textContent.trim()) : '');
+        window.location.href = url;
+      });
+      
       var resizeTimer;
       window.addEventListener('resize', function () {
         clearTimeout(resizeTimer);
@@ -661,6 +709,25 @@ Accoom.$$('.media-dot', mediaEl).forEach(function (d, i) {
     }
 
 
+
+    // ============================================================
+    // SUGGESTED FOR YOU — horizontal slider (arrows + touch swipe)
+    // ============================================================
+    (function initSuggestedCarousel() {
+      var track = document.querySelector('[data-suggested-track]');
+      var prevBtn = document.querySelector('[data-suggested-prev]');
+      var nextBtn = document.querySelector('[data-suggested-next]');
+      if (!track) return;
+
+      function scrollByCard(direction) {
+        var card = track.querySelector('.suggested-card');
+        var step = card ? card.getBoundingClientRect().width + 20 : 300;
+        track.scrollBy({ left: direction * step, behavior: 'smooth' });
+      }
+
+      if (prevBtn) Accoom.on(prevBtn, 'click', function () { scrollByCard(-1); });
+      if (nextBtn) Accoom.on(nextBtn, 'click', function () { scrollByCard(1); });
+    })();
 
     // ============================================================
     // SHARE MODAL — bounce-in dialog opened by the share icon on each card
@@ -803,6 +870,34 @@ var nameEl = card.querySelector('.listing-name');
         });
       });
     })();
+
+// Favorite toggle on suggested agent cards
+    Accoom.$$('.suggested-favorite').forEach(function (btn) {
+      Accoom.on(btn, 'click', function () {
+        this.classList.toggle('is-active');
+      });
+    });
+
+    // Feedback form
+    var feedbackForm = document.querySelector('[data-feedback-form]');
+    if (feedbackForm) {
+      Accoom.on(feedbackForm, 'submit', function (e) {
+        e.preventDefault();
+        var input = this.querySelector('.feedback-input');
+        if (input && input.value.trim()) {
+          console.log('Feedback:', input.value.trim());
+          input.value = '';
+        }
+      });
+    }
+
+// Footer year (footer is now an async partial, so wait for it)
+    Accoom.on(document, 'partial:loaded', function (e) {
+      if (e.detail.url === 'partials/footer.html') {
+        var yearEl = document.querySelector('[data-current-year]');
+        if (yearEl) yearEl.textContent = new Date().getFullYear();
+      }
+    });
 
     console.log('Home page initialized');
   });
