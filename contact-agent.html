@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Messages — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/contact-agent.css" />
+</head>
+<body>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================= -->
+  <header class="site-header">
+    <div class="container header-inner">
+
+      <button class="hamburger-btn" data-panel-open aria-label="Open menu" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <a href="home.html" class="logo-link">
+        <img src="assets/images/accoom-logo.png" alt="ACCOOM Logo" class="logo-dark" />
+        <img src="assets/images/accoom-white-logo.png" alt="ACCOOM Logo" class="logo-light" />
+      </a>
+
+      <nav class="nav-links" aria-label="Primary">
+        <a href="home.html">Home</a>
+        <a href="#">Browse</a>
+        <a href="#">Agents</a>
+        <a href="#">Deals</a>
+        <a href="#">About Us</a>
+      </nav>
+
+      <div class="header-actions">
+
+        <form class="mobile-search" role="search" action="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
+          </svg>
+          <input type="search" placeholder="Search location or property" aria-label="Search location or property" />
+        </form>
+
+        <a href="#" class="btn btn--primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11.5 12 4l9 7.5"></path>
+            <path d="M5 10v10h14V10"></path>
+          </svg>
+          Find Accommodation
+        </a>
+
+        <div class="dropdown desktop-menu-dropdown">
+          <button type="button" class="desktop-hamburger-btn dropdown-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Open menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
+          <div class="dropdown-panel desktop-menu-panel" data-dropdown-panel>
+
+            <div class="dropdown">
+              <button type="button" class="panel-row dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Account</span>
+                <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Account">
+                <li role="option"><a href="#"><span>Sign in</span></a></li>
+                <li role="option"><a href="#"><span>Sign up</span></a></li>
+              </ul>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <div class="dropdown">
+              <button type="button" class="panel-row location-badge dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
+                  <circle cx="12" cy="10" r="2.5"></circle>
+                </svg>
+                <span>Lagos</span>
+                <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Country">
+                <li role="option">
+                  <a href="#">
+                    <span>Nigeria</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <label class="panel-toggle-row">
+              <span class="left">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+                </svg>
+                Dark Mode
+              </span>
+              <span class="switch">
+                <input type="checkbox" data-dark-toggle />
+                <span class="track"></span>
+                <span class="thumb"></span>
+              </span>
+            </label>
+
+            <div class="panel-help">
+              <div class="panel-help-top">
+                <div class="panel-help-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1v-7h3"></path>
+                    <path d="M3 17v-5h3v7H5a2 2 0 0 1-2-2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h4>Need help finding the right place?</h4>
+                  <p>Chat directly with verified agents near you.</p>
+                </div>
+              </div>
+              <a href="contact-agent.html" class="panel-help-link">
+                Chat with an Agent
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       MOBILE SIDE PANEL
+  ========================================================= -->
+  <div class="panel-overlay" data-panel-overlay></div>
+
+  <aside class="side-panel" data-panel aria-label="Mobile menu">
+
+    <div class="panel-fixed-top">
+      <button class="panel-close" data-panel-close aria-label="Close menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="panel-brand">
+        <p>Find Accommodation. Connect. Secure. <span class="accent">Move in.</span></p>
+      </div>
+    </div>
+
+    <div class="panel-scroll">
+
+      <nav class="panel-nav" aria-label="Mobile primary">
+        <a href="home.html">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11.5 12 4l9 7.5"></path>
+            <path d="M5 10v10h14V10"></path>
+          </svg>
+          Home
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
+          </svg>
+          Browse
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"></path>
+          </svg>
+          Agents
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.6 12.6 12.7 20.5a2 2 0 0 1-2.8 0L3 13.6V4h9.6l8 8.6z"></path>
+            <circle cx="7.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"></circle>
+          </svg>
+          Deals
+        </a>
+        <a href="#">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <line x1="12" y1="11" x2="12" y2="16"></line>
+            <circle cx="12" cy="7.7" r="0.9" fill="currentColor" stroke="none"></circle>
+          </svg>
+          About Us
+        </a>
+      </nav>
+
+      <div class="panel-divider"></div>
+
+      <div class="dropdown panel-location-dropdown">
+        <button type="button" class="panel-row location-badge dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
+            <circle cx="12" cy="10" r="2.5"></circle>
+          </svg>
+          <span>Lagos</span>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Country">
+          <li role="option">
+            <a href="#">
+              <span>Nigeria</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <a href="#" class="panel-row">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>Sign in</span>
+      </a>
+
+      <div class="panel-divider"></div>
+
+      <a href="#" class="btn btn--primary panel-cta">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11.5 12 4l9 7.5"></path>
+          <path d="M5 10v10h14V10"></path>
+        </svg>
+        Find Accommodation
+      </a>
+
+      <div class="panel-help">
+        <div class="panel-help-top">
+          <div class="panel-help-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1v-7h3"></path>
+              <path d="M3 17v-5h3v7H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+          </div>
+          <div>
+            <h4>Need help finding the right place?</h4>
+            <p>Chat directly with verified agents near you.</p>
+          </div>
+        </div>
+        <a href="contact-agent.html" class="panel-help-link">
+          Chat with an Agent
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+
+      <label class="panel-toggle-row">
+        <span class="left">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+          </svg>
+          Dark Mode
+        </span>
+        <span class="switch">
+          <input type="checkbox" data-dark-toggle />
+          <span class="track"></span>
+          <span class="thumb"></span>
+        </span>
+      </label>
+
+    </div>
+  </aside>
+
+  <!-- =========================================================
+       MESSAGES / CHAT
+  ========================================================= -->
+  <main class="msgs-page">
+
+    <div class="container msgs-breadcrumb-wrap">
+      <nav class="msgs-breadcrumb" aria-label="Breadcrumb">
+        <a href="home.html">Home</a>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <span>Messages</span>
+      </nav>
+    </div>
+
+    <div class="container msgs-shell">
+      <div class="msgs-layout" data-msgs-layout>
+
+        <!-- ==================== LIST PANEL ==================== -->
+        <aside class="msgs-list-panel" data-msgs-list-panel>
+
+          <div class="msgs-list-header">
+            <h1>Messages</h1>
+
+            <div class="dropdown msgs-menu">
+              <button type="button" class="msgs-icon-btn dropdown-trigger" data-msgs-list-menu-trigger aria-haspopup="true" aria-expanded="false" aria-label="List options">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>
+              </button>
+              <ul class="dropdown-panel msgs-menu-panel" data-dropdown-panel>
+                <li role="option" data-msgs-select-all>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Select All</span>
+                </li>
+                <li role="option" data-msgs-deselect-all>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  <span>Deselect All</span>
+                </li>
+                <li role="option" class="msgs-menu-danger" data-msgs-delete-all>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                  <span>Delete All</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="msgs-selection-bar is-hidden" data-msgs-selection-bar>
+            <span data-msgs-selection-count>0 selected</span>
+            <div class="msgs-selection-actions">
+              <button type="button" class="msgs-icon-btn msgs-icon-btn--danger" data-msgs-delete-selected aria-label="Delete selected">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+              <button type="button" class="msgs-text-btn" data-msgs-cancel-selection>Cancel</button>
+            </div>
+          </div>
+
+          <div class="msgs-search input-search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.6" y2="16.6"></line></svg>
+            <input type="search" placeholder="Search conversations..." data-msgs-search />
+          </div>
+
+          <div class="msgs-tabs" role="tablist" aria-label="Filter conversations">
+            <button type="button" class="msgs-tab is-active" data-msgs-tab="all" role="tab" aria-selected="true">All</button>
+            <button type="button" class="msgs-tab" data-msgs-tab="unread" role="tab" aria-selected="false">Unread</button>
+            <button type="button" class="msgs-tab" data-msgs-tab="agents" role="tab" aria-selected="false">Agents</button>
+          </div>
+
+          <ul class="msgs-list" data-msgs-list></ul>
+
+          <div class="msgs-empty is-hidden" data-msgs-list-empty>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <p data-msgs-list-empty-title>No messages yet</p>
+            <span data-msgs-list-empty-text>Conversations with agents will show up here.</span>
+          </div>
+        </aside>
+
+        <!-- ==================== CHAT PANEL ==================== -->
+        <section class="msgs-chat-panel" data-msgs-chat-panel>
+
+          <div class="msgs-chat-empty" data-msgs-chat-empty>
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <h3 data-msgs-chat-empty-title>Select a conversation</h3>
+            <p data-msgs-chat-empty-text>Choose a chat on the left to start messaging an agent.</p>
+          </div>
+
+          <div class="msgs-chat is-hidden" data-msgs-chat>
+
+            <div class="msgs-chat-header">
+              <button type="button" class="msgs-back-btn" data-msgs-back aria-label="Back to messages">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+
+              <img class="msgs-chat-avatar" data-msgs-chat-avatar src="" alt="" />
+
+              <div class="msgs-chat-who">
+                <p class="msgs-chat-name" data-msgs-chat-name></p>
+                <p class="msgs-chat-status" data-msgs-chat-status></p>
+              </div>
+
+              <a href="agent-profile.html" class="btn btn--ghost btn--sm msgs-view-profile" data-msgs-view-profile>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                View Profile
+              </a>
+
+              <div class="dropdown msgs-menu">
+                <button type="button" class="msgs-icon-btn dropdown-trigger" data-msgs-chat-menu-trigger aria-haspopup="true" aria-expanded="false" aria-label="Chat options">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>
+                </button>
+                <ul class="dropdown-panel msgs-menu-panel" data-dropdown-panel>
+                  <li role="option" data-msgs-clear-chat>Clear Chat</li>
+                  <li role="option" data-msgs-mute-chat>Mute Notifications</li>
+                  <li role="option" class="msgs-menu-danger" data-msgs-block>Block Agent</li>
+                </ul>
+              </div>
+            </div>
+
+            <a href="property.html" class="msgs-property-card" data-msgs-property-card>
+              <img data-msgs-property-img src="" alt="" />
+              <div class="msgs-property-info">
+                <p class="msgs-property-name" data-msgs-property-name></p>
+                <p class="msgs-property-loc" data-msgs-property-loc>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+                  <span data-msgs-property-loc-text></span>
+                </p>
+                <p class="msgs-property-price" data-msgs-property-price></p>
+              </div>
+            </a>
+
+            <div class="msgs-chat-tabs" role="tablist" aria-label="Chat sections">
+              <button type="button" class="msgs-chat-tab is-active" data-msgs-chat-tab="messages" role="tab" aria-selected="true">Messages</button>
+              <button type="button" class="msgs-chat-tab" data-msgs-chat-tab="saved" role="tab" aria-selected="false">Saved</button>
+            </div>
+
+            <div class="msgs-thread-wrap">
+              <div class="msgs-thread" data-msgs-thread></div>
+              <div class="msgs-thread" data-msgs-saved-thread hidden></div>
+
+              <div class="msgs-empty msgs-thread-empty is-hidden" data-msgs-thread-empty>
+                <p>No messages in this conversation</p>
+                <span>Start the conversation below.</span>
+              </div>
+              <div class="msgs-empty msgs-thread-empty is-hidden" data-msgs-saved-empty>
+                <p>No saved messages</p>
+                <span>Messages you save will appear here.</span>
+              </div>
+            </div>
+
+            <div class="msgs-reply-preview is-hidden" data-msgs-reply-preview>
+              <div class="msgs-reply-preview-bar"></div>
+              <div class="msgs-reply-preview-body">
+                <p class="msgs-reply-preview-name" data-msgs-reply-preview-name></p>
+                <p class="msgs-reply-preview-text" data-msgs-reply-preview-text></p>
+              </div>
+              <button type="button" class="msgs-reply-cancel" data-msgs-reply-cancel aria-label="Cancel reply">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+
+            <form class="msgs-composer" data-msgs-composer>
+              <button type="button" class="msgs-icon-btn" data-msgs-attach aria-label="Attach file">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 11.1 12.3 20a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10 18a2 2 0 0 1-3-3l7.4-7.4"></path></svg>
+              </button>
+              <input type="text" placeholder="Type a message..." data-msgs-input autocomplete="off" />
+              <button type="submit" class="msgs-send-btn" aria-label="Send message" data-msgs-send>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20l18-8L3 4v6l12 2-12 2z"></path></svg>
+              </button>
+            </form>
+
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       SCRIPTS
+  ========================================================= -->
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+
+  <script src="assets/js/animations/buttons.js"></script>
+  <script src="assets/js/animations/transitions.js"></script>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/contact-agent.js"></script>
+
+</body>
+</html>
