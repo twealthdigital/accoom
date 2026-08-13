@@ -1129,10 +1129,11 @@
 
   .msgs-layout {
     grid-template-columns: 1fr;
-    border-radius: 0;
+    border-radius: 0 0 22px 22px;
     border-left: none;
     border-right: none;
     height: calc(100dvh - var(--header-h-mobile));
+    overflow: hidden;
   }
 
   .msgs-list-panel { border-right: none; }
@@ -1176,7 +1177,7 @@
   /* Tabs row: let it scroll horizontally instead of wrapping/squashing
      the pills on narrow screens. */
   .msgs-shell {
-    padding-inline: 10px;
+    padding-inline: 0;
   }
 
   .msgs-list-header {
