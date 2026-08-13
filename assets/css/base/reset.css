@@ -35,6 +35,15 @@ svg {
   max-width: 100%;
 }
 
+/* WebKit/iOS flexbox bug: flex items default to a shrinkable min-width/
+   min-height, so SVG icons get squashed to near-invisible in tight flex
+   rows on iPhone Safari — even though the same markup renders fine on
+   Chrome/Android. Lock icon SVGs to their intrinsic size everywhere. */
+svg {
+  flex-shrink: 0;
+  min-width: 0;
+}
+
 h1,
 h2,
 h3,
