@@ -1318,8 +1318,13 @@
     if (els.input) {
       Accoom.on(els.input, 'input', autoGrowInput);
 
+      var isTouchDevice = (('ontouchstart' in window) || navigator.maxTouchPoints > 0);
+
       Accoom.on(els.input, 'keydown', function (e) {
-        // Plain Enter sends; Shift+Enter makes a new line
+        // Desktop: plain Enter sends, Shift+Enter makes a new line.
+        // Touch devices (mobile/tablet): Enter always makes a new line; use the send button.
+        if (isTouchDevice) return;
+
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
           if (els.composer && els.composer.requestSubmit) {
