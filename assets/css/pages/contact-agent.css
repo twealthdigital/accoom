@@ -215,6 +215,10 @@
 
 .msgs-list-item:hover { background: var(--surface-page); }
 
+@media (hover: none) and (pointer: coarse) {
+  .msgs-list-item:active { background: var(--surface-page); }
+}
+
 .msgs-list-item.is-active {
   background: var(--gold-soft);
 }
