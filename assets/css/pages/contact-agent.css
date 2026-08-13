@@ -983,6 +983,12 @@
 .msgs-row--me.is-dragging .msgs-drag-reply-hint { opacity: 1; }
 .msgs-row--agent.is-reply-ready .msgs-drag-reply-hint { opacity: 1; }
 
+@media (max-width: 860px) {
+  .msgs-row--agent .msgs-drag-reply-hint {
+    right: calc(100% + 4px + 26px + 8px);
+  }
+}
+
 /* ---- reply preview above composer ---- */
 .msgs-reply-preview {
   display: flex;
