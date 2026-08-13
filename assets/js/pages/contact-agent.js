@@ -724,9 +724,24 @@
       els.chatEmptyText.textContent = 'Chats you saved will appear here.';
     }
 
+    var MOBILE_QUERY = '(max-width: 860px)';
+
+    function isMobileView() {
+      return window.matchMedia && window.matchMedia(MOBILE_QUERY).matches;
+    }
+
     function openConversation(id) {
       var conv = findConv(id);
       if (!conv) return;
+
+      // On mobile, opening a chat is a "navigation" into a sub-view.
+      // Push a history entry so the phone's back button returns to the
+      // list instead of leaving the page, but only when we're actually
+      // coming from the list (avoid stacking entries when switching
+      // between chats while already inside the chat view).
+      if (isMobileView() && layout.getAttribute('data-view') !== 'chat') {
+        history.pushState({ msgsView: 'chat' }, '', location.href);
+      }
 
       applyBlockedState(conv);
 
@@ -1349,9 +1364,21 @@
     /* ---------------- MOBILE BACK ---------------- */
     if (els.backBtn) {
       Accoom.on(els.backBtn, 'click', function () {
-        layout.setAttribute('data-view', 'list');
+        // Go through history.back() so it stays in sync with the
+        // phone's own back gesture/button (handled by popstate below).
+        if (isMobileView() && history.state && history.state.msgsView === 'chat') {
+          history.back();
+        } else {
+          layout.setAttribute('data-view', 'list');
+        }
       });
     }
+
+    Accoom.on(window, 'popstate', function () {
+      if (isMobileView() && layout.getAttribute('data-view') === 'chat') {
+        layout.setAttribute('data-view', 'list');
+      }
+    });
 
     /* ---------------- CHAT MENU (clear / mute / block) ---------------- */
     /* ---------------- CHAT MENU (mute / block) ---------------- */
