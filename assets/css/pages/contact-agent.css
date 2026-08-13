@@ -349,6 +349,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  min-width: 0;
   background: var(--surface-page);
 }
 
@@ -435,7 +436,7 @@
   flex-shrink: 0;
 }
 
-.msgs-property-info { min-width: 0; flex: 1; }
+.msgs-property-info { min-width: 0; flex: 1 1 auto; overflow: hidden; }
 .msgs-property-name {
   font-size: 0.9rem;
   font-weight: 700;
@@ -452,6 +453,14 @@
   font-size: 0.78rem;
   color: var(--on-page-soft);
   margin-top: 2px;
+  min-width: 0;
+}
+
+.msgs-property-loc span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .msgs-property-loc svg { color: var(--gold); flex-shrink: 0; }
@@ -461,12 +470,16 @@
   font-weight: 700;
   color: var(--gold);
   margin-top: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .msgs-property-extra-actions {
   display: flex;
   gap: 8px;
   flex-shrink: 0;
+  flex-wrap: nowrap;
   margin-left: auto;
 }
 
@@ -703,7 +716,12 @@
   border-radius: 16px;
   font-size: 0.9rem;
   line-height: 1.42;
+  white-space: pre-wrap;
   word-wrap: break-word;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
+  max-width: 100%;
   transition: transform var(--dur-fast) var(--ease);
 }
 
@@ -1048,7 +1066,8 @@
 
 .msgs-reply-preview + .msgs-composer { border-top: none; }
 
-.msgs-composer input {
+.msgs-composer input,
+.msgs-composer textarea {
   flex: 1;
   min-width: 0;
   background: var(--surface-page-alt);
@@ -1060,13 +1079,15 @@
   transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
 }
 
-.msgs-composer input:focus {
+.msgs-composer input:focus,
+.msgs-composer textarea:focus {
   outline: none;
   border-color: var(--gold);
   box-shadow: 0 0 0 3px var(--gold-soft);
 }
 
-.msgs-composer input::placeholder { color: var(--on-page-soft); }
+.msgs-composer input::placeholder,
+.msgs-composer textarea::placeholder { color: var(--on-page-soft); }
 
 .msgs-send-btn {
   display: flex;
@@ -1301,7 +1322,7 @@
 }
 
 @media (min-width: 861px) {
-  .msgs-layout { grid-template-columns: 340px 1fr; }
+  .msgs-layout { grid-template-columns: 340px minmax(0, 1fr); }
 }
 
 /* Tablet: no native search clear icon at all */
@@ -1310,6 +1331,31 @@
   .msgs-search input::-webkit-search-decoration {
     -webkit-appearance: none;
     appearance: none;
+  }
+
+  .msgs-property-pay-btn,
+  .msgs-property-review-btn {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    gap: 0;
+  }
+
+  .msgs-property-pay-btn span,
+  .msgs-property-review-btn span {
+    display: none;
+  }
+
+  .msgs-property-name {
+    max-width: 140px;
+  }
+
+  .msgs-chat-tabs-row {
+    gap: 8px;
+  }
+
+  .msgs-offer-btn span {
+    display: none;
   }
 }
 
@@ -1407,6 +1453,12 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
   font-size: inherit;
   padding-top: 10px;
   padding-bottom: 10px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* old Edge/IE */
+}
+
+.msgs-composer textarea[data-msgs-input]::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge (Chromium), and mobile WebKit */
 }
 
 .msgs-attach-menu {

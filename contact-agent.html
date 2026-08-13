@@ -327,10 +327,6 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>
               </button>
               <ul class="dropdown-panel msgs-menu-panel" data-dropdown-panel>
-                <li role="option" class="msgs-menu-danger" data-msgs-delete-all>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                  <span>Delete All</span>
-                </li>
                 <li role="option" data-msgs-mark-read>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l5 5L22 4"></path><path d="M2 15l5 5L14 13"></path></svg>
                   <span>Mark as Read</span>
@@ -410,7 +406,6 @@
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>
                 </button>
                 <ul class="dropdown-panel msgs-menu-panel" data-dropdown-panel>
-                  <li role="option" data-msgs-clear-chat>Clear Chat</li>
                   <li role="option" data-msgs-mute-chat>Mute Notifications</li>
                   <li role="option" class="msgs-menu-danger" data-msgs-block><span>Block Agent</span></li>
                 </ul>
@@ -498,7 +493,7 @@
               </div>
               <div class="msgs-empty msgs-thread-empty is-hidden" data-msgs-saved-empty>
                 <p>No saved messages</p>
-                <span>Messages you save will appear here.</span>
+                <span>Messages you saved will appear here.</span>
               </div>
             </div>
 
@@ -530,7 +525,7 @@
                 </button>
               </div>
 
-              <input type="text" placeholder="Type a message..." data-msgs-input autocomplete="off" />
+              <textarea placeholder="Type a message..." data-msgs-input autocomplete="off" rows="1"></textarea>
               <button type="submit" class="msgs-send-btn" aria-label="Send message" data-msgs-send>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20l18-8L3 4v6l12 2-12 2z"></path></svg>
               </button>

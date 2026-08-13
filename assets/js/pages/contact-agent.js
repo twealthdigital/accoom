@@ -606,20 +606,6 @@
       renderList();
     });
 
-    Accoom.on(Accoom.$('[data-msgs-delete-all]'), 'click', function () {
-      if (state.listTab === 'saved') {
-        state.savedConversations = [];
-      } else {
-        state.conversations = [];
-      }
-      state.selectMode = false;
-      state.selected = {};
-      state.activeId = null;
-      showChatEmpty(true);
-      renderList();
-      updateSelectionBar();
-    });
-
     Accoom.on(Accoom.$('[data-msgs-mark-read]'), 'click', function () {
       state.conversations.forEach(function (c) { c.unread = 0; });
       renderList();
@@ -735,7 +721,7 @@
       }
 
       els.chatEmptyTitle.textContent = 'No saved Chats';
-      els.chatEmptyText.textContent = 'Chats you save will appear here.';
+      els.chatEmptyText.textContent = 'Chats you saved will appear here.';
     }
 
     function openConversation(id) {
@@ -1305,17 +1291,35 @@
       if (e.key === 'ArrowRight' && els.lightboxNext) els.lightboxNext.click();
     });
 
-    /* ---------------- COMPOSER TEXTAREA (auto-grow + Enter to send) ---------------- */
+    /* ---------------- COMPOSER TEXTAREA (auto-grow once + Enter for newline) ---------------- */
+    var INPUT_EXPANDED_HEIGHT = 64; // grows to this once a 2nd line appears, then just scrolls
+    var inputSingleLineHeight = null;
+
+    function getSingleLineHeight() {
+      if (inputSingleLineHeight || !els.input) return inputSingleLineHeight;
+      var prevValue = els.input.value;
+      var prevHeight = els.input.style.height;
+      els.input.value = 'x';
+      els.input.style.height = 'auto';
+      inputSingleLineHeight = els.input.scrollHeight;
+      els.input.value = prevValue;
+      els.input.style.height = prevHeight;
+      return inputSingleLineHeight;
+    }
+
     function autoGrowInput() {
       if (!els.input) return;
+      var base = getSingleLineHeight() || 40;
       els.input.style.height = 'auto';
-      els.input.style.height = Math.min(els.input.scrollHeight, 120) + 'px';
+      var needsExpand = els.input.scrollHeight > base + 2; // +2px rounding tolerance
+      els.input.style.height = (needsExpand ? INPUT_EXPANDED_HEIGHT : base) + 'px';
     }
 
     if (els.input) {
       Accoom.on(els.input, 'input', autoGrowInput);
 
       Accoom.on(els.input, 'keydown', function (e) {
+        // Plain Enter sends; Shift+Enter makes a new line
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
           if (els.composer && els.composer.requestSubmit) {
@@ -1345,20 +1349,9 @@
     }
 
     /* ---------------- CHAT MENU (clear / mute / block) ---------------- */
-    var clearChatBtn = Accoom.$('[data-msgs-clear-chat]');
+    /* ---------------- CHAT MENU (mute / block) ---------------- */
     var muteChatBtn = Accoom.$('[data-msgs-mute-chat]');
     var blockBtn = Accoom.$('[data-msgs-block]');
-
-    if (clearChatBtn) {
-      Accoom.on(clearChatBtn, 'click', function () {
-        var conv = findConv(state.activeId);
-        if (!conv) return;
-        conv.messages = [];
-        renderThread(conv);
-        renderSavedThread(conv);
-        renderList();
-      });
-    }
 
     if (muteChatBtn) {
       Accoom.on(muteChatBtn, 'click', function () {
