@@ -327,17 +327,21 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>
               </button>
               <ul class="dropdown-panel msgs-menu-panel" data-dropdown-panel>
-                <li role="option" data-msgs-select-all>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Select All</span>
-                </li>
-                <li role="option" data-msgs-deselect-all>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                  <span>Deselect All</span>
-                </li>
                 <li role="option" class="msgs-menu-danger" data-msgs-delete-all>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                   <span>Delete All</span>
+                </li>
+                <li role="option" data-msgs-mark-read>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l5 5L22 4"></path><path d="M2 15l5 5L14 13"></path></svg>
+                  <span>Mark as Read</span>
+                </li>
+                <li role="option" data-msgs-mark-unread>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle></svg>
+                  <span>Mark as Unread</span>
+                </li>
+                <li role="option" data-msgs-move-saved>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                  <span>Move to Saved</span>
                 </li>
               </ul>
             </div>
@@ -361,7 +365,7 @@
           <div class="msgs-tabs" role="tablist" aria-label="Filter conversations">
             <button type="button" class="msgs-tab is-active" data-msgs-tab="all" role="tab" aria-selected="true">All</button>
             <button type="button" class="msgs-tab" data-msgs-tab="unread" role="tab" aria-selected="false">Unread</button>
-            <button type="button" class="msgs-tab" data-msgs-tab="agents" role="tab" aria-selected="false">Agents</button>
+            <button type="button" class="msgs-tab" data-msgs-tab="saved" role="tab" aria-selected="false">Saved</button>
           </div>
 
           <ul class="msgs-list" data-msgs-list></ul>
@@ -398,7 +402,7 @@
 
               <a href="agent-profile.html" class="btn btn--ghost btn--sm msgs-view-profile" data-msgs-view-profile>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                View Profile
+                <span class="msgs-view-profile-label">View Profile</span>
               </a>
 
               <div class="dropdown msgs-menu">
@@ -408,26 +412,80 @@
                 <ul class="dropdown-panel msgs-menu-panel" data-dropdown-panel>
                   <li role="option" data-msgs-clear-chat>Clear Chat</li>
                   <li role="option" data-msgs-mute-chat>Mute Notifications</li>
-                  <li role="option" class="msgs-menu-danger" data-msgs-block>Block Agent</li>
+                  <li role="option" class="msgs-menu-danger" data-msgs-block><span>Block Agent</span></li>
                 </ul>
               </div>
             </div>
 
-            <a href="property.html" class="msgs-property-card" data-msgs-property-card>
-              <img data-msgs-property-img src="" alt="" />
-              <div class="msgs-property-info">
+            <div class="msgs-msg-selection-bar is-hidden" data-msgs-msg-selection-bar>
+              <button type="button" class="msgs-icon-btn" data-msgs-msg-selection-cancel aria-label="Cancel selection">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+              <span data-msgs-msg-selection-count>1 selected</span>
+            </div>
+
+            <div class="msgs-property-card" data-msgs-property-card>
+              <a href="property.html" class="msgs-property-thumb" data-msgs-property-link>
+                <img data-msgs-property-img src="" alt="" />
+              </a>
+              <a href="property.html" class="msgs-property-info" data-msgs-property-link>
                 <p class="msgs-property-name" data-msgs-property-name></p>
                 <p class="msgs-property-loc" data-msgs-property-loc>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
                   <span data-msgs-property-loc-text></span>
                 </p>
                 <p class="msgs-property-price" data-msgs-property-price></p>
-              </div>
-            </a>
+              </a>
 
-            <div class="msgs-chat-tabs" role="tablist" aria-label="Chat sections">
-              <button type="button" class="msgs-chat-tab is-active" data-msgs-chat-tab="messages" role="tab" aria-selected="true">Messages</button>
-              <button type="button" class="msgs-chat-tab" data-msgs-chat-tab="saved" role="tab" aria-selected="false">Saved</button>
+              <div class="msgs-property-extra-actions">
+                <button type="button" class="msgs-property-pay-btn" data-msgs-property-pay-btn>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                  <span>Make Payment</span>
+                </button>
+                <button type="button" class="msgs-property-review-btn" data-msgs-property-review-btn>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+                  <span>Request a Review</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="msgs-chat-tabs-row">
+              <div class="msgs-chat-tabs" role="tablist" aria-label="Chat sections">
+                <button type="button" class="msgs-chat-tab is-active" data-msgs-chat-tab="messages" role="tab" aria-selected="true">Messages</button>
+                <button type="button" class="msgs-chat-tab" data-msgs-chat-tab="saved" role="tab" aria-selected="false">Saved</button>
+              </div>
+
+              <div class="dropdown msgs-menu msgs-offer-menu" data-msgs-offer-menu>
+                <button type="button" class="msgs-offer-btn dropdown-trigger" aria-haspopup="true" aria-expanded="false">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 12.7 12.7 20.6a2 2 0 0 1-2.8 0l-8-8a2 2 0 0 1-.6-1.4V4a2 2 0 0 1 2-2h7.3c.5 0 1 .2 1.4.6l8 8a2 2 0 0 1 0 2.8Z"></path><circle cx="7" cy="7" r="1"></circle></svg>
+                  <span>Offer</span>
+                  <svg class="msgs-offer-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+
+                <div class="dropdown-panel msgs-offer-panel" data-dropdown-panel>
+                  <button type="button" class="msgs-offer-item" data-msgs-offer-make>
+                    <span class="msgs-offer-item-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 12.7 12.7 20.6a2 2 0 0 1-2.8 0l-8-8a2 2 0 0 1-.6-1.4V4a2 2 0 0 1 2-2h7.3c.5 0 1 .2 1.4.6l8 8a2 2 0 0 1 0 2.8Z"></path><circle cx="7" cy="7" r="1"></circle></svg></span>
+                    <span class="msgs-offer-item-text">
+                      <strong>Make an Offer</strong>
+                      <em>Propose your price for this property</em>
+                    </span>
+                  </button>
+                  <button type="button" class="msgs-offer-item" data-msgs-offer-history>
+                    <span class="msgs-offer-item-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 14"></polyline></svg></span>
+                    <span class="msgs-offer-item-text">
+                      <strong>View Offer History</strong>
+                      <em>See your previous offers</em>
+                    </span>
+                  </button>
+                  <button type="button" class="msgs-offer-item" data-msgs-offer-learn>
+                    <span class="msgs-offer-item-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>
+                    <span class="msgs-offer-item-text">
+                      <strong>Learn about Offers</strong>
+                      <em>How offers work on Accoom</em>
+                    </span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div class="msgs-thread-wrap">
@@ -455,15 +513,36 @@
               </button>
             </div>
 
+
+            <div class="msgs-lightbox is-hidden" data-msgs-lightbox>
+              <button type="button" class="msgs-lightbox-close" data-msgs-lightbox-close aria-label="Close preview">&times;</button>
+              <button type="button" class="msgs-lightbox-nav msgs-lightbox-prev" data-msgs-lightbox-prev aria-label="Previous image">&#8249;</button>
+              <div class="msgs-lightbox-stage" data-msgs-lightbox-stage></div>
+              <button type="button" class="msgs-lightbox-nav msgs-lightbox-next" data-msgs-lightbox-next aria-label="Next image">&#8250;</button>
+              <div class="msgs-lightbox-counter" data-msgs-lightbox-counter></div>
+            </div>
+
             <form class="msgs-composer" data-msgs-composer>
-              <button type="button" class="msgs-icon-btn" data-msgs-attach aria-label="Attach file">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 11.1 12.3 20a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10 18a2 2 0 0 1-3-3l7.4-7.4"></path></svg>
-              </button>
+              <div class="msgs-pay-menu" data-msgs-pay-menu>
+                <button type="button" class="msgs-pay-btn" data-msgs-pay-btn aria-label="Make Payment">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                  <span>Pay <span class="msgs-pay-btn-extra"> Now</span></span>
+                </button>
+              </div>
+
               <input type="text" placeholder="Type a message..." data-msgs-input autocomplete="off" />
               <button type="submit" class="msgs-send-btn" aria-label="Send message" data-msgs-send>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20l18-8L3 4v6l12 2-12 2z"></path></svg>
               </button>
             </form>
+
+            <div class="msgs-blocked-bar is-hidden" data-msgs-blocked-bar>
+              <p>You've blocked this agent. You can't send messages until you unblock.</p>
+              <div class="msgs-blocked-actions">
+                <button type="button" class="msgs-blocked-btn msgs-blocked-btn--unblock" data-msgs-unblock>Unblock</button>
+                <button type="button" class="msgs-blocked-btn msgs-blocked-btn--delete" data-msgs-delete-chat>Delete</button>
+              </div>
+            </div>
 
           </div>
         </section>

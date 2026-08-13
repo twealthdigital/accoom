@@ -74,9 +74,16 @@
   color: var(--gold);
 }
 
-.msgs-menu .dropdown-panel { min-width: 190px; right: 0; left: auto; }
+.msgs-menu .dropdown-panel { min-width: 200px; right: 0; left: auto; }
 .msgs-menu-danger { color: #e0455f !important; }
 .msgs-menu-danger:hover { background: rgba(224, 69, 95, 0.12) !important; color: #e0455f !important; }
+
+.msgs-menu-panel li {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px;
+}
 
 /* ============================================================
    EMPTY STATES
@@ -133,7 +140,14 @@
 
 .msgs-selection-actions { display: flex; align-items: center; gap: 4px; }
 
-.msgs-search { margin: 0 16px 12px; flex-shrink: 0; }
+.msgs-search {
+  margin: 0 16px 12px;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(0, 0, 0, 0.14);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+.msgs-search input { border: none; box-shadow: none; }
 
 .msgs-tabs {
   display: flex;
@@ -263,6 +277,8 @@
 }
 
 .msgs-list-item-name {
+  flex: 1;
+  min-width: 0;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--on-page);
@@ -286,6 +302,8 @@
 }
 
 .msgs-list-item-preview {
+  flex: 1;
+  min-width: 0;
   font-size: 0.82rem;
   color: var(--on-page-soft);
   overflow: hidden;
@@ -395,9 +413,9 @@
 .msgs-property-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 12px 18px 0;
-  padding: 10px;
+  gap: 10px;
+  margin: 8px 18px 0;
+  padding: 7px 8px;
   border-radius: 12px;
   background: var(--surface-page-alt);
   border: 1px solid var(--line-page);
@@ -407,15 +425,17 @@
 
 .msgs-property-card:hover { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08); }
 
+.msgs-property-thumb { flex-shrink: 0; }
+
 .msgs-property-card img {
-  width: 58px;
-  height: 58px;
+  width: 44px;
+  height: 44px;
   border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
 }
 
-.msgs-property-info { min-width: 0; }
+.msgs-property-info { min-width: 0; flex: 1; }
 .msgs-property-name {
   font-size: 0.9rem;
   font-weight: 700;
@@ -443,13 +463,54 @@
   margin-top: 3px;
 }
 
-/* ---- chat tabs (Messages / Saved) ---- */
-.msgs-chat-tabs {
+.msgs-property-extra-actions {
   display: flex;
-  gap: 22px;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.msgs-property-pay-btn,
+.msgs-property-review-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  white-space: nowrap;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: filter var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+
+.msgs-property-pay-btn {
+  background: var(--gold);
+  color: var(--navy-2);
+}
+.msgs-property-pay-btn:hover { filter: brightness(1.1); transform: scale(1.02); }
+
+.msgs-property-review-btn {
+  background: rgba(224, 69, 95, 0.12);
+  color: #e0455f;
+  border: 1px solid rgba(224, 69, 95, 0.35);
+}
+.msgs-property-review-btn:hover { background: rgba(224, 69, 95, 0.2); }
+
+/* ---- chat tabs row (Messages / Saved + Offer) ---- */
+.msgs-chat-tabs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 14px 18px 0;
   border-bottom: 1px solid var(--line-page);
   flex-shrink: 0;
+}
+
+.msgs-chat-tabs {
+  display: flex;
+  gap: 22px;
 }
 
 .msgs-chat-tab {
@@ -473,6 +534,76 @@
 
 .msgs-chat-tab.is-active { color: var(--gold); }
 .msgs-chat-tab.is-active::after { transform: scaleX(1); }
+
+/* ---- Offer hover menu ---- */
+/* ---- Offer menu (click to open, uses shared .dropdown/.dropdown-panel toggle) ---- */
+.msgs-offer-menu {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.msgs-offer-btn {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--gold);
+  color: var(--navy-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: filter var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.msgs-offer-btn:hover { filter: brightness(1.1); transform: scale(1.02); }
+.msgs-offer-btn svg { flex-shrink: 0; }
+
+.msgs-offer-chevron { transition: transform var(--dur-fast) var(--ease); }
+.msgs-offer-menu .dropdown-trigger[aria-expanded="true"] .msgs-offer-chevron { transform: rotate(180deg); }
+
+.msgs-offer-menu .dropdown-panel {
+  position: absolute !important;
+  top: calc(100% + 8px) !important;
+  bottom: auto !important;
+  right: 0 !important;
+  left: auto !important;
+  transform: none !important;
+  width: 240px;
+  padding: 6px;
+  z-index: 20;
+}
+
+.msgs-offer-item {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 8px;
+  text-align: left;
+  transition: background var(--dur-fast) var(--ease);
+}
+.msgs-offer-item:hover { background: var(--gold-soft); }
+
+.msgs-offer-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--surface-page-alt);
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.msgs-offer-item-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.msgs-offer-item-text strong { font-size: 0.82rem; color: var(--on-page); }
+.msgs-offer-item-text em { font-size: 0.72rem; font-style: normal; color: var(--on-page-soft); }
 
 /* ---- thread ---- */
 .msgs-thread-wrap {
@@ -664,6 +795,7 @@
   justify-content: center;
   width: 26px;
   height: 26px;
+  flex-shrink: 0;
   border-radius: 50%;
   color: var(--on-page-soft);
   background: var(--surface-page-alt);
@@ -691,7 +823,70 @@
   }
 }
 
-.msgs-row-menu { position: relative; }
+/* Touch: the dot only appears on a message once it's long-pressed
+   (selected) — see .is-msg-selected below — never all the time. */
+@media (hover: none) and (pointer: coarse) {
+  .msgs-row.is-msg-selected .msgs-row-action,
+  .msgs-row-action.is-open-force {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+
+  .msgs-bubble {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .msgs-row.is-msg-selected .msgs-bubble {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+}
+
+/* Selection bar — swaps in above the thread while long-pressing messages */
+.msgs-msg-selection-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line-page);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--on-page);
+  flex-shrink: 0;
+}
+.msgs-msg-selection-bar.is-hidden { display: none; }
+
+.msgs-row-menu {
+  position: relative;
+  height: 0;
+  width: 26px;
+  overflow: hidden;
+  transition: height 0.2s ease, margin-top 0.2s ease;
+}
+
+.msgs-row-menu:has(.dropdown-panel.is-open) {
+  overflow: visible;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .msgs-row:hover .msgs-row-menu,
+  .msgs-row-menu:has(.is-open-force) {
+    height: 26px;
+    margin-top: 4px;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .msgs-row.is-msg-selected .msgs-row-menu,
+  .msgs-row-menu:has(.is-open-force) {
+    height: 26px;
+    margin-top: 4px;
+  }
+}
 .msgs-row-menu .dropdown-panel {
   min-width: 0;
   width: max-content;
@@ -877,6 +1072,46 @@
 .msgs-send-btn:hover { filter: brightness(1.1); transform: scale(1.05); }
 .msgs-send-btn:disabled { opacity: 0.5; pointer-events: none; }
 
+.msgs-pay-menu { position: relative; flex-shrink: 0; }
+
+.msgs-pay-btn {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding: 0 14px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  background: var(--gold);
+  color: var(--navy-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transition: filter var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.msgs-pay-menu:hover .msgs-pay-btn,
+.msgs-pay-menu:focus-within .msgs-pay-btn { filter: brightness(1.1); transform: scale(1.03); }
+.msgs-pay-btn svg:first-child { flex-shrink: 0; margin-right: 6px; }
+
+.msgs-pay-btn > span {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.msgs-pay-btn-extra {
+  display: inline-block;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  line-height: 1;
+  opacity: 0;
+  transition: max-width var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
+}
+.msgs-pay-menu:hover .msgs-pay-btn-extra,
+.msgs-pay-menu:focus-within .msgs-pay-btn-extra { max-width: 50px; opacity: 1; }
+
 /* ============================================================
    RESPONSIVE
    ============================================================ */
@@ -896,22 +1131,68 @@
 
   .msgs-back-btn { display: flex; }
 
+  .msgs-view-profile {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    gap: 0;
+    justify-content: center;
+    border-radius: 10px;
+  }
+
+  .msgs-view-profile-label { display: none; }
+
   .msgs-row { max-width: 88%; }
 
-  /* Touch devices have no hover, so keep the button visible and tappable
-     — it still gets the same smooth scale-in from the base rule above. */
-  .msgs-row-action {
-    opacity: 1;
-    visibility: visible;
-    transform: scale(1);
-    pointer-events: auto;
+  .msgs-property-extra-actions {
+    gap: 6px;
   }
+
+  .msgs-property-pay-btn,
+  .msgs-property-review-btn {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    gap: 0;
+  }
+
+  .msgs-property-pay-btn span,
+  .msgs-property-review-btn span {
+    display: none;
+  }
+
 
   /* Tabs row: let it scroll horizontally instead of wrapping/squashing
      the pills on narrow screens. */
+  .msgs-shell {
+    padding-inline: 10px;
+  }
+
+  .msgs-list-header {
+    padding: 20px 20px 14px;
+  }
+
+  .msgs-list-header .msgs-icon-btn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .msgs-list-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .msgs-search {
+    margin: 0 20px 16px;
+  }
+
+  .msgs-search input {
+    height: 48px;
+    font-size: 0.95rem;
+  }
+
   .msgs-tabs {
-    padding: 0 12px 10px;
-    gap: 8px;
+    padding: 0 20px 18px;
+    gap: 10px;
     overflow-x: auto;
     flex-wrap: nowrap;
     scrollbar-width: none;
@@ -921,8 +1202,74 @@
 
   .msgs-tab {
     flex-shrink: 0;
-    padding: 6px 12px;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  /* Conversation list rows were cropping instead of truncating on
+     narrow screens — tighten spacing and reclaim the delete-icon's
+     reserved (but invisible) width so the ellipsis has room to kick in. */
+  .msgs-list {
+    padding: 0 16px 16px;
+  }
+
+  .msgs-list-item {
+    gap: 16px;
+    padding: 14px 8px;
+    border-radius: 16px;
+    margin-bottom: 2px;
+  }
+
+  .msgs-list-item-avatar img {
+    width: 56px;
+    height: 56px;
+  }
+
+  .msgs-list-item-menu {
+    display: none;
+  }
+  .msgs-list-item-menu.is-open-force {
+    display: flex;
+  }
+
+  .msgs-list-item-name,
+  .msgs-list-item-preview {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .msgs-list-item-name {
+    font-size: 1.02rem;
+  }
+
+  .msgs-list-item-preview {
+    font-size: 0.92rem;
+  }
+
+  .msgs-list-item-bottom {
+    margin-top: 6px;
+  }
+
+  .msgs-list-item-time {
     font-size: 0.78rem;
+  }
+
+  /* The panel was sticking out past the screen edge — grid/flex items
+     don't shrink below their content's natural width unless told to,
+     so force min-width:0 down the whole chain and clip anything left over. */
+  .msgs-layout {
+    overflow-x: hidden;
+  }
+
+  .msgs-list-panel,
+  .msgs-chat-panel,
+  .msgs-list,
+  .msgs-list-item,
+  .msgs-list-item-body {
+    min-width: 0;
   }
 }
 
@@ -932,3 +1279,352 @@
 
 html.dark-mode .msgs-reply-quote { background: rgba(255, 255, 255, 0.06); }
 html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25); }
+
+.msgs-blocked-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.msgs-blocked-bar.is-hidden {
+  display: none;
+}
+
+[data-msgs-composer].is-hidden {
+  display: none;
+}
+
+.msgs-blocked-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.msgs-blocked-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.msgs-blocked-btn--unblock {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #16a34a;
+}
+
+.msgs-blocked-btn--unblock:hover {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.msgs-blocked-btn--delete {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}
+
+.msgs-blocked-btn--delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+
+.msgs-composer {
+  position: relative;
+  align-items: flex-end;
+}
+
+.msgs-composer textarea[data-msgs-input] {
+  resize: none;
+  max-height: 120px;
+  overflow-y: auto;
+  line-height: 1.4;
+  font-family: inherit;
+  font-size: inherit;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.msgs-attach-menu {
+  position: static;
+}
+
+.msgs-attach-menu .dropdown-panel {
+  position: absolute !important;
+  top: auto !important;
+  bottom: calc(100% + 8px) !important;
+  left: 0 !important;
+  right: auto !important;
+  transform: none !important;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 40;
+}
+
+.msgs-attach-panel li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.msgs-bubble--media img,
+.msgs-bubble--media video {
+  max-width: 240px;
+  border-radius: 12px;
+  display: block;
+}
+
+.msgs-bubble--audio,
+.msgs-bubble--file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.msgs-bubble--file {
+  text-decoration: none;
+}
+
+.msgs-attach-preview {
+  padding: 10px 12px 0;
+}
+
+.msgs-attach-preview.is-hidden {
+  display: none;
+}
+
+.msgs-attach-preview-card {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.msgs-attach-preview-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 420px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.msgs-attach-preview-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: inherit;
+  opacity: 0.85;
+  padding-left: 2px;
+}
+
+.msgs-attach-chip {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+.msgs-attach-chip img,
+.msgs-attach-chip video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.msgs-attach-chip-file {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  padding: 4px;
+  text-align: center;
+}
+
+.msgs-attach-chip-file em {
+  font-style: normal;
+  font-size: 9px;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 56px;
+}
+
+.msgs-attach-chip-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.msgs-bubble-photos-file {
+  width: 68px;
+  height: 68px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+
+/* Thread scrollbar — match theme instead of default OS scrollbar */
+/* Scrollbars — follow the theme instead of a hardcoded dark color,
+   so they look right in both light and dark mode. */
+.msgs-thread,
+.msgs-saved-thread,
+.msgs-list {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--on-page-soft) 35%, transparent) transparent;
+}
+
+.msgs-thread::-webkit-scrollbar,
+.msgs-saved-thread::-webkit-scrollbar,
+.msgs-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.msgs-thread::-webkit-scrollbar-track,
+.msgs-saved-thread::-webkit-scrollbar-track,
+.msgs-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.msgs-thread::-webkit-scrollbar-thumb,
+.msgs-saved-thread::-webkit-scrollbar-thumb,
+.msgs-list::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--on-page-soft) 35%, transparent);
+  border-radius: 10px;
+}
+
+.msgs-thread::-webkit-scrollbar-thumb:hover,
+.msgs-saved-thread::-webkit-scrollbar-thumb:hover,
+.msgs-list::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--on-page-soft) 55%, transparent);
+}
+
+.msgs-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.msgs-lightbox.is-hidden {
+  display: none;
+}
+
+.msgs-lightbox-stage {
+  max-width: min(80vw, 640px);
+  max-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.msgs-lightbox-stage img,
+.msgs-lightbox-stage video {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+.msgs-lightbox-stage-file {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  padding: 24px;
+}
+
+.msgs-lightbox-close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.msgs-lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.msgs-lightbox-nav:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.msgs-lightbox-prev {
+  left: 18px;
+}
+
+.msgs-lightbox-next {
+  right: 18px;
+}
+
+.msgs-lightbox-counter {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+}
+
+.msgs-attach-chip {
+  cursor: pointer;
+}
+
+.msgs-bubble-photos img,
+.msgs-bubble-photos video,
+.msgs-bubble-photos-file {
+  cursor: pointer;
+}

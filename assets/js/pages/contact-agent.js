@@ -14,7 +14,8 @@
     star: '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>',
     reply: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"></polyline><path d="M20 18v-2a4 4 0 0 0-4-4H4"></path></svg>',
     dots: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>',
-    trash: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>'
+    trash: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>',
+    file: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>'
   };
 
   var AVATAR = 'assets/images/agent-images/agenticonimg.webp';
@@ -39,7 +40,12 @@
           name: '2 Bedroom Detached Duplex',
           location: 'Lekki Phase 1, Lagos',
           price: '\u20A6460,000 / year',
-          image: 'assets/images/home-properties/miniflat1.png'
+          image: 'assets/images/home-properties/miniflat1.png',
+          beds: 2,
+          baths: 3,
+          parking: true,
+          furnished: true,
+          description: 'Spacious and well finished 2 bedroom detached duplex in a secure estate with 24/7 security, steady power supply and good road network.'
         },
         messages: [
           { id: 'm1', from: 'me', day: 'Today', time: '2:27 PM', read: true,
@@ -50,12 +56,6 @@
             text: 'Yes please. Can I get more pictures of the living room and kitchen?' },
           { id: 'm4', from: 'agent', day: 'Today', time: '2:30 PM',
             text: "Sure, I'll send them right away." },
-          { id: 'm5', from: 'agent', day: 'Today', time: '2:30 PM',
-            photos: [
-              'assets/images/home-properties/hall2.png',
-              'assets/images/home-properties/bedroomflat3.png',
-              'assets/images/home-properties/miniflat.png'
-            ] },
           { id: 'm6', from: 'agent', day: 'Today', time: '2:30 PM',
             text: 'Hi, is the apartment still available?' }
         ]
@@ -74,7 +74,12 @@
           name: '2 Bedroom Apartment',
           location: 'Victoria Island, Lagos',
           price: '\u20A6325,000 / year',
-          image: 'assets/images/home-properties/miniflat.png'
+          image: 'assets/images/home-properties/miniflat.png',
+          beds: 2,
+          baths: 2,
+          parking: true,
+          furnished: false,
+          description: 'Modern 2 bedroom apartment close to the island business district, with reliable power and a resident security team.'
         },
         messages: [
           { id: 's1', from: 'agent', day: 'Today', time: '11:20 AM',
@@ -106,6 +111,174 @@
           { id: 'e2', from: 'agent', day: 'Yesterday', time: '4:40 PM',
             text: "I'll like to schedule a viewing." }
         ]
+      },
+      {
+        id: 'grace-o',
+        name: 'Grace O.',
+        role: 'Real Estate Agent',
+        avatar: AVATAR,
+        online: true,
+        verified: true,
+        muted: false,
+        property: {
+          id: 'ACCOM-40122',
+          name: '3 Bedroom Terrace',
+          location: 'Gwarinpa, Abuja',
+          price: '\u20A6900,000 / year',
+          image: 'assets/images/home-properties/hall2.png',
+          beds: 3, baths: 3, parking: true, furnished: false,
+          description: 'Roomy 3 bedroom terrace in a quiet estate with tarred road access and constant water supply.'
+        },
+        messages: [
+          { id: 'g1', from: 'agent', day: 'Monday', time: '9:15 AM',
+            text: 'Good day! The terrace in Gwarinpa is now open for viewing, would you like to book a slot?' },
+          { id: 'g2', from: 'me', day: 'Monday', time: '9:30 AM', read: true,
+            text: 'Yes, this weekend works for me.' },
+          { id: 'g3', from: 'agent', day: 'Monday', time: '9:32 AM',
+            text: "Great, I'll pencil you in for Saturday 11am." }
+        ]
+      },
+      {
+        id: 'daniel-k',
+        name: 'Daniel K.',
+        role: 'Real Estate Agent',
+        avatar: AVATAR,
+        online: false,
+        verified: false,
+        muted: false,
+        property: {
+          id: 'ACCOM-40530',
+          name: 'Mini Flat',
+          location: 'Yaba, Lagos',
+          price: '\u20A6520,000 / year',
+          image: 'assets/images/home-properties/miniflat.png',
+          beds: 1, baths: 1, parking: false, furnished: true,
+          description: 'Newly renovated mini flat close to major tech hubs in Yaba, fully furnished and net-ready.'
+        },
+        messages: [
+          { id: 'd1', from: 'me', day: 'Tuesday', time: '1:05 PM', read: true,
+            text: 'Is the mini flat in Yaba still up?' },
+          { id: 'd2', from: 'agent', day: 'Tuesday', time: '2:00 PM',
+            text: 'Yes it is, rent is negotiable for a 2 year upfront payment.' }
+        ]
+      },
+      {
+        id: 'blessing-u',
+        name: 'Blessing U.',
+        role: 'Real Estate Agent',
+        avatar: AVATAR,
+        online: true,
+        verified: true,
+        muted: true,
+        property: {
+          id: 'ACCOM-41087',
+          name: '4 Bedroom Semi-Detached',
+          location: 'Ikoyi, Lagos',
+          price: '\u20A63,200,000 / year',
+          image: 'assets/images/home-properties/bedroomflat3.png',
+          beds: 4, baths: 5, parking: true, furnished: true,
+          description: 'Luxury 4 bedroom semi-detached duplex with BQ, generator house, and 24/7 estate security in Ikoyi.'
+        },
+        messages: [
+          { id: 'b1', from: 'agent', day: 'Wednesday', time: '10:00 AM',
+            text: "Good morning, I have the Ikoyi listing you requested. It's fully serviced." },
+          { id: 'b2', from: 'me', day: 'Wednesday', time: '10:20 AM', read: true,
+            text: 'Noted, let me discuss with my partner and get back to you.' }
+        ]
+      },
+      {
+        id: 'emeka-n',
+        name: 'Emeka N.',
+        role: 'Real Estate Agent',
+        avatar: AVATAR,
+        online: false,
+        verified: true,
+        muted: false,
+        property: {
+          id: 'ACCOM-41560',
+          name: 'Self-Contained Room',
+          location: 'Uyo, Akwa Ibom',
+          price: '\u20A6180,000 / year',
+          image: 'assets/images/home-properties/selfcon1.png',
+          beds: 1, baths: 1, parking: false, furnished: false,
+          description: 'Affordable self-contained room in a residential neighbourhood, walking distance to the market.'
+        },
+        messages: [
+          { id: 'n1', from: 'me', day: 'Last week', time: '5:45 PM', read: true,
+            text: 'Good evening, does the price include agency fees?' },
+          { id: 'n2', from: 'agent', day: 'Last week', time: '6:10 PM',
+            text: 'No, agency and legal fees are 10% combined, paid separately.' }
+        ]
+      },
+      {
+        id: 'ruth-a',
+        name: 'Ruth A.',
+        role: 'Real Estate Agent',
+        avatar: AVATAR,
+        online: true,
+        verified: true,
+        muted: false,
+        property: {
+          id: 'ACCOM-42011',
+          name: '2 Bedroom Flat',
+          location: 'Port Harcourt, Rivers',
+          price: '\u20A6600,000 / year',
+          image: 'assets/images/home-properties/hall2.png',
+          beds: 2, baths: 2, parking: true, furnished: false,
+          description: 'Well-maintained 2 bedroom flat in a gated compound with borehole water and a caretaker on site.'
+        },
+        messages: [
+          { id: 'r1', from: 'agent', day: 'Last week', time: '3:00 PM',
+            text: 'Hello, following up — are you still interested in the PH flat?' }
+        ]
+      },
+      {
+        id: 'tunde-b',
+        name: 'Tunde B.',
+        role: 'Real Estate Agent',
+        avatar: AVATAR,
+        online: false,
+        verified: false,
+        muted: false,
+        property: {
+          id: 'ACCOM-42480',
+          name: 'Duplex with BQ',
+          location: 'Magodo, Lagos',
+          price: '\u20A61,800,000 / year',
+          image: 'assets/images/home-properties/bedroomflat3.png',
+          beds: 3, baths: 4, parking: true, furnished: false,
+          description: 'Solidly built duplex with a boys quarters, private compound, and good drainage in Magodo Phase 2.'
+        },
+        messages: [
+          { id: 't1', from: 'me', day: '2 weeks ago', time: '12:00 PM', read: true,
+            text: 'Can we do a video tour before I travel down for the physical viewing?' },
+          { id: 't2', from: 'agent', day: '2 weeks ago', time: '1:15 PM',
+            text: 'Sure, send me a good time and I will set it up.' }
+        ]
+      },
+      {
+        id: 'faith-e',
+        name: 'Faith E.',
+        role: 'Real Estate Agent',
+        avatar: AVATAR,
+        online: true,
+        verified: true,
+        muted: false,
+        property: {
+          id: 'ACCOM-42890',
+          name: 'Serviced Apartment',
+          location: 'Wuse 2, Abuja',
+          price: '\u20A61,100,000 / year',
+          image: 'assets/images/home-properties/miniflat1.png',
+          beds: 2, baths: 2, parking: true, furnished: true,
+          description: 'Fully serviced 2 bedroom apartment with 24hr power, gym access, and a resident concierge in Wuse 2.'
+        },
+        messages: [
+          { id: 'f1', from: 'me', day: '3 weeks ago', time: '8:30 AM', read: true,
+            text: 'Does the service charge cover electricity too?' },
+          { id: 'f2', from: 'agent', day: '3 weeks ago', time: '9:00 AM',
+            text: 'Yes, electricity, water, and security are all covered in the service charge.' }
+        ]
       }
     ];
   }
@@ -136,14 +309,29 @@
       chatStatus: Accoom.$('[data-msgs-chat-status]'),
       viewProfile: Accoom.$('[data-msgs-view-profile]'),
       backBtn: Accoom.$('[data-msgs-back]'),
+      msgSelectionBar: Accoom.$('[data-msgs-msg-selection-bar]'),
+      msgSelectionCount: Accoom.$('[data-msgs-msg-selection-count]'),
+      msgSelectionCancel: Accoom.$('[data-msgs-msg-selection-cancel]'),
 
       propCard: Accoom.$('[data-msgs-property-card]'),
       propImg: Accoom.$('[data-msgs-property-img]'),
       propName: Accoom.$('[data-msgs-property-name]'),
       propLocText: Accoom.$('[data-msgs-property-loc-text]'),
       propPrice: Accoom.$('[data-msgs-property-price]'),
+      propPayBtn: Accoom.$('[data-msgs-property-pay-btn]'),
+      propReviewBtn: Accoom.$('[data-msgs-property-review-btn]'),
 
       chatTabs: Accoom.$$('[data-msgs-chat-tab]'),
+      blockedBar: Accoom.$('[data-msgs-blocked-bar]'),
+      unblockBtn: Accoom.$('[data-msgs-unblock]'),
+      deleteChatBtn: Accoom.$('[data-msgs-delete-chat]'),
+      payBtn: Accoom.$('[data-msgs-pay-btn]'),
+      lightbox: Accoom.$('[data-msgs-lightbox]'),
+      lightboxStage: Accoom.$('[data-msgs-lightbox-stage]'),
+      lightboxCounter: Accoom.$('[data-msgs-lightbox-counter]'),
+      lightboxPrev: Accoom.$('[data-msgs-lightbox-prev]'),
+      lightboxNext: Accoom.$('[data-msgs-lightbox-next]'),
+      lightboxClose: Accoom.$('[data-msgs-lightbox-close]'),
       thread: Accoom.$('[data-msgs-thread]'),
       savedThread: Accoom.$('[data-msgs-saved-thread]'),
       threadEmpty: Accoom.$('[data-msgs-thread-empty]'),
@@ -159,6 +347,10 @@
       send: Accoom.$('[data-msgs-send]')
     };
 
+    Accoom.$$('.msgs-menu').forEach(function (menu) {
+      Accoom.initDropdown(menu);
+    });
+
     var state = {
       conversations: seedConversations(),
       activeId: null,
@@ -167,13 +359,72 @@
       query: '',
       selectMode: false,
       selected: {},
-      replyTo: null
+      replyTo: null,
+      savedConversations: [],
+      msgSelectMode: false,
+      msgSelected: {}
     };
+
+    /* ---------------- MESSAGE LONG-PRESS SELECT (touch) ---------------- */
+    function updateMsgSelectionBar() {
+      if (!els.msgSelectionBar) return;
+      var count = Object.keys(state.msgSelected).length;
+      if (state.msgSelectMode && count > 0) {
+        els.msgSelectionBar.classList.remove('is-hidden');
+        if (els.msgSelectionCount) {
+          els.msgSelectionCount.textContent = count + (count === 1 ? ' selected' : ' selected');
+        }
+      } else {
+        els.msgSelectionBar.classList.add('is-hidden');
+      }
+    }
+
+    function enterMsgSelectMode(id, conv) {
+      state.msgSelectMode = true;
+      state.msgSelected = {};
+      state.msgSelected[id] = true;
+      renderThread(conv);
+      renderSavedThread(conv);
+      updateMsgSelectionBar();
+    }
+
+    function toggleMsgSelect(id, conv) {
+      if (state.msgSelected[id]) {
+        delete state.msgSelected[id];
+      } else {
+        state.msgSelected[id] = true;
+      }
+      if (!Object.keys(state.msgSelected).length) {
+        state.msgSelectMode = false;
+      }
+      renderThread(conv);
+      renderSavedThread(conv);
+      updateMsgSelectionBar();
+    }
+
+    function exitMsgSelectMode(conv) {
+      state.msgSelectMode = false;
+      state.msgSelected = {};
+      if (conv) {
+        renderThread(conv);
+        renderSavedThread(conv);
+      }
+      updateMsgSelectionBar();
+    }
+
+    if (els.msgSelectionCancel) {
+      Accoom.on(els.msgSelectionCancel, 'click', function () {
+        exitMsgSelectMode(findConv(state.activeId));
+      });
+    }
 
     /* ---------------- helpers ---------------- */
     function findConv(id) {
       for (var i = 0; i < state.conversations.length; i++) {
         if (state.conversations[i].id === id) return state.conversations[i];
+      }
+      for (var j = 0; j < state.savedConversations.length; j++) {
+        if (state.savedConversations[j].id === id) return state.savedConversations[j];
       }
       return null;
     }
@@ -204,22 +455,12 @@
     /* ---------------- LIST RENDER ---------------- */
     function visibleConversations() {
       var q = state.query.trim().toLowerCase();
-      var list = state.conversations.filter(function (c) {
-        if (state.listTab === 'unread' && unreadCount(c) === 0) return false;
+      var source = state.listTab === 'saved' ? state.savedConversations : state.conversations;
+      var list = source.filter(function (c) {
+        if (state.listTab === 'unread' && unreadCount(c) === 0 && c.id !== state.keepUnreadId) return false;
         if (q && c.name.toLowerCase().indexOf(q) === -1) return false;
         return true;
       });
-
-      // In the All tab, unread conversations always float to the top,
-      // above everything already read. Sort is stable, so read/unread
-      // groups otherwise keep their existing relative order.
-      if (state.listTab === 'all') {
-        list = list.slice().sort(function (a, b) {
-          var aUnread = unreadCount(a) > 0 ? 0 : 1;
-          var bUnread = unreadCount(b) > 0 ? 0 : 1;
-          return aUnread - bUnread;
-        });
-      }
 
       return list;
     }
@@ -232,8 +473,11 @@
         els.listEmpty.classList.remove('is-hidden');
         if (els.listEmptyTitle && els.listEmptyText) {
           if (state.listTab === 'unread') {
-            els.listEmptyTitle.textContent = 'No unread messages';
-            els.listEmptyText.textContent = "You're all caught up. New messages will show up here.";
+            els.listEmptyTitle.textContent = 'No unread messages yet';
+            els.listEmptyText.textContent = 'Unread conversations with agents will show up here.';
+          } else if (state.listTab === 'saved') {
+            els.listEmptyTitle.textContent = 'No saved messages yet';
+            els.listEmptyText.textContent = 'Saved conversations with agents will show up here.';
           } else if (state.query.trim()) {
             els.listEmptyTitle.textContent = 'No matches found';
             els.listEmptyText.textContent = 'Try a different name or keyword.';
@@ -313,17 +557,25 @@
 
     function deleteConversation(id) {
       var wasActive = state.activeId === id;
-      var idx = state.conversations.findIndex(function (c) { return c.id === id; });
+      var list = state.conversations.some(function (c) { return c.id === id; })
+        ? state.conversations
+        : state.savedConversations;
+      var idx = list.findIndex(function (c) { return c.id === id; });
 
-      state.conversations = state.conversations.filter(function (c) { return c.id !== id; });
+      if (list === state.conversations) {
+        state.conversations = state.conversations.filter(function (c) { return c.id !== id; });
+      } else {
+        state.savedConversations = state.savedConversations.filter(function (c) { return c.id !== id; });
+      }
       delete state.selected[id];
 
       if (wasActive) {
-        if (state.conversations.length) {
+        var remaining = visibleConversations();
+        if (remaining.length) {
           // Prefer the conversation that slid up into this row's spot;
           // fall back to the one above it if we deleted the last row.
-          var nextIdx = idx < state.conversations.length ? idx : state.conversations.length - 1;
-          openConversation(state.conversations[nextIdx].id);
+          var nextIdx = idx < remaining.length ? idx : remaining.length - 1;
+          openConversation(remaining[nextIdx].id);
         } else {
           state.activeId = null;
           showChatEmpty(true);
@@ -350,13 +602,55 @@
     });
 
     Accoom.on(Accoom.$('[data-msgs-delete-all]'), 'click', function () {
-      state.conversations = [];
-      state.activeId = null;
+      if (state.listTab === 'saved') {
+        state.savedConversations = [];
+      } else {
+        state.conversations = [];
+      }
+      state.selectMode = false;
       state.selected = {};
+      state.activeId = null;
       showChatEmpty(true);
       renderList();
       updateSelectionBar();
     });
+
+    Accoom.on(Accoom.$('[data-msgs-mark-read]'), 'click', function () {
+      state.conversations.forEach(function (c) { c.unread = 0; });
+      renderList();
+    });
+
+    Accoom.on(Accoom.$('[data-msgs-mark-unread]'), 'click', function () {
+      state.conversations.forEach(function (c) { c.unread = c.unread || 1; });
+      renderList();
+    });
+
+    var moveSavedBtn = Accoom.$('[data-msgs-move-saved]');
+    var moveSavedLabel = moveSavedBtn ? moveSavedBtn.querySelector('span') : null;
+
+    function updateMoveSavedLabel() {
+      if (!moveSavedLabel) return;
+      moveSavedLabel.textContent = state.listTab === 'saved' ? 'Remove from Saved' : 'Move to Saved';
+    }
+
+    if (moveSavedBtn) {
+      Accoom.on(moveSavedBtn, 'click', function () {
+        if (state.listTab === 'saved') {
+          // Reverse: put everything back where it came from, exactly as
+          // it was (unread counts, etc. are untouched by the move).
+          state.conversations = state.conversations.concat(state.savedConversations);
+          state.savedConversations = [];
+        } else {
+          state.savedConversations = (state.savedConversations || []).concat(state.conversations);
+          state.conversations = [];
+        }
+        state.activeId = null;
+        state.selected = {};
+        showChatEmpty(true);
+        renderList();
+        updateSelectionBar();
+      });
+    }
 
     Accoom.on(Accoom.$('[data-msgs-delete-selected]'), 'click', function () {
       var ids = Object.keys(state.selected).filter(function (k) { return state.selected[k]; });
@@ -392,13 +686,15 @@
 
     els.tabs.forEach(function (tab) {
       Accoom.on(tab, 'click', function () {
-        var key = tab.getAttribute('data-msgs-tab');
+       var key = tab.getAttribute('data-msgs-tab');
         state.listTab = key;
+        state.keepUnreadId = null;
         setActiveTabUI(key);
+        updateMoveSavedLabel();
 
-        // Jumping into Unread should never leave a previously-open chat
-        // sitting on the right — force a pick from the filtered list.
-        if (key === 'unread') {
+        // Jumping into Unread or Saved should never leave a previously-open
+        // chat sitting on the right — force a pick from the filtered list.
+        if (key === 'unread' || key === 'saved') {
           state.activeId = null;
           showChatEmpty();
         }
@@ -433,33 +729,36 @@
         return;
       }
 
-      els.chatEmptyTitle.textContent = 'Select a conversation';
-      els.chatEmptyText.textContent = 'Choose a chat on the left to start messaging an agent.';
+      els.chatEmptyTitle.textContent = 'No saved Chats';
+      els.chatEmptyText.textContent = 'Chats you save will appear here.';
     }
 
     function openConversation(id) {
       var conv = findConv(id);
       if (!conv) return;
 
+      applyBlockedState(conv);
+
       var wasUnread = unreadCount(conv) > 0;
+
+      // If a different chat was being "held" visible in the Unread tab
+      // after being read, opening a new one lets it finally drop out.
+      if (state.keepUnreadId && state.keepUnreadId !== id) {
+        state.keepUnreadId = null;
+      }
+
       conv.unread = 0;
       state.activeId = id;
       state.activeChatTab = 'messages';
       state.replyTo = null;
+      state.msgSelectMode = false;
+      state.msgSelected = {};
+      updateMsgSelectionBar();
 
-      // Reading a chat bumps it to the front — matches "becoming the
-      // first message" once it lands (read) in the All tab.
-      var idx = state.conversations.indexOf(conv);
-      if (idx > 0) {
-        state.conversations.splice(idx, 1);
-        state.conversations.unshift(conv);
-      }
-
-      // Opened it from the Unread tab? Smoothly hand control back to All
-      // — the pill transition is already animated via .msgs-tab's CSS.
+      // Stay on the Unread tab after reading it — it keeps showing until
+      // another chat is opened or the tab is switched manually.
       if (wasUnread && state.listTab === 'unread') {
-        state.listTab = 'all';
-        setActiveTabUI('all');
+        state.keepUnreadId = id;
       }
 
       els.chatEmpty.classList.add('is-hidden');
@@ -500,11 +799,12 @@
     }
 
     function renderPropertyCard(conv) {
-      els.propImg.src = conv.property.image;
-      els.propImg.alt = conv.property.name;
-      els.propName.textContent = conv.property.name;
-      els.propLocText.textContent = conv.property.location;
-      els.propPrice.textContent = conv.property.price;
+      var p = conv.property;
+      els.propImg.src = p.image;
+      els.propImg.alt = p.name;
+      els.propName.textContent = p.name;
+      els.propLocText.textContent = p.location;
+      els.propPrice.textContent = p.price;
     }
 
     /* ---------------- CHAT TABS (Messages / Saved) ---------------- */
@@ -515,6 +815,9 @@
     });
 
     function switchChatTab(key) {
+      state.msgSelectMode = false;
+      state.msgSelected = {};
+      updateMsgSelectionBar();
       state.activeChatTab = key;
       els.chatTabs.forEach(function (t) {
         var active = t.getAttribute('data-msgs-chat-tab') === key;
@@ -572,7 +875,8 @@
 
     function buildRow(msg, conv, isSavedView) {
       var row = document.createElement('div');
-      row.className = 'msgs-row msgs-row--' + (msg.from === 'me' ? 'me' : 'agent');
+      row.className = 'msgs-row msgs-row--' + (msg.from === 'me' ? 'me' : 'agent') +
+        (state.msgSelected[msg.id] ? ' is-msg-selected' : '');
       row.setAttribute('data-msg-id', msg.id);
 
       var avatarHtml = msg.from === 'agent'
@@ -584,14 +888,19 @@
         replyHtml = '<div class="msgs-reply-quote"><b>' + msg.replyTo.name + '</b><span>' + msg.replyTo.text + '</span></div>';
       }
 
-      var bubbleInner;
+      var bubbleInner = '';
       if (msg.photos) {
         bubbleInner = '<div class="msgs-bubble-photos">' +
           msg.photos.map(function (src) { return '<img src="' + src + '" alt="" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.png\';" />'; }).join('') +
           '<span class="msgs-bubble-photos-count">' + msg.photos.length + ' Photos</span>' +
           '</div>';
       } else {
-        bubbleInner = '<div class="msgs-bubble">' + escapeHtml(msg.text) + (msg.saved ? '<span class="msgs-bubble-saved">' + ICONS.star + '</span>' : '') + '</div>';
+        if (msg.attachments && msg.attachments.length) {
+          bubbleInner += buildAttachmentsBubble(msg.attachments);
+        }
+        if (msg.text) {
+          bubbleInner += '<div class="msgs-bubble">' + escapeHtml(msg.text) + (msg.saved ? '<span class="msgs-bubble-saved">' + ICONS.star + '</span>' : '') + '</div>';
+        }
       }
 
       var metaHtml = '<div class="msgs-meta-row' + (msg.from === 'me' && msg.read ? ' is-read' : '') + '">' +
@@ -616,12 +925,30 @@
 
       row.innerHTML =
         avatarHtml +
-        actionHtml +
-        '<div class="msgs-bubble-col">' + replyHtml + bubbleInner + metaHtml + '</div>';
+        '<div class="msgs-bubble-col">' + replyHtml + bubbleInner + actionHtml + metaHtml + '</div>';
 
       var actionBtn = row.querySelector('[data-row-action]');
       var panel = row.querySelector('[data-row-menu-panel]');
       var scrollHost = isSavedView ? els.savedThread : els.thread;
+
+      if (msg.attachments && msg.attachments.length) {
+        row.querySelectorAll('[data-sent-attach-index]').forEach(function (node) {
+          Accoom.on(node, 'click', function () {
+            openLightbox(msg.attachments, parseInt(node.getAttribute('data-sent-attach-index'), 10));
+          });
+        });
+      }
+
+      if (msg.photos && msg.photos.length) {
+        var photoItems = msg.photos.map(function (src) {
+          return { kind: 'image', url: src, name: src.split('/').pop() };
+        });
+        row.querySelectorAll('.msgs-bubble-photos img').forEach(function (img, index) {
+          Accoom.on(img, 'click', function () {
+            openLightbox(photoItems, index);
+          });
+        });
+      }
 
       Accoom.on(actionBtn, 'click', function (e) {
         e.stopPropagation();
@@ -650,6 +977,44 @@
         renderSavedThread(conv);
       });
 
+      // Long-press (touch only) to select a message and reveal its dot;
+      // once in select mode, a plain tap on any other message toggles it
+      // too, instead of needing another long press each time.
+      var longPressTimer = null;
+      var longPressFired = false;
+
+      Accoom.on(row, 'touchstart', function (e) {
+  if (e.target.closest('.msgs-row-menu')) return;
+  longPressFired = false;
+  clearTimeout(longPressTimer);
+  longPressTimer = setTimeout(function () {
+    longPressFired = true;
+    enterMsgSelectMode(msg.id, conv);
+  }, 550);
+});
+
+      Accoom.on(row, 'touchmove', function () {
+        clearTimeout(longPressTimer);
+      });
+
+      Accoom.on(row, 'touchend', function () {
+        clearTimeout(longPressTimer);
+      });
+
+      Accoom.on(row, 'click', function (e) {
+        if (longPressFired) {
+          // Swallow the synthetic click some browsers fire right after
+          // a long-press touch, so it doesn't immediately deselect.
+          longPressFired = false;
+          e.stopPropagation();
+          return;
+        }
+        if (state.msgSelectMode) {
+          e.stopPropagation();
+          toggleMsgSelect(msg.id, conv);
+        }
+      });
+
       return row;
     }
 
@@ -676,6 +1041,31 @@
       return div.innerHTML;
     }
 
+    function attachmentsLabel(attachments) {
+      var count = attachments.length;
+      var allImages = attachments.every(function (a) { return a.kind === 'image'; });
+      var allVideos = attachments.every(function (a) { return a.kind === 'video'; });
+      if (allImages) return count + (count === 1 ? ' Photo' : ' Photos');
+      if (allVideos) return count + (count === 1 ? ' Video' : ' Videos');
+      return count + (count === 1 ? ' File' : ' Files');
+    }
+
+    function buildAttachmentsBubble(attachments) {
+      var thumbs = attachments.map(function (att, index) {
+        if (att.kind === 'image') {
+          return '<img src="' + att.url + '" alt="' + escapeHtml(att.name) + '" data-sent-attach-index="' + index + '" />';
+        }
+        if (att.kind === 'video') {
+          return '<video src="' + att.url + '" muted data-sent-attach-index="' + index + '"></video>';
+        }
+        return '<span class="msgs-bubble-photos-file" data-sent-attach-index="' + index + '">' + ICONS.file + '</span>';
+      }).join('');
+
+      return '<div class="msgs-bubble-photos">' +
+        thumbs +
+        '<span class="msgs-bubble-photos-count">' + attachmentsLabel(attachments) + '</span>' +
+        '</div>';
+    }
     /* ---------------- REPLY PREVIEW ---------------- */
     function setReply(msg, conv) {
       state.replyTo = {
@@ -712,15 +1102,17 @@
           from: 'me',
           day: 'Today',
           time: formatNow(),
-          read: false,
-          text: text
+          read: false
         };
+        if (text) msg.text = text;
         if (state.replyTo) {
           msg.replyTo = state.replyTo;
         }
 
         conv.messages.push(msg);
         els.input.value = '';
+        autoGrowInput();
+        closeLightbox();
         hideReplyPreview();
         renderThread(conv);
         renderList();
@@ -730,6 +1122,156 @@
           msg.read = true;
           renderThread(conv);
         }, 900);
+      });
+    }
+
+    /* ---------------- ATTACHMENTS ---------------- */
+    /* ---------------- PAYMENT ---------------- */
+    /* ---------------- PAYMENT ---------------- */
+    function goToCheckout() {
+      var conv = findConv(state.activeId);
+      if (!conv) return;
+      // TODO: wire to real checkout (Paystack/Flutterwave) using conv.property.id
+      window.location.href = 'checkout.html?property=' + encodeURIComponent(conv.property.id);
+    }
+
+    if (els.payBtn) Accoom.on(els.payBtn, 'click', goToCheckout);
+    if (els.propPayBtn) Accoom.on(els.propPayBtn, 'click', goToCheckout);
+
+    if (els.propReviewBtn) {
+      Accoom.on(els.propReviewBtn, 'click', function () {
+        var conv = findConv(state.activeId);
+        if (!conv) return;
+        // TODO: wire to real "request a review" flow using conv.property.id
+        window.location.href = 'review-request.html?property=' + encodeURIComponent(conv.property.id);
+      });
+    }
+
+    /* ---------------- OFFER MENU ---------------- */
+    var offerMake = Accoom.$('[data-msgs-offer-make]');
+    var offerHistory = Accoom.$('[data-msgs-offer-history]');
+    var offerLearn = Accoom.$('[data-msgs-offer-learn]');
+
+    if (offerMake) {
+      Accoom.on(offerMake, 'click', function () {
+        var conv = findConv(state.activeId);
+        if (!conv) return;
+        // TODO: wire to real "make an offer" flow using conv.property.id
+        window.location.href = 'offer.html?property=' + encodeURIComponent(conv.property.id);
+      });
+    }
+    if (offerHistory) {
+      Accoom.on(offerHistory, 'click', function () {
+        window.location.href = 'offers-history.html';
+      });
+    }
+    if (offerLearn) {
+      Accoom.on(offerLearn, 'click', function () {
+        window.location.href = 'about-offers.html';
+      });
+    }
+
+    /* ---------------- LIGHTBOX ---------------- */
+    state.lightboxIndex = 0;
+    state.lightboxItems = [];
+
+    function openLightbox(items, index) {
+      if (!els.lightbox || !items || !items.length) return;
+      state.lightboxItems = items;
+      state.lightboxIndex = index;
+      els.lightbox.classList.remove('is-hidden');
+      renderLightbox();
+    }
+
+    function openPendingLightbox(index) {
+      openLightbox(state.pendingAttachments, index);
+    }
+
+    function closeLightbox() {
+      if (!els.lightbox) return;
+      els.lightbox.classList.add('is-hidden');
+      state.lightboxItems = [];
+    }
+
+    function renderLightbox() {
+      var items = state.lightboxItems;
+      if (!items.length) { closeLightbox(); return; }
+
+      if (state.lightboxIndex < 0) state.lightboxIndex = 0;
+      if (state.lightboxIndex > items.length - 1) state.lightboxIndex = items.length - 1;
+
+      var att = items[state.lightboxIndex];
+      var stageHtml;
+      if (att.kind === 'image') {
+        stageHtml = '<img src="' + att.url + '" alt="' + escapeHtml(att.name) + '" />';
+      } else if (att.kind === 'video') {
+        stageHtml = '<video src="' + att.url + '" controls autoplay></video>';
+      } else if (att.kind === 'audio') {
+        stageHtml = '<div class="msgs-lightbox-stage-file">' + ICONS.file + '<span>' + escapeHtml(att.name) + '</span><audio src="' + att.url + '" controls></audio></div>';
+      } else {
+        stageHtml = '<div class="msgs-lightbox-stage-file">' + ICONS.file + '<span>' + escapeHtml(att.name) + '</span></div>';
+      }
+
+      els.lightboxStage.innerHTML = stageHtml;
+      if (els.lightboxCounter) {
+        els.lightboxCounter.textContent = (state.lightboxIndex + 1) + ' / ' + items.length;
+      }
+      if (els.lightboxPrev) els.lightboxPrev.disabled = items.length < 2;
+      if (els.lightboxNext) els.lightboxNext.disabled = items.length < 2;
+    }
+
+    if (els.lightboxClose) {
+      Accoom.on(els.lightboxClose, 'click', closeLightbox);
+    }
+
+    if (els.lightbox) {
+      Accoom.on(els.lightbox, 'click', function (e) {
+        if (e.target === els.lightbox) closeLightbox();
+      });
+    }
+
+    if (els.lightboxPrev) {
+      Accoom.on(els.lightboxPrev, 'click', function () {
+        state.lightboxIndex -= 1;
+        if (state.lightboxIndex < 0) state.lightboxIndex = state.lightboxItems.length - 1;
+        renderLightbox();
+      });
+    }
+
+    if (els.lightboxNext) {
+      Accoom.on(els.lightboxNext, 'click', function () {
+        state.lightboxIndex += 1;
+        if (state.lightboxIndex > state.lightboxItems.length - 1) state.lightboxIndex = 0;
+        renderLightbox();
+      });
+    }
+
+    Accoom.on(document, 'keydown', function (e) {
+      if (!els.lightbox || els.lightbox.classList.contains('is-hidden')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft' && els.lightboxPrev) els.lightboxPrev.click();
+      if (e.key === 'ArrowRight' && els.lightboxNext) els.lightboxNext.click();
+    });
+
+    /* ---------------- COMPOSER TEXTAREA (auto-grow + Enter to send) ---------------- */
+    function autoGrowInput() {
+      if (!els.input) return;
+      els.input.style.height = 'auto';
+      els.input.style.height = Math.min(els.input.scrollHeight, 120) + 'px';
+    }
+
+    if (els.input) {
+      Accoom.on(els.input, 'input', autoGrowInput);
+
+      Accoom.on(els.input, 'keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          if (els.composer && els.composer.requestSubmit) {
+            els.composer.requestSubmit();
+          } else if (els.send) {
+            els.send.click();
+          }
+        }
       });
     }
 
@@ -779,12 +1321,42 @@
 
     if (blockBtn) {
       Accoom.on(blockBtn, 'click', function () {
+        var conv = findConv(state.activeId);
+        if (!conv) return;
+        conv.blocked = !conv.blocked;
+        applyBlockedState(conv);
+      });
+    }
+
+    if (els.unblockBtn) {
+      Accoom.on(els.unblockBtn, 'click', function () {
+        var conv = findConv(state.activeId);
+        if (!conv) return;
+        conv.blocked = false;
+        applyBlockedState(conv);
+      });
+    }
+
+    if (els.deleteChatBtn) {
+      Accoom.on(els.deleteChatBtn, 'click', function () {
         if (!state.activeId) return;
         deleteConversation(state.activeId);
       });
     }
 
+    function applyBlockedState(conv) {
+      var blocked = !!conv.blocked;
+      if (blockBtn) {
+        var label = blockBtn.querySelector('span');
+        if (label) label.textContent = blocked ? 'Unblock Agent' : 'Block Agent';
+      }
+      if (els.composer) els.composer.classList.toggle('is-hidden', blocked);
+      if (els.blockedBar) els.blockedBar.classList.toggle('is-hidden', !blocked);
+      if (blocked) hideReplyPreview();
+    }
+
     /* ---------------- INIT ---------------- */
+    updateMoveSavedLabel();
     renderList();
     showChatEmpty();
     Accoom.initButtonAnimations();
