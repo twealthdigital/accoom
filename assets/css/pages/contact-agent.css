@@ -720,7 +720,8 @@
   border-bottom-right-radius: 4px;
 }
 
-.msgs-row.is-dragging .msgs-bubble { transform: translateX(var(--drag-x, 0)); }
+.msgs-row.is-dragging .msgs-bubble,
+.msgs-row.is-dragging .msgs-bubble-photos { transform: translateX(var(--drag-x, 0)); }
 
 .msgs-bubble-photos {
   display: grid;
@@ -787,6 +788,7 @@
 }
 .msgs-row--me .msgs-bubble-saved { right: -4px; }
 .msgs-row--agent .msgs-bubble-saved { left: -4px; }
+
 
 /* desktop hover arrow -> opens message menu */
 .msgs-row-action {

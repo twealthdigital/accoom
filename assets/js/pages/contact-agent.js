@@ -18,8 +18,13 @@
     file: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>'
   };
 
-  var AVATAR = 'assets/images/agent-images/agenticonimg.webp';
+    var AVATAR = 'assets/images/agent-images/agenticonimg.webp';
 
+  // Touch/mobile devices reply by swiping a message right instead of
+  // using the "Reply" item in the 3-dot menu (desktop-only from here on).
+  var IS_TOUCH = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  var DRAG_REPLY_MAX = 64;
+  var DRAG_REPLY_THRESHOLD = 46;
   /* ============================================================
      MOCK DATA — replace with your real API / backend later.
      Each conversation carries its own message thread.
@@ -909,7 +914,7 @@
         '</div>';
 
       var menuItems = '';
-      if (!isSavedView) {
+      if (!isSavedView && !IS_TOUCH) {
         menuItems += '<li role="option" data-row-reply>' + ICONS.reply + ' <span style="margin-left:6px;">Reply</span></li>';
       }
       menuItems += '<li role="option" data-row-save>' + ICONS.star + ' <span style="margin-left:6px;">' + (msg.saved ? 'Unsave' : 'Save') + '</span></li>';
@@ -923,9 +928,11 @@
           '<ul class="dropdown-panel" data-row-menu-panel>' + menuItems + '</ul>' +
         '</div>';
 
+      var dragHintHtml = (!isSavedView && IS_TOUCH) ? '<div class="msgs-drag-reply-hint">' + ICONS.reply + '</div>' : '';
+
       row.innerHTML =
         avatarHtml +
-        '<div class="msgs-bubble-col">' + replyHtml + bubbleInner + actionHtml + metaHtml + '</div>';
+        '<div class="msgs-bubble-col">' + dragHintHtml + replyHtml + bubbleInner + actionHtml + metaHtml + '</div>';
 
       var actionBtn = row.querySelector('[data-row-action]');
       var panel = row.querySelector('[data-row-menu-panel]');
@@ -982,23 +989,66 @@
       // too, instead of needing another long press each time.
       var longPressTimer = null;
       var longPressFired = false;
+      var dragStartX = 0;
+      var dragStartY = 0;
+      var dragX = 0;
+      var isReplyDragging = false;
+      var dragAxisLocked = null;
+      var canSwipeReply = !isSavedView && IS_TOUCH;
 
       Accoom.on(row, 'touchstart', function (e) {
-  if (e.target.closest('.msgs-row-menu')) return;
-  longPressFired = false;
-  clearTimeout(longPressTimer);
-  longPressTimer = setTimeout(function () {
-    longPressFired = true;
-    enterMsgSelectMode(msg.id, conv);
-  }, 550);
-});
-
-      Accoom.on(row, 'touchmove', function () {
+        if (e.target.closest('.msgs-row-menu')) return;
+        var t = e.touches[0];
+        dragStartX = t.clientX;
+        dragStartY = t.clientY;
+        dragX = 0;
+        isReplyDragging = false;
+        dragAxisLocked = null;
+        longPressFired = false;
         clearTimeout(longPressTimer);
+        longPressTimer = setTimeout(function () {
+          longPressFired = true;
+          enterMsgSelectMode(msg.id, conv);
+        }, 550);
+      });
+
+      Accoom.on(row, 'touchmove', function (e) {
+        if (!canSwipeReply) {
+          clearTimeout(longPressTimer);
+          return;
+        }
+        var t = e.touches[0];
+        var deltaX = t.clientX - dragStartX;
+        var deltaY = t.clientY - dragStartY;
+
+        if (!dragAxisLocked && (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8)) {
+          dragAxisLocked = Math.abs(deltaX) > Math.abs(deltaY) ? 'x' : 'y';
+        }
+
+        if (dragAxisLocked !== 'x' || deltaX <= 0) {
+          clearTimeout(longPressTimer);
+          return;
+        }
+
+        clearTimeout(longPressTimer);
+        isReplyDragging = true;
+        dragX = Math.min(deltaX, DRAG_REPLY_MAX);
+        row.classList.add('is-dragging');
+        row.style.setProperty('--drag-x', dragX + 'px');
       });
 
       Accoom.on(row, 'touchend', function () {
         clearTimeout(longPressTimer);
+        if (isReplyDragging) {
+          if (dragX >= DRAG_REPLY_THRESHOLD) {
+            setReply(msg, conv);
+          }
+          row.classList.remove('is-dragging');
+          row.style.removeProperty('--drag-x');
+          isReplyDragging = false;
+          dragX = 0;
+          longPressFired = true;
+        }
       });
 
       Accoom.on(row, 'click', function (e) {
