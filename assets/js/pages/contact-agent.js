@@ -635,7 +635,7 @@
 
     function updateMoveSavedLabel() {
       if (!moveSavedLabel) return;
-      moveSavedLabel.textContent = state.listTab === 'saved' ? 'Remove from Saved' : 'Move to Saved';
+      moveSavedLabel.textContent = state.listTab === 'saved' ? 'Remove Saved' : 'Move to Saved';
     }
 
     if (moveSavedBtn) {
@@ -1035,6 +1035,7 @@
         dragX = Math.min(deltaX, DRAG_REPLY_MAX);
         row.classList.add('is-dragging');
         row.style.setProperty('--drag-x', dragX + 'px');
+        row.classList.toggle('is-reply-ready', dragX >= DRAG_REPLY_THRESHOLD);
       });
 
       Accoom.on(row, 'touchend', function () {
@@ -1044,6 +1045,7 @@
             setReply(msg, conv);
           }
           row.classList.remove('is-dragging');
+          row.classList.remove('is-reply-ready');
           row.style.removeProperty('--drag-x');
           isReplyDragging = false;
           dragX = 0;

@@ -980,7 +980,8 @@
 
 .msgs-row--me .msgs-drag-reply-hint,
 .msgs-row--agent .msgs-drag-reply-hint { right: calc(100% + 4px); }
-.msgs-row.is-dragging .msgs-drag-reply-hint { opacity: 1; }
+.msgs-row--me.is-dragging .msgs-drag-reply-hint { opacity: 1; }
+.msgs-row--agent.is-reply-ready .msgs-drag-reply-hint { opacity: 1; }
 
 /* ---- reply preview above composer ---- */
 .msgs-reply-preview {
@@ -1031,7 +1032,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 18px;
+  padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--line-page);
   flex-shrink: 0;
 }
@@ -1118,12 +1119,20 @@
    RESPONSIVE
    ============================================================ */
 @media (max-width: 860px) {
+  .msgs-breadcrumb-wrap {
+    display: none;
+  }
+
+  .msgs-shell {
+    padding-block: 0;
+  }
+
   .msgs-layout {
     grid-template-columns: 1fr;
     border-radius: 0;
     border-left: none;
     border-right: none;
-    height: calc(100dvh - var(--header-h-mobile) - 60px);
+    height: calc(100dvh - var(--header-h-mobile));
   }
 
   .msgs-list-panel { border-right: none; }
@@ -1188,8 +1197,14 @@
   }
 
   .msgs-search input {
-    height: 48px;
+    height: 20px;
     font-size: 0.95rem;
+  }
+
+  .msgs-search input::-webkit-search-cancel-button,
+  .msgs-search input::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
   }
 
   .msgs-tabs {
@@ -1277,6 +1292,40 @@
 
 @media (min-width: 861px) {
   .msgs-layout { grid-template-columns: 340px 1fr; }
+}
+
+/* Tablet: no native search clear icon at all */
+@media (min-width: 861px) and (max-width: 1024px) {
+  .msgs-search input::-webkit-search-cancel-button,
+  .msgs-search input::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+}
+
+/* Desktop: keep the clear icon, but styled to match the theme */
+@media (min-width: 1025px) {
+  .msgs-search input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    margin-left: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    background: var(--on-page-soft);
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18'/%3E%3Cline x1='6' y1='6' x2='18' y2='18'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18'/%3E%3Cline x1='6' y1='6' x2='18' y2='18'/%3E%3C/svg%3E");
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    transition: background var(--dur-fast) var(--ease);
+  }
+
+  .msgs-search input::-webkit-search-cancel-button:hover {
+    background: var(--gold);
+  }
 }
 
 html.dark-mode .msgs-reply-quote { background: rgba(255, 255, 255, 0.06); }
