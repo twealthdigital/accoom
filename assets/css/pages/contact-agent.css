@@ -985,7 +985,10 @@
 
 @media (max-width: 860px) {
   .msgs-row--agent .msgs-drag-reply-hint {
-    right: 10px;
+    top: 6px;
+    left: -4px;
+    right: auto;
+    transform: none;
   }
 }
 
