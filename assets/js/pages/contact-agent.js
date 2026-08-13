@@ -498,6 +498,7 @@
       items.forEach(function (conv) {
         var msg = lastMessage(conv);
         var unread = unreadCount(conv);
+        void 0; // placeholder, spawnRipple defined below renderList
 
         var li = document.createElement('li');
         li.className = 'msgs-list-item' +
@@ -528,6 +529,8 @@
           '</span>';
 
         Accoom.on(li, 'click', function (e) {
+          if (!e.target.closest('[data-conv-delete]')) spawnRipple(li, e);
+
           if (e.target.closest('[data-conv-delete]')) {
             e.stopPropagation();
             deleteConversation(conv.id);
@@ -693,6 +696,24 @@
         renderList();
       });
     });
+
+    function spawnRipple(el, e) {
+      var rect = el.getBoundingClientRect();
+      var size = Math.max(rect.width, rect.height);
+      var x = (e.clientX || (rect.left + rect.width / 2)) - rect.left - size / 2;
+      var y = (e.clientY || (rect.top + rect.height / 2)) - rect.top - size / 2;
+
+      var ripple = document.createElement('span');
+      ripple.className = 'msgs-ripple';
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+
+      el.appendChild(ripple);
+      ripple.addEventListener('animationend', function () {
+        ripple.remove();
+      });
+    }
 
     /* ---------------- OPEN CONVERSATION ---------------- */
     function showChatEmpty(noConversations) {

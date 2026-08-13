@@ -210,10 +210,27 @@
   padding: 10px 10px;
   border-radius: 12px;
   cursor: pointer;
+  overflow: hidden;
   transition: background var(--dur-fast) var(--ease);
 }
 
 .msgs-list-item:hover { background: var(--surface-page); }
+
+.msgs-ripple {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--on-page) 18%, transparent);
+  transform: scale(0);
+  animation: msgs-ripple-anim 500ms var(--ease);
+}
+
+@keyframes msgs-ripple-anim {
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
 
 @media (hover: none) and (pointer: coarse) {
   .msgs-list-item:active { background: var(--surface-page); }
