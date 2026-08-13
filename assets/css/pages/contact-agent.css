@@ -978,8 +978,8 @@
   pointer-events: none;
 }
 
-.msgs-row--me .msgs-drag-reply-hint { right: calc(100% + 4px); }
-.msgs-row--agent .msgs-drag-reply-hint { left: calc(100% + 4px); }
+.msgs-row--me .msgs-drag-reply-hint,
+.msgs-row--agent .msgs-drag-reply-hint { right: calc(100% + 4px); }
 .msgs-row.is-dragging .msgs-drag-reply-hint { opacity: 1; }
 
 /* ---- reply preview above composer ---- */
