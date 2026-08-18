@@ -1416,6 +1416,19 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
   padding: 14px 16px;
 }
 
+@media (max-width: 1024px) {
+  .msgs-blocked-bar {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .msgs-blocked-actions {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
 .msgs-blocked-bar.is-hidden {
   display: none;
 }
@@ -1457,6 +1470,19 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
 
 .msgs-blocked-btn--delete:hover {
   background: rgba(239, 68, 68, 0.2);
+}
+
+.msgs-offer-menu.is-disabled {
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+.msgs-property-pay-btn:disabled,
+.msgs-property-review-btn:disabled,
+.msgs-pay-btn:disabled {
+  pointer-events: none;
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 

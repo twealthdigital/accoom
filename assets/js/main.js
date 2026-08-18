@@ -55,6 +55,92 @@ window.Accoom = window.Accoom || {};
       Accoom.initDropdown(listingsSort);
     }
 
+    // Notifications dropdown + panel behavior (site-wide).
+    // Markup now ships via the partials/notifications.html partial on
+    // every page, so this has to wait for the partial to actually be
+    // in the DOM instead of running on plain Accoom.ready.
+    Accoom.on(document, 'partials:ready', function () {
+      var notifDropdown = document.querySelector('.notif-dropdown');
+      if (notifDropdown) {
+        Accoom.initDropdown(notifDropdown);
+      }
+
+      var trigger = document.querySelector('.notif-trigger');
+      var list = document.querySelector('[data-notif-list]');
+      if (!trigger || !list) return;
+
+      var COLLAPSED_LINES = 2;
+
+      function refreshBadge() {
+        var hasUnread = !!list.querySelector('.notif-item.is-unread');
+        trigger.classList.toggle('has-unread', hasUnread);
+      }
+
+      list.querySelectorAll('[data-notif-content]').forEach(function (content) {
+        var btn = content.closest('.notif-item-body').querySelector('[data-notif-more]');
+        if (!btn) return;
+
+        var lineHeight = parseFloat(getComputedStyle(content).lineHeight) || 18;
+        var collapsedHeight = lineHeight * COLLAPSED_LINES;
+        content.style.maxHeight = collapsedHeight + 'px';
+
+        if (content.scrollHeight > collapsedHeight + 1) {
+          btn.classList.add('is-visible');
+        }
+      });
+
+      list.addEventListener('click', function (e) {
+        var moreBtn = e.target.closest('[data-notif-more]');
+        if (moreBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          var content = moreBtn.closest('.notif-item-body').querySelector('[data-notif-content]');
+          var lineHeight = parseFloat(getComputedStyle(content).lineHeight) || 18;
+          var collapsedHeight = lineHeight * COLLAPSED_LINES;
+          var isExpanded = moreBtn.dataset.expanded === 'true';
+
+          if (isExpanded) {
+            content.style.maxHeight = collapsedHeight + 'px';
+            moreBtn.textContent = 'more';
+            moreBtn.dataset.expanded = 'false';
+          } else {
+            content.style.maxHeight = content.scrollHeight + 'px';
+            moreBtn.textContent = 'show less';
+            moreBtn.dataset.expanded = 'true';
+          }
+          return;
+        }
+
+        var markReadBtn = e.target.closest('[data-notif-mark-read]');
+        if (markReadBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          var readItem = markReadBtn.closest('[data-notif-item]');
+          if (readItem) readItem.classList.remove('is-unread');
+          markReadBtn.classList.add('is-read');
+          markReadBtn.setAttribute('aria-label', 'Marked as read');
+          refreshBadge();
+          return;
+        }
+
+        var closeBtn = e.target.closest('[data-notif-close]');
+        if (closeBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          var item = closeBtn.closest('[data-notif-item]');
+          if (!item) return;
+          item.classList.add('is-removing');
+          setTimeout(function () {
+            item.remove();
+            refreshBadge();
+          }, 260);
+        }
+      });
+
+      refreshBadge();
+    });
+
     // Desktop menu dropdown (hamburger: Account / Location / Theme / Help)
     var desktopMenu = document.querySelector('.desktop-menu-dropdown');
     if (desktopMenu) {

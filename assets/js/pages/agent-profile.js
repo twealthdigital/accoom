@@ -242,16 +242,9 @@
     })();
 
     // ============================================================
-    // CONTACT AGENT — placeholder hook for the messaging/chat flow
+    // CONTACT AGENT — link already points to contact-agent.html,
+    // nothing to intercept.
     // ============================================================
-    (function initContact() {
-      var btn = document.querySelector('[data-ap-contact]');
-      if (!btn) return;
-      Accoom.on(btn, 'click', function (e) {
-        e.preventDefault();
-        console.log('Contact agent clicked:', agent.name);
-      });
-    })();
 
     console.log('ACCOOM agent profile page initialized');
   });

@@ -56,6 +56,9 @@
           Find Accommodation
         </a>
 
+        <!-- Notifications -->
+        <div data-partial="partials/notifications.html"></div>
+
         <div class="dropdown desktop-menu-dropdown">
           <button type="button" class="desktop-hamburger-btn dropdown-trigger" aria-haspopup="true" aria-expanded="false" aria-label="Open menu">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -305,14 +308,6 @@
   ========================================================= -->
   <main class="msgs-page">
 
-    <div class="container msgs-breadcrumb-wrap">
-      <nav class="msgs-breadcrumb" aria-label="Breadcrumb">
-        <a href="home.html">Home</a>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        <span>Messages</span>
-      </nav>
-    </div>
-
     <div class="container msgs-shell">
       <div class="msgs-layout" data-msgs-layout>
 
@@ -439,7 +434,7 @@
                 </button>
                 <button type="button" class="msgs-property-review-btn" data-msgs-property-review-btn>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
-                  <span>Request a Review</span>
+                  <span>Report Agent</span>
                 </button>
               </div>
             </div>
@@ -535,7 +530,6 @@
               <p>You've blocked this agent. You can't send messages until you unblock.</p>
               <div class="msgs-blocked-actions">
                 <button type="button" class="msgs-blocked-btn msgs-blocked-btn--unblock" data-msgs-unblock>Unblock</button>
-                <button type="button" class="msgs-blocked-btn msgs-blocked-btn--delete" data-msgs-delete-chat>Delete</button>
               </div>
             </div>
 

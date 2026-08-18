@@ -329,8 +329,8 @@
       chatTabs: Accoom.$$('[data-msgs-chat-tab]'),
       blockedBar: Accoom.$('[data-msgs-blocked-bar]'),
       unblockBtn: Accoom.$('[data-msgs-unblock]'),
-      deleteChatBtn: Accoom.$('[data-msgs-delete-chat]'),
       payBtn: Accoom.$('[data-msgs-pay-btn]'),
+      offerMenu: Accoom.$('[data-msgs-offer-menu]'),
       lightbox: Accoom.$('[data-msgs-lightbox]'),
       lightboxStage: Accoom.$('[data-msgs-lightbox-stage]'),
       lightboxCounter: Accoom.$('[data-msgs-lightbox-counter]'),
@@ -936,10 +936,12 @@
         '</div>';
 
       var menuItems = '';
-      if (!isSavedView && !IS_TOUCH) {
-        menuItems += '<li role="option" data-row-reply>' + ICONS.reply + ' <span style="margin-left:6px;">Reply</span></li>';
+      if (!conv.blocked) {
+        if (!isSavedView && !IS_TOUCH) {
+          menuItems += '<li role="option" data-row-reply>' + ICONS.reply + ' <span style="margin-left:6px;">Reply</span></li>';
+        }
+        menuItems += '<li role="option" data-row-save>' + ICONS.star + ' <span style="margin-left:6px;">' + (msg.saved ? 'Unsave' : 'Save') + '</span></li>';
       }
-      menuItems += '<li role="option" data-row-save>' + ICONS.star + ' <span style="margin-left:6px;">' + (msg.saved ? 'Unsave' : 'Save') + '</span></li>';
       // Individual messages are intentionally NOT deletable — chats can
       // serve as evidence for both the client and the agent. Whole
       // conversations can still be removed from the list.
@@ -1435,13 +1437,6 @@
       });
     }
 
-    if (els.deleteChatBtn) {
-      Accoom.on(els.deleteChatBtn, 'click', function () {
-        if (!state.activeId) return;
-        deleteConversation(state.activeId);
-      });
-    }
-
     function applyBlockedState(conv) {
       var blocked = !!conv.blocked;
       if (blockBtn) {
@@ -1451,6 +1446,11 @@
       if (els.composer) els.composer.classList.toggle('is-hidden', blocked);
       if (els.blockedBar) els.blockedBar.classList.toggle('is-hidden', !blocked);
       if (blocked) hideReplyPreview();
+
+      if (els.payBtn) els.payBtn.disabled = blocked;
+      if (els.propPayBtn) els.propPayBtn.disabled = blocked;
+      if (els.propReviewBtn) els.propReviewBtn.disabled = blocked;
+      if (els.offerMenu) els.offerMenu.classList.toggle('is-disabled', blocked);
     }
 
     /* ---------------- INIT ---------------- */

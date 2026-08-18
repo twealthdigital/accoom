@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <!-- =========================================================
+     NOTIFICATIONS DROPDOWN
+     TODO(backend): notif-list below is hardcoded — swap for
+     items rendered from the notifications API when it's ready.
+============================================================= -->
+<div class="dropdown notif-dropdown">
+  <button type="button" class="notif-trigger dropdown-trigger has-unread" aria-haspopup="true" aria-expanded="false" aria-label="Notifications">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+    </svg>
+    <span class="notif-badge-dot" data-notif-badge></span>
+  </button>
+
+  <div class="dropdown-panel notif-panel" data-dropdown-panel>
+    <div class="notif-panel-header">
+      <h4>Notifications</h4>
+    </div>
+
+    <div class="notif-list" data-notif-list>
+
+      <div class="notif-item is-unread" data-notif-item data-notif-type="order">
+        <div class="notif-item-main">
+          <span class="notif-item-icon notif-item-icon--order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="M3.3 7 12 12l8.7-5"></path><path d="M12 22V12"></path></svg>
+          </span>
+          <span class="notif-item-body">
+            <span class="notif-item-top">
+              <span class="notif-item-title">Booking order confirmed</span>
+              <span class="notif-item-time">1h ago</span>
+            </span>
+            <span class="notif-item-text">
+              <span class="notif-text-content" data-notif-content>Your order #ACC-4821 for the self-contained apartment in Maitama has been confirmed by the agent.</span>
+            </span>
+            <button type="button" class="notif-more-btn" data-notif-more>...more</button>
+          </span>
+        </div>
+        <div class="notif-item-actions">
+          <button type="button" class="notif-close" data-notif-close aria-label="Dismiss notification">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          <button type="button" class="notif-item-msg-box" data-notif-mark-read aria-label="Mark as read">
+            <svg class="notif-mail-icon notif-mail-icon--closed" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>
+            <svg class="notif-mail-icon notif-mail-icon--open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v2l-8 6-8-6Z"></path><path d="M2 8v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-9.1 6.8a1.5 1.5 0 0 1-1.8 0Z"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="notif-item is-unread" data-notif-item data-notif-type="order">
+        <div class="notif-item-main">
+          <span class="notif-item-icon notif-item-icon--order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="M3.3 7 12 12l8.7-5"></path><path d="M12 22V12"></path></svg>
+          </span>
+          <span class="notif-item-body">
+            <span class="notif-item-top">
+              <span class="notif-item-title">Booking order confirmed</span>
+              <span class="notif-item-time">1h ago</span>
+            </span>
+            <span class="notif-item-text">
+              <span class="notif-text-content" data-notif-content>Your order #ACC-4821 for the self-contained apartment in Maitama has been confirmed by the agent.</span>
+            </span>
+            <button type="button" class="notif-more-btn" data-notif-more>...more</button>
+          </span>
+        </div>
+        <div class="notif-item-actions">
+          <button type="button" class="notif-close" data-notif-close aria-label="Dismiss notification">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          <button type="button" class="notif-item-msg-box" data-notif-mark-read aria-label="Mark as read">
+            <svg class="notif-mail-icon notif-mail-icon--closed" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>
+            <svg class="notif-mail-icon notif-mail-icon--open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v2l-8 6-8-6Z"></path><path d="M2 8v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-9.1 6.8a1.5 1.5 0 0 1-1.8 0Z"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="notif-item is-unread" data-notif-item data-notif-type="accoom">
+        <a href="notification.html" class="notif-item-main">
+          <span class="notif-item-icon notif-item-icon--accoom">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg>
+          </span>
+          <span class="notif-item-body">
+            <span class="notif-item-top">
+              <span class="notif-item-title">Accoom</span>
+              <span class="notif-item-time">3h ago</span>
+            </span>
+            <span class="notif-item-text">
+              <span class="notif-text-content" data-notif-content>Complete your profile verification to unlock direct chat with agents and priority replies.</span>
+            </span>
+            <button type="button" class="notif-more-btn" data-notif-more>more</button>
+          </span>
+        </a>
+        <div class="notif-item-actions">
+          <button type="button" class="notif-close" data-notif-close aria-label="Dismiss notification">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          <button type="button" class="notif-item-msg-box" data-notif-mark-read aria-label="Mark as read">
+            <svg class="notif-mail-icon notif-mail-icon--closed" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>
+            <svg class="notif-mail-icon notif-mail-icon--open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v2l-8 6-8-6Z"></path><path d="M2 8v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-9.1 6.8a1.5 1.5 0 0 1-1.8 0Z"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="notif-item" data-notif-item data-notif-type="message">
+        <a href="contact-agent.html" class="notif-item-main">
+          <span class="notif-item-icon notif-item-icon--message">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          </span>
+          <span class="notif-item-body">
+            <span class="notif-item-top">
+              <span class="notif-item-title">Sanan Ullah replied</span>
+              <span class="notif-item-time">Yesterday</span>
+            </span>
+            <span class="notif-item-text">
+              <span class="notif-text-content" data-notif-content>I hope to hear from you soon, and I will deliver my best to get you the apartment you want.</span>
+            </span>
+            <button type="button" class="notif-more-btn" data-notif-more>more</button>
+          </span>
+        </a>
+        <div class="notif-item-actions">
+          <button type="button" class="notif-close" data-notif-close aria-label="Dismiss notification">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          <button type="button" class="notif-item-msg-box" data-notif-mark-read aria-label="Mark as read">
+            <svg class="notif-mail-icon notif-mail-icon--closed" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>
+            <svg class="notif-mail-icon notif-mail-icon--open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v2l-8 6-8-6Z"></path><path d="M2 8v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-9.1 6.8a1.5 1.5 0 0 1-1.8 0Z"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="notif-item" data-notif-item data-notif-type="order">
+        <a href="notification.html" class="notif-item-main">
+          <span class="notif-item-icon notif-item-icon--order">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="M3.3 7 12 12l8.7-5"></path><path d="M12 22V12"></path></svg>
+          </span>
+          <span class="notif-item-body">
+            <span class="notif-item-top">
+              <span class="notif-item-title">Order delivered</span>
+              <span class="notif-item-time">2 days ago</span>
+            </span>
+            <span class="notif-item-text">
+              <span class="notif-text-content" data-notif-content>Your agent visit request has been completed and marked as closed.</span>
+            </span>
+            <button type="button" class="notif-more-btn" data-notif-more>more</button>
+          </span>
+        </a>
+        <div class="notif-item-actions">
+          <button type="button" class="notif-close" data-notif-close aria-label="Dismiss notification">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          <button type="button" class="notif-item-msg-box" data-notif-mark-read aria-label="Mark as read">
+            <svg class="notif-mail-icon notif-mail-icon--closed" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>
+            <svg class="notif-mail-icon notif-mail-icon--open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v2l-8 6-8-6Z"></path><path d="M2 8v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-9.1 6.8a1.5 1.5 0 0 1-1.8 0Z"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="notif-item" data-notif-item data-notif-type="accoom">
+        <a href="notification.html" class="notif-item-main">
+          <span class="notif-item-icon notif-item-icon--accoom">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg>
+          </span>
+          <span class="notif-item-body">
+            <span class="notif-item-top">
+              <span class="notif-item-title">Accoom</span>
+              <span class="notif-item-time">4 days ago</span>
+            </span>
+            <span class="notif-item-text">
+              <span class="notif-text-content" data-notif-content>Thanks for verifying your account, you now have full access to chat with agents.</span>
+            </span>
+            <button type="button" class="notif-more-btn" data-notif-more>more</button>
+          </span>
+        </a>
+        <div class="notif-item-actions">
+          <button type="button" class="notif-close" data-notif-close aria-label="Dismiss notification">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          <button type="button" class="notif-item-msg-box" data-notif-mark-read aria-label="Mark as read">
+            <svg class="notif-mail-icon notif-mail-icon--closed" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>
+            <svg class="notif-mail-icon notif-mail-icon--open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v2l-8 6-8-6Z"></path><path d="M2 8v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-9.1 6.8a1.5 1.5 0 0 1-1.8 0Z"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="notif-item" data-notif-item data-notif-type="message">
+        <a href="contact-agent.html" class="notif-item-main">
+          <span class="notif-item-icon notif-item-icon--message">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          </span>
+          <span class="notif-item-body">
+            <span class="notif-item-top">
+              <span class="notif-item-title">Faisal Shafiq</span>
+              <span class="notif-item-time">1 week ago</span>
+            </span>
+            <span class="notif-item-text">
+              <span class="notif-text-content" data-notif-content>Sorry, no need for now. I already found a place closer to my office.</span>
+            </span>
+            <button type="button" class="notif-more-btn" data-notif-more>more</button>
+          </span>
+        </a>
+        <div class="notif-item-actions">
+          <button type="button" class="notif-close" data-notif-close aria-label="Dismiss notification">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          <button type="button" class="notif-item-msg-box" data-notif-mark-read aria-label="Mark as read">
+            <svg class="notif-mail-icon notif-mail-icon--closed" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>
+            <svg class="notif-mail-icon notif-mail-icon--open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v2l-8 6-8-6Z"></path><path d="M2 8v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-9.1 6.8a1.5 1.5 0 0 1-1.8 0Z"></path></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>
