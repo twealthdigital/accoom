@@ -826,7 +826,12 @@ html:not(.dark-mode) .notif-trigger {
   }
 
   .notif-panel {
-    right: -8px;
+    position: fixed;
+    top: calc(var(--header-h-mobile) + 8px);
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: none;
   }
 }
 

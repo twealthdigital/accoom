@@ -241,9 +241,10 @@
   transform: rotate(180deg);
 }
 
-.panel-location-dropdown .dropdown-panel {
-  position: relative;
-  top: 4px;
+.panel-location-dropdown .dropdown-panel,
+.panel-account-dropdown .dropdown-panel {
+  position: absolute;
+  top: calc(100% + 4px);
   left: 0;
   right: 0;
   width: 100%;

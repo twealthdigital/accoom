@@ -254,14 +254,25 @@
             </a>
           </li>
         </ul>
+      </div>
 
-      <a href="#" class="panel-row">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <span>Sign in</span>
-      </a>
+      <div class="dropdown panel-account-dropdown">
+        <button type="button" class="panel-row dropdown-trigger" aria-haspopup="listbox" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>Account</span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <ul class="dropdown-panel" data-dropdown-panel role="listbox" aria-label="Account">
+          <li role="option"><a href="#"><span>Sign in</span></a></li>
+          <li role="option"><a href="#"><span>Sign up</span></a></li>
+        </ul>
+      </div>
 
       <div class="panel-divider"></div>
 

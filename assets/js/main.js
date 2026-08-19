@@ -44,6 +44,12 @@ window.Accoom = window.Accoom || {};
       Accoom.initLocationDropdown(panelLocation);
     }
 
+    // Mobile panel account
+    var panelAccount = document.querySelector('.panel-account-dropdown');
+    if (panelAccount) {
+      Accoom.initDropdown(panelAccount);
+    }
+
 // Listings filters/sort dropdowns
     var listingsFilters = document.querySelector('.listings-filter-dropdown');
     if (listingsFilters) {
@@ -116,10 +122,14 @@ window.Accoom = window.Accoom || {};
         if (markReadBtn) {
           e.preventDefault();
           e.stopPropagation();
-          var readItem = markReadBtn.closest('[data-notif-item]');
-          if (readItem) readItem.classList.remove('is-unread');
-          markReadBtn.classList.add('is-read');
-          markReadBtn.setAttribute('aria-label', 'Marked as read');
+          var toggleItem = markReadBtn.closest('[data-notif-item]');
+          var nowRead = markReadBtn.classList.toggle('is-read');
+
+          if (toggleItem) {
+            toggleItem.classList.toggle('is-unread', !nowRead);
+          }
+
+          markReadBtn.setAttribute('aria-label', nowRead ? 'Mark as unread' : 'Mark as read');
           refreshBadge();
           return;
         }

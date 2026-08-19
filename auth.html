@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" class="dark-mode">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In or Sign Up — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/auth.css" />
+</head>
+<body class="auth-body">
+
+  <div class="auth-page">
+
+    <!-- =========================================================
+         VISUAL SIDE
+    ========================================================= -->
+    <section class="auth-visual">
+      <div class="auth-visual-bg">
+        <img src="assets/images/home-images/home-hero.png" alt="" />
+        <div class="auth-visual-scrim"></div>
+      </div>
+
+            <div class="auth-visual-top">
+        <a href="home.html" class="logo-link">
+          <img src="assets/images/accoom-logo.png" alt="ACCOOM Logo" class="logo-dark" />
+          <img src="assets/images/accoom-white-logo.png" alt="ACCOOM Logo" class="logo-light" />
+        </a>
+        <div class="auth-visual-top-right">
+          <div class="auth-theme-toggle" data-auth-theme-toggle>
+            <span class="auth-theme-toggle-indicator" data-auth-theme-indicator></span>
+            <button type="button" class="auth-theme-btn" data-auth-theme="dark" aria-label="Dark mode">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+            </button>
+            <button type="button" class="auth-theme-btn" data-auth-theme="light" aria-label="Light mode">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+            </button>
+          </div>
+          <a href="home.html" class="auth-back-home">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 11.5 12 4l9 7.5"></path>
+              <path d="M5 10v10h14V10"></path>
+            </svg>
+            Back to Home
+          </a>
+        </div>
+      </div>
+
+      <div class="auth-visual-content">
+        <h1 data-auth-headline>Create <span class="accent">your</span> account.<br>Unlock the <span class="accent">perfect stay</span>.</h1>
+        <p data-auth-subhead>Join thousands of users finding verified accommodations with trusted agents. Fast, secure, and hassle-free.</p>
+
+        <ul class="auth-feature-list">
+          <li>
+            <span class="auth-feature-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"></path></svg>
+            </span>
+            <span>
+              <strong>Secure &amp; Trusted</strong>
+              <small>Your data is safe with us.</small>
+            </span>
+          </li>
+          <li>
+            <span class="auth-feature-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"></path></svg>
+            </span>
+            <span>
+              <strong>Fast &amp; Easy</strong>
+              <small>Quick sign up in less than a minute.</small>
+            </span>
+          </li>
+          <li>
+            <span class="auth-feature-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"></circle><path d="M17 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path><path d="M1 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"></path></svg>
+            </span>
+            <span>
+              <strong>Verified Agents</strong>
+              <small>Connect with reliable, verified agents.</small>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         FORM SIDE
+    ========================================================= -->
+    <section class="auth-panel-wrap">
+      <div class="auth-card">
+
+        <!-- LOGIN / SIGNUP TABS -->
+        <div class="auth-tabs" data-auth-tabs>
+          <div class="auth-tabs-indicator" data-auth-indicator></div>
+          <button type="button" class="auth-tab" data-auth-tab="login">Login</button>
+          <button type="button" class="auth-tab" data-auth-tab="signup">Sign up</button>
+        </div>
+
+        <!-- HEADER TEXT (switches per view) -->
+        <div class="auth-card-head">
+          <h2 data-auth-title>Welcome back</h2>
+          <p>
+            <span data-auth-switch="login">Don't have an account? <a href="#" data-auth-goto="signup">Sign up</a></span>
+            <span data-auth-switch="signup" hidden>Already have an account? <a href="#" data-auth-goto="login">Sign in</a></span>
+          </p>
+        </div>
+
+        <!-- GOOGLE -->
+        <button type="button" class="auth-google-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.7-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"></path><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3c-1.1.7-2.4 1.2-4 1.2-3.1 0-5.7-2.1-6.6-4.9H1.4v3.1C3.3 21.3 7.3 24 12 24z"></path><path fill="#FBBC05" d="M5.4 14.4c-.2-.7-.4-1.5-.4-2.4s.1-1.6.4-2.4V6.5H1.4C.5 8.2 0 10.1 0 12s.5 3.8 1.4 5.5l4-3.1z"></path><path fill="#EA4335" d="M12 4.8c1.7 0 3.3.6 4.5 1.7l3.4-3.4C17.9 1.2 15.2 0 12 0 7.3 0 3.3 2.7 1.4 6.5l4 3.1C6.3 6.9 8.9 4.8 12 4.8z"></path></svg>
+          <span data-auth-google-label>Continue with Google</span>
+        </button>
+
+        <div class="auth-divider" data-auth-divider-label>or continue with email</div>
+
+        <!-- LOGIN FORM -->
+        <form class="auth-form" data-auth-form="login" novalidate>
+          <label class="auth-field">
+            <span>Email Address</span>
+            <span class="auth-input">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>
+              <input type="email" placeholder="Enter your email address" required autocomplete="email" />
+            </span>
+          </label>
+
+          <label class="auth-field">
+            <span class="auth-field-label-row">
+              Password
+              <a href="#" class="auth-forgot-link" data-auth-goto="forgot">Forgot password?</a>
+            </span>
+            <span class="auth-input">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+              <input type="password" placeholder="Enter your password" required autocomplete="current-password" />
+              <button type="button" class="auth-eye-toggle" data-auth-eye aria-label="Show password">
+                <svg class="auth-eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <svg class="auth-eye-closed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 20c-7 0-11-8-11-8a19.6 19.6 0 0 1 5-5.9M9.9 4.2A10 10 0 0 1 12 4c7 0 11 8 11 8a19.7 19.7 0 0 1-2.4 3.5M14.1 14.1a3 3 0 1 1-4.2-4.2"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+              </button>
+            </span>
+          </label>
+
+          <button type="submit" class="btn btn--primary btn--block auth-submit">Login</button>
+        </form>
+
+        <!-- SIGN UP FORM -->
+        <form class="auth-form" data-auth-form="signup" hidden novalidate>
+          <label class="auth-field">
+            <span>Full Name</span>
+            <span class="auth-input">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <input type="text" placeholder="Enter your full name" required autocomplete="name" />
+            </span>
+          </label>
+
+          <label class="auth-field">
+            <span>Email Address</span>
+            <span class="auth-input">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>
+              <input type="email" placeholder="Enter your email address" required autocomplete="email" />
+            </span>
+          </label>
+
+          <label class="auth-field">
+            <span>Password</span>
+            <span class="auth-input">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+              <input type="password" placeholder="Create a password" required autocomplete="new-password" />
+              <button type="button" class="auth-eye-toggle" data-auth-eye aria-label="Show password">
+                <svg class="auth-eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <svg class="auth-eye-closed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 20c-7 0-11-8-11-8a19.6 19.6 0 0 1 5-5.9M9.9 4.2A10 10 0 0 1 12 4c7 0 11 8 11 8a19.7 19.7 0 0 1-2.4 3.5M14.1 14.1a3 3 0 1 1-4.2-4.2"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+              </button>
+            </span>
+          </label>
+
+          <label class="auth-field">
+            <span>Confirm Password</span>
+            <span class="auth-input">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+              <input type="password" placeholder="Confirm your password" required autocomplete="new-password" />
+              <button type="button" class="auth-eye-toggle" data-auth-eye aria-label="Show password">
+                <svg class="auth-eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <svg class="auth-eye-closed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 20c-7 0-11-8-11-8a19.6 19.6 0 0 1 5-5.9M9.9 4.2A10 10 0 0 1 12 4c7 0 11 8 11 8a19.7 19.7 0 0 1-2.4 3.5M14.1 14.1a3 3 0 1 1-4.2-4.2"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+              </button>
+            </span>
+          </label>
+
+          <button type="submit" class="btn btn--primary btn--block auth-submit">Sign up</button>
+
+          <p class="auth-terms">By signing up, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+        </form>
+
+        <!-- FORGOT PASSWORD FORM -->
+        <form class="auth-form auth-form--forgot" data-auth-form="forgot" hidden novalidate>
+          <button type="button" class="auth-back-btn" data-auth-goto="login">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to login
+          </button>
+
+          <h2 class="auth-forgot-title">Reset your password</h2>
+          <p class="auth-forgot-copy">Enter the email linked to your account and we'll send you a link to reset your password.</p>
+
+          <label class="auth-field">
+            <span>Email Address</span>
+            <span class="auth-input">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>
+              <input type="email" placeholder="Enter your email address" required autocomplete="email" />
+            </span>
+          </label>
+
+          <button type="submit" class="btn btn--primary btn--block auth-submit">Send reset link</button>
+        </form>
+
+        <!-- RESET LINK SENT -->
+        <div class="auth-success" data-auth-form="reset-sent" hidden>
+          <span class="auth-success-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </span>
+          <h2>Check your email</h2>
+          <p data-auth-sent-copy>We've sent a password reset link to your email address.</p>
+          <button type="button" class="auth-back-btn" data-auth-goto="login">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to login
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/pages/auth.js"></script>
+
+</body>
+</html>
