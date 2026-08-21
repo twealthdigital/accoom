@@ -24,6 +24,8 @@ window.Accoom = window.Accoom || {};
       els.forEach(function (el) {
         if (el.type === 'checkbox') {
           el.checked = isDark;
+        } else {
+          el.setAttribute('aria-pressed', isDark ? 'true' : 'false');
         }
       });
       Accoom.dispatch(document, 'theme:change', { theme: theme });
@@ -42,11 +44,17 @@ window.Accoom = window.Accoom || {};
 
     // Setup toggles
     els.forEach(function (el) {
-      Accoom.on(el, 'change', function () {
-        var theme = el.checked ? 'dark' : 'light';
-        Accoom.setStorage(storageKey, theme);
-        apply(theme);
-      });
+      if (el.type === 'checkbox') {
+        Accoom.on(el, 'change', function () {
+          var theme = el.checked ? 'dark' : 'light';
+          Accoom.setStorage(storageKey, theme);
+          apply(theme);
+        });
+      } else {
+        Accoom.on(el, 'click', function () {
+          toggle();
+        });
+      }
     });
 
     return {

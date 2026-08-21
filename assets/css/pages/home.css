@@ -2159,3 +2159,21 @@ html.dark-mode .listing-card {
   }
 }
 
+/* ============================================================
+   BECOME AN AGENT — header CTA
+   ============================================================ */
+.become-agent-link {
+  display: none;
+}
+
+@media (min-width: 1180px) {
+  .become-agent-link {
+    display: inline-flex;
+  }
+}
+
+.panel-agent-cta {
+  margin-top: 10px;
+  margin-bottom: 16px;
+}
+

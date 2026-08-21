@@ -90,3 +90,29 @@
   gap: 8px;
   color: inherit;
 }
+
+
+/* Account dropdown — icons for every state, gold badge for the signed-in profile item */
+[aria-label="Account"] a {
+  justify-content: flex-start;
+}
+
+[aria-label="Account"] .account-menu-icon {
+  flex-shrink: 0;
+}
+
+.account-menu-name {
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+[aria-label="Account"] [data-value="profile"],
+[aria-label="Account"] [data-value="profile"]:hover {
+  background: var(--gold);
+  color: var(--navy-2);
+  font-weight: 700;
+}

@@ -1,16 +1,14 @@
 /* ==========================================================================
    ACCOOM — Auth Page (Login / Sign up / Forgot Password)
-   Always renders dark, independent of the site-wide light/dark toggle.
+   Follows the site-wide light/dark toggle (persisted via localStorage).
    ========================================================================== */
-
 body.auth-body {
   background: var(--black);
   min-height: 100dvh;
 }
 
 .auth-page {
-  display: flex;
-  flex-direction: column;
+  position: relative;
   min-height: 100dvh;
   background: var(--black);
 }
@@ -30,9 +28,11 @@ body.auth-body {
    VISUAL SIDE
    ============================================================ */
 .auth-visual {
-  position: relative;
-  height: 300px;
-  flex-shrink: 0;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -50,19 +50,59 @@ body.auth-body {
 .auth-visual-scrim {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(5, 5, 5, 0.4) 35%, var(--black) 100%),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.4) 0%, transparent 20%, transparent 55%, var(--black) 100%),
-    radial-gradient(120% 100% at 100% 50%, rgba(0, 0, 0, 0.92) 0%, rgba(0,0,0,0.4) 45%, transparent 100%);
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .auth-visual-top {
-  position: relative;
-  z-index: 2;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 20px;
+  background: rgba(10, 10, 10, 0.32);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.auth-visual-top .logo-link {
+  order: 1;
+  margin-right: auto;
+}
+
+.auth-theme-toggle {
+  order: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.08);
+  transition: background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease);
+}
+
+.auth-theme-toggle:hover {
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+
+.auth-theme-icon--sun,
+.auth-theme-icon--moon {
+  display: none;
+}
+
+html.dark-mode .auth-theme-icon--sun { display: block; }
+html:not(.dark-mode) .auth-theme-icon--moon { display: block; }
+
+.auth-visual-top-right {
+  order: 3;
+  margin-left: auto;
 }
 
 .auth-visual-top .logo-link img {
@@ -70,8 +110,16 @@ body.auth-body {
   width: auto;
 }
 
+.auth-visual-top .logo-dark {
+  display: block !important;
+}
+
+.auth-visual-top .logo-light {
+  display: none !important;
+}
+
 .auth-back-home {
-  display: none;
+  display: flex;
   align-items: center;
   gap: 8px;
   font-size: 0.85rem;
@@ -90,9 +138,7 @@ body.auth-body {
 }
 
 .auth-visual-content {
-  position: relative;
-  z-index: 2;
-  padding: 0 20px 28px;
+  display: none;
 }
 
 .auth-visual-content h1 {
@@ -123,12 +169,15 @@ body.auth-body {
    FORM SIDE
    ============================================================ */
 .auth-panel-wrap {
-  flex: 1;
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 28px 20px calc(48px + env(safe-area-inset-bottom, 0px));
-  background: var(--black);
+  padding: 96px 20px calc(48px + env(safe-area-inset-bottom, 0px));
+  background: transparent;
+  pointer-events: none;
 }
 
 .auth-card {
@@ -139,6 +188,7 @@ body.auth-body {
   border-radius: var(--radius-m);
   padding: 24px 20px 28px;
   color: var(--white);
+  pointer-events: auto;
 }
 
 .auth-card-head {
@@ -259,11 +309,6 @@ body.auth-body {
   gap: 16px;
 }
 
-@media (min-width: 992px) {
-  .auth-page[data-current-view="signup"] .auth-panel-wrap {
-    padding-top: 255px;
-  }
-}
 
 .auth-field {
   display: flex;
@@ -442,21 +487,9 @@ body.auth-body {
    DESKTOP
    ============================================================ */
 @media (min-width: 992px) {
-  .auth-page {
-    flex-direction: row;
-    height: 100vh;
-    overflow: hidden;
-  }
-
-  .auth-visual {
-    height: auto;
-    flex: 1.15;
-    display: flex;
-    flex-direction: column;
-  }
 
   .auth-visual-top {
-    padding: 32px 48px 0;
+    padding: 22px 48px;
   }
 
   .auth-visual-top .logo-link img {
@@ -468,6 +501,9 @@ body.auth-body {
   }
 
   .auth-visual-content {
+    display: block;
+    position: relative;
+    z-index: 2;
     margin-top: auto;
     padding: 0 48px 64px;
   }
@@ -521,101 +557,31 @@ body.auth-body {
   }
 
   .auth-panel-wrap {
-    flex: 1;
-    height: 100%;
     overflow-y: auto;
-    align-items: center;
-    padding: 40px;
+    padding: 110px 64px 40px;
+    justify-content: flex-end;
   }
 
-  .auth-card {
-    padding: 32px 36px 36px;
+    .auth-card {
+    max-width: 750px;
+    padding: 40px 48px 48px;
   }
 }
 
-/* ============================================================
-   THEME TOGGLE (segmented pill, same idea as .auth-tabs)
-   ============================================================ */
-.auth-visual-top-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 
-.auth-theme-toggle {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 3px;
-  border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.08);
-}
+  .auth-page[data-current-view="signup"] .auth-panel-wrap {
+    padding-top: 100px;
 
-.auth-theme-toggle-indicator {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark-grad) 100%);
-  box-shadow: 0 4px 10px rgba(223, 150, 46, 0.3);
-  transition: transform var(--dur-med) var(--ease);
-  z-index: 0;
-}
-
-.auth-theme-btn {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  color: rgba(255, 255, 255, 0.55);
-  transition: color var(--dur-fast) var(--ease);
-}
-
-.auth-theme-btn.is-active {
-  color: var(--navy-2);
 }
 
 /* ============================================================
    LIGHT MODE
    ============================================================ */
-html:not(.dark-mode) .auth-page,
-html:not(.dark-mode) body.auth-body,
-html:not(.dark-mode) .auth-panel-wrap {
-  background: var(--white);
-}
-
-html:not(.dark-mode) .auth-visual-scrim {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 35%, var(--white) 100%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.25) 0%, transparent 20%, transparent 55%, var(--white) 100%),
-    radial-gradient(120% 100% at 100% 50%, rgba(255, 255, 255, 0.92) 0%, rgba(255,255,255,0.4) 45%, transparent 100%);
-}
-
-html:not(.dark-mode) .auth-back-home {
-  color: var(--ink);
-  background: rgba(17, 31, 53, 0.06);
-}
-
-html:not(.dark-mode) .auth-theme-toggle {
-  background: rgba(17, 31, 53, 0.08);
-}
-
-html:not(.dark-mode) .auth-theme-btn {
-  color: var(--ink-soft);
-}
-
 html:not(.dark-mode) .auth-card {
-  background: var(--white);
+  background: #F7F5F1;
   border-color: var(--line);
   color: var(--ink);
-  box-shadow: 0 16px 40px rgba(17, 31, 53, 0.1);
+  box-shadow: 0 16px 40px rgba(17, 31, 53, 0.12);
 }
 
 html:not(.dark-mode) .auth-card-head h2,
@@ -665,4 +631,16 @@ html:not(.dark-mode) .auth-input input {
 
 html:not(.dark-mode) .auth-input input::placeholder {
   color: var(--ink-soft);
+}
+
+html:not(.dark-mode) .auth-tabs {
+  background: rgba(17, 31, 53, 0.06);
+}
+
+html:not(.dark-mode) .auth-tab {
+  color: var(--ink-soft);
+}
+
+html:not(.dark-mode) .auth-tab.is-active {
+  color: var(--navy-2);
 }

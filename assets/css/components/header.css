@@ -584,6 +584,25 @@ html:not(.dark-mode) .notif-trigger {
   scrollbar-color: var(--gold);
 }
 
+.notif-empty {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 180px;
+  padding: 24px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--on-page-soft);
+  opacity: 0;
+  transition: opacity var(--dur-med) var(--ease);
+}
+
+.notif-empty.is-visible {
+  display: flex;
+  opacity: 1;
+}
+
 .notif-list::-webkit-scrollbar {
   width: 5px;
 }

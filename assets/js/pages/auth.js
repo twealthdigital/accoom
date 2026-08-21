@@ -129,38 +129,22 @@
           return;
         }
 
+        if (kind === 'signup') {
+          var nameInput = form.querySelector('input[type="text"]');
+          var signupEmailInput = form.querySelector('input[type="email"]');
+          Accoom.setStorage('accoom-user', {
+            name: nameInput ? nameInput.value : '',
+            email: signupEmailInput ? signupEmailInput.value : '',
+            createdAt: new Date().toISOString()
+          });
+          window.location.href = 'home.html';
+          return;
+        }
+
         console.log('ACCOOM auth: ' + kind + ' submitted (no backend wired up yet)');
       });
     });
 
-       // Theme toggle (dark / light) beside "Back to Home" — shares the
-    // same storage key as the rest of the site.
-    (function initAuthTheme() {
-      var toggle = document.querySelector('[data-auth-theme-toggle]');
-      var indicator = document.querySelector('[data-auth-theme-indicator]');
-      var buttons = Accoom.$$('[data-auth-theme]');
-      if (!toggle || !buttons.length) return;
-
-      function apply(theme) {
-        document.documentElement.classList.toggle('dark-mode', theme === 'dark');
-        buttons.forEach(function (btn) {
-          btn.classList.toggle('is-active', btn.getAttribute('data-auth-theme') === theme);
-        });
-        if (indicator) {
-          indicator.style.transform = theme === 'light' ? 'translateX(28px)' : 'translateX(0)';
-        }
-      }
-
-      buttons.forEach(function (btn) {
-        Accoom.on(btn, 'click', function () {
-          var theme = this.getAttribute('data-auth-theme');
-          Accoom.setStorage('accoom-theme', theme);
-          apply(theme);
-        });
-      });
-
-      apply(Accoom.getStorage('accoom-theme', 'dark'));
-    })();
 
     // Initial view: auth.html?mode=signup or ?mode=forgot, otherwise login
     var params = new URLSearchParams(window.location.search);
