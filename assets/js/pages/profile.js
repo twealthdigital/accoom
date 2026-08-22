@@ -361,6 +361,84 @@
       });
     }
 
+        // ----------------------------------------------------------------
+    // Profile Information — email / phone / location, edited inline,
+    // one shared Save button for all three (mirrors the hero edit above).
+    // ----------------------------------------------------------------
+    var INFO_FIELDS = ['email', 'phone', 'location'];
+    var INFO_EMPTY_TEXT = 'Not added yet';
+    var infoSaveBtn = document.querySelector('[data-profile-info-save]');
+    var infoFields = {};
+
+    INFO_FIELDS.forEach(function (key) {
+      var row = document.querySelector('[data-profile-info-row="' + key + '"]');
+      if (!row) return;
+      infoFields[key] = {
+        display: row.querySelector('[data-profile-' + key + ']'),
+        input: row.querySelector('[data-profile-' + key + '-input]'),
+        toggle: row.querySelector('[data-profile-info-toggle="' + key + '"]')
+      };
+    });
+
+    function renderInfoField(key) {
+      var field = infoFields[key];
+      if (!field) return;
+      var value = (user[key] || '').trim();
+      field.display.textContent = value || INFO_EMPTY_TEXT;
+      if (field.toggle) field.toggle.textContent = value ? 'Change' : 'Add';
+    }
+
+    INFO_FIELDS.forEach(renderInfoField);
+
+    function enterInfoEdit(key) {
+      var field = infoFields[key];
+      if (!field) return;
+      field.input.value = user[key] || '';
+      field.display.hidden = true;
+      field.toggle.hidden = true;
+      field.input.hidden = false;
+      field.input.focus();
+      if (infoSaveBtn) infoSaveBtn.disabled = false;
+    }
+
+    INFO_FIELDS.forEach(function (key) {
+      var field = infoFields[key];
+      if (!field || !field.toggle) return;
+      Accoom.on(field.toggle, 'click', function (e) {
+        e.preventDefault();
+        enterInfoEdit(key);
+      });
+    });
+
+    // Phone: digits (and a leading +) only, capped as they type
+    if (infoFields.phone && infoFields.phone.input) {
+      Accoom.on(infoFields.phone.input, 'input', function () {
+        var input = infoFields.phone.input;
+        var cleaned = input.value.replace(/[^\d+]/g, '').slice(0, 15);
+        if (cleaned !== input.value) input.value = cleaned;
+      });
+    }
+
+    function saveInfoFields() {
+      INFO_FIELDS.forEach(function (key) {
+        var field = infoFields[key];
+        if (!field || field.input.hidden) return;
+        var maxLen = parseInt(field.input.getAttribute('maxlength'), 10) || 60;
+        user[key] = field.input.value.trim().slice(0, maxLen);
+        field.input.hidden = true;
+        field.display.hidden = false;
+        field.toggle.hidden = false;
+        renderInfoField(key);
+      });
+      Accoom.setStorage('accoom-user', user);
+      if (infoSaveBtn) infoSaveBtn.disabled = true;
+    }
+
+    if (infoSaveBtn) {
+      Accoom.on(infoSaveBtn, 'click', saveInfoFields);
+    }
+
   });
 
 })(window.Accoom);
+
