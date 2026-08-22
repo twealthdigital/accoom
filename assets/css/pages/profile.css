@@ -192,6 +192,10 @@
   flex-wrap: wrap;
 }
 
+.profile-name-display {
+  color: var(--gold);
+}
+
 .profile-wave {
   display: inline-block;
   animation: profile-wave 1.6s ease-in-out infinite;
@@ -709,21 +713,35 @@
   .profile-sidebar { width: 100%; }
 
   /* menu list rows, matching the mockup */
-  .profile-nav { flex-direction: column; overflow-x: visible; gap: 0; }
+  .profile-nav {
+    flex-direction: column;
+    overflow-x: visible;
+    gap: 0;
+    background: var(--surface-page-alt);
+    border: 1px solid var(--line-page);
+    border-radius: var(--radius-m);
+    padding: 6px 8px;
+  }
 
   .profile-nav-link {
     display: grid;
-    grid-template-columns: 40px 1fr auto;
+    grid-template-columns: 36px 1fr auto;
     align-items: center;
     column-gap: 12px;
-    padding: 14px 4px;
+    padding: 11px 10px;
     background: none;
     border: none;
     border-radius: 0;
     border-bottom: 1px solid var(--line-page);
   }
   .profile-nav-link:last-child { border-bottom: none; }
-  .profile-nav-link.is-active { background: none; border-color: transparent; }
+  .profile-nav-link.is-active {
+    background: var(--gold-soft);
+    color: var(--gold-dark);
+    border-radius: var(--radius-s, 10px);
+    border-bottom-color: transparent;
+    margin: 2px 0;
+  }
 
   .profile-nav-link > svg:first-child {
     width: 36px;
@@ -746,7 +764,7 @@
   }
   .profile-nav-link-chevron { color: var(--on-page-soft); flex-shrink: 0; }
 
-  .profile-nav-divider { display: block; height: 1px; background: var(--line-page); margin: 16px 4px; }
+  .profile-nav-divider { display: block; height: 1px; background: var(--line-page); margin: 10px 4px; }
 
   .profile-signout {
     display: flex;
@@ -756,8 +774,9 @@
     padding: 15px;
     margin-top: 4px;
     border-radius: var(--radius-pill);
-    background: var(--black);
-    color: var(--white);
+    background: var(--surface-page);
+    border: 1px solid var(--line-page);
+    color: #e6553f;
     font-weight: 700;
   }
 
@@ -884,6 +903,14 @@
 /* ============================================================
    DESKTOP
    ============================================================ */
+.profile-hero--sidebar { margin-bottom: 16px; }
+
+@media (min-width: 900px) {
+  .profile-hero--sidebar { display: none; }
+}
+
+
+   
 @media (min-width: 900px) {
   .profile-sidebar {
     width: 250px;
@@ -917,7 +944,7 @@
     display: block;
     height: 1px;
     background: var(--line-page);
-    margin: 16px 4px;
+    margin: 10px 4px;
   }
 
   .profile-signout {

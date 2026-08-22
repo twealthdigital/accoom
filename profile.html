@@ -382,7 +382,26 @@
 
       <!-- Sidebar -->
       <aside class="profile-sidebar">
-        <nav class="profile-nav" data-profile-nav aria-label="Account">
+<div class="profile-hero profile-hero--sidebar">
+  <div class="profile-avatar-wrap">
+    <div class="profile-avatar" data-profile-avatar-side>AC</div>
+    <img class="profile-avatar-img" data-profile-avatar-img-side alt="" hidden />
+  </div>
+  <div class="profile-hero-text">
+    <h1>
+      Hello,
+      <span class="profile-name-display" data-profile-name-side>there</span>
+      <span class="profile-wave">&#128075;</span>
+    </h1>
+    <p class="profile-desc-display" data-profile-desc-side>Manage your account details and view your orders, saved properties and more.</p>
+    <p class="profile-member-since">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      Member since <span data-profile-member-since-side>&mdash;</span>
+    </p>
+  </div>
+</div>
+
+<nav class="profile-nav" data-profile-nav aria-label="Account">
           <a href="#" class="profile-nav-link is-active" data-profile-link>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v10h14V10"></path></svg>
             <span class="profile-nav-link-title" data-sub="Account summary and activity">Overview</span>

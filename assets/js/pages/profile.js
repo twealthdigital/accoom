@@ -56,16 +56,25 @@
     var nameEl = document.querySelector('[data-profile-name]');
     var memberEl = document.querySelector('[data-profile-member-since]');
     var emailEl = document.querySelector('[data-profile-email]');
+    var avatarSideEl = document.querySelector('[data-profile-avatar-side]');
+    var nameSideEl = document.querySelector('[data-profile-name-side]');
+    var memberSideEl = document.querySelector('[data-profile-member-since-side]');
+    var descSideEl = document.querySelector('[data-profile-desc-side]');
 
     if (avatarEl) avatarEl.textContent = initials(user.name, user.email);
     if (nameEl) nameEl.textContent = firstName(user.name, user.email);
     if (memberEl) memberEl.textContent = memberSince(user.createdAt);
     if (emailEl) emailEl.textContent = user.email || 'Not added yet';
 
+    if (avatarSideEl) avatarSideEl.textContent = initials(user.name, user.email);
+    if (nameSideEl) nameSideEl.textContent = firstName(user.name, user.email);
+    if (memberSideEl) memberSideEl.textContent = memberSince(user.createdAt);
+
     // ----------------------------------------------------------------
     // Avatar upload — stored as base64 on the same user record.
     // ----------------------------------------------------------------
     var avatarImgEl = document.querySelector('[data-profile-avatar-img]');
+    var avatarImgSideEl = document.querySelector('[data-profile-avatar-img-side]');
     var avatarInput = document.querySelector('[data-profile-avatar-input]');
     var avatarAddBtn = document.querySelector('[data-profile-avatar-add]');
     var avatarEditBtn = document.querySelector('[data-profile-avatar-edit]');
@@ -76,6 +85,10 @@
       if (avatarImgEl) {
         avatarImgEl.src = hasAvatar ? user.avatar : '';
         avatarImgEl.hidden = !hasAvatar;
+      }
+      if (avatarImgSideEl) {
+        avatarImgSideEl.src = hasAvatar ? user.avatar : '';
+        avatarImgSideEl.hidden = !hasAvatar;
       }
       if (avatarAddBtn) avatarAddBtn.hidden = hasAvatar;
       if (avatarEditBtn) avatarEditBtn.hidden = !hasAvatar;
@@ -135,6 +148,7 @@
     var descCounter = document.querySelector('[data-profile-desc-counter]');
 
     if (descDisplay && user.bio) descDisplay.textContent = user.bio;
+    if (descSideEl && user.bio) descSideEl.textContent = user.bio;
 
     var isEditingProfile = false;
 
@@ -195,9 +209,11 @@
 
       if (newName) {
         nameDisplay.textContent = newName;
+        if (nameSideEl) nameSideEl.textContent = newName;
         user.name = newName;
       }
       descDisplay.textContent = newDesc;
+      if (descSideEl) descSideEl.textContent = newDesc;
       user.bio = newDesc;
 
       Accoom.setStorage('accoom-user', user);
