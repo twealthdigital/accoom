@@ -400,7 +400,70 @@
   height: 30px;
   border-radius: 50%;
   color: var(--on-page-soft);
-  cursor: default;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.profile-order-more:hover,
+.profile-order-more.is-active {
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+}
+
+/* Kebab dropdown — appended to <body>, positioned with JS via
+   getBoundingClientRect() so it always stays on-screen regardless
+   of scroll position inside .profile-order-list or viewport size. */
+.profile-order-menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 190px;
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  padding: 6px;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-order-menu.is-open {
+  display: flex;
+}
+
+.profile-order-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 7px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--on-page);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.profile-order-menu-item svg {
+  flex-shrink: 0;
+}
+
+.profile-order-menu-item:hover {
+  background: var(--gold-soft);
+}
+
+.profile-order-menu-item--danger {
+  color: #d64545;
+}
+
+.profile-order-menu-item--danger:hover {
+  background: rgba(214, 69, 69, 0.1);
 }
 
 .profile-order-link {

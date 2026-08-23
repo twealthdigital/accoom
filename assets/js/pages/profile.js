@@ -282,6 +282,10 @@
       orders.forEach(function (order) {
         var li = document.createElement('li');
         li.className = 'profile-order-item';
+        li.dataset.orderId = order.id;
+        li.dataset.orderName = order.name;
+        li.dataset.orderPrice = order.price;
+        li.dataset.orderImage = order.image;
         li.innerHTML =
           '<a class="profile-order-link" href="property.html?id=' + encodeURIComponent(order.id) + '&name=' + encodeURIComponent(order.name) + '">' +
             '<div class="profile-order-thumb"><img src="' + order.image + '" alt="' + order.name + '" /></div>' +
@@ -296,6 +300,129 @@
         ordersList.insertBefore(li, ordersEmpty);
       });
     }
+
+    // ----------------------------------------------------------------
+    // Order item menu (⋮) — Save Property / Remove
+    // Menu is a single node appended to <body> and repositioned with
+    // getBoundingClientRect() each time it opens, so it's never clipped
+    // by the scrolling order list and works in any layout/viewport.
+    // ----------------------------------------------------------------
+    var orderMenu = null;
+    var orderMenuActiveLi = null;
+    var orderMenuActiveBtn = null;
+
+    function buildOrderMenu() {
+      if (orderMenu) return orderMenu;
+      orderMenu = document.createElement('div');
+      orderMenu.className = 'profile-order-menu';
+      orderMenu.innerHTML =
+        '<button type="button" class="profile-order-menu-item" data-order-action="save">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline></svg>' +
+          '<span>Save Property</span>' +
+        '</button>' +
+        '<button type="button" class="profile-order-menu-item profile-order-menu-item--danger" data-order-action="remove">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>' +
+          '<span>Remove</span>' +
+        '</button>';
+      document.body.appendChild(orderMenu);
+      return orderMenu;
+    }
+
+    function closeOrderMenu() {
+      if (orderMenu) orderMenu.classList.remove('is-open');
+      if (orderMenuActiveBtn) orderMenuActiveBtn.classList.remove('is-active');
+      orderMenuActiveLi = null;
+      orderMenuActiveBtn = null;
+    }
+
+    function positionOrderMenu(btn) {
+      var rect = btn.getBoundingClientRect();
+      var menu = orderMenu;
+      menu.style.visibility = 'hidden';
+      menu.classList.add('is-open');
+
+      var menuW = menu.offsetWidth;
+      var menuH = menu.offsetHeight;
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+
+      var left = rect.right - menuW;
+      if (left < 8) left = rect.left;
+      if (left + menuW > vw - 8) left = vw - menuW - 8;
+
+      var top = rect.bottom + 6;
+      if (top + menuH > vh - 8) top = rect.top - menuH - 6;
+      if (top < 8) top = 8;
+
+      menu.style.left = left + 'px';
+      menu.style.top = top + 'px';
+      menu.style.visibility = 'visible';
+    }
+
+    function openOrderMenu(btn, li) {
+      var menu = buildOrderMenu();
+      var reopening = orderMenuActiveLi === li && menu.classList.contains('is-open');
+      closeOrderMenu();
+      if (reopening) return;
+      orderMenuActiveLi = li;
+      orderMenuActiveBtn = btn;
+      btn.classList.add('is-active');
+      positionOrderMenu(btn);
+    }
+
+    function saveOrderToSavedProperties(li) {
+      var property = {
+        id: li.dataset.orderId,
+        name: li.dataset.orderName,
+        price: li.dataset.orderPrice,
+        image: li.dataset.orderImage
+      };
+      var saved = JSON.parse(localStorage.getItem('accoom_saved_properties') || '[]');
+      var exists = saved.some(function (p) { return p.id === property.id; });
+      if (!exists) {
+        saved.push(property);
+        localStorage.setItem('accoom_saved_properties', JSON.stringify(saved));
+      }
+      // No Saved Properties panel yet — this just persists the data under
+      // 'accoom_saved_properties' so that panel can read it once it exists.
+    }
+
+    function removeOrder(li) {
+      li.remove();
+      if (ordersList && !ordersList.querySelector('.profile-order-item')) {
+        if (ordersEmpty) ordersEmpty.hidden = false;
+      }
+    }
+
+    if (ordersList) {
+      Accoom.on(ordersList, 'click', function (e) {
+        var moreBtn = e.target.closest('.profile-order-more');
+        if (!moreBtn) return;
+        e.stopPropagation();
+        openOrderMenu(moreBtn, moreBtn.closest('.profile-order-item'));
+      });
+    }
+
+    document.addEventListener('click', function (e) {
+      var action = e.target.closest('[data-order-action]');
+      if (action && orderMenuActiveLi) {
+        var li = orderMenuActiveLi;
+        if (action.dataset.orderAction === 'save') saveOrderToSavedProperties(li);
+        if (action.dataset.orderAction === 'remove') removeOrder(li);
+        closeOrderMenu();
+        return;
+      }
+      if (orderMenu && orderMenu.classList.contains('is-open') && !orderMenu.contains(e.target)) {
+        closeOrderMenu();
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeOrderMenu();
+    });
+
+    window.addEventListener('scroll', closeOrderMenu, true);
+    window.addEventListener('resize', closeOrderMenu);
 
     // ----------------------------------------------------------------
     // Mock purchases — swap this for a real fetch once the backend
@@ -324,9 +451,29 @@
     var mainTitleEl = document.querySelector('[data-profile-main-title]');
     var backBtn = document.querySelector('[data-profile-back-btn]');
 
+    // Restore whichever nav link was active before leaving for a real
+    // page (e.g. My Purchases), so the back arrow returns to the same tab.
+    var savedActiveHref = Accoom.getStorage('accoom-profile-active-nav', null);
+    if (savedActiveHref) {
+      var matchLink = navLinks.filter(function (l) {
+        return l.getAttribute('href') === savedActiveHref;
+      })[0];
+      if (matchLink) {
+        navLinks.forEach(function (l) { l.classList.remove('is-active'); });
+        matchLink.classList.add('is-active');
+      }
+    }
+
     navLinks.forEach(function (link) {
       Accoom.on(link, 'click', function (e) {
+        var href = this.getAttribute('href');
+        if (href && href !== '#') {
+          Accoom.setStorage('accoom-profile-active-nav', href);
+          return; // real page link (e.g. My Purchases) — let it navigate
+        }
+
         e.preventDefault();
+        Accoom.setStorage('accoom-profile-active-nav', '#');
         navLinks.forEach(function (l) { l.classList.remove('is-active'); });
         this.classList.add('is-active');
 

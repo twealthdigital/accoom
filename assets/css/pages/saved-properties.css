@@ -1,0 +1,253 @@
+/* ==========================================================================
+   ACCOOM — Saved Properties Page
+   Sits on top of profile.css, same shell as purchases.css.
+   ========================================================================== */
+
+.saved-card {
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-m);
+  padding: 22px;
+}
+
+.saved-head {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line-page);
+}
+
+.saved-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--on-page);
+}
+
+.saved-subtitle {
+  margin-top: 4px;
+  font-size: 0.88rem;
+  color: var(--on-page-soft);
+}
+
+.saved-count {
+  margin-top: 18px;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--on-page);
+}
+
+/* List */
+.saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.saved-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--surface-page);
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-m);
+}
+
+.saved-thumb {
+  flex-shrink: 0;
+  width: 96px;
+  height: 84px;
+  border-radius: var(--radius-s);
+  overflow: hidden;
+  background: var(--surface-page-alt);
+}
+
+.saved-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.saved-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.saved-info h4 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--on-page);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.saved-loc {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: var(--on-page-soft);
+}
+
+.saved-loc svg {
+  flex-shrink: 0;
+  color: var(--on-page-soft);
+}
+
+.saved-specs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  margin-top: 8px;
+}
+
+.saved-specs span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: var(--on-page-soft);
+}
+
+.saved-specs svg {
+  flex-shrink: 0;
+  color: var(--on-page-soft);
+}
+
+.saved-price-block {
+  flex-shrink: 0;
+  text-align: right;
+  min-width: 110px;
+}
+
+.saved-price {
+  display: block;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--gold-dark);
+}
+
+.saved-price-unit {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.76rem;
+  color: var(--on-page-soft);
+}
+
+.saved-remove-btn {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 74px;
+}
+
+.saved-remove-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-s);
+  background: rgba(230, 85, 63, 0.14);
+  color: #e6553f;
+  transition: background var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
+}
+
+.saved-remove-btn:hover .saved-remove-icon {
+  background: rgba(230, 85, 63, 0.24);
+  transform: scale(1.05);
+}
+
+.saved-remove-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--on-page-soft);
+}
+
+.saved-empty {
+  padding: 40px 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--on-page-soft);
+}
+
+/* CTA */
+.saved-cta {
+  margin-top: 22px;
+  padding: 32px 20px;
+  text-align: center;
+  border: 1px dashed var(--line-page);
+  border-radius: var(--radius-m);
+}
+
+.saved-cta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--gold-dark);
+  color: var(--gold-dark);
+  margin-bottom: 14px;
+}
+
+.saved-cta h3 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--on-page);
+}
+
+.saved-cta p {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--on-page-soft);
+}
+
+.saved-cta-btn {
+  margin-top: 16px;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .saved-item {
+    flex-wrap: wrap;
+  }
+
+  .saved-thumb {
+    width: 72px;
+    height: 64px;
+  }
+
+  .saved-info {
+    flex-basis: calc(100% - 88px);
+  }
+
+  .saved-price-block {
+    flex: 1 1 auto;
+    text-align: left;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line-page);
+  }
+
+  .saved-remove-btn {
+    flex-direction: row;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line-page);
+    min-width: 0;
+  }
+
+  .saved-remove-icon {
+    width: 34px;
+    height: 34px;
+  }
+}

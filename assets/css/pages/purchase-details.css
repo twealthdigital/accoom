@@ -1,0 +1,352 @@
+/* ==========================================================================
+   ACCOOM — Purchase Details Page
+   Sits on top of profile.css, same shell as purchases.css.
+   ========================================================================== */
+
+.pod-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pod-not-found {
+  padding: 60px 0;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--on-page-soft);
+}
+
+.pod-not-found a {
+  color: var(--gold-dark);
+  font-weight: 700;
+}
+
+/* Summary card */
+.pod-card {
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-m);
+  padding: 22px;
+}
+
+.pod-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold-dark);
+  margin-bottom: 18px;
+}
+
+.pod-back-link:hover {
+  text-decoration: underline;
+}
+
+.pod-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.pod-summary-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.pod-summary-thumb {
+  flex-shrink: 0;
+  width: 120px;
+  height: 90px;
+  border-radius: var(--radius-s);
+  overflow: hidden;
+  background: var(--surface-page);
+}
+
+.pod-summary-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pod-summary-body {
+  flex: 1;
+  min-width: 200px;
+}
+
+.pod-summary-body h1 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--on-page);
+}
+
+.pod-summary-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 10px;
+}
+
+.pod-summary-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  color: var(--on-page-soft);
+}
+
+.pod-summary-meta svg {
+  flex-shrink: 0;
+  color: var(--on-page-soft);
+}
+
+.pod-summary-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-page);
+}
+
+.pod-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 100px;
+}
+
+.pod-summary-label {
+  font-size: 0.74rem;
+  color: var(--on-page-soft);
+}
+
+.pod-summary-value {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--on-page);
+}
+
+.pod-summary-value--gold {
+  color: var(--gold-dark);
+}
+
+.pod-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.pod-status-badge--upcoming {
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+}
+
+.pod-status-badge--completed {
+  background: rgba(52, 168, 83, 0.14);
+  color: #2f9950;
+}
+
+.pod-status-badge--cancelled {
+  background: rgba(230, 85, 63, 0.14);
+  color: #e6553f;
+}
+
+/* Section titles + info cards */
+.pod-section-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--on-page);
+}
+
+.pod-info-card {
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-m);
+  padding: 20px;
+}
+
+.pod-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+}
+
+.pod-info-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pod-info-label {
+  font-size: 0.76rem;
+  color: var(--on-page-soft);
+}
+
+.pod-info-value {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--on-page);
+}
+
+.pod-info-value--gold {
+  color: var(--gold-dark);
+}
+
+/* Timeline */
+.pod-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.pod-timeline-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+}
+
+.pod-timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 34px;
+  bottom: -14px;
+  width: 2px;
+  background: var(--line-page);
+}
+
+.pod-timeline-item:last-child::before {
+  display: none;
+}
+
+.pod-timeline-dot {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-page);
+  border: 2px solid var(--line-page);
+  color: var(--white);
+}
+
+.pod-timeline-item--done .pod-timeline-dot {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--navy-2);
+}
+
+.pod-timeline-item--current .pod-timeline-dot {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
+.pod-timeline-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.pod-timeline-body h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--on-page);
+}
+
+.pod-timeline-body p {
+  margin-top: 2px;
+  font-size: 0.8rem;
+  color: var(--on-page-soft);
+}
+
+.pod-timeline-date {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  color: var(--on-page-soft);
+  white-space: nowrap;
+}
+
+/* Support banner — mirrors .purchases-support */
+.pod-support {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, rgba(230, 178, 62, 0.12) 0%, rgba(230, 178, 62, 0.04) 100%);
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-m);
+}
+
+.pod-support-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--black);
+  color: var(--gold);
+}
+
+.pod-support-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.pod-support-text h3 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--gold-dark);
+}
+
+.pod-support-text p {
+  margin-top: 3px;
+  font-size: 0.85rem;
+  color: var(--on-page-soft);
+}
+
+.pod-support-btn {
+  flex-shrink: 0;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .pod-summary-top {
+    flex-direction: column;
+  }
+
+  .pod-summary-stats {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .pod-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pod-support {
+    flex-wrap: wrap;
+  }
+
+  .pod-support-text {
+    flex-basis: calc(100% - 62px);
+  }
+
+  .pod-support-btn,
+  .pod-support-btn .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
