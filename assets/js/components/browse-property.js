@@ -67,11 +67,15 @@ window.Accoom = window.Accoom || {};
 
   function handleBrowseTouchStart(e) {
     if (scrollLockMinY == null) return;
+    // Anything inside the bar/suggestions scrolls itself — the page
+    // scroll wall below is only for the page behind it.
+    if (e.target.closest('[data-browse-overlay]')) return;
     touchStartY = e.touches[0].clientY;
   }
 
   function handleBrowseTouchMove(e) {
     if (scrollLockMinY == null || touchStartY == null) return;
+    if (e.target.closest('[data-browse-overlay]')) return;
     var currentY = e.touches[0].clientY;
     var draggingDown = currentY > touchStartY;
     // Re-check direction from THIS move, not just the original touch
@@ -261,10 +265,23 @@ window.Accoom = window.Accoom || {};
       window.clearTimeout(Accoom._browseCollapseTimer);
 
       // Bring the hidden sections back — restores real page height and
-      // layout. No scroll-back animation; the page just stays where it
-      // is once the sections reappear.
+      // layout.
+      var wasCollapsed = document.body.classList.contains('browse-sections-collapsed');
       document.body.classList.remove('browse-sections-collapsed');
       document.documentElement.style.removeProperty('--browse-overlay-h');
+
+      if (wasCollapsed) {
+        // Those sections just pushed back in above the listings — jump
+        // the scroll down by their combined height so the user keeps
+        // looking at what they were actually looking at (the listings),
+        // instead of the page appearing to snap back up to hero.
+        var restoredHeight = 0;
+        ['.hero', '.quick-search', '.popular-accommodation'].forEach(function (sel) {
+          var el = document.querySelector(sel);
+          if (el) restoredHeight += el.offsetHeight;
+        });
+        window.scrollTo(0, window.pageYOffset + restoredHeight);
+      }
 
       scrollLockMinY = null;
       touchStartY = null;
