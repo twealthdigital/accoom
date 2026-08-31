@@ -45,7 +45,7 @@
 
       <nav class="nav-links" aria-label="Primary">
         <a href="home.html">Home</a>
-        <a href="#">Browse</a>
+        <a href="#" data-browse-trigger>Browse</a>
         <a href="#">Agents</a>
         <a href="#">Deals</a>
         <a href="#">About Us</a>
@@ -220,7 +220,7 @@
           </svg>
           Home
         </a>
-        <a href="#">
+        <a href="#" data-browse-trigger>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="7"></circle>
             <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
@@ -588,15 +588,18 @@
   <!-- =========================================================
        FOOTER
   ============================================================= -->
-  <div data-partial="partials/footer.html"></div>
-
+<div data-partial="partials/browse-property.html"></div>
+<div data-partial="partials/footer.html"></div>
   <!-- =========================================================
        SCRIPTS
   ========================================================= -->
   <script src="assets/js/core/dom.js"></script>
   <script src="assets/js/core/events.js"></script>
-  <script src="assets/js/core/storage.js"></script>
-  <script src="assets/js/core/partials.js"></script>
+<script src="assets/js/core/storage.js"></script>
+<script src="assets/js/core/skeleton.js"></script>
+<script src="assets/js/core/partials.js"></script>
+<script src="assets/js/data/properties.js"></script>
+<script src="assets/js/components/browse-property.js"></script>
 
   <script src="assets/js/modules/dropdown.js"></script>
   <script src="assets/js/modules/offcanvas.js"></script>

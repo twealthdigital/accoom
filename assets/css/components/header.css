@@ -6,7 +6,7 @@
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 220;
   height: var(--header-h);
   background: var(--surface-header);
   border-bottom: 1px solid var(--line-dark);
@@ -560,8 +560,8 @@ html:not(.dark-mode) .notif-trigger {
   max-height: none;
   padding: 0;
   overflow: hidden;
-  background: var(--surface-page);
-  border-color: var(--line-page);
+  background: var(--surface-page-alt);
+  border-color: var(--line-dark);
 }
 
 .notif-panel-header {
@@ -582,6 +582,8 @@ html:not(.dark-mode) .notif-trigger {
   overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: var(--gold);
+  padding-bottom: 10px;
+  border-bottom: 10px solid var(--surface-page-alt);
 }
 
 .notif-empty {

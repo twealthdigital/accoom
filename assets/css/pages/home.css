@@ -971,6 +971,16 @@ html.dark-mode .popular-card p { color: rgba(255, 255, 255, 0.4); }
   color: var(--navy-2);
 }
 
+/* Options with nothing matching the current search — dimmed and
+   unselectable, so a visitor can't pick a filter that returns zero
+   results. Cleared automatically once the search is cleared. */
+.filter-checkbox.is-unavailable,
+.filter-pill-btn.is-unavailable {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* Toggle rows */
 .filter-group-toggles {
   display: flex;
@@ -1070,6 +1080,17 @@ html.dark-mode .popular-card p { color: rgba(255, 255, 255, 0.4); }
   color: var(--on-page-soft);
   font-size: 0.85rem;
   margin-bottom: 20px;
+}
+
+.listings-empty {
+  display: none;
+  text-align: center;
+  padding: 60px 0;
+  color: var(--on-page-soft);
+}
+
+.listings-empty.is-visible {
+  display: block;
 }
 
 /* Responsive: mobile — buttons split 50/50, pills wrap */
@@ -2176,4 +2197,3 @@ html.dark-mode .listing-card {
   margin-top: 10px;
   margin-bottom: 16px;
 }
-

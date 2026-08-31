@@ -15,9 +15,11 @@
 
 /* Components */
 @import 'components/scrollbar.css';
+@import 'components/skeleton.css';
 @import 'components/buttons.css';
 @import 'components/forms.css';
 @import 'components/dropdown.css';
+@import 'components/browse-property.css';
 @import 'components/header.css';
 @import 'components/panel.css';
 @import 'components/footer.css';

@@ -102,7 +102,7 @@
     // (e.g. fetch('/api/properties?page=' + page + '&perPage=' + perPage))
     // — the return shape { items, total } is all the rendering code needs,
     // so nothing else below has to change.
-    var PropertyService = (function () {
+var PropertyService = Accoom.PropertyService || (function () {
     var TYPES = {
         '2-bedroom-flat':   '2 Bedroom Flat',
         '3-bedroom-flat':   '3 Bedroom Flat',
@@ -185,7 +185,45 @@ price: 120000 + (i % 10) * 85000,
         });
       }
 
-// sortBy: 'nearby' | 'newest' | 'online' | 'verified'
+// Typo tolerant matcher. Tries an exact substring first (fast path),
+      // then falls back to per word edit distance so a misspelt token like
+      // "bouy" still finds "boy". Allowance scales with word length so
+      // short words don't match too loosely.
+      function levenshtein(a, b) {
+        var m = a.length, n = b.length;
+        if (!m) return n;
+        if (!n) return m;
+        var row = [];
+        for (var j = 0; j <= n; j++) row[j] = j;
+        for (var i = 1; i <= m; i++) {
+          var prev = row[0];
+          row[0] = i;
+          for (var k = 1; k <= n; k++) {
+            var temp = row[k];
+            row[k] = a.charAt(i - 1) === b.charAt(k - 1)
+              ? prev
+              : Math.min(prev, row[k], row[k - 1]) + 1;
+            prev = temp;
+          }
+        }
+        return row[n];
+      }
+
+      function fuzzyMatch(hay, query) {
+        if (!query) return true;
+        if (hay.indexOf(query) !== -1) return true;
+        var hayWords = hay.split(/\s+/);
+        var queryWords = query.split(/\s+/);
+        return queryWords.every(function (qw) {
+          if (!qw) return true;
+          var maxDist = qw.length <= 4 ? 1 : qw.length <= 7 ? 2 : 3;
+          return hayWords.some(function (hw) {
+            return hw.indexOf(qw) !== -1 || levenshtein(qw, hw) <= maxDist;
+          });
+        });
+      }
+
+      // sortBy: 'nearby' | 'newest' | 'online' | 'verified'
       // filters: { priceMin, priceMax, levels: [], beds: [], verifiedOnly, onlineOnly }
       // Swap this whole function for a real API call when ready —
       // e.g. fetch('/api/properties?page=' + page + '&perPage=' + perPage + '&sort=' + sortBy + '&' + serializeFilters(filters))
@@ -214,6 +252,13 @@ price: 120000 + (i % 10) * 85000,
         if (filters.onlineOnly) {
           list = list.filter(function (item) { return item.agent.online; });
         }
+        if (filters.search) {
+          var q = filters.search.trim().toLowerCase();
+          list = list.filter(function (item) {
+            var hay = (item.name + ' ' + item.location + ' ' + item.typeLabel + ' ' + item.agent.name).toLowerCase();
+            return fuzzyMatch(hay, q);
+          });
+        }
 
         if (sortBy === 'online') {
           list.sort(function (a, b) { return (b.agent.online ? 1 : 0) - (a.agent.online ? 1 : 0); });
@@ -241,18 +286,38 @@ function getById(id) {
         return found;
       }
 
-      return { fetchPage: fetchPage, getById: getById };
+      // Returns every listing, untouched. Used by syncFilterAvailability
+      // (below) to know the full catalogue before narrowing it to a query.
+      function getAll() {
+        return ALL.slice();
+      }
+
+      // Same text-match rule fetchPage() uses for filters.search — kept
+      // as one function so the two never drift apart.
+      function searchList(list, query) {
+        var q = (query || '').trim().toLowerCase();
+        if (!q) return { items: list.slice(), total: list.length };
+        var items = list.filter(function (item) {
+          var hay = (item.name + ' ' + item.location + ' ' + item.typeLabel + ' ' + item.agent.name).toLowerCase();
+          return fuzzyMatch(hay, q);
+        });
+        return { items: items, total: items.length };
+      }
+
+      return { fetchPage: fetchPage, getById: getById, getAll: getAll, searchList: searchList };
     })();
 
     var listingsGrid = document.querySelector('[data-listings-grid]');
     var listingsPagination = document.querySelector('[data-listings-pagination]');
+    var listingsEmpty = document.querySelector('[data-listings-empty]');
+    var resultsCountEl = document.querySelector('[data-results-count]');
 
     if (listingsGrid && listingsPagination) {
 
 var currentPage = 1;
       var currentPerPage = getPerPage();
       var currentSort = 'newest';
-      var currentFilters = { priceMin: 100000, priceMax: 1000000, levels: [], beds: [], verifiedOnly: false, onlineOnly: false };
+      var currentFilters = { priceMin: 100000, priceMax: 1000000, levels: [], beds: [], verifiedOnly: false, onlineOnly: false, search: '' };
 
 function getPerPage() {
         var w = window.innerWidth;
@@ -375,6 +440,8 @@ function cardTemplate(item) {
 
       function renderGrid(items) {
         listingsGrid.innerHTML = items.map(cardTemplate).join('');
+        listingsGrid.classList.toggle('is-hidden', items.length === 0);
+        if (listingsEmpty) listingsEmpty.classList.toggle('is-visible', items.length === 0);
       }
 
       function renderPagination(page, totalPages) {
@@ -391,13 +458,25 @@ function cardTemplate(item) {
 
 function loadPage(page) {
         var perPage = getPerPage();
+        Accoom.showSkeleton(listingsGrid, 'listingCard', perPage);
         PropertyService.fetchPage(page, perPage, currentSort, currentFilters).then(function (res) {
           var totalPages = Math.max(1, Math.ceil(res.total / perPage));
           currentPage = Math.min(page, totalPages);
           renderGrid(res.items);
           renderPagination(currentPage, totalPages);
+          if (resultsCountEl) {
+            resultsCountEl.textContent = res.total + (res.total === 1 ? ' property found' : ' properties found');
+          }
         });
       }
+
+      // Exposed so the Browse search bar (browse-property.js) can drive
+      // the real listings grid live as the user types.
+      Accoom.setListingsSearch = function (query) {
+        currentFilters.search = query || '';
+        if (Accoom.renderActiveFilters) Accoom.renderActiveFilters();
+        loadPage(1);
+      };
 
 var listingsSortEl = document.querySelector('.listings-sort-dropdown');
       if (listingsSortEl) {
@@ -478,6 +557,7 @@ var listingsSortEl = document.querySelector('.listings-sort-dropdown');
               }
 
               renderPriceRange();
+              updateFilterCountBadge();
             }
 
             function onUp() {
@@ -495,15 +575,81 @@ var listingsSortEl = document.querySelector('.listings-sort-dropdown');
         dragThumb(thumbMax, 'max');
         renderPriceRange();
 
+        // ============================================================
+        // FILTER AVAILABILITY — narrows the panel's own options (price
+        // range, bed pills, agent levels) down to only what actually
+        // exists among the current search matches, so a visitor can
+        // never select a filter that would return nothing. Recomputed
+        // whenever a search is committed (Enter pressed in the Browse
+        // search bar) — see Accoom.syncFilterAvailability below.
+        // ============================================================
+        function applyAvailability(items) {
+          var availableBeds = {};
+          items.forEach(function (it) {
+            availableBeds[it.beds >= 4 ? 4 : it.beds] = true;
+          });
+          Accoom.$$('.filter-pill-btn', filtersPanel).forEach(function (btn) {
+            var bed = parseInt(btn.getAttribute('data-bed'), 10);
+            var has = !!availableBeds[bed];
+            btn.disabled = !has;
+            btn.classList.toggle('is-unavailable', !has);
+            if (!has) btn.classList.remove('is-active');
+          });
+
+          var availableLevels = {};
+          items.forEach(function (it) { availableLevels[it.agent.level] = true; });
+          Accoom.$$('.filter-checkbox input', filtersPanel).forEach(function (input) {
+            var has = !!availableLevels[input.value];
+            input.disabled = !has;
+            input.closest('.filter-checkbox').classList.toggle('is-unavailable', !has);
+            if (!has && input.checked) {
+              input.checked = false;
+              input.closest('.filter-checkbox').classList.remove('is-checked');
+            }
+          });
+
+          // Rescale the price slider itself to the real min/max found —
+          // dragging is clamped to PRICE_MIN/PRICE_MAX by closure in
+          // dragThumb() above, so this takes effect immediately.
+          if (items.length) {
+            var prices = items.map(function (it) { return it.price; });
+            var lo = snapToStep(Math.min.apply(null, prices));
+            var hi = snapToStep(Math.max.apply(null, prices));
+            if (lo === hi) hi = lo + PRICE_STEP;
+            PRICE_MIN = lo;
+            PRICE_MAX = hi;
+          } else {
+            // No matches at all — fall back to the full catalogue range
+            // rather than leaving the slider stuck on a dead-end.
+            PRICE_MIN = 100000;
+            PRICE_MAX = 1000000;
+          }
+          priceValues.min = PRICE_MIN;
+          priceValues.max = PRICE_MAX;
+          renderPriceRange();
+        }
+
+        // Exposed so the Browse search bar (browse-property.js) can
+        // re-narrow this panel the instant a search is committed.
+        Accoom.syncFilterAvailability = function (query) {
+          var all = PropertyService.getAll();
+          var matched = (query && PropertyService.searchList)
+            ? PropertyService.searchList(all, query).items
+            : all;
+          applyAvailability(matched);
+        };
+
         Accoom.$$('.filter-checkbox input', filtersPanel).forEach(function (input) {
           Accoom.on(input, 'change', function () {
             this.closest('.filter-checkbox').classList.toggle('is-checked', this.checked);
+            updateFilterCountBadge();
           });
         });
 
         Accoom.$$('.filter-pill-btn', filtersPanel).forEach(function (btn) {
           Accoom.on(btn, 'click', function () {
             this.classList.toggle('is-active');
+            updateFilterCountBadge();
           });
         });
 
@@ -512,11 +658,166 @@ var listingsSortEl = document.querySelector('.listings-sort-dropdown');
         var filterVerifiedInput = filtersPanel.querySelector('[data-filter-verified]');
         var filterOnlineInput = filtersPanel.querySelector('[data-filter-online]');
 
+        // ============================================================
+        // LIVE "Filters N" BADGE
+        // Reads the panel's CURRENT picks directly (not currentFilters),
+        // so the number updates the instant a box/pill/toggle is picked
+        // or unpicked — no need to press Apply first.
+        // ============================================================
+        function updateFilterCountBadge() {
+          var filterCountEl = document.querySelector('[data-filter-count]');
+          if (!filterCountEl) return;
+          var n = Accoom.$$('.filter-checkbox input:checked', filtersPanel).length +
+                  Accoom.$$('.filter-pill-btn.is-active', filtersPanel).length +
+                  (filterVerifiedInput && filterVerifiedInput.checked ? 1 : 0) +
+                  (filterOnlineInput && filterOnlineInput.checked ? 1 : 0) +
+                  ((priceValues.min !== PRICE_MIN || priceValues.max !== PRICE_MAX) ? 1 : 0);
+          filterCountEl.textContent = n;
+          filterCountEl.classList.toggle('is-hidden', n === 0);
+        }
+
+        if (filterVerifiedInput) Accoom.on(filterVerifiedInput, 'change', updateFilterCountBadge);
+        if (filterOnlineInput) Accoom.on(filterOnlineInput, 'change', updateFilterCountBadge);
+
+        // ============================================================
+        // ACTIVE FILTER PILLS
+        // Built straight from currentFilters, so the bar can never
+        // drift out of sync with what's actually applied — no hardcoded
+        // pill text anywhere. To add a new filterable field later, add
+        // ONE entry to FILTER_PILL_DEFS below; nothing else needs to
+        // change (this is the only spot a backend dev should touch).
+        //
+        //   key        unique id for this filter type
+        //   values(f)  -> array of currently-active values (empty = none shown)
+        //   label(v)   -> pill text for one value
+        //   clear(f,v) -> unset it on currentFilters AND reset the
+        //                 matching panel control (checkbox/pill/slider)
+        // ============================================================
+        var activeFiltersBar = document.querySelector('[data-active-filters]');
+        var clearAllBtnEl = activeFiltersBar ? activeFiltersBar.querySelector('[data-clear-filters]') : null;
+
+        var FILTER_PILL_DEFS = [
+          {
+            key: 'search',
+            values: function (f) { return f.search ? [f.search] : []; },
+            label: function (v) { return '"' + v + '"'; },
+            clear: function (f) {
+              f.search = '';
+              var browseInput = document.querySelector('[data-browse-input]');
+              if (browseInput) browseInput.value = '';
+            }
+          },
+          {
+            key: 'price',
+            values: function (f) {
+              return (f.priceMin !== PRICE_MIN || f.priceMax !== PRICE_MAX) ? [{ min: f.priceMin, max: f.priceMax }] : [];
+            },
+            label: function (v) { return formatPrice(v.min) + ' \u2013 ' + formatPrice(v.max); },
+            clear: function (f) {
+              f.priceMin = PRICE_MIN;
+              f.priceMax = PRICE_MAX;
+              priceValues.min = PRICE_MIN;
+              priceValues.max = PRICE_MAX;
+              renderPriceRange();
+            }
+          },
+          {
+            key: 'beds',
+            values: function (f) { return f.beds || []; },
+            label: function (v) { return (v >= 4 ? '4+' : v) + (v === 1 ? ' Bedroom' : ' Bedrooms'); },
+            clear: function (f, v) {
+              f.beds = (f.beds || []).filter(function (b) { return b !== v; });
+              Accoom.$$('.filter-pill-btn', filtersPanel).forEach(function (btn) {
+                if (parseInt(btn.getAttribute('data-bed'), 10) === v) btn.classList.remove('is-active');
+              });
+            }
+          },
+          {
+            key: 'levels',
+            values: function (f) { return f.levels || []; },
+            label: function (v) { return v; },
+            clear: function (f, v) {
+              f.levels = (f.levels || []).filter(function (l) { return l !== v; });
+              Accoom.$$('.filter-checkbox input', filtersPanel).forEach(function (input) {
+                if (input.value === v) {
+                  input.checked = false;
+                  input.closest('.filter-checkbox').classList.remove('is-checked');
+                }
+              });
+            }
+          },
+          {
+            key: 'verifiedOnly',
+            values: function (f) { return f.verifiedOnly ? [true] : []; },
+            label: function () { return 'Verified only'; },
+            clear: function (f) {
+              f.verifiedOnly = false;
+              if (filterVerifiedInput) filterVerifiedInput.checked = false;
+            }
+          },
+          {
+            key: 'onlineOnly',
+            values: function (f) { return f.onlineOnly ? [true] : []; },
+            label: function () { return 'Online only'; },
+            clear: function (f) {
+              f.onlineOnly = false;
+              if (filterOnlineInput) filterOnlineInput.checked = false;
+            }
+          }
+        ];
+
+        function makePillEl(def, value) {
+          var span = document.createElement('span');
+          span.className = 'filter-pill';
+          span.setAttribute('data-filter-key', def.key);
+          span.appendChild(document.createTextNode(def.label(value)));
+
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.setAttribute('aria-label', 'Remove ' + def.label(value) + ' filter');
+          btn.textContent = '\u00D7';
+          Accoom.on(btn, 'click', function () {
+            def.clear(currentFilters, value);
+            renderActiveFilters();
+            loadPage(1);
+          });
+          span.appendChild(btn);
+          return span;
+        }
+
+        function renderActiveFilters() {
+          if (!activeFiltersBar) return;
+
+          Accoom.$$('.filter-pill', activeFiltersBar).forEach(function (el) { el.remove(); });
+
+          var hasActive = false;
+          FILTER_PILL_DEFS.forEach(function (def) {
+            def.values(currentFilters).forEach(function (v) {
+              activeFiltersBar.insertBefore(makePillEl(def, v), clearAllBtnEl || null);
+              hasActive = true;
+            });
+          });
+
+          activeFiltersBar.classList.toggle('is-hidden', !hasActive);
+          if (clearAllBtnEl) clearAllBtnEl.classList.toggle('is-hidden', !hasActive);
+
+          // Removing a pill here calls a def's clear(), which resets the
+          // matching panel control too — so re-reading the panel now
+          // gives the correct, de-incremented count.
+          updateFilterCountBadge();
+        }
+
+        // Exposed so other files (e.g. browse-property.js, which drives
+        // the search box) can refresh this bar the moment currentFilters changes.
+        Accoom.renderActiveFilters = renderActiveFilters;
+        renderActiveFilters();
+
         Accoom.on(filterApplyBtn, 'click', function () {
           var levels = Accoom.$$('.filter-checkbox input:checked', filtersPanel).map(function (i) { return i.value; });
           var beds = Accoom.$$('.filter-pill-btn.is-active', filtersPanel).map(function (b) { return parseInt(b.getAttribute('data-bed'), 10); });
 
           currentFilters = {
+            search: currentFilters.search || '',
             priceMin: priceValues.min,
             priceMax: priceValues.max,
             levels: levels,
@@ -525,14 +826,7 @@ var listingsSortEl = document.querySelector('.listings-sort-dropdown');
             onlineOnly: filterOnlineInput.checked
           };
 
-          var activeCount = levels.length + beds.length +
-            (filterVerifiedInput.checked ? 1 : 0) +
-            (filterOnlineInput.checked ? 1 : 0) +
-            ((priceValues.min !== PRICE_MIN || priceValues.max !== PRICE_MAX) ? 1 : 0);
-
-          var countEl = document.querySelector('[data-filter-count]');
-          if (countEl) countEl.textContent = activeCount;
-
+          renderActiveFilters();
           loadPage(1);
 
           var filterDropdownEl = document.querySelector('.listings-filter-dropdown');
@@ -542,6 +836,23 @@ var listingsSortEl = document.querySelector('.listings-sort-dropdown');
           }
         });
 
+        // Undoes whatever applyAvailability() narrowed — full price
+        // range back, every bed pill and agent level re-enabled. Call
+        // this whenever the panel (or the search behind it) is cleared,
+        // so it doesn't stay stuck on a previous search's bounds.
+        function resetAvailability() {
+          Accoom.$$('.filter-pill-btn', filtersPanel).forEach(function (b) {
+            b.disabled = false;
+            b.classList.remove('is-unavailable');
+          });
+          Accoom.$$('.filter-checkbox input', filtersPanel).forEach(function (i) {
+            i.disabled = false;
+            i.closest('.filter-checkbox').classList.remove('is-unavailable');
+          });
+          PRICE_MIN = 100000;
+          PRICE_MAX = 1000000;
+        }
+
         function resetFilterInputs() {
           Accoom.$$('.filter-checkbox input', filtersPanel).forEach(function (i) {
             i.checked = false;
@@ -550,9 +861,11 @@ var listingsSortEl = document.querySelector('.listings-sort-dropdown');
           Accoom.$$('.filter-pill-btn', filtersPanel).forEach(function (b) { b.classList.remove('is-active'); });
           filterVerifiedInput.checked = false;
           filterOnlineInput.checked = false;
+          resetAvailability();
           priceValues.min = PRICE_MIN;
           priceValues.max = PRICE_MAX;
           renderPriceRange();
+          updateFilterCountBadge();
         }
 
         Accoom.on(filterClearBtn, 'click', resetFilterInputs);
@@ -564,6 +877,7 @@ var listingsSortEl = document.querySelector('.listings-sort-dropdown');
             resetFilterInputs();
 
             currentFilters = {
+              search: '',
               priceMin: PRICE_MIN,
               priceMax: PRICE_MAX,
               levels: [],
@@ -572,12 +886,10 @@ var listingsSortEl = document.querySelector('.listings-sort-dropdown');
               onlineOnly: false
             };
 
-            var countEl = document.querySelector('[data-filter-count]');
-            if (countEl) countEl.textContent = '0';
+            var browseInput = document.querySelector('[data-browse-input]');
+            if (browseInput) browseInput.value = '';
 
-            var activeFiltersBar = document.querySelector('[data-active-filters]');
-            if (activeFiltersBar) activeFiltersBar.innerHTML = '';
-
+            renderActiveFilters();
             loadPage(1);
           });
         }
@@ -593,7 +905,20 @@ var listingsSortEl = document.querySelector('.listings-sort-dropdown');
         else target = parseInt(target, 10);
 
         loadPage(target);
-        listingsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Same per-breakpoint offsets as the Browse overlay — tweak each
+        // independently until the grid sits where you want it under the
+        // fixed header on that screen size.
+        var SCROLL_OFFSET_DESKTOP = 10;  // px, >= 992
+        var SCROLL_OFFSET_TABLET  = 10;  // px, 768–991
+        var SCROLL_OFFSET_MOBILE  = 10;  // px, < 768
+        var pgw = window.innerWidth;
+        var SCROLL_OFFSET = pgw >= 992 ? SCROLL_OFFSET_DESKTOP
+                          : pgw >= 768 ? SCROLL_OFFSET_TABLET
+                          : SCROLL_OFFSET_MOBILE;
+        var headerEl = document.querySelector('.site-header');
+        var headerHeight = headerEl ? headerEl.offsetHeight : 0;
+        var targetY = listingsGrid.getBoundingClientRect().top + window.pageYOffset - headerHeight - SCROLL_OFFSET;
+        window.scrollTo({ top: Math.max(targetY, 0), behavior: 'smooth' });
       });
 
 

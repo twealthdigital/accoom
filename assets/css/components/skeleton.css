@@ -1,0 +1,57 @@
+/* ==========================================================================
+   ACCOOM — Skeleton Loading (wireframe placeholders)
+   One shared shimmer system reused everywhere: listing grids, property
+   pages, agent profiles, messages. Overwrite this markup with the real
+   content once it's ready, don't fade a spinner in front of blank space.
+   ========================================================================== */
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-page-alt, #e9e9e9);
+  border-radius: var(--radius-s, 8px);
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0) 100%);
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+
+html.dark-mode .skeleton {
+  background: var(--surface-page-alt, #2a2a2a);
+}
+
+html.dark-mode .skeleton::after {
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0) 100%);
+}
+
+@keyframes skeletonShimmer {
+  100% { transform: translateX(100%); }
+}
+
+/* Building blocks, mix and match per section */
+.skeleton-line          { height: 12px; margin-bottom: 8px; }
+.skeleton-line.is-short  { width: 40%; }
+.skeleton-line.is-medium { width: 65%; }
+.skeleton-line.is-wide   { width: 90%; }
+.skeleton-circle { border-radius: 50%; }
+
+/* Property/listing card shape, mirrors .listing-card */
+.skeleton-card {
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+
+.skeleton-card-media { width: 100%; aspect-ratio: 4 / 3; border-radius: 0; }
+.skeleton-card-body  { padding: 12px; }

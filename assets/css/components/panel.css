@@ -11,7 +11,7 @@
   visibility: hidden;
   transition: opacity var(--dur-med) var(--ease),
               visibility var(--dur-med) var(--ease);
-  z-index: 199;
+  z-index: 230;
   cursor: pointer;
 }
 
@@ -30,7 +30,7 @@
   width: 86%;
   max-width: 340px;
   background: var(--surface-panel);
-  z-index: 200;
+  z-index: 231;
   display: flex;
   flex-direction: column;
   padding: 0;

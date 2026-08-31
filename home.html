@@ -35,7 +35,7 @@
       <!-- Desktop nav -->
       <nav class="nav-links" aria-label="Primary">
         <a href="home.html" class="active">Home</a>
-        <a href="#">Browse</a>
+        <a href="#" data-browse-trigger>Browse</a>
         <a href="#">Agents</a>
         <a href="#">Deals</a>
         <a href="#">About Us</a>
@@ -219,7 +219,7 @@
           </svg>
           Home
         </a>
-        <a href="#">
+        <a href="#" data-browse-trigger>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="7"></circle>
             <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
@@ -624,7 +624,7 @@
             <line x1="11" y1="18" x2="13" y2="18"></line>
           </svg>
           <span>Filters</span>
-          <span class="filter-count" data-filter-count>3</span>
+          <span class="filter-count is-hidden" data-filter-count>0</span>
           <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -745,11 +745,12 @@
     </div>
     </div>
 
-    <div class="active-filters" data-active-filters>
-      <span class="filter-pill">Lagos <button type="button" aria-label="Remove Lagos filter">&times;</button></span>
-      <span class="filter-pill">Min: &#8358;100,000 <button type="button" aria-label="Remove minimum price filter">&times;</button></span>
-      <span class="filter-pill">2+ Bedrooms <button type="button" aria-label="Remove bedrooms filter">&times;</button></span>
-      <button type="button" class="clear-filters" data-clear-filters>Clear all</button>
+    <div class="active-filters is-hidden" data-active-filters>
+      <!-- Filter pills are rendered here by home.js (renderActiveFilters()),
+           built entirely from currentFilters — nothing here is hardcoded.
+           To add a new filterable field, add ONE entry to FILTER_PILL_DEFS
+           in assets/js/pages/home.js — no markup changes needed. -->
+      <button type="button" class="clear-filters is-hidden" data-clear-filters>Clear all</button>
     </div>
 
     <p class="results-count" data-results-count>120+ properties found</p>
@@ -757,6 +758,8 @@
     <div class="listings-grid" data-listings-grid aria-live="polite">
       <!-- Property cards rendered by home.js -->
     </div>
+
+    <p class="listings-empty" data-listings-empty>No properties match your search. Try a different name, location or type.</p>
 
     <nav class="pagination" data-listings-pagination aria-label="Listings pagination">
       <!-- Page controls rendered by home.js -->
@@ -1196,8 +1199,8 @@
 <!-- =========================================================
      FOOTER
 ============================================================= -->
+<div data-partial="partials/browse-property.html"></div>
 <div data-partial="partials/footer.html"></div>
-
 
   
   
@@ -1209,7 +1212,10 @@
 <script src="assets/js/core/dom.js"></script>
 <script src="assets/js/core/events.js"></script>
 <script src="assets/js/core/storage.js"></script>
+<script src="assets/js/core/skeleton.js"></script>
 <script src="assets/js/core/partials.js"></script>
+<script src="assets/js/data/properties.js"></script>
+<script src="assets/js/components/browse-property.js"></script>
 
   <!-- Modules -->
   <script src="assets/js/modules/dropdown.js"></script>
