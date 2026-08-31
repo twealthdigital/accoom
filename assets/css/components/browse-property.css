@@ -146,10 +146,14 @@ html.browse-scroll-walled {
   display: flex;
 }
 
+/* A suggestion dropdown, not a grid — one column, room for about
+   two results before it scrolls. */
 .browse-property-results {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 168px;
+  overflow-y: auto;
 }
 
 .browse-result {
@@ -225,20 +229,8 @@ html.browse-scroll-walled {
   to   { opacity: 1; transform: none; }
 }
 
-/* Keep the results scrollable within the overlay on small screens. */
-.browse-property-results {
-  max-height: calc(100dvh - var(--header-h) - 120px);
-  overflow-y: auto;
-}
-
 @media (max-width: 991px) {
   .browse-property {
     top: var(--header-h-mobile);
-  }
-}
-
-@media (max-width: 767px) {
-  .browse-property-results {
-    max-height: calc(100dvh - var(--header-h-mobile) - 120px);
   }
 }

@@ -198,8 +198,8 @@ window.Accoom = window.Accoom || {};
       document.body.classList.add('browse-property-locked');
       if (input) input.value = '';
 
-      // Show every listing immediately, as if the section were scrolled to.
-      if (listEl) renderResults(listEl, emptyEl, getCatalogue());
+      // Suggestions stay empty until they actually type something.
+      clearResults();
 
       // Keep the real section aligned behind the blur for continuity.
       // scrollIntoView's "start" lines the section up flush with the
@@ -299,9 +299,15 @@ window.Accoom = window.Accoom || {};
     Accoom.on(input, 'input', Accoom.debounce(function () {
       var query = input.value.trim();
       // Live-filter the dropdown list itself using the shared smart
-      // matcher — this is what makes results narrow as you type.
+      // matcher — this is what makes results narrow as you type. Nothing
+      // shows for an empty box, and it's capped to a few suggestions
+      // rather than dumping the whole catalogue.
       if (listEl && emptyEl) {
-        renderResults(listEl, emptyEl, filterItems(getCatalogue(), query));
+        if (!query) {
+          clearResults();
+        } else {
+          renderResults(listEl, emptyEl, filterItems(getCatalogue(), query).slice(0, 6));
+        }
       }
       // Also drive the real listings grid behind the overlay so it's
       // already correct the moment the overlay closes.
@@ -318,8 +324,10 @@ window.Accoom = window.Accoom || {};
       var query = input.value.trim();
       if (Accoom.syncFilterAvailability) Accoom.syncFilterAvailability(query);
       if (Accoom.setListingsSearch) Accoom.setListingsSearch(query);
-      // Bar stays open, just commit the filter. It used to call close()
-      // here, which dumped the user back to the top of the page.
+      // Bar stays open, but the suggestion dropdown itself goes away,
+      // leaving just the bar sitting over the real (already filtered)
+      // listings section.
+      clearResults();
     });
 
     if (listEl) {
