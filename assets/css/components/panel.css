@@ -161,6 +161,25 @@
   transition: transform var(--dur-fast) var(--ease);
 }
 
+/* Balance row inside the hamburger panel — hidden by default since
+   desktop/tablet keep Balance in the header; shown on phones only */
+.panel-balance-row {
+  display: none;
+}
+
+.panel-balance-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+@media (max-width: 767px) {
+  .panel-balance-row {
+    display: flex;
+  }
+}
+
 /* Mobile Location Dropdown - SAME STYLE AS DESKTOP */
 .panel-location-dropdown {
   width: 100%;

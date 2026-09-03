@@ -32,12 +32,28 @@ window.Accoom = window.Accoom || {};
   };
 
   /**
-   * Load every [data-partial] element on the page.
-   * Resolves once ALL partials have been injected.
+   * Load every [data-partial] element on the page, including ones that
+   * only appear after another partial injects them (e.g. header.html
+   * contains its own nested [data-partial] rows for messages/
+   * notifications). Keeps re-scanning until no new ones show up.
+   * Resolves once ALL partials — nested or not — have been injected.
    */
   Accoom.loadPartials = function () {
-    var targets = Accoom.$$('[data-partial]');
-    return Promise.all(targets.map(Accoom.loadPartial)).then(function () {
+    var MAX_PASSES = 5;
+
+    function loadPass(pass) {
+      var targets = Accoom.$$('[data-partial]');
+      if (!targets.length) return Promise.resolve();
+
+      return Promise.all(targets.map(Accoom.loadPartial)).then(function () {
+        var remaining = Accoom.$$('[data-partial]');
+        if (remaining.length && pass < MAX_PASSES) {
+          return loadPass(pass + 1);
+        }
+      });
+    }
+
+    return loadPass(1).then(function () {
       Accoom.dispatch(document, 'partials:ready');
     });
   };

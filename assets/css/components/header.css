@@ -318,6 +318,14 @@ html:not(.dark-mode) .mobile-search:focus-within {
   }
 
   .header-actions .notif-dropdown {
+    display: none !important;
+  }
+
+  .header-actions .msg-dropdown {
+    display: none !important;
+  }
+
+  .header-actions .balance-toggle {
     display: flex !important;
   }
 
@@ -355,6 +363,7 @@ html:not(.dark-mode) .mobile-search:focus-within {
     flex: 1;
     gap: 10px;
     min-width: 0;
+    justify-content: flex-end;
   }
   .hamburger-btn {
     order: 3;
@@ -368,6 +377,36 @@ html:not(.dark-mode) .mobile-search:focus-within {
 @media (max-width: 420px) {
   .container.header-inner {
     padding-inline: 16px;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE - PHONE ONLY
+   Search bar is removed entirely; message & notification icons
+   take its place beside the hamburger instead. Balance still
+   moves into the side panel. Tablet (768–991px) and desktop
+   are untouched.
+   ============================================================ */
+@media (max-width: 767px) {
+
+  .header-actions .balance-toggle {
+    display: none !important;
+  }
+
+  .mobile-search {
+    display: none !important;
+  }
+
+  .header-actions .notif-dropdown,
+  .header-actions .msg-dropdown {
+    display: flex !important;
+  }
+
+  /* Already shown in the header on phone — don't duplicate them
+     inside the side panel too. */
+  .side-panel .msg-dropdown,
+  .side-panel .notif-dropdown {
+    display: none !important;
   }
 }
 
@@ -388,6 +427,14 @@ html:not(.dark-mode) .mobile-search:focus-within {
   }
 
   .header-actions .notif-dropdown {
+    display: flex !important;
+  }
+
+  .header-actions .msg-dropdown {
+    display: flex !important;
+  }
+
+  .header-actions .balance-toggle {
     display: flex !important;
   }
 
@@ -550,6 +597,109 @@ html:not(.dark-mode) .notif-trigger {
 .notif-trigger:not(.has-unread) .notif-badge-dot {
   opacity: 0;
   transform: scale(0);
+}
+
+.notif-trigger-label,
+.notif-badge-count {
+  display: none;
+}
+
+.side-panel .notif-trigger {
+  width: 100%;
+  height: auto;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-m);
+}
+
+.side-panel .notif-trigger:hover,
+.side-panel .notif-trigger[aria-expanded="true"] {
+  background: var(--gold-soft);
+}
+
+.side-panel .notif-badge-dot {
+  display: none;
+}
+
+.side-panel .notif-trigger-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--on-surface);
+}
+
+.side-panel .notif-badge-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  margin-left: auto;
+  border-radius: var(--radius-pill);
+  background: var(--gold);
+  color: var(--navy-2);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.side-panel .notif-trigger:not(.has-unread) .notif-badge-count {
+  display: none;
+}
+
+.msg-item-property {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin: 1px 0 2px;
+}
+
+/* ============================================================
+   BALANCE
+   ============================================================ */
+.balance-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-on-dark);
+  white-space: nowrap;
+  padding: 6px 10px;
+  border-radius: var(--radius-pill);
+  border: 0;
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease);
+}
+
+html:not(.dark-mode) .balance-toggle {
+  color: var(--on-surface);
+}
+
+.balance-toggle:hover {
+  color: var(--on-surface);
+  background: var(--gold-soft);
+}
+
+.balance-eye-icon {
+  flex-shrink: 0;
+}
+
+.balance-eye-icon--hidden {
+  display: none;
+}
+
+.balance-toggle.is-balance-masked .balance-eye-icon--visible {
+  display: none;
+}
+
+.balance-toggle.is-balance-masked .balance-eye-icon--hidden {
+  display: block;
 }
 
 .notif-panel {

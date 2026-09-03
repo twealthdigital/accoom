@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <!-- =========================================================
+     MESSAGES DROPDOWN
+     TODO(backend): msg-list below is hardcoded — swap for
+     items rendered from the messaging API when it's ready.
+============================================================= -->
+<div class="dropdown msg-dropdown">
+  <button type="button" class="msg-trigger notif-trigger dropdown-trigger has-unread" aria-haspopup="true" aria-expanded="false" aria-label="Messages">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+    <span class="notif-trigger-label">Messages</span>
+    <span class="notif-badge-dot" data-msg-badge></span>
+    <span class="notif-badge-count" data-msg-count>0</span>
+  </button>
+
+  <div class="dropdown-panel notif-panel msg-panel" data-dropdown-panel>
+    <div class="notif-panel-header">
+      <h4>Messages</h4>
+    </div>
+
+    <div class="notif-list" data-msg-list>
+
+      <div class="notif-empty" data-msg-empty>No Messages</div>
+
+      <div class="notif-item is-unread" data-msg-item>
+        <a href="contact-agent.html" class="notif-item-main">
+          <span class="notif-item-icon notif-item-icon--message">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          </span>
+          <span class="notif-item-body">
+            <span class="notif-item-top">
+              <span class="notif-item-title">Sanan Ullah</span>
+              <span class="notif-item-time">1h ago</span>
+            </span>
+            <span class="msg-item-property">Self-contained Apartment · Maitama</span>
+            <span class="notif-text-content">I hope to hear from you soon, and I will deliver my best to get you the apartment you want.</span>
+          </span>
+        </a>
+      </div>
+
+      <div class="notif-item is-unread" data-msg-item>
+        <a href="contact-agent.html" class="notif-item-main">
+          <span class="notif-item-icon notif-item-icon--message">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          </span>
+          <span class="notif-item-body">
+            <span class="notif-item-top">
+              <span class="notif-item-title">Faisal Shafiq</span>
+              <span class="notif-item-time">Yesterday</span>
+            </span>
+            <span class="msg-item-property">2-Bedroom Flat · Wuse</span>
+            <span class="notif-text-content">Sorry, no need for now. I already found a place closer to my office.</span>
+          </span>
+        </a>
+      </div>
+
+      <div class="notif-item" data-msg-item>
+        <a href="contact-agent.html" class="notif-item-main">
+          <span class="notif-item-icon notif-item-icon--message">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          </span>
+          <span class="notif-item-body">
+            <span class="notif-item-top">
+              <span class="notif-item-title">Grace Adeyemi</span>
+              <span class="notif-item-time">3 days ago</span>
+            </span>
+            <span class="msg-item-property">Mini Flat · Gwarinpa</span>
+            <span class="notif-text-content">Inspection is booked for Saturday 10am, see you then.</span>
+          </span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

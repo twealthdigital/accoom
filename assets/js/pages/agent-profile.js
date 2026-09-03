@@ -83,6 +83,7 @@
     // TABS — Available / In Progress / Sold
     // ============================================================
     (function initTabs() {
+      var tabsContainer = Accoom.$('[data-ap-tabs]');
       var tabs = Accoom.$$('[data-ap-tab]');
       var panels = Accoom.$$('[data-ap-panel]');
       if (!tabs.length) return;

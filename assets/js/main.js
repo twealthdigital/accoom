@@ -8,13 +8,122 @@ window.Accoom = window.Accoom || {};
 (function (Accoom) {
   'use strict';
 
+  // Page content that is already in the static HTML at parse time
+  // (not shipped via a [data-partial]), so this can run on plain
+  // Accoom.ready as before.
   Accoom.ready(function () {
+    // Listings filters/sort dropdowns
+    var listingsFilters = document.querySelector('.listings-filter-dropdown');
+    if (listingsFilters) {
+      Accoom.initDropdown(listingsFilters);
+    }
+
+    var listingsSort = document.querySelector('.listings-sort-dropdown');
+    if (listingsSort) {
+      Accoom.initDropdown(listingsSort);
+    }
+
+    // VIEW PROFILE — send agent + property context to agent-profile.html
+    (function initViewProfile() {
+      function goToProfile(agent) {
+        var currentProperty = Accoom.currentProperty || {};
+        agent.property = { id: currentProperty.id || '', name: currentProperty.name || '' };
+        Accoom.setStorage('accoom-active-agent', agent);
+        window.location.href = 'agent-profile.html';
+      }
+
+      var mainBtn = document.querySelector('[data-pd-view-profile]');
+      if (mainBtn) {
+        Accoom.on(mainBtn, 'click', function (e) {
+          e.preventDefault();
+          goToProfile({
+            name: (document.querySelector('[data-pd-agent-name]').textContent || '').trim(),
+            avatar: document.querySelector('[data-pd-agent-avatar]').getAttribute('src'),
+            verified: !!document.querySelector('[data-pd-agent-name] .pd-agent-verified-badge'),
+            stats: (document.querySelector('[data-pd-agent-stats]').textContent || '').trim(),
+            rating: (document.querySelector('[data-pd-agent-rating]').textContent || '').trim(),
+            level: (Accoom.currentProperty && Accoom.currentProperty.agent) ? Accoom.currentProperty.agent.level : 'AL5'
+          });
+        });
+      }
+
+      Accoom.delegate(document, 'click', '.pd-agent-tile .btn', function (e) {
+        e.preventDefault();
+        var tile = this.closest('.pd-agent-tile');
+        goToProfile({
+          name: (tile.querySelector('.pd-agent-name').textContent || '').trim(),
+          avatar: tile.querySelector('.pd-agent-tile-avatar').getAttribute('src'),
+          verified: !!tile.querySelector('.pd-agent-verified-badge'),
+          stats: (tile.querySelector('.pd-agent-tile-stats').textContent || '').trim(),
+          rating: (tile.querySelector('.pd-agent-tile-rating').textContent || '').trim(),
+          level: 'AL5'
+        });
+      });
+    })();
+
+    console.log('ACCOOM initialized');
+  });
+
+  // Everything below touches markup that now ships via [data-partial]
+  // (header.html, messages.html, notifications.html, footer.html, ...),
+  // so it all has to wait for partials:ready instead of running on
+  // plain Accoom.ready — otherwise it'd run before the fetch() calls
+  // that inject that markup have resolved.
+  Accoom.on(document, 'partials:ready', function () {
+
     // Mobile search — stop page reload on submit
     Accoom.$$('.mobile-search').forEach(function (form) {
       Accoom.on(form, 'submit', function (e) {
         e.preventDefault();
       });
     });
+
+    // Mobile search expand/collapse (phone-only visuals via CSS;
+    // this JS just tracks state and is harmless on tablet/desktop
+    // where the collapsed styles don't apply).
+    Accoom.$$('[data-mobile-search]').forEach(function (form) {
+      var toggleBtn = form.querySelector('[data-mobile-search-toggle]');
+      var closeBtn = form.querySelector('[data-mobile-search-close]');
+      var input = form.querySelector('[data-mobile-search-input]');
+      var headerActions = form.closest('.header-actions');
+      if (!toggleBtn || !closeBtn || !input) return;
+
+      function expand() {
+        form.classList.add('is-expanded');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        if (headerActions) headerActions.classList.add('search-expanded');
+        input.focus();
+      }
+
+      function collapse() {
+        form.classList.remove('is-expanded');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        if (headerActions) headerActions.classList.remove('search-expanded');
+      }
+
+      Accoom.on(toggleBtn, 'click', function (e) {
+        e.preventDefault();
+        expand();
+      });
+
+      Accoom.on(closeBtn, 'click', function (e) {
+        e.preventDefault();
+        input.value = '';
+        collapse();
+      });
+
+      Accoom.on(document, 'click', function (e) {
+        if (!form.classList.contains('is-expanded')) return;
+        if (!form.contains(e.target)) collapse();
+      });
+
+      Accoom.on(document, 'keydown', function (e) {
+        if (e.key === 'Escape' && form.classList.contains('is-expanded')) {
+          collapse();
+        }
+      });
+    });
+
     // Initialize theme toggle (site-wide)
     var themeToggles = document.querySelectorAll('[data-dark-toggle]');
     if (themeToggles.length) {
@@ -23,12 +132,12 @@ window.Accoom = window.Accoom || {};
 
     // Initialize off-canvas panel (site-wide)
     var hamburgerBtn = document.querySelector('[data-panel-open]');
-    var closeBtn = document.querySelector('[data-panel-close]');
+    var panelCloseBtn = document.querySelector('[data-panel-close]');
     var overlay = document.querySelector('[data-panel-overlay]');
     var panel = document.querySelector('[data-panel]');
 
     if (hamburgerBtn && panel && overlay) {
-      Accoom.initOffCanvas(hamburgerBtn, panel, overlay, closeBtn);
+      Accoom.initOffCanvas(hamburgerBtn, panel, overlay, panelCloseBtn);
     }
 
     // Initialize location dropdowns (site-wide) - FIXED
@@ -38,7 +147,7 @@ window.Accoom = window.Accoom || {};
       Accoom.initLocationDropdown(desktopLocation);
     }
 
-// Mobile panel location
+    // Mobile panel location
     var panelLocation = document.querySelector('.panel-location-dropdown');
     if (panelLocation) {
       Accoom.initLocationDropdown(panelLocation);
@@ -53,8 +162,8 @@ window.Accoom = window.Accoom || {};
     // Account dropdown — "Sign in" / "Sign up" route to the auth page,
     // landing on the matching login/signup toggle state there.
     // Once signed in, the same slots become "Profile" / "Sign out".
-    Accoom.$$('[aria-label="Account"]').forEach(function (panel) {
-      var dropdownEl = panel.closest('.dropdown');
+    Accoom.$$('[aria-label="Account"]').forEach(function (accountPanel) {
+      var dropdownEl = accountPanel.closest('.dropdown');
       if (!dropdownEl) return;
       Accoom.on(dropdownEl, 'dropdown:select', function (e) {
         var value = e.detail && e.detail.value;
@@ -95,34 +204,17 @@ window.Accoom = window.Accoom || {};
       });
     })();
 
-// Listings filters/sort dropdowns
-    var listingsFilters = document.querySelector('.listings-filter-dropdown');
-    if (listingsFilters) {
-      Accoom.initDropdown(listingsFilters);
-    }
-
-    var listingsSort = document.querySelector('.listings-sort-dropdown');
-    if (listingsSort) {
-      Accoom.initDropdown(listingsSort);
-    }
-
     // Notifications dropdown + panel behavior (site-wide).
-    // Markup now ships via the partials/notifications.html partial on
-    // every page, so this has to wait for the partial to actually be
-    // in the DOM instead of running on plain Accoom.ready.
-    Accoom.on(document, 'partials:ready', function () {
-      var notifDropdown = document.querySelector('.notif-dropdown');
-      if (notifDropdown) {
-        Accoom.initDropdown(notifDropdown);
-      }
+    Accoom.$$('.notif-dropdown').forEach(function (notifDropdown) {
+      Accoom.initDropdown(notifDropdown);
 
-      var trigger = document.querySelector('.notif-trigger');
-      var list = document.querySelector('[data-notif-list]');
+      var trigger = notifDropdown.querySelector('.notif-trigger');
+      var list = notifDropdown.querySelector('[data-notif-list]');
       if (!trigger || !list) return;
 
       var COLLAPSED_LINES = 2;
 
-           var emptyState = list.querySelector('[data-notif-empty]');
+      var emptyState = list.querySelector('[data-notif-empty]');
 
       function refreshBadge() {
         var hasUnread = !!list.querySelector('.notif-item.is-unread');
@@ -186,11 +278,11 @@ window.Accoom = window.Accoom || {};
           return;
         }
 
-        var closeBtn = e.target.closest('[data-notif-close]');
-        if (closeBtn) {
+        var notifCloseBtn = e.target.closest('[data-notif-close]');
+        if (notifCloseBtn) {
           e.preventDefault();
           e.stopPropagation();
-          var item = closeBtn.closest('[data-notif-item]');
+          var item = notifCloseBtn.closest('[data-notif-item]');
           if (!item) return;
           item.classList.add('is-removing');
           setTimeout(function () {
@@ -203,6 +295,29 @@ window.Accoom = window.Accoom || {};
       refreshBadge();
     });
 
+    // Messages dropdown + unread badge (site-wide).
+    Accoom.$$('.msg-dropdown').forEach(function (msgDropdown) {
+      Accoom.initDropdown(msgDropdown);
+
+      var msgTrigger = msgDropdown.querySelector('.msg-trigger');
+      var msgList = msgDropdown.querySelector('[data-msg-list]');
+      if (!msgTrigger || !msgList) return;
+
+      var msgEmptyState = msgList.querySelector('[data-msg-empty]');
+
+      function refreshMsgBadge() {
+        var hasUnread = !!msgList.querySelector('.notif-item.is-unread');
+        msgTrigger.classList.toggle('has-unread', hasUnread);
+
+        if (msgEmptyState) {
+          var hasItems = !!msgList.querySelector('[data-msg-item]');
+          msgEmptyState.classList.toggle('is-visible', !hasItems);
+        }
+      }
+
+      refreshMsgBadge();
+    });
+
     // Desktop menu dropdown (hamburger: Account / Location / Theme / Help)
     var desktopMenu = document.querySelector('.desktop-menu-dropdown');
     if (desktopMenu) {
@@ -212,49 +327,31 @@ window.Accoom = window.Accoom || {};
       Accoom.$$('.desktop-menu-panel > .dropdown', desktopMenu).forEach(function (nestedDropdown) {
         Accoom.initDropdown(nestedDropdown);
       });
-
-      // ============================================================
-    // VIEW PROFILE — send agent + property context to agent-profile.html
-    // ============================================================
-    (function initViewProfile() {
-      function goToProfile(agent) {
-        var currentProperty = Accoom.currentProperty || {};
-        agent.property = { id: currentProperty.id || '', name: currentProperty.name || '' };
-        Accoom.setStorage('accoom-active-agent', agent);
-        window.location.href = 'agent-profile.html';
-      }
-
-      var mainBtn = document.querySelector('[data-pd-view-profile]');
-      if (mainBtn) {
-        Accoom.on(mainBtn, 'click', function (e) {
-          e.preventDefault();
-          goToProfile({
-            name: (document.querySelector('[data-pd-agent-name]').textContent || '').trim(),
-            avatar: document.querySelector('[data-pd-agent-avatar]').getAttribute('src'),
-            verified: !!document.querySelector('[data-pd-agent-name] .pd-agent-verified-badge'),
-            stats: (document.querySelector('[data-pd-agent-stats]').textContent || '').trim(),
-            rating: (document.querySelector('[data-pd-agent-rating]').textContent || '').trim(),
-            level: (Accoom.currentProperty && Accoom.currentProperty.agent) ? Accoom.currentProperty.agent.level : 'AL5'
-          });
-        });
-      }
-
-      Accoom.delegate(document, 'click', '.pd-agent-tile .btn', function (e) {
-        e.preventDefault();
-        var tile = this.closest('.pd-agent-tile');
-        goToProfile({
-          name: (tile.querySelector('.pd-agent-name').textContent || '').trim(),
-          avatar: tile.querySelector('.pd-agent-tile-avatar').getAttribute('src'),
-          verified: !!tile.querySelector('.pd-agent-verified-badge'),
-          stats: (tile.querySelector('.pd-agent-tile-stats').textContent || '').trim(),
-          rating: (tile.querySelector('.pd-agent-tile-rating').textContent || '').trim(),
-          level: 'AL5'
-        });
-      });
-    })();
     }
 
-    console.log('ACCOOM initialized');
+    // Balance amount show/hide toggle (site-wide)
+    Accoom.$$('[data-balance-toggle]').forEach(function (btn) {
+      var amountEl = btn.querySelector('[data-balance-amount]');
+      if (!amountEl) return;
+
+      var realValue = amountEl.textContent;
+      var hidden = Accoom.getStorage('accoom-balance-hidden', false);
+
+      function render() {
+        amountEl.textContent = hidden ? '••••••' : realValue;
+        btn.classList.toggle('is-balance-masked', hidden);
+        btn.setAttribute('aria-label', hidden ? 'Show balance' : 'Hide balance');
+      }
+
+      Accoom.on(btn, 'click', function () {
+        hidden = !hidden;
+        Accoom.setStorage('accoom-balance-hidden', hidden);
+        render();
+      });
+
+      render();
+    });
+
   });
 
 })(window.Accoom);
