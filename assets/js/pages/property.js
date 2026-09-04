@@ -375,14 +375,123 @@ var params = new URLSearchParams(window.location.search);
     })();
 
     // ============================================================
-    // MAKE PAYMENT — placeholder hook for the payment flow
+    // MAKE PAYMENT — wallet-balance check + confirm/deposit dialog
+    // (same visual/behavioral pattern as the Share modal above)
     // ============================================================
     (function initPayment() {
       var btn = document.querySelector('[data-pd-payment]');
       if (!btn) return;
+
+      function parseAmount(str) {
+        var n = parseFloat(String(str || '').replace(/[^0-9.]/g, ''));
+        return isNaN(n) ? 0 : n;
+      }
+
+      // Wallet balance lives in the header partial. It reads the raw
+      // (unmasked) value stashed by main.js so this works even while
+      // the user has their balance hidden via the eye toggle.
+      function getWalletBalance() {
+        var el = document.querySelector('[data-balance-amount]');
+        if (!el) return 0;
+        return parseAmount(el.getAttribute('data-balance-raw') || el.textContent);
+      }
+
+      // The real payable figure is the "Total (First Year)" row, not
+      // just the base rent — that's the actual amount being charged.
+      function getPayableAmount() {
+        var totalEl = document.querySelector('.pd-price-total span:last-child');
+        var display = totalEl ? totalEl.textContent.trim() : property.price;
+        return { display: display, value: parseAmount(display) };
+      }
+
+      var modal = document.createElement('div');
+      modal.className = 'share-modal-overlay share-modal-overlay--pay';
+      modal.setAttribute('data-pay-modal', '');
+      modal.innerHTML =
+        '<div class="share-modal share-modal--pay" role="dialog" aria-modal="true" aria-labelledby="pay-modal-title">' +
+          '<button type="button" class="share-modal-close" data-pay-close aria-label="Close">' +
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+          '</button>' +
+          '<div class="pay-modal-icon-wrap" data-pay-icon-wrap>' +
+            '<svg data-pay-icon width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>' +
+          '</div>' +
+          '<div class="pay-modal-body-text">' +
+            '<p class="share-modal-title" id="pay-modal-title" data-pay-title></p>' +
+            '<p class="share-modal-subtitle" data-pay-subtitle></p>' +
+          '</div>' +
+          '<div class="pay-modal-amount-row">' +
+            '<span>Amount Due</span>' +
+            '<span data-pay-amount></span>' +
+          '</div>' +
+          '<div class="pay-modal-actions">' +
+            '<button type="button" class="btn btn--ghost" data-pay-cancel>Cancel</button>' +
+            '<button type="button" class="btn btn--primary" data-pay-confirm></button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(modal);
+
+      var iconWrap = modal.querySelector('[data-pay-icon-wrap]');
+      var iconSvg = modal.querySelector('[data-pay-icon]');
+      var titleEl = modal.querySelector('[data-pay-title]');
+      var subtitleEl = modal.querySelector('[data-pay-subtitle]');
+      var amountEl = modal.querySelector('[data-pay-amount]');
+      var confirmBtn = modal.querySelector('[data-pay-confirm]');
+
+      var ICON_WARN = '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="13"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>';
+      var ICON_OK = '<path d="M20 6 9 17l-5-5"></path>';
+
+      var state = { hasFunds: false, payable: { display: '', value: 0 } };
+
+      function openModal(hasFunds, payable) {
+        state.hasFunds = hasFunds;
+        state.payable = payable;
+
+        iconWrap.className = 'pay-modal-icon-wrap ' + (hasFunds ? 'pay-modal-icon-wrap--ok' : 'pay-modal-icon-wrap--warn');
+        iconSvg.innerHTML = hasFunds ? ICON_OK : ICON_WARN;
+
+        titleEl.textContent = hasFunds ? 'Confirm Your Payment' : 'Insufficient Balance';
+        subtitleEl.textContent = hasFunds
+          ? 'Your wallet balance covers this payment. Review the amount below, then proceed to complete it securely.'
+          : 'Your wallet balance is not enough to cover this payment. Deposit funds to continue.';
+
+        amountEl.textContent = payable.display;
+        confirmBtn.textContent = hasFunds ? 'Proceed' : 'Deposit';
+
+        modal.classList.add('is-open');
+        document.body.classList.add('no-scroll');
+      }
+
+      function closeModal() {
+        modal.classList.remove('is-open');
+        document.body.classList.remove('no-scroll');
+      }
+
       Accoom.on(btn, 'click', function () {
-        // Wire this up to the real checkout / payment flow.
-        console.log('Make Payment clicked for property:', property.id);
+        var payable = getPayableAmount();
+        var balance = getWalletBalance();
+        openModal(payable.value > 0 && balance >= payable.value, payable);
+      });
+
+      Accoom.on(modal.querySelector('[data-pay-close]'), 'click', closeModal);
+      Accoom.on(modal.querySelector('[data-pay-cancel]'), 'click', closeModal);
+
+      Accoom.on(modal, 'click', function (e) {
+        if (e.target === modal) closeModal();
+      });
+
+      Accoom.on(document, 'keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+      });
+
+      Accoom.on(confirmBtn, 'click', function () {
+        // Deposit (insufficient funds) and Proceed (sufficient funds)
+        // both hand off to payment.html; it reads `mode` to decide
+        // whether to show the top-up step or go straight to checkout.
+        var url = 'payment.html'
+          + '?id=' + encodeURIComponent(property.id)
+          + '&amount=' + encodeURIComponent(state.payable.value)
+          + '&mode=' + (state.hasFunds ? 'checkout' : 'deposit');
+        window.location.href = url;
       });
     })();
 

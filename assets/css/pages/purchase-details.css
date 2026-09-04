@@ -215,6 +215,7 @@
 .pod-timeline-item::before {
   content: '';
   position: absolute;
+  z-index: 0;
   left: 13px;
   top: 34px;
   bottom: -14px;
@@ -227,6 +228,8 @@
 }
 
 .pod-timeline-dot {
+  position: relative;
+  z-index: 1;
   flex-shrink: 0;
   width: 28px;
   height: 28px;

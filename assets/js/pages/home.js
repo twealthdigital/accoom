@@ -41,31 +41,56 @@
       });
     });
 
-    // Quick search form
+    // Quick search form — same fuzzy search that drives the listings grid
     var quickSearch = document.querySelector('.quick-search-bar');
     if (quickSearch) {
       Accoom.on(quickSearch, 'submit', function (e) {
         e.preventDefault();
         var input = this.querySelector('input');
-        if (input && input.value.trim()) {
-          // Handle search
-          console.log('Search:', input.value.trim());
+        var query = input ? input.value.trim() : '';
+        if (!query) return;
+        if (Accoom.setListingsSearch) {
+          Accoom.setListingsSearch(query);
+        }
+        var target = document.getElementById('all-listings');
+        if (target) {
+          var headerEl = document.querySelector('.site-header');
+          var headerHeight = headerEl ? headerEl.offsetHeight : 0;
+          var targetY = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
+          window.scrollTo({ top: Math.max(targetY, 0), behavior: 'smooth' });
         }
       });
     }
 
-    // Hero search form
+    // Hero search form. Builds one query string from location + type
+    // and hands it to Accoom.setListingsSearch, the SAME fuzzy search
+    // that already drives the listings grid and filter bar
+    // (PropertyService.fetchPage / searchList). New properties, however
+    // they get added (hardcoded in ALL, pushed from JS, or from a real
+    // backend once fetchPage is swapped for an API call), get searched
+    // automatically. Nothing here needs to change for that.
     var heroSearch = document.querySelector('.hero-search');
     if (heroSearch) {
       Accoom.on(heroSearch, 'submit', function (e) {
         e.preventDefault();
         var location = this.querySelector('#hs-location');
-        var type = this.querySelector('#hs-type');
-        // Handle search
-        console.log('Search:', {
-          location: location ? location.value : '',
-          type: type ? type.value : ''
-        });
+        var typeHidden = this.querySelector('#hs-type');
+        var typeLabelEl = this.querySelector('.hero-search-select [data-dropdown-label]');
+        var locationText = location ? location.value.trim() : '';
+        var typeText = (typeHidden && typeHidden.value && typeLabelEl) ? typeLabelEl.textContent.trim() : '';
+        var query = (locationText + ' ' + typeText).trim();
+
+        if (Accoom.setListingsSearch) {
+          Accoom.setListingsSearch(query);
+        }
+
+        var target = document.getElementById('all-listings');
+        if (target) {
+          var headerEl = document.querySelector('.site-header');
+          var headerHeight = headerEl ? headerEl.offsetHeight : 0;
+          var targetY = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
+          window.scrollTo({ top: Math.max(targetY, 0), behavior: 'smooth' });
+        }
       });
     }
 
@@ -77,18 +102,25 @@
       });
     });
 
-    // Popular search pills
+    // Popular search pills — populate AND run the search immediately
     Accoom.$$('.pill').forEach(function (pill) {
       Accoom.on(pill, 'click', function (e) {
         e.preventDefault();
         var text = this.textContent.trim();
-        // Populate search with pill text
         var quickInput = document.querySelector('.quick-search-bar input');
         if (quickInput) {
           quickInput.value = text;
-          quickInput.focus();
         }
-        console.log('Popular search:', text);
+        if (Accoom.setListingsSearch) {
+          Accoom.setListingsSearch(text);
+        }
+        var target = document.getElementById('all-listings');
+        if (target) {
+          var headerEl = document.querySelector('.site-header');
+          var headerHeight = headerEl ? headerEl.offsetHeight : 0;
+          var targetY = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
+          window.scrollTo({ top: Math.max(targetY, 0), behavior: 'smooth' });
+        }
       });
     });
 
@@ -209,6 +241,33 @@ price: 120000 + (i % 10) * 85000,
         return row[n];
       }
 
+      // Add an entry any time a real search term should also match a
+      // differently worded listing (e.g. "flat" vs "apartment"). Fully
+      // data driven, extend the list, nothing else needs to change.
+      var SYNONYMS = {
+        'flat': ['apartment', 'apt'],
+        'apartment': ['flat', 'apt'],
+        'self': ['studio', 'selfcon', 'contained'],
+        'contained': ['studio', 'selfcon', 'self'],
+        'studio': ['self', 'contained', 'selfcon'],
+        'room': ['studio', 'hostel', 'self'],
+        'mini': ['small', 'compact', 'studio'],
+        'bedroom': ['bed', 'br'],
+        'bed': ['bedroom', 'br'],
+        'duplex': ['storey', 'story', 'maisonette'],
+        'bungalow': ['storey', 'story', 'house'],
+        'hostel': ['room', 'shared', 'lodge'],
+        'shared': ['hostel', 'lodge'],
+        'commercial': ['office', 'shop', 'store'],
+        'land': ['plot', 'acre']
+      };
+
+      function wordsMatch(qw, hw) {
+        if (hw.indexOf(qw) !== -1) return true;
+        var maxDist = qw.length <= 4 ? 1 : qw.length <= 7 ? 2 : 3;
+        return levenshtein(qw, hw) <= maxDist;
+      }
+
       function fuzzyMatch(hay, query) {
         if (!query) return true;
         if (hay.indexOf(query) !== -1) return true;
@@ -216,9 +275,10 @@ price: 120000 + (i % 10) * 85000,
         var queryWords = query.split(/\s+/);
         return queryWords.every(function (qw) {
           if (!qw) return true;
-          var maxDist = qw.length <= 4 ? 1 : qw.length <= 7 ? 2 : 3;
-          return hayWords.some(function (hw) {
-            return hw.indexOf(qw) !== -1 || levenshtein(qw, hw) <= maxDist;
+          if (hayWords.some(function (hw) { return wordsMatch(qw, hw); })) return true;
+          var syns = SYNONYMS[qw] || [];
+          return syns.some(function (syn) {
+            return hayWords.some(function (hw) { return wordsMatch(syn, hw); });
           });
         });
       }
@@ -307,6 +367,49 @@ function getById(id) {
       return { fetchPage: fetchPage, getById: getById, getAll: getAll, searchList: searchList };
     })();
 
+    // Popular Accommodation cards — no hardcoded counts. Each card's number
+    // is recomputed from PropertyService.getAll() using the SAME fuzzy
+    // search used by the "Popular searches" pills, so it automatically
+    // reflects whatever is really in the catalogue (0 if nothing matches),
+    // and grows/shrinks the moment new properties are added anywhere
+    // upstream (admin dashboard, seller dashboard, or a real API).
+    function syncPopularCounts() {
+      var all = PropertyService.getAll();
+      Accoom.$$('.popular-card[data-popular-type]').forEach(function (card) {
+        var titleEl = card.querySelector('h3');
+        var countEl = card.querySelector('[data-popular-count]');
+        if (!titleEl || !countEl) return;
+        var query = titleEl.textContent.trim().toLowerCase();
+        var matches = PropertyService.searchList(all, query).total;
+        countEl.textContent = matches > 0 ? (matches + '+') : '0';
+      });
+    }
+    syncPopularCounts();
+
+    // Clicking/activating a card filters "All Property Listings" using
+    // its own title as the search term (identical pattern to the pills above).
+    Accoom.$$('.popular-card[data-popular-type]').forEach(function (card) {
+      function activate() {
+        var titleEl = card.querySelector('h3');
+        var query = titleEl ? titleEl.textContent.trim() : '';
+        if (!query) return;
+        var quickInput = document.querySelector('.quick-search-bar input');
+        if (quickInput) quickInput.value = query;
+        if (Accoom.setListingsSearch) Accoom.setListingsSearch(query);
+        var target = document.getElementById('all-listings');
+        if (target) {
+          var headerEl = document.querySelector('.site-header');
+          var headerHeight = headerEl ? headerEl.offsetHeight : 0;
+          var targetY = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
+          window.scrollTo({ top: Math.max(targetY, 0), behavior: 'smooth' });
+        }
+      }
+      Accoom.on(card, 'click', activate);
+      Accoom.on(card, 'keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+      });
+    });
+
     var listingsGrid = document.querySelector('[data-listings-grid]');
     var listingsPagination = document.querySelector('[data-listings-pagination]');
     var listingsEmpty = document.querySelector('[data-listings-empty]');
@@ -394,7 +497,7 @@ function cardTemplate(item) {
             '</div>' +
             '<div class="listing-card-body">' +
             '<p class="listing-name">' + item.name + '</p>' +
-              '<p class="listing-price">' + formatPrice(item.price) + ' <small>/ year</small></p>' +
+              '<p class="listing-price">' + formatPrice(item.price) + ' <small>' + item.priceLabel + '</small></p>' +
               '<p class="listing-location">' + item.location + '</p>' +
               '<div class="listing-meta">' +
                 '<span>' + item.beds + ' Bed</span><span>' + item.baths + ' Bath</span>' +
@@ -1058,6 +1161,36 @@ Accoom.delegate(listingsGrid, 'click', '.listing-card', function (e) {
 
       if (prevBtn) Accoom.on(prevBtn, 'click', function () { scrollByCard(-1); });
       if (nextBtn) Accoom.on(nextBtn, 'click', function () { scrollByCard(1); });
+
+      // "View Details" — each card carries its own fixed id (data-id on
+      // the name), so this always opens THAT card's page, regardless of
+      // carousel position/cloning. Swap the hardcoded ids for real
+      // backend-provided ones later and nothing here has to change.
+      Accoom.delegate(track, 'click', '.suggested-property-actions .btn--ghost', function (e) {
+        e.preventDefault();
+        var card = this.closest('.suggested-card');
+        var nameEl = card ? card.querySelector('[data-id]') : null;
+        if (!nameEl) return;
+
+        var id = nameEl.getAttribute('data-id');
+        var name = nameEl.textContent.trim();
+        var priceEl = card.querySelector('.suggested-property-price');
+        var locationEl = card.querySelector('.suggested-property-location');
+        var imgEl = card.querySelector('.suggested-property-media img');
+
+        Accoom.setStorage('accoom-active-listing', {
+          id: id,
+          name: name,
+          price: priceEl ? parseInt(priceEl.textContent.replace(/[^\d]/g, ''), 10) : 0,
+          location: locationEl ? locationEl.textContent.replace(/\s+/g, ' ').trim() : '',
+          images: imgEl ? [imgEl.getAttribute('src')] : [],
+          video: null,
+          agent: { level: 'AL5' }
+        });
+
+        window.location.href = 'property.html?id=' + encodeURIComponent(id) +
+          '&name=' + encodeURIComponent(name);
+      });
     })();
 
     // ============================================================

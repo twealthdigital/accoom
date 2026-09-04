@@ -451,29 +451,20 @@
     var mainTitleEl = document.querySelector('[data-profile-main-title]');
     var backBtn = document.querySelector('[data-profile-back-btn]');
 
-    // Restore whichever nav link was active before leaving for a real
-    // page (e.g. My Purchases), so the back arrow returns to the same tab.
-    var savedActiveHref = Accoom.getStorage('accoom-profile-active-nav', null);
-    if (savedActiveHref) {
-      var matchLink = navLinks.filter(function (l) {
-        return l.getAttribute('href') === savedActiveHref;
-      })[0];
-      if (matchLink) {
-        navLinks.forEach(function (l) { l.classList.remove('is-active'); });
-        matchLink.classList.add('is-active');
-      }
-    }
+    // profile.html only ever shows the Overview content, and the real
+    // sub-pages (My Purchases, Saved Properties, ...) already hardcode
+    // their own correct is-active link in their own markup. So there's
+    // nothing to "remember" here — Overview's is-active in the HTML is
+    // always the right state and JS should leave it alone on load.
 
     navLinks.forEach(function (link) {
       Accoom.on(link, 'click', function (e) {
         var href = this.getAttribute('href');
         if (href && href !== '#') {
-          Accoom.setStorage('accoom-profile-active-nav', href);
-          return; // real page link (e.g. My Purchases) — let it navigate
+          return; // real page link (e.g. My Purchases) — let it navigate, its own page sets the active state
         }
 
         e.preventDefault();
-        Accoom.setStorage('accoom-profile-active-nav', '#');
         navLinks.forEach(function (l) { l.classList.remove('is-active'); });
         this.classList.add('is-active');
 

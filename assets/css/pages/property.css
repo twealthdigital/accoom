@@ -649,7 +649,7 @@ html.dark-mode .pd-card {
   height: 16px;
   border-radius: 50%;
   background: var(--gold);
-  color: #14100a;
+  color: #fff;
   flex-shrink: 0;
 }
 
@@ -1494,4 +1494,78 @@ html.dark-mode .pd-map-visual iframe {
     justify-content: space-between;
   }
   .feedback-form { flex-wrap: nowrap; }
+}
+
+
+/* ============================================================
+   PAYMENT CONFIRM / INSUFFICIENT BALANCE MODAL
+   (built on the site-wide .share-modal-overlay / .share-modal —
+   see agent-profile.css — with an extra backdrop blur per spec)
+   ============================================================ */
+.share-modal-overlay--pay {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.share-modal--pay {
+  text-align: center;
+}
+
+.pay-modal-icon-wrap {
+  width: 64px;
+  height: 64px;
+  margin: 4px auto 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pay-modal-icon-wrap--warn {
+  background: rgba(229, 72, 77, 0.14);
+  color: #E5484D;
+}
+
+.pay-modal-icon-wrap--ok {
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+
+.share-modal--pay .share-modal-title {
+  text-align: center;
+}
+
+.share-modal--pay .share-modal-subtitle {
+  text-align: center;
+  line-height: 1.45;
+}
+
+.pay-modal-amount-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--surface-page);
+  border: 1px solid var(--line-page);
+  font-size: 0.82rem;
+  color: var(--on-page-soft);
+}
+
+.pay-modal-amount-row span:last-child {
+  font-weight: 700;
+  color: var(--on-page);
+}
+
+.pay-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pay-modal-actions .btn {
+  flex: 1;
+  justify-content: center;
 }

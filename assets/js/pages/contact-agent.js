@@ -290,6 +290,12 @@
 
   Accoom.ready(function () {
 
+    // Guests can't view real conversations — bounce straight to signup.
+    if (!Accoom.isLoggedIn()) {
+      window.location.href = 'auth.html?mode=signup';
+      return;
+    }
+
     var layout = Accoom.$('[data-msgs-layout]');
     if (!layout) return;
 

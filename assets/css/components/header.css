@@ -318,7 +318,7 @@ html:not(.dark-mode) .mobile-search:focus-within {
   }
 
   .header-actions .notif-dropdown {
-    display: none !important;
+    display: flex !important;
   }
 
   .header-actions .msg-dropdown {
@@ -326,7 +326,7 @@ html:not(.dark-mode) .mobile-search:focus-within {
   }
 
   .header-actions .balance-toggle {
-    display: flex !important;
+    display: none !important;
   }
 
   .header-actions .location-dropdown {
@@ -363,7 +363,6 @@ html:not(.dark-mode) .mobile-search:focus-within {
     flex: 1;
     gap: 10px;
     min-width: 0;
-    justify-content: flex-end;
   }
   .hamburger-btn {
     order: 3;
@@ -380,35 +379,7 @@ html:not(.dark-mode) .mobile-search:focus-within {
   }
 }
 
-/* ============================================================
-   RESPONSIVE - PHONE ONLY
-   Search bar is removed entirely; message & notification icons
-   take its place beside the hamburger instead. Balance still
-   moves into the side panel. Tablet (768–991px) and desktop
-   are untouched.
-   ============================================================ */
-@media (max-width: 767px) {
 
-  .header-actions .balance-toggle {
-    display: none !important;
-  }
-
-  .mobile-search {
-    display: none !important;
-  }
-
-  .header-actions .notif-dropdown,
-  .header-actions .msg-dropdown {
-    display: flex !important;
-  }
-
-  /* Already shown in the header on phone — don't duplicate them
-     inside the side panel too. */
-  .side-panel .msg-dropdown,
-  .side-panel .notif-dropdown {
-    display: none !important;
-  }
-}
 
 /* ============================================================
    DESKTOP - Ensure proper display
@@ -431,7 +402,7 @@ html:not(.dark-mode) .mobile-search:focus-within {
   }
 
   .header-actions .msg-dropdown {
-    display: flex !important;
+    display: none !important;
   }
 
   .header-actions .balance-toggle {
@@ -510,6 +481,22 @@ html.dark-mode .logo-link .logo-dark {
 
 .desktop-menu-panel .panel-row {
   color: var(--on-page);
+}
+
+.desktop-menu-panel .panel-row--messages .notif-badge-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  margin-left: auto;
+  border-radius: var(--radius-pill);
+  background: var(--gold);
+  color: var(--navy-2);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .desktop-menu-panel .panel-row[href*="chat"],
@@ -1017,5 +1004,21 @@ html:not(.dark-mode) .balance-toggle {
 
   .notif-panel {
     width: calc(100vw - 20px);
+  }
+}
+
+/* ============================================================
+   SIDE PANEL — Messages lives here on tablet & phone since it's
+   no longer its own icon in the header at those widths.
+   Notifications stays in the header, so its panel copy stays off.
+   ============================================================ */
+@media (max-width: 991px) {
+  .side-panel .msg-dropdown {
+    display: block !important;
+    width: 100%;
+  }
+
+  .side-panel .notif-dropdown {
+    display: none !important;
   }
 }

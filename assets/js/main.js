@@ -12,6 +12,14 @@ window.Accoom = window.Accoom || {};
   // (not shipped via a [data-partial]), so this can run on plain
   // Accoom.ready as before.
   Accoom.ready(function () {
+    // Dark/light mode toggle — init here (not only in partials:ready)
+    // so pages with no [data-partial] includes, like auth.html, still
+    // get the click handler bound to their static toggle button.
+    var earlyThemeToggles = document.querySelectorAll('[data-dark-toggle]');
+    if (earlyThemeToggles.length) {
+      Accoom.initThemeToggle(earlyThemeToggles);
+    }
+
     // Listings filters/sort dropdowns
     var listingsFilters = document.querySelector('.listings-filter-dropdown');
     if (listingsFilters) {
@@ -71,10 +79,66 @@ window.Accoom = window.Accoom || {};
   // that inject that markup have resolved.
   Accoom.on(document, 'partials:ready', function () {
 
-    // Mobile search — stop page reload on submit
+    // ---- GUEST GATE --------------------------------------------------
+    // Nothing account-specific (balance, message/notification previews,
+    // agent chat) may be visible to a signed-out visitor. Any control
+    // that would normally open real data instead routes to signup.
+    if (!Accoom.isLoggedIn()) {
+      // Balance: hide the trigger entirely, not just the figure.
+      Accoom.$$('[data-balance-toggle]').forEach(function (btn) {
+        btn.classList.add('is-hidden');
+      });
+
+      // Guests have no messages or notifications yet — strip every
+      // hardcoded preview item so both panels fall back to their
+      // existing empty states ("No Messages" / "No Notifications").
+      Accoom.$$('[data-msg-item]').forEach(function (item) { item.remove(); });
+      Accoom.$$('[data-notif-item]').forEach(function (item) { item.remove(); });
+      Accoom.$$('[data-msg-empty]').forEach(function (el) {
+        el.textContent = 'Sign in to view your messages';
+      });
+
+      // Any entry point into real messaging — the messages/notif
+      // triggers, a message-panel row, or any "Contact/Message Agent"
+      // link anywhere on the page — sends guests to signup instead.
+      Accoom.on(document, 'click', function (e) {
+        var gated = e.target.closest('.msg-trigger, .panel-row--messages, a[href="contact-agent.html"]');
+        if (!gated) return;
+        e.preventDefault();
+        window.location.href = 'auth.html?mode=signup';
+      });
+    }
+
+    // Highlight the current page in the nav (desktop + mobile panel)
+    (function () {
+      var page = window.location.pathname.split('/').pop() || 'home.html';
+      Accoom.$$('.nav-links a, .panel-nav a').forEach(function (link) {
+        var href = link.getAttribute('href');
+        if (!href || href === '#') return;
+        var linkPage = href.split('/').pop().split('?')[0];
+        link.classList.toggle('active', linkPage === page);
+      });
+    })();
+
+    // Mobile search — commit query to the shared listings search
     Accoom.$$('.mobile-search').forEach(function (form) {
       Accoom.on(form, 'submit', function (e) {
         e.preventDefault();
+        var input = form.querySelector('[data-mobile-search-input]');
+        var query = input ? input.value.trim() : '';
+        if (!query) return;
+        if (Accoom.setListingsSearch) {
+          Accoom.setListingsSearch(query);
+          var target = document.getElementById('all-listings');
+          if (target) {
+            var headerEl = document.querySelector('.site-header');
+            var headerHeight = headerEl ? headerEl.offsetHeight : 0;
+            var targetY = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
+            window.scrollTo({ top: Math.max(targetY, 0), behavior: 'smooth' });
+          }
+        } else {
+          window.location.href = 'home.html?search=' + encodeURIComponent(query);
+        }
       });
     });
 
@@ -124,7 +188,9 @@ window.Accoom = window.Accoom || {};
       });
     });
 
-    // Initialize theme toggle (site-wide)
+    // Theme toggle for header/panel copies injected via partials
+    // (auth.html's own toggle is already handled above in Accoom.ready,
+    // since it ships as static HTML, not a partial).
     var themeToggles = document.querySelectorAll('[data-dark-toggle]');
     if (themeToggles.length) {
       Accoom.initThemeToggle(themeToggles);
@@ -335,6 +401,7 @@ window.Accoom = window.Accoom || {};
       if (!amountEl) return;
 
       var realValue = amountEl.textContent;
+      amountEl.setAttribute('data-balance-raw', realValue);
       var hidden = Accoom.getStorage('accoom-balance-hidden', false);
 
       function render() {

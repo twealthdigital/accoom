@@ -60,4 +60,12 @@ window.Accoom = window.Accoom || {};
     }
   };
 
+  /**
+   * True once a real user session exists in storage.
+   * Every guest-gating check site-wide reads through this one function.
+   */
+  Accoom.isLoggedIn = function () {
+    return !!Accoom.getStorage('accoom-user', null);
+  };
+
 })(window.Accoom);
