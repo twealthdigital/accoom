@@ -27,24 +27,23 @@
       <!-- Desktop nav -->
       <nav class="nav-links" aria-label="Primary">
         <a href="home.html">Home</a>
-        <a href="#" data-browse-trigger>Quick Browse</a>
-        <a href="saved-properties.html">Saved</a>
-        <a href="purchases.html">Purchases</a>
+        <a href="home.html#all-listings" data-properties-nav>Properties</a>
       </nav>
 
       <!-- Right side -->
 <div class="header-actions">
 
         <!-- Mobile search bar -->
-        <form class="mobile-search" role="search" action="#" data-mobile-search>
+        <form class="mobile-search header-search" role="search" action="#" data-mobile-search>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="7"></circle>
             <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
           </svg>
           <input type="search" placeholder="Search location or property" aria-label="Search location or property" data-mobile-search-input />
+          <div class="header-search-suggestions" data-header-search-suggestions hidden></div>
         </form>
 
-                <a href="#" class="btn btn--primary">
+                <a href="filter-accomodation.html" class="btn btn--primary">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 11.5 12 4l9 7.5"></path>
             <path d="M5 10v10h14V10"></path>
@@ -52,22 +51,8 @@
           Find Accommodation
         </a>
 
-        <!-- Balance -->
-        <button type="button" class="balance-toggle" data-balance-toggle aria-label="Hide balance">
-          <span class="balance-amount" data-balance-amount>$00.00</span>
-          <svg class="balance-eye-icon balance-eye-icon--visible" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-          </svg>
-          <svg class="balance-eye-icon balance-eye-icon--hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a13.16 13.16 0 0 1-1.67 2.68"></path>
-            <path d="M6.61 6.61A13.5 13.5 0 0 0 1 11s4 7 11 7a9.26 9.26 0 0 0 5.39-1.61"></path>
-            <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
-            <line x1="1" y1="1" x2="23" y2="23"></line>
-          </svg>
-        </button>
-
-        <div data-partial="partials/notifications.html"></div>
+        <div data-partial="partials/messages.html" data-private-messages></div>
+        <div data-partial="partials/notifications.html" data-private-notifications></div>
 
         <!-- Desktop hamburger menu: Account / Location / Theme / Help -->
         <div class="dropdown desktop-menu-dropdown">
@@ -122,14 +107,28 @@
 
             <div class="panel-divider"></div>
 
-            <!-- Messages -->
-            <a href="contact-agent.html" class="panel-row panel-row--messages">
+            <!-- Balance -->
+            <button type="button" class="panel-row balance-toggle panel-balance-row" data-balance-toggle data-private-balance aria-label="Hide balance">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
               </svg>
-              <span>Messages</span>
-              <span class="notif-badge-count" data-msg-count>0</span>
-            </a>
+              <span>Balance</span>
+              <span class="panel-balance-right">
+                <span class="balance-amount" data-balance-amount>$00.00</span>
+                <svg class="balance-eye-icon balance-eye-icon--visible" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg class="balance-eye-icon balance-eye-icon--hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a13.16 13.16 0 0 0-1.67 2.68"></path>
+                  <path d="M6.61 6.61A13.5 13.5 0 0 0 1 11s4 7 11 7a9.26 9.26 0 0 0 5.39-1.61"></path>
+                  <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </span>
+            </button>
+
+            <div class="panel-divider"></div>
 
             <div class="panel-divider"></div>
 
@@ -175,22 +174,23 @@
               </span>
             </label>
 
-            <!-- Help -->
+            <!-- Agent CTA -->
             <div class="panel-help">
               <div class="panel-help-top">
                 <div class="panel-help-icon">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 12a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1v-7h3"></path>
-                    <path d="M3 17v-5h3v7H5a2 2 0 0 1-2-2z"></path>
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="10" cy="7" r="4"></circle>
+                    <path d="M20 8v6M23 11h-6"></path>
                   </svg>
                 </div>
                 <div>
-                  <h4>Need help finding the right place?</h4>
-                  <p>Chat directly with verified agents near you.</p>
+                  <h4>Grow your property business</h4>
+                  <p>List your places, manage leads, and close deals faster.</p>
                 </div>
               </div>
-              <a href="contact-agent.html" class="panel-help-link">
-                Chat with an Agent
+              <a href="auth.html?mode=signup" class="panel-help-link">
+                Become an Agent
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12"></line>
                   <polyline points="12 5 19 12 12 19"></polyline>
@@ -235,38 +235,16 @@
           </svg>
           Home
         </a>
-        <a href="#" data-browse-trigger>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="7"></circle>
-            <line x1="21" y1="21" x2="16.6" y2="16.6"></line>
-          </svg>
-          Quick Browse
-        </a>
-        <a href="#">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="8" r="4"></circle>
-            <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"></path>
-          </svg>
-          Agents
-        </a>
-        <a href="purchases.html">
+        <a href="home.html#all-listings" data-properties-nav>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20.6 12.6 12.7 20.5a2 2 0 0 1-2.8 0L3 13.6V4h9.6l8 8.6z"></path>
             <circle cx="7.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"></circle>
           </svg>
-          Purchases
-        </a>
-        <a href="#">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="9"></circle>
-            <line x1="12" y1="11" x2="12" y2="16"></line>
-            <circle cx="12" cy="7.7" r="0.9" fill="currentColor" stroke="none"></circle>
-          </svg>
-          About Us
+          Properties
         </a>
       </nav>
 
-      <button type="button" class="panel-row balance-toggle panel-balance-row" data-balance-toggle aria-label="Hide balance">
+      <button type="button" class="panel-row balance-toggle panel-balance-row" data-balance-toggle data-private-balance aria-label="Hide balance">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
         </svg>
@@ -286,15 +264,7 @@
         </span>
       </button>
 
-      <a href="contact-agent.html" class="panel-row panel-row--messages">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-        <span>Messages</span>
-        <span class="notif-badge-count" data-msg-count>0</span>
-      </a>
-
-      <div data-partial="partials/notifications.html"></div>
+      <div data-partial="partials/notifications.html" data-private-notifications></div>
 
       <div class="panel-divider"></div>
 
@@ -361,7 +331,7 @@
 
       <div class="panel-divider"></div>
 
-      <a href="#" class="btn btn--primary panel-cta">
+      <a href="filter-accomodation.html" class="btn btn--primary panel-cta">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 11.5 12 4l9 7.5"></path>
           <path d="M5 10v10h14V10"></path>
@@ -373,17 +343,18 @@
         <div class="panel-help-top">
           <div class="panel-help-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 12a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-1v-7h3"></path>
-              <path d="M3 17v-5h3v7H5a2 2 0 0 1-2-2z"></path>
+              <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="10" cy="7" r="4"></circle>
+              <path d="M20 8v6M23 11h-6"></path>
             </svg>
           </div>
           <div>
-            <h4>Need help finding the right place?</h4>
-            <p>Chat directly with verified agents near you.</p>
+            <h4>Grow your property business</h4>
+            <p>List your places, manage leads, and close deals faster.</p>
           </div>
         </div>
-        <a href="contact-agent.html" class="panel-help-link">
-          Chat with an Agent
+        <a href="auth.html?mode=signup" class="panel-help-link">
+          Become an Agent
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>

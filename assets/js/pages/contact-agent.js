@@ -1210,15 +1210,92 @@
     /* ---------------- ATTACHMENTS ---------------- */
     /* ---------------- PAYMENT ---------------- */
     /* ---------------- PAYMENT ---------------- */
+    function parsePaymentAmount(value) {
+      var amount = parseFloat(String(value || '').replace(/[^0-9.]/g, ''));
+      return isNaN(amount) ? 0 : amount;
+    }
+
+    function getBalance() {
+      var balanceEl = Accoom.$('[data-balance-amount]');
+      if (!balanceEl) return 0;
+      return parsePaymentAmount(balanceEl.getAttribute('data-balance-raw') || balanceEl.textContent);
+    }
+
+    var paymentModal = document.createElement('div');
+    paymentModal.className = 'msgs-payment-modal-overlay';
+    paymentModal.setAttribute('aria-hidden', 'true');
+    paymentModal.innerHTML =
+      '<div class="msgs-payment-modal" role="dialog" aria-modal="true" aria-labelledby="msgs-payment-title">' +
+        '<div class="msgs-payment-icon" data-msgs-payment-icon></div>' +
+        '<h2 id="msgs-payment-title" data-msgs-payment-title></h2>' +
+        '<p data-msgs-payment-copy></p>' +
+        '<div class="msgs-payment-amount"><span>Amount due</span><strong data-msgs-payment-amount></strong></div>' +
+        '<div class="msgs-payment-actions">' +
+          '<button type="button" class="btn btn--ghost" data-msgs-payment-cancel>Cancel</button>' +
+          '<button type="button" class="btn btn--primary" data-msgs-payment-confirm></button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(paymentModal);
+
+    var paymentTitle = paymentModal.querySelector('[data-msgs-payment-title]');
+    var paymentCopy = paymentModal.querySelector('[data-msgs-payment-copy]');
+    var paymentAmount = paymentModal.querySelector('[data-msgs-payment-amount]');
+    var paymentIcon = paymentModal.querySelector('[data-msgs-payment-icon]');
+    var paymentConfirm = paymentModal.querySelector('[data-msgs-payment-confirm]');
+    var paymentTarget = null;
+
+    function closePaymentModal() {
+      paymentModal.classList.remove('is-open');
+      paymentModal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('no-scroll');
+    }
+
+    function openPaymentModal(conv) {
+      var amount = parsePaymentAmount(conv.property.price);
+      var balance = getBalance();
+      var hasFunds = balance >= amount && amount > 0;
+      paymentTarget = { id: conv.property.id, amount: amount, mode: hasFunds ? 'checkout' : 'deposit' };
+
+      paymentIcon.className = 'msgs-payment-icon ' + (hasFunds ? 'is-confirm' : 'is-warning');
+      paymentIcon.innerHTML = hasFunds
+        ? '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>'
+        : '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="8" x2="12" y2="13"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+      paymentTitle.textContent = hasFunds ? 'Your balance covers this payment' : 'Insufficient balance';
+      paymentCopy.textContent = hasFunds
+        ? 'Your available balance is enough to cover this property. You can proceed to complete the payment securely.'
+        : 'Your available balance is not enough to make this payment. Deposit funds to continue.';
+      paymentAmount.textContent = '\u20A6' + amount.toLocaleString('en-NG');
+      paymentConfirm.textContent = hasFunds ? 'Proceed' : 'Deposit';
+
+      paymentModal.classList.add('is-open');
+      paymentModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('no-scroll');
+      paymentConfirm.focus();
+    }
+
     function goToCheckout() {
       var conv = findConv(state.activeId);
       if (!conv) return;
-      // TODO: wire to real checkout (Paystack/Flutterwave) using conv.property.id
-      window.location.href = 'checkout.html?property=' + encodeURIComponent(conv.property.id);
+      openPaymentModal(conv);
     }
 
     if (els.payBtn) Accoom.on(els.payBtn, 'click', goToCheckout);
     if (els.propPayBtn) Accoom.on(els.propPayBtn, 'click', goToCheckout);
+
+    Accoom.on(paymentModal.querySelector('[data-msgs-payment-cancel]'), 'click', closePaymentModal);
+    Accoom.on(paymentModal, 'click', function (e) {
+      if (e.target === paymentModal) closePaymentModal();
+    });
+    Accoom.on(document, 'keydown', function (e) {
+      if (e.key === 'Escape' && paymentModal.classList.contains('is-open')) closePaymentModal();
+    });
+    Accoom.on(paymentConfirm, 'click', function () {
+      if (!paymentTarget) return;
+      window.location.href = 'payment.html?id=' + encodeURIComponent(paymentTarget.id)
+        + '&amount=' + encodeURIComponent(paymentTarget.amount)
+        + '&mode=' + paymentTarget.mode
+        + '&return=contact-agent.html';
+    });
 
     if (els.propReviewBtn) {
       Accoom.on(els.propReviewBtn, 'click', function () {

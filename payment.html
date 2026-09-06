@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/payment.css" />
+</head>
+<body>
+  <div class="partial-mount" data-partial="partials/header.html"></div>
+
+  <main class="payment-page">
+    <div class="container payment-layout">
+      <a class="payment-back" href="property.html" data-payment-back>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span data-payment-back-label>Back to property</span>
+      </a>
+
+      <section class="payment-card" data-payment-card>
+        <div class="payment-card-heading">
+          <span class="payment-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+          </span>
+          <div>
+            <p class="payment-eyebrow">Secure payment</p>
+            <h1>Complete your payment</h1>
+            <p class="payment-subtitle" data-payment-subtitle>Review the amount and enter your payment details.</p>
+          </div>
+        </div>
+
+        <div class="payment-summary">
+          <span>Property</span>
+          <strong data-payment-property>Selected property</strong>
+          <span>Amount due</span>
+          <strong data-payment-amount>&#8358;0</strong>
+        </div>
+
+        <fieldset class="payment-methods">
+          <legend>Choose payment method</legend>
+          <div class="payment-method-options" role="radiogroup" aria-label="Payment method">
+            <label class="payment-method is-selected">
+              <input type="radio" name="payment-method" value="card" checked data-payment-method />
+              <span class="payment-method-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+              </span>
+              <span class="payment-method-copy"><strong>Card</strong><small>Visa, Mastercard or Verve</small></span>
+              <span class="payment-method-check" aria-hidden="true"></span>
+            </label>
+
+            <label class="payment-method">
+              <input type="radio" name="payment-method" value="transfer" data-payment-method />
+              <span class="payment-method-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18"></path><path d="M5 10v9M9 10v9M15 10v9M19 10v9M3 21h18M12 3l9 5H3l9-5Z"></path></svg>
+              </span>
+              <span class="payment-method-copy"><strong>Bank Transfer</strong><small>Pay from your Nigerian bank app</small></span>
+              <span class="payment-method-check" aria-hidden="true"></span>
+            </label>
+
+            <label class="payment-method">
+              <input type="radio" name="payment-method" value="ussd" data-payment-method />
+              <span class="payment-method-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="9" y1="6" x2="15" y2="6"></line><circle cx="9" cy="11" r=".7"></circle><circle cx="12" cy="11" r=".7"></circle><circle cx="15" cy="11" r=".7"></circle><circle cx="9" cy="15" r=".7"></circle><circle cx="12" cy="15" r=".7"></circle><circle cx="15" cy="15" r=".7"></circle></svg>
+              </span>
+              <span class="payment-method-copy"><strong>USSD</strong><small>Pay with your bank USSD code</small></span>
+              <span class="payment-method-check" aria-hidden="true"></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <form class="payment-form" data-payment-form novalidate>
+          <div class="payment-method-fields" data-payment-fields="card">
+            <label>
+            Cardholder name
+            <input name="name" type="text" autocomplete="cc-name" placeholder="Enter cardholder name" required />
+            </label>
+            <label>
+            Card number
+            <input name="number" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" maxlength="19" required />
+            </label>
+            <div class="payment-form-row">
+              <label>
+              Expiry date
+              <input name="expiry" inputmode="numeric" autocomplete="cc-exp" placeholder="MM / YY" maxlength="7" required />
+              </label>
+              <label>
+              CVV
+              <input name="cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="4" required />
+              </label>
+            </div>
+          </div>
+          <div class="payment-method-fields is-hidden" data-payment-fields="transfer" hidden>
+            <div class="payment-instructions">
+              <strong>Transfer to the ACCOOM account below</strong>
+              <span>Bank: Access Bank</span>
+              <span>Account name: ACCOOM Escrow Services</span>
+              <span>Account number: 0123456789</span>
+              <small>Use your property reference as the transfer description. Your payment is confirmed after verification.</small>
+            </div>
+            <label>
+              Transfer description/note
+              <input name="transfer-reference" type="text" placeholder="Enter the transfer note added during your transfer" autocomplete="off" data-payment-optional />
+            </label>
+            <label class="payment-upload-field">
+              Transaction receipt
+              <span class="payment-upload-control">
+                <input name="transfer-receipt" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" data-payment-receipt />
+                <span class="payment-upload-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"></path><polyline points="7 9 12 4 17 9"></polyline><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"></path></svg>
+                </span>
+                <span class="payment-upload-copy"><strong data-payment-receipt-label>Upload receipt</strong><small>JPG, PNG, WEBP or PDF, maximum 5MB</small></span>
+              </span>
+              <small class="payment-field-help">Upload the receipt or screenshot from your banking app. This helps us verify your payment if there is an issue.</small>
+            </label>
+          </div>
+          <div class="payment-method-fields is-hidden" data-payment-fields="ussd" hidden>
+            <div class="payment-instructions">
+              <strong>Pay with USSD</strong>
+              <span>Dial the code shown after you continue, then approve the payment from your bank line.</span>
+            </div>
+            <label>
+              Bank name
+              <input name="bank-name" type="text" placeholder="Enter your bank name" />
+            </label>
+            <label class="payment-upload-field">
+              USSD transaction receipt
+              <span class="payment-upload-control">
+                <input name="ussd-receipt" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" data-payment-receipt />
+                <span class="payment-upload-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"></path><polyline points="7 9 12 4 17 9"></polyline><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"></path></svg>
+                </span>
+                <span class="payment-upload-copy"><strong data-payment-receipt-label>Upload receipt</strong><small>JPG, PNG, WEBP or PDF, maximum 5MB</small></span>
+              </span>
+              <small class="payment-field-help">Upload the receipt or screenshot from your banking app so we can verify the payment.</small>
+            </label>
+          </div>
+          <p class="payment-error" data-payment-error role="alert" hidden></p>
+          <button class="btn btn--primary payment-submit" type="submit" data-payment-submit>Pay securely by card</button>
+        </form>
+
+      </section>
+    </div>
+  </main>
+
+  <div class="payment-success-overlay" data-payment-success aria-hidden="true">
+    <div class="payment-success" role="dialog" aria-modal="true" aria-labelledby="payment-success-title">
+      <span class="payment-success-icon" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </span>
+      <span class="payment-processing-spinner" data-payment-processing-spinner aria-hidden="true"></span>
+      <p class="payment-success-eyebrow" data-payment-success-eyebrow>Processing payment</p>
+      <h2 id="payment-success-title" data-payment-success-title>Processing payment...</h2>
+      <p data-payment-success-copy>Your payment request has been recorded. You can review your purchases from your account.</p>
+      <a class="btn btn--primary is-loading" href="purchases.html" data-payment-success-action aria-disabled="true">Processing...</a>
+    </div>
+  </div>
+
+  <div data-partial="partials/footer.html"></div>
+
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+  <script src="assets/js/animations/buttons.js"></script>
+  <script src="assets/js/animations/transitions.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/payment.js"></script>
+  <script>Accoom.loadPartials();</script>
+</body>
+</html>

@@ -85,8 +85,13 @@ window.Accoom = window.Accoom || {};
     // that would normally open real data instead routes to signup.
     if (!Accoom.isLoggedIn()) {
       // Balance: hide the trigger entirely, not just the figure.
-      Accoom.$$('[data-balance-toggle]').forEach(function (btn) {
+      Accoom.$$('[data-balance-toggle], [data-private-balance]').forEach(function (btn) {
         btn.classList.add('is-hidden');
+      });
+
+      // These controls expose account-only information and actions.
+      Accoom.$$('[data-private-messages], [data-private-notifications], .notif-dropdown').forEach(function (control) {
+        control.classList.add('is-hidden');
       });
 
       // Guests have no messages or notifications yet — strip every
@@ -118,14 +123,74 @@ window.Accoom = window.Accoom || {};
         var linkPage = href.split('/').pop().split('?')[0];
         link.classList.toggle('active', linkPage === page);
       });
+
+      var homeLinks = Accoom.$$('.nav-links a[href="home.html"], .panel-nav a[href="home.html"]');
+      var propertyLinks = Accoom.$$('[data-properties-nav]');
+      var listingsSection = document.getElementById('all-listings');
+      var onHome = window.location.pathname.endsWith('/home.html') || window.location.pathname.endsWith('/');
+
+      function setSectionActive(isActive) {
+        propertyLinks.forEach(function (link) { link.classList.toggle('active', isActive); });
+        homeLinks.forEach(function (link) { link.classList.toggle('active', !isActive); });
+      }
+
+      function updateSectionActive() {
+        if (!onHome || !listingsSection) return;
+        var header = document.querySelector('.site-header');
+        var topBoundary = (header ? header.offsetHeight : 0) + 8;
+        var rect = listingsSection.getBoundingClientRect();
+        setSectionActive(rect.top <= topBoundary && rect.bottom > topBoundary);
+      }
+
+      propertyLinks.forEach(function (link) {
+        Accoom.on(link, 'click', function (event) {
+          if (!onHome || !listingsSection) return;
+          event.preventDefault();
+          var header = document.querySelector('.site-header');
+          var offset = header ? header.offsetHeight : 0;
+          window.scrollTo({
+            top: Math.max(listingsSection.getBoundingClientRect().top + window.pageYOffset - offset, 0),
+            behavior: 'smooth'
+          });
+        });
+      });
+
+      if (onHome && listingsSection) {
+        var sectionFrame = null;
+        Accoom.on(window, 'scroll', function () {
+          if (sectionFrame) return;
+          sectionFrame = window.requestAnimationFrame(function () {
+            sectionFrame = null;
+            updateSectionActive();
+          });
+        }, { passive: true });
+        Accoom.on(window, 'resize', updateSectionActive);
+        updateSectionActive();
+      }
     })();
 
-    // Mobile search — commit query to the shared listings search
+    // The header search is the single property search entry point.
     Accoom.$$('.mobile-search').forEach(function (form) {
-      Accoom.on(form, 'submit', function (e) {
-        e.preventDefault();
-        var input = form.querySelector('[data-mobile-search-input]');
-        var query = input ? input.value.trim() : '';
+      var input = form.querySelector('[data-mobile-search-input]');
+      var suggestions = form.querySelector('[data-header-search-suggestions]');
+
+      function renderSuggestions(query) {
+        if (!suggestions || !Accoom.PropertyService || !Accoom.PropertyService.searchList) return;
+        var items = query
+          ? Accoom.PropertyService.searchList(Accoom.PropertyService.getAll(), query).items.slice(0, 6)
+          : [];
+
+        suggestions.innerHTML = items.map(function (item) {
+          var image = item.images && item.images[0] ? item.images[0] : '';
+          return '<a class="header-search-suggestion" href="property.html?id=' + encodeURIComponent(item.id) + '&name=' + encodeURIComponent(item.name) + '" data-header-search-result="' + item.id + '">' +
+            '<span class="header-search-suggestion-thumb" style="background-image:url(\'' + image + '\')"></span>' +
+            '<span class="header-search-suggestion-copy"><strong>' + item.name + '</strong><small>' + item.location + ' &middot; &#8358;' + item.price.toLocaleString('en-NG') + '</small></span>' +
+          '</a>';
+        }).join('');
+        suggestions.hidden = !items.length;
+      }
+
+      function commitSearch(query) {
         if (!query) return;
         if (Accoom.setListingsSearch) {
           Accoom.setListingsSearch(query);
@@ -139,51 +204,60 @@ window.Accoom = window.Accoom || {};
         } else {
           window.location.href = 'home.html?search=' + encodeURIComponent(query);
         }
+      }
+
+      if (input) {
+        Accoom.on(input, 'input', Accoom.debounce(function () {
+          var query = input.value.trim();
+          renderSuggestions(query);
+          if (Accoom.setListingsSearch) Accoom.setListingsSearch(query);
+        }, 150));
+        Accoom.on(input, 'focus', function () { renderSuggestions(input.value.trim()); });
+      }
+
+      if (suggestions) {
+        Accoom.delegate(suggestions, 'click', '[data-header-search-result]', function () {
+          var item = Accoom.PropertyService && Accoom.PropertyService.getById(this.getAttribute('data-header-search-result'));
+          if (item) Accoom.setStorage('accoom-active-listing', item);
+        });
+      }
+
+      Accoom.on(form, 'submit', function (e) {
+        e.preventDefault();
+        var query = input ? input.value.trim() : '';
+        commitSearch(query);
+        if (suggestions) suggestions.hidden = true;
       });
     });
 
-    // Mobile search expand/collapse (phone-only visuals via CSS;
-    // this JS just tracks state and is harmless on tablet/desktop
-    // where the collapsed styles don't apply).
+    // Mobile search expansion keeps the header useful on narrow screens.
     Accoom.$$('[data-mobile-search]').forEach(function (form) {
-      var toggleBtn = form.querySelector('[data-mobile-search-toggle]');
-      var closeBtn = form.querySelector('[data-mobile-search-close]');
       var input = form.querySelector('[data-mobile-search-input]');
       var headerActions = form.closest('.header-actions');
-      if (!toggleBtn || !closeBtn || !input) return;
+      if (!input || !headerActions) return;
+      if (window.innerWidth > 767) return;
 
       function expand() {
         form.classList.add('is-expanded');
-        toggleBtn.setAttribute('aria-expanded', 'true');
-        if (headerActions) headerActions.classList.add('search-expanded');
-        input.focus();
+        headerActions.classList.add('search-expanded');
       }
 
       function collapse() {
         form.classList.remove('is-expanded');
-        toggleBtn.setAttribute('aria-expanded', 'false');
-        if (headerActions) headerActions.classList.remove('search-expanded');
+        headerActions.classList.remove('search-expanded');
       }
 
-      Accoom.on(toggleBtn, 'click', function (e) {
-        e.preventDefault();
-        expand();
-      });
-
-      Accoom.on(closeBtn, 'click', function (e) {
-        e.preventDefault();
-        input.value = '';
-        collapse();
-      });
+      Accoom.on(input, 'focus', expand);
 
       Accoom.on(document, 'click', function (e) {
         if (!form.classList.contains('is-expanded')) return;
-        if (!form.contains(e.target)) collapse();
+        if (!form.contains(e.target) && !e.target.closest('.msg-dropdown, .notif-dropdown')) collapse();
       });
 
       Accoom.on(document, 'keydown', function (e) {
         if (e.key === 'Escape' && form.classList.contains('is-expanded')) {
           collapse();
+          input.blur();
         }
       });
     });

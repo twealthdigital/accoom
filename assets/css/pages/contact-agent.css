@@ -1485,6 +1485,123 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
   cursor: not-allowed;
 }
 
+/* Payment decision dialog */
+.msgs-payment-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-med) var(--ease);
+}
+
+.msgs-payment-modal-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.msgs-payment-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(430px, calc(100vw - 40px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 32px 28px 26px;
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-m);
+  background: var(--surface-panel);
+  color: var(--on-page);
+  text-align: center;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+  transform: translate3d(-50%, calc(-50% + 12px), 0) scale(.96);
+  transform-origin: center center;
+  transition: transform var(--dur-med) var(--ease);
+}
+
+.msgs-payment-modal-overlay.is-open .msgs-payment-modal {
+  transform: translate3d(-50%, -50%, 0) scale(1);
+}
+
+.msgs-payment-icon {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 18px;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.msgs-payment-icon.is-warning {
+  color: #e5484d;
+  background: rgba(229, 72, 77, 0.14);
+}
+
+.msgs-payment-icon.is-confirm {
+  color: var(--gold);
+  background: var(--gold-soft);
+}
+
+.msgs-payment-modal h2 {
+  margin: 0;
+  color: var(--on-page);
+  font-size: 1.25rem;
+}
+
+.msgs-payment-modal > p {
+  margin: 10px auto 0;
+  max-width: 34ch;
+  color: var(--on-page-soft);
+  line-height: 1.5;
+}
+
+.msgs-payment-amount {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 13px 15px;
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-s);
+  color: var(--on-page-soft);
+  background: var(--surface-page);
+  font-size: .86rem;
+  text-align: left;
+}
+
+.msgs-payment-amount strong {
+  color: var(--on-page);
+  font-size: .98rem;
+}
+
+.msgs-payment-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.msgs-payment-actions .btn {
+  flex: 1;
+  justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .msgs-payment-modal {
+    width: min(430px, calc(100vw - 40px));
+    padding: 30px 20px 22px;
+  }
+  .msgs-payment-actions { flex-direction: column-reverse; }
+}
+
 
 .msgs-composer {
   position: relative;

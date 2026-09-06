@@ -422,6 +422,27 @@ var currentPage = 1;
       var currentSort = 'newest';
       var currentFilters = { priceMin: 100000, priceMax: 1000000, levels: [], beds: [], verifiedOnly: false, onlineOnly: false, search: '' };
 
+      // Carry selections from the dedicated accommodation filter page into
+      // the existing listings engine. New filter fields can be mapped here
+      // as the property data model grows.
+      try {
+        var savedFilterState = JSON.parse(sessionStorage.getItem('accoom-filter-state') || 'null');
+        if (savedFilterState) {
+          sessionStorage.removeItem('accoom-filter-state');
+          currentFilters.priceMin = Number(savedFilterState.priceMin) || currentFilters.priceMin;
+          currentFilters.priceMax = Number(savedFilterState.priceMax) || currentFilters.priceMax;
+          currentFilters.levels = (savedFilterState.agent || []).filter(function (value) { return /^AL\d+$/i.test(value); });
+          currentFilters.verifiedOnly = (savedFilterState.agent || []).indexOf('verified') !== -1;
+          currentFilters.beds = savedFilterState.bedrooms && savedFilterState.bedrooms !== 'any'
+            ? [Number(savedFilterState.bedrooms)]
+            : [];
+          var typeLabels = (savedFilterState.propertyType || []).map(function (value) {
+            return value.replace(/-/g, ' ');
+          });
+          currentFilters.search = typeLabels.concat(savedFilterState.city || savedFilterState.location || []).join(' ').trim();
+        }
+      } catch (filterStateError) {}
+
 function getPerPage() {
         var w = window.innerWidth;
         if (w >= 992) return 20; // desktop: 4 x 5
@@ -806,8 +827,8 @@ var listingsSortEl = document.querySelector('.listings-sort-dropdown');
             label: function (v) { return '"' + v + '"'; },
             clear: function (f) {
               f.search = '';
-              var browseInput = document.querySelector('[data-browse-input]');
-              if (browseInput) browseInput.value = '';
+              var headerInput = document.querySelector('[data-mobile-search-input]');
+              if (headerInput) headerInput.value = '';
             }
           },
           {
@@ -989,8 +1010,8 @@ var listingsSortEl = document.querySelector('.listings-sort-dropdown');
               onlineOnly: false
             };
 
-            var browseInput = document.querySelector('[data-browse-input]');
-            if (browseInput) browseInput.value = '';
+            var headerInput = document.querySelector('[data-mobile-search-input]');
+            if (headerInput) headerInput.value = '';
 
             renderActiveFilters();
             loadPage(1);

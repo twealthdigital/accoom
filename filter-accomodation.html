@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Find Accommodation - ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/filter-accomodation.css" />
+</head>
+<body>
+  <div class="partial-mount" data-partial="partials/header.html"></div>
+
+  <main class="accommodation-filter-page">
+    <section class="filter-hero">
+      <div class="container filter-hero-inner">
+        <a class="filter-back" href="home.html">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Back to properties
+        </a>
+        <p class="filter-eyebrow">Find your next place</p>
+        <h1>Find accommodation that fits your life.</h1>
+        <p class="filter-intro">Choose from the available options below. No typing required.</p>
+      </div>
+    </section>
+
+    <section class="filter-workspace">
+      <div class="container filter-workspace-grid">
+        <div class="filter-form-panel">
+          <div class="filter-panel-head">
+            <div>
+              <h2>Refine your search</h2>
+              <p>Use as many filters as you need.</p>
+            </div>
+            <button type="button" class="filter-reset" data-filter-reset>Reset all</button>
+          </div>
+          <form data-accommodation-form novalidate>
+            <div class="filter-sections" data-filter-sections></div>
+            <div class="filter-form-actions">
+              <button type="button" class="btn btn--ghost" data-filter-reset>Reset</button>
+              <button type="submit" class="btn btn--primary" data-filter-submit>Show properties</button>
+            </div>
+          </form>
+        </div>
+
+        <aside class="filter-summary" aria-live="polite">
+          <div class="summary-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="20" y1="20" x2="16.1" y2="16.1"></line></svg>
+          </div>
+          <p class="summary-eyebrow">Your search</p>
+          <h2><span data-filter-result-count>0</span> properties match</h2>
+          <p class="summary-copy">Your choices update this result count instantly.</p>
+          <div class="summary-chips" data-filter-chips></div>
+          <button type="submit" class="btn btn--primary summary-submit" form="accommodation-filter-form" data-filter-summary-submit>View matching properties</button>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <div data-partial="partials/footer.html"></div>
+
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+  <script src="assets/js/animations/buttons.js"></script>
+  <script src="assets/js/animations/transitions.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/filter-accomodation.js"></script>
+  <script>Accoom.loadPartials();</script>
+</body>
+</html>

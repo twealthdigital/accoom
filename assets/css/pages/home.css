@@ -107,6 +107,7 @@
    HERO SEARCH - DESKTOP FIRST (HORIZONTAL)
    ============================================================ */
 .hero-search {
+  display: none !important;
   margin-top: 24px;
   background: rgba(255, 255, 255, 0.147);
   border: 1px solid rgba(255, 255, 255, 0.10);
