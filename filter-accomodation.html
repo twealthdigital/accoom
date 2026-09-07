@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Find Accommodation - ACCOOM</title>
   <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark' || t === null) document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="assets/css/main.css" />
   <link rel="stylesheet" href="assets/css/pages/filter-accomodation.css" />
 </head>
@@ -14,13 +24,12 @@
   <main class="accommodation-filter-page">
     <section class="filter-hero">
       <div class="container filter-hero-inner">
-        <a class="filter-back" href="home.html">
+        <p class="filter-eyebrow">Find your next place</p>
+        <h1>Find accommodation that fits your life.</h1>
+                <a class="filter-back btn btn--ghost" href="home.html">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
           Back to properties
         </a>
-        <p class="filter-eyebrow">Find your next place</p>
-        <h1>Find accommodation that fits your life.</h1>
-        <p class="filter-intro">Choose from the available options below. No typing required.</p>
       </div>
     </section>
 

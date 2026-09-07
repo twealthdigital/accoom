@@ -73,7 +73,8 @@
   transition: color var(--dur-fast) var(--ease);
 }
 
-.footer-col a:hover {
+.footer-col a:hover,
+.footer-col a.active {
   color: var(--gold);
 }
 

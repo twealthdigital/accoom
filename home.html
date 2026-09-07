@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ACCOOM — Find Accommodation. Connect. Secure. Move in.</title>
   <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark' || t === null) document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
 
   <link rel="stylesheet" href="assets/css/main.css" />
   <link rel="stylesheet" href="assets/css/pages/home.css" />
@@ -21,7 +31,13 @@
   ========================================================= -->
   <section class="hero">
     <div class="hero-bg">
-      <img src="assets/images/home-images/home-hero.png" alt="" />
+      <div class="hero-bg-track">
+        <img src="assets/images/home-images/home-hero.png" alt="" />
+        <img src="assets/images/home-images/home-hero2.png" alt="" />
+        <img src="assets/images/home-images/home-hero3.png" alt="" />
+        <img src="assets/images/home-images/home-hero4.png" alt="" />
+        <img src="assets/images/home-images/home-hero5.png" alt="" />
+      </div>
       <div class="hero-scrim"></div>
     </div>
 

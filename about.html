@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark' || t === null) document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/about.css" />
+</head>
+<body>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================= -->
+  <div class="partial-mount" data-partial="partials/header.html"></div>
+
+  <!-- =========================================================
+       ABOUT HERO
+       Left-side title ("About" / "Accoom") over a property photo,
+       with 4 live "spotlight" property cards floating over the
+       image. The cards are NOT hardcoded — assets/js/pages/about.js
+       pulls them straight from Accoom.PropertyService (the same
+       service the "All Property Listings" section on home.html
+       uses), picks the strongest 4 records, and renders them here.
+       Clicking a card behaves exactly like clicking a card on the
+       All Property Listings grid: it stores the listing and opens
+       property.html?id=... . Swap PropertyService's data source for
+       a real API and this section keeps working with zero changes.
+  ========================================================= -->
+  <section class="about-hero">
+    <div class="about-hero-media">
+      <img src="assets/images/home-images/home-hero2.png" alt="An ACCOOM-listed apartment building at night" loading="eager" />
+      <div class="about-hero-scrim"></div>
+    </div>
+
+
+    <div class="about-hero-inner container">
+      <div class="about-hero-title-block">
+        <h1 class="about-hero-title">About<br><span class="about-hero-title-gold">Accoom</span></h1>
+      </div>
+
+      <p class="about-hero-tagline">Connecting active &amp; capable renters and buyers with trusted, verified agents across Nigeria.</p>
+
+      <a href="home.html#all-listings" data-properties-nav class="btn btn--ghost about-hero-cta">
+        Explore Properties
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- =========================================================
+       OUR STORY
+  ========================================================= -->
+  <section class="about-story">
+    <div class="container about-story-inner">
+      <div class="about-story-copy">
+        <span class="about-eyebrow">Our Story</span>
+        <h2 class="heading-lg">Built to make finding a home in Nigeria simple again</h2>
+        <p class="text-body">ACCOOM is a marketplace for finding and listing premium properties. We connect active, capable buyers and renters with trusted, verified agents on one secure, transparent platform, so every search ends with a place worth moving into.</p>
+        <p class="text-body">From single rooms to luxury apartments, every listing on ACCOOM is tied to a real agent profile with a verification level, a rating and a response history, so you always know exactly who you're dealing with before you reach out.</p>
+      </div>
+
+      <div class="about-story-media">
+        <img src="assets/images/about-images/about-image.png" alt="A premium ACCOOM-listed property" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       WHY ACCOOM
+  ========================================================= -->
+  <section class="about-values">
+    <div class="container">
+      <span class="about-eyebrow about-eyebrow--center">Why Accoom</span>
+      <h2 class="heading-lg text-center">What you get on every listing</h2>
+
+      <div class="about-values-grid">
+        <div class="about-value-card">
+          <span class="about-value-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </span>
+          <h3 class="heading-md">Verified Agents</h3>
+          <p class="text-small">Every agent carries a level, a rating and a review history, so you can tell a trusted lister from a stranger before you send a single message.</p>
+        </div>
+        <div class="about-value-card">
+          <span class="about-value-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+          </span>
+          <h3 class="heading-md">Real Locations</h3>
+          <p class="text-small">Rooms, flats, self-contained units, commercial spaces and land, mapped to the neighbourhoods people actually search for.</p>
+        </div>
+        <div class="about-value-card">
+          <span class="about-value-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>
+          </span>
+          <h3 class="heading-md">Direct Contact</h3>
+          <p class="text-small">Message or reach an agent straight from a listing, no middlemen and no waiting on a callback that never comes.</p>
+        </div>
+        <div class="about-value-card">
+          <span class="about-value-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path></svg>
+          </span>
+          <h3 class="heading-md">Save & Compare</h3>
+          <p class="text-small">Shortlist properties as you browse and come back to compare them side by side whenever you're ready to decide.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       CTA
+  ========================================================= -->
+  <section class="about-cta">
+    <div class="container about-cta-inner">
+      <h2 class="heading-lg">Ready to find your next place?</h2>
+      <p class="text-body">Browse every active listing on ACCOOM and reach out to a verified agent today.</p>
+      <a href="home.html#all-listings" data-properties-nav class="btn btn--primary about-cta-btn">Browse Properties</a>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       FEEDBACK BANNER (reused verbatim from home page)
+  ========================================================= -->
+  <section class="feedback-banner">
+    <div class="container">
+      <div class="feedback-inner">
+        <div class="feedback-text">
+          <h2 class="section-title">Help us serve you <span class="text-gold">better</span></h2>
+          <p>We value your feedback. Let us know your experience so we can keep improving.</p>
+        </div>
+
+        <form class="feedback-form" data-feedback-form>
+          <textarea class="feedback-input" placeholder="Share your feedback..." aria-label="Share your feedback" required></textarea>
+          <button type="submit" class="btn btn--primary feedback-submit">
+            Send Feedback
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================= -->
+  <div data-partial="partials/footer.html"></div>
+
+  <!-- =========================================================
+       SCRIPTS
+  ========================================================= -->
+  <!-- Core -->
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/skeleton.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+
+  <!-- Modules -->
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+
+  <!-- Animations -->
+  <script src="assets/js/animations/buttons.js"></script>
+  <script src="assets/js/animations/transitions.js"></script>
+
+  <!-- Partials -->
+  <script>Accoom.loadPartials();</script>
+
+  <!-- Main & Page -->
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/about.js"></script>
+
+</body>
+</html>

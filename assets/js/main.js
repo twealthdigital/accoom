@@ -117,7 +117,7 @@ window.Accoom = window.Accoom || {};
     // Highlight the current page in the nav (desktop + mobile panel)
     (function () {
       var page = window.location.pathname.split('/').pop() || 'home.html';
-      Accoom.$$('.nav-links a, .panel-nav a').forEach(function (link) {
+      Accoom.$$('.nav-links a, .panel-nav a, .footer-col a').forEach(function (link) {
         var href = link.getAttribute('href');
         if (!href || href === '#') return;
         var linkPage = href.split('/').pop().split('?')[0];
