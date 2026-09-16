@@ -73,14 +73,13 @@
     // ----------------------------------------------------------------
     // Avatar upload — stored as base64 on the same user record.
     // ----------------------------------------------------------------
+    // Display only — uploading/changing the photo now lives on Account
+    // Settings. This just reflects whatever's already stored, and picks
+    // up a change instantly if it happens there in another tab.
     var avatarImgEl = document.querySelector('[data-profile-avatar-img]');
     var avatarImgSideEl = document.querySelector('[data-profile-avatar-img-side]');
-    var avatarInput = document.querySelector('[data-profile-avatar-input]');
-    var avatarAddBtn = document.querySelector('[data-profile-avatar-add]');
-    var avatarEditBtn = document.querySelector('[data-profile-avatar-edit]');
-    var avatarDeleteBtn = document.querySelector('[data-profile-avatar-delete]');
 
-    function refreshAvatarButtons() {
+    function refreshAvatarDisplay() {
       var hasAvatar = !!user.avatar;
       if (avatarImgEl) {
         avatarImgEl.src = hasAvatar ? user.avatar : '';
@@ -90,172 +89,51 @@
         avatarImgSideEl.src = hasAvatar ? user.avatar : '';
         avatarImgSideEl.hidden = !hasAvatar;
       }
-      if (avatarAddBtn) avatarAddBtn.hidden = hasAvatar;
-      if (avatarEditBtn) avatarEditBtn.hidden = !hasAvatar;
-      if (avatarDeleteBtn) avatarDeleteBtn.hidden = !hasAvatar;
     }
 
-    refreshAvatarButtons();
+    refreshAvatarDisplay();
 
-    function openAvatarPicker() {
-      if (avatarInput) avatarInput.click();
-    }
-
-    if (avatarAddBtn) Accoom.on(avatarAddBtn, 'click', openAvatarPicker);
-    if (avatarEditBtn) Accoom.on(avatarEditBtn, 'click', openAvatarPicker);
-
-    if (avatarInput) {
-      Accoom.on(avatarInput, 'change', function () {
-        var file = avatarInput.files && avatarInput.files[0];
-        if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function () {
-          user.avatar = reader.result;
-          Accoom.setStorage('accoom-user', user);
-          refreshAvatarButtons();
-        };
-        reader.readAsDataURL(file);
-        avatarInput.value = '';
-      });
-    }
-
-    if (avatarDeleteBtn) {
-      Accoom.on(avatarDeleteBtn, 'click', function () {
-        user.avatar = null;
-        Accoom.setStorage('accoom-user', user);
-        refreshAvatarButtons();
+    // ----------------------------------------------------------------
+    // Deposit button — sends the buyer to the wallet top-up step on the
+    // payment page (no property/amount context, so the page asks the
+    // user how much to add). context=wallet is what tells payment.js
+    // this is a plain top-up and not a property checkout.
+    // ----------------------------------------------------------------
+    var depositBtn = document.querySelector('[data-profile-deposit-btn]');
+    if (depositBtn) {
+      Accoom.on(depositBtn, 'click', function () {
+        window.location.href = 'payment.html?context=wallet&mode=deposit&return=profile.html';
       });
     }
 
     // ----------------------------------------------------------------
-    // Edit profile: name + description, one button toggles both
+    // Stats — balance comes from the shared wallet module and stays in
+    // sync live (e.g. right after a deposit lands, or in another tab).
+    // Plug real counts in for purchases/orders/saved once they have
+    // somewhere to live; left at 0 until then.
     // ----------------------------------------------------------------
-    var DESC_MAX = 150;
-    var NAME_MAX = 30;
+    var DASHBOARD_LOG = Accoom.getStorage('accoom-purchases-log', []);
+    if (!Array.isArray(DASHBOARD_LOG)) DASHBOARD_LOG = [];
 
-    var heroEditBtn = document.querySelector('[data-profile-edit-toggle]');
-    var editIcon = document.querySelector('[data-profile-edit-icon]');
-    var saveIcon = document.querySelector('[data-profile-save-icon]');
-    var editLabel = document.querySelector('[data-profile-edit-label]');
-
-    var nameDisplay = document.querySelector('[data-profile-name]');
-    var nameInput = document.querySelector('[data-profile-name-input]');
-    var nameCounter = document.querySelector('[data-profile-name-counter]');
-
-    var descDisplay = document.querySelector('[data-profile-desc]');
-    var descEditWrap = document.querySelector('[data-profile-desc-edit]');
-    var descInput = document.querySelector('[data-profile-desc-input]');
-    var descCounter = document.querySelector('[data-profile-desc-counter]');
-
-    if (descDisplay && user.bio) descDisplay.textContent = user.bio;
-    if (descSideEl && user.bio) descSideEl.textContent = user.bio;
-
-    var isEditingProfile = false;
-
-    function updateDescCounter() {
-      if (!descCounter || !descInput) return;
-      var len = descInput.value.length;
-      descCounter.textContent = len + '/' + DESC_MAX;
-      descCounter.classList.toggle('is-near-limit', len >= DESC_MAX * 0.85 && len < DESC_MAX);
-      descCounter.classList.toggle('is-at-limit', len >= DESC_MAX);
+    var stats = {
+      purchases: DASHBOARD_LOG.filter(function (p) { return p.status === 'completed'; }).length,
+      orders: 0,
+      saved: 0
+    };
+    function renderBalanceStat() {
+      var el = document.querySelector('[data-profile-stat="balance"]');
+      if (el) el.textContent = Accoom.formatWalletAmount(Accoom.getWalletBalance());
     }
+    renderBalanceStat();
+    document.addEventListener(Accoom.WALLET_UPDATED_EVENT, renderBalanceStat);
 
-    function updateNameCounter() {
-      if (!nameCounter || !nameInput) return;
-      var len = nameInput.value.length;
-      nameCounter.textContent = len + '/' + NAME_MAX;
-      nameCounter.classList.toggle('is-near-limit', len >= NAME_MAX * 0.85 && len < NAME_MAX);
-      nameCounter.classList.toggle('is-at-limit', len >= NAME_MAX);
-    }
-
-    function enterProfileEdit() {
-      isEditingProfile = true;
-      nameInput.value = nameDisplay.textContent.trim();
-      descInput.value = descDisplay.textContent.trim();
-      updateDescCounter();
-      updateNameCounter();
-
-      nameDisplay.hidden = true;
-      nameInput.hidden = false;
-      if (nameCounter) nameCounter.hidden = false;
-      descDisplay.hidden = true;
-      descEditWrap.hidden = false;
-
-      if (editIcon) editIcon.style.setProperty('display', 'none', 'important');
-      if (saveIcon) saveIcon.style.setProperty('display', 'inline-block', 'important');
-      if (editLabel) editLabel.textContent = 'Save Edits';
-      heroEditBtn.classList.add('is-editing');
-
-      nameInput.focus();
-    }
-
-    function exitProfileEdit() {
-      isEditingProfile = false;
-      nameDisplay.hidden = false;
-      nameInput.hidden = true;
-      if (nameCounter) nameCounter.hidden = true;
-      descDisplay.hidden = false;
-      descEditWrap.hidden = true;
-
-      if (editIcon) editIcon.style.setProperty('display', 'inline-block', 'important');
-      if (saveIcon) saveIcon.style.setProperty('display', 'none', 'important');
-      if (editLabel) editLabel.textContent = 'Edit Profile';
-      heroEditBtn.classList.remove('is-editing');
-    }
-
-    function saveProfileEdit() {
-      var newName = nameInput.value.trim().slice(0, NAME_MAX);
-      var newDesc = descInput.value.trim().slice(0, DESC_MAX);
-
-      if (newName) {
-        nameDisplay.textContent = newName;
-        if (nameSideEl) nameSideEl.textContent = newName;
-        user.name = newName;
-      }
-      descDisplay.textContent = newDesc;
-      if (descSideEl) descSideEl.textContent = newDesc;
-      user.bio = newDesc;
-
-      Accoom.setStorage('accoom-user', user);
-      exitProfileEdit();
-    }
-
-    if (heroEditBtn) {
-      Accoom.on(heroEditBtn, 'click', function () {
-        if (isEditingProfile) {
-          saveProfileEdit();
-        } else {
-          enterProfileEdit();
-        }
-      });
-    }
-
-    if (descInput) {
-      Accoom.on(descInput, 'input', updateDescCounter);
-    }
-
-    if (nameInput) {
-      Accoom.on(nameInput, 'input', updateNameCounter);
-    }
-
-    if (nameInput) {
-      Accoom.on(nameInput, 'keydown', function (e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          saveProfileEdit();
-        }
-        if (e.key === 'Escape') exitProfileEdit();
-      });
-    }
-
-    // ----------------------------------------------------------------
-    // Stats — plug real counts in here once orders/saved/addresses/
-    // payments have somewhere to live. Left at 0 until then.
-    // ----------------------------------------------------------------
-    var stats = { orders: 0, saved: 0, addresses: 0, payments: 0 };
     Accoom.$$('[data-profile-stat]').forEach(function (el) {
       var key = el.getAttribute('data-profile-stat');
-      el.textContent = stats[key] || 0;
+      if (key === 'balance') {
+        return; // handled by renderBalanceStat() above
+      } else {
+        el.textContent = stats[key] || 0;
+      }
     });
 
     // ----------------------------------------------------------------
@@ -266,10 +144,11 @@
     var ordersEmpty = document.querySelector('[data-profile-orders-empty]');
 
     var STATUS_CLASS = {
+      upcoming: 'profile-order-status--upcoming',
       completed: 'profile-order-status--completed',
-      processing: 'profile-order-status--processing',
-      shipped: 'profile-order-status--shipped'
+      cancelled: 'profile-order-status--cancelled'
     };
+    var STATUS_LABEL = { upcoming: 'Upcoming', completed: 'Completed', cancelled: 'Cancelled' };
 
     function renderOrders(orders) {
       if (!ordersList) return;
@@ -286,6 +165,9 @@
         li.dataset.orderName = order.name;
         li.dataset.orderPrice = order.price;
         li.dataset.orderImage = order.image;
+        var statusBadge = order.status
+          ? '<span class="profile-order-status ' + (STATUS_CLASS[order.status] || '') + '">' + (STATUS_LABEL[order.status] || order.status) + '</span>'
+          : '';
         li.innerHTML =
           '<a class="profile-order-link" href="property.html?id=' + encodeURIComponent(order.id) + '&name=' + encodeURIComponent(order.name) + '">' +
             '<div class="profile-order-thumb"><img src="' + order.image + '" alt="' + order.name + '" /></div>' +
@@ -294,6 +176,7 @@
               '<p class="profile-order-price">' + order.price + '<span> / year</span></p>' +
             '</div>' +
           '</a>' +
+          statusBadge +
           '<button type="button" class="profile-order-more" aria-label="More options">' +
             '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6"></circle><circle cx="12" cy="12" r="1.6"></circle><circle cx="12" cy="19" r="1.6"></circle></svg>' +
           '</button>';
@@ -433,15 +316,27 @@
     //     .catch(function () { renderOrders([]); });
     // renderOrders([]) (no arg / empty array) shows the empty state.
     // ----------------------------------------------------------------
+    // Same combined data set purchases.js renders (mock catalogue +
+    // anything logged from the chat's payment flow), so a status here —
+    // upcoming, completed, or cancelled — always matches what's on the
+    // My Purchases page instead of a separate hardcoded, status-less list.
     var MOCK_PURCHASES = [
-      { id: 'ACCOM-30021', name: '4 Bedroom Detached Duplex', price: '\u20A6460,000', image: 'assets/images/home-properties/miniflat1.png' },
-      { id: 'ACCOM-30022', name: '2 Bedroom Apartment', price: '\u20A6325,000', image: 'assets/images/home-properties/miniflat.png' },
-      { id: 'ACCOM-30023', name: 'Self-Contained Studio', price: '\u20A6280,000', image: 'assets/images/home-properties/selfcon1.png' },
-      { id: 'ACCOM-30024', name: '3 Bedroom Flat', price: '\u20A6550,000', image: 'assets/images/home-properties/hall2.png' },
-      { id: 'ACCOM-30025', name: 'Mini Flat', price: '\u20A6310,000', image: 'assets/images/home-properties/bedroomflat3.png' }
+      { id: 'ACCOOM-2025-0008', name: '2 Bedroom Apartment', price: '\u20A6250,000', image: 'assets/images/home-properties/miniflat.png', status: 'upcoming' },
+      { id: 'ACCOOM-2025-0007', name: 'Modern Detached Duplex', price: '\u20A6450,000', image: 'assets/images/home-properties/hall2.png', status: 'completed' },
+      { id: 'ACCOOM-2025-0006', name: '1 Bedroom Apartment', price: '\u20A6120,000', image: 'assets/images/home-properties/bedroomflat3.png', status: 'completed' },
+      { id: 'ACCOOM-2025-0005', name: 'Self-Contained Studio', price: '\u20A680,000', image: 'assets/images/home-properties/selfcon1.png', status: 'cancelled' },
+      { id: 'ACCOOM-2025-0004', name: '3 Bedroom Apartment', price: '\u20A6350,000', image: 'assets/images/home-properties/miniflat1.png', status: 'completed' },
+      { id: 'ACCOOM-2025-0003', name: 'Mini Flat', price: '\u20A6180,000', image: 'assets/images/home-properties/miniflat.png', status: 'completed' },
+      { id: 'ACCOOM-2025-0002', name: '4 Bedroom Detached Duplex', price: '\u20A6460,000', image: 'assets/images/home-properties/hall2.png', status: 'completed' },
+      { id: 'ACCOOM-2025-0001', name: 'Self-Contained Studio', price: '\u20A675,000', image: 'assets/images/home-properties/selfcon1.png', status: 'completed' }
     ];
 
-    renderOrders(MOCK_PURCHASES);
+    if (Array.isArray(DASHBOARD_LOG) && DASHBOARD_LOG.length) {
+      MOCK_PURCHASES = DASHBOARD_LOG.concat(MOCK_PURCHASES);
+    }
+
+    // Overview only ever needs the 3 most recent, whatever their status.
+    renderOrders(MOCK_PURCHASES.slice(0, 3));
 
     // ----------------------------------------------------------------
     // Sidebar tabs — the other pages aren't built yet, so clicking just
@@ -451,15 +346,38 @@
     var mainTitleEl = document.querySelector('[data-profile-main-title]');
     var backBtn = document.querySelector('[data-profile-back-btn]');
 
-    // profile.html only ever shows the Overview content, and the real
-    // sub-pages (My Purchases, Saved Properties, ...) already hardcode
-    // their own correct is-active link in their own markup. So there's
-    // nothing to "remember" here — Overview's is-active in the HTML is
-    // always the right state and JS should leave it alone on load.
+    // Real sub-pages (My Purchases, Saved Properties, Account Settings)
+    // navigate away entirely, so when the user hits the back arrow on one
+    // of them, this page does a full fresh load — the markup's hardcoded
+    // "Overview" is-active is all it has to go on. We remember which row
+    // was actually tapped so the mobile menu list can restore it instead
+    // of always snapping back to Overview.
+    var LAST_SECTION_KEY = 'accoom-last-account-section';
+
+    function sectionKeyFromHref(href) {
+      return (!href || href === '#') ? 'profile' : href.replace('.html', '');
+    }
+
+    (function restoreLastActiveSection() {
+      var saved = null;
+      try { saved = sessionStorage.getItem(LAST_SECTION_KEY); } catch (err) {}
+      if (!saved || saved === 'profile') return;
+
+      var savedLink = navLinks.filter(function (l) {
+        return sectionKeyFromHref(l.getAttribute('href')) === saved;
+      })[0];
+      if (!savedLink) return;
+
+      navLinks.forEach(function (l) { l.classList.remove('is-active'); });
+      savedLink.classList.add('is-active');
+    })();
 
     navLinks.forEach(function (link) {
       Accoom.on(link, 'click', function (e) {
         var href = this.getAttribute('href');
+
+        try { sessionStorage.setItem(LAST_SECTION_KEY, sectionKeyFromHref(href)); } catch (err) {}
+
         if (href && href !== '#') {
           return; // real page link (e.g. My Purchases) — let it navigate, its own page sets the active state
         }
@@ -497,83 +415,6 @@
         Accoom.setStorage('accoom-user', null);
         window.location.href = 'home.html';
       });
-    }
-
-        // ----------------------------------------------------------------
-    // Profile Information — email / phone / location, edited inline,
-    // one shared Save button for all three (mirrors the hero edit above).
-    // ----------------------------------------------------------------
-    var INFO_FIELDS = ['email', 'phone', 'location'];
-    var INFO_EMPTY_TEXT = 'Not added yet';
-    var infoSaveBtn = document.querySelector('[data-profile-info-save]');
-    var infoFields = {};
-
-    INFO_FIELDS.forEach(function (key) {
-      var row = document.querySelector('[data-profile-info-row="' + key + '"]');
-      if (!row) return;
-      infoFields[key] = {
-        display: row.querySelector('[data-profile-' + key + ']'),
-        input: row.querySelector('[data-profile-' + key + '-input]'),
-        toggle: row.querySelector('[data-profile-info-toggle="' + key + '"]')
-      };
-    });
-
-    function renderInfoField(key) {
-      var field = infoFields[key];
-      if (!field) return;
-      var value = (user[key] || '').trim();
-      field.display.textContent = value || INFO_EMPTY_TEXT;
-      if (field.toggle) field.toggle.textContent = value ? 'Change' : 'Add';
-    }
-
-    INFO_FIELDS.forEach(renderInfoField);
-
-    function enterInfoEdit(key) {
-      var field = infoFields[key];
-      if (!field) return;
-      field.input.value = user[key] || '';
-      field.display.hidden = true;
-      field.toggle.hidden = true;
-      field.input.hidden = false;
-      field.input.focus();
-      if (infoSaveBtn) infoSaveBtn.disabled = false;
-    }
-
-    INFO_FIELDS.forEach(function (key) {
-      var field = infoFields[key];
-      if (!field || !field.toggle) return;
-      Accoom.on(field.toggle, 'click', function (e) {
-        e.preventDefault();
-        enterInfoEdit(key);
-      });
-    });
-
-    // Phone: digits (and a leading +) only, capped as they type
-    if (infoFields.phone && infoFields.phone.input) {
-      Accoom.on(infoFields.phone.input, 'input', function () {
-        var input = infoFields.phone.input;
-        var cleaned = input.value.replace(/[^\d+]/g, '').slice(0, 15);
-        if (cleaned !== input.value) input.value = cleaned;
-      });
-    }
-
-    function saveInfoFields() {
-      INFO_FIELDS.forEach(function (key) {
-        var field = infoFields[key];
-        if (!field || field.input.hidden) return;
-        var maxLen = parseInt(field.input.getAttribute('maxlength'), 10) || 60;
-        user[key] = field.input.value.trim().slice(0, maxLen);
-        field.input.hidden = true;
-        field.display.hidden = false;
-        field.toggle.hidden = false;
-        renderInfoField(key);
-      });
-      Accoom.setStorage('accoom-user', user);
-      if (infoSaveBtn) infoSaveBtn.disabled = true;
-    }
-
-    if (infoSaveBtn) {
-      Accoom.on(infoSaveBtn, 'click', saveInfoFields);
     }
 
   });

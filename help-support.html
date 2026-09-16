@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Help & Support — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark' || t === null) document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/help-support.css" />
+</head>
+<body>
+
+  <div class="partial-mount" data-partial="partials/header.html"></div>
+
+  <main class="help-page">
+
+    <!-- HERO -->
+    <section class="help-hero">
+      <div class="help-hero-media">
+        <div class="help-hero-media-track">
+          <img src="assets/images/home-images/home-hero.png" alt="" loading="eager" />
+          <img src="assets/images/home-images/home-hero2.png" alt="" />
+          <img src="assets/images/home-images/home-hero3.png" alt="" />
+          <img src="assets/images/home-images/home-hero4.png" alt="" />
+          <img src="assets/images/home-images/home-hero5.png" alt="" />
+        </div>
+        <div class="help-hero-scrim"></div>
+      </div>
+      <div class="container help-hero-inner">
+        <p class="help-eyebrow">We're here for you</p>
+        <h1>Help &amp; Support</h1>
+        <p class="help-hero-sub">Questions about a listing, a payment, or your account? Find quick answers below, or reach the ACCOOM team directly.</p>
+        <a class="help-back btn btn--ghost" href="home.html" data-help-back>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          <span data-help-back-label>Back to home</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- QUICK CONTACT -->
+    <section class="help-contact-section">
+      <div class="container">
+        <div class="help-contact-grid">
+
+          <div class="help-contact-card">
+            <span class="help-contact-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.9 2.2z"></path></svg>
+            </span>
+            <h3>Call Us</h3>
+            <p>Mon &ndash; Fri, 8am &ndash; 6pm (WAT)</p>
+            <a href="tel:+2348035550192">+234 803 555 0192</a>
+          </div>
+
+          <div class="help-contact-card">
+            <span class="help-contact-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>
+            </span>
+            <h3>Email Us</h3>
+            <p>We reply within 24 hours</p>
+            <a href="mailto:support@accoom.ng">support@accoom.ng</a>
+          </div>
+
+          <div class="help-contact-card">
+            <span class="help-contact-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.5-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1.1 2.8 1.2 3c.1.2 2.2 3.3 5.3 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.6.2-1.2.2-1.3-.1-.1-.3-.2-.5-.3z"></path><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .9.9-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z"></path></svg>
+            </span>
+            <h3>WhatsApp</h3>
+            <p>Fastest way to reach us</p>
+            <a href="https://wa.me/2348035550192" target="_blank" rel="noopener">Chat on WhatsApp</a>
+          </div>
+
+          <div class="help-contact-card">
+            <span class="help-contact-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+            </span>
+            <h3>Visit Us</h3>
+            <p>12 Airport Road</p>
+            <span class="help-contact-static">Akure, Ondo State, Nigeria</span>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="help-faq-section">
+      <div class="container help-faq-inner">
+        <span class="help-eyebrow help-eyebrow--center">FAQs</span>
+        <h2 class="heading-lg text-center">Frequently asked questions</h2>
+
+        <div class="help-faq-list" data-faq-list>
+          <div class="help-faq-item is-open" data-faq-item>
+            <button type="button" class="help-faq-trigger" data-faq-trigger aria-expanded="true">
+              How do I contact an agent about a property?
+            </button>
+            <div class="help-faq-panel" data-faq-panel>
+              <p>Open any listing and select "Contact Agent." You'll be taken to a chat with that agent where you can ask questions, request a viewing, or make an offer directly.</p>
+            </div>
+          </div>
+          <div class="help-faq-item" data-faq-item>
+            <button type="button" class="help-faq-trigger" data-faq-trigger aria-expanded="false">
+              How does ACCOOM verify agents?
+            </button>
+            <div class="help-faq-panel" data-faq-panel>
+              <p>Every agent on ACCOOM completes an identity verification step (including NIN checks) before their listings go live, and each profile shows a verification level, rating, and review history.</p>
+            </div>
+          </div>
+          <div class="help-faq-item" data-faq-item>
+            <button type="button" class="help-faq-trigger" data-faq-trigger aria-expanded="false">
+              Is my payment secure?
+            </button>
+            <div class="help-faq-panel" data-faq-panel>
+              <p>Card, bank transfer, and USSD payments are processed through our secure payment flow, and transfer/USSD payments are manually verified against your uploaded receipt before funds move.</p>
+            </div>
+          </div>
+          <div class="help-faq-item" data-faq-item>
+            <button type="button" class="help-faq-trigger" data-faq-trigger aria-expanded="false">
+              How do I list my own property as an agent?
+            </button>
+            <div class="help-faq-panel" data-faq-panel>
+              <p>Select "Become an Agent" from the menu, complete your agent profile and verification, and you'll be able to publish listings from your agent dashboard.</p>
+            </div>
+          </div>
+          <div class="help-faq-item" data-faq-item>
+            <button type="button" class="help-faq-trigger" data-faq-trigger aria-expanded="false">
+              Can I save properties to review later?
+            </button>
+            <div class="help-faq-panel" data-faq-panel>
+              <p>Yes — tap the heart icon on any listing to add it to your Saved Properties, accessible any time from your account.</p>
+            </div>
+          </div>
+          <div class="help-faq-item" data-faq-item>
+            <button type="button" class="help-faq-trigger" data-faq-trigger aria-expanded="false">
+              How do I report a problem with a listing or an agent?
+            </button>
+            <div class="help-faq-panel" data-faq-panel>
+              <p>Use the contact form below, call, or email our support team with the property name or agent's name and a description of the issue, and we'll follow up promptly.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOCIALS -->
+    <section class="help-social-section">
+      <div class="container help-social-inner">
+        <h2 class="heading-md">Follow ACCOOM</h2>
+        <p>Get listing drops, tips, and platform updates.</p>
+        <div class="help-social-links">
+          <a href="#" aria-label="Facebook" class="help-social-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-8h2.7l.4-3.2h-3.1V7.7c0-.9.3-1.6 1.6-1.6h1.7V3.2C16.5 3.1 15.4 3 14.2 3c-2.6 0-4.4 1.6-4.4 4.5V9.8H7v3.2h2.8v8h3.7z"></path></svg></a>
+          <a href="#" aria-label="Twitter" class="help-social-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23.3 22h-7.1l-5.6-6.9L4 22H1l8.1-9.3L1 2h7.3l5 6.3L18.9 2zm-1.2 18h1.9L7.4 4H5.4l12.3 16z"></path></svg></a>
+          <a href="#" aria-label="Instagram" class="help-social-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle></svg></a>
+          <a href="#" aria-label="LinkedIn" class="help-social-link"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2 3.77-2 4 0 4.8 2.6 4.8 6v6.3h-4v-5.6c0-1.3 0-3-1.9-3-1.9 0-2.2 1.4-2.2 2.9V21H9z"></path></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT FORM (same component used on home/about/property) -->
+    <section class="feedback-banner">
+      <div class="container">
+        <div class="feedback-inner">
+          <div class="feedback-text">
+            <h2 class="section-title">Still need help? <span class="text-gold">Send us a message</span></h2>
+            <p>Describe your issue and our support team will get back to you within 24 hours.</p>
+          </div>
+
+          <form class="feedback-form" data-feedback-form>
+            <textarea class="feedback-input" placeholder="Tell us what's going on..." aria-label="Describe your issue" required></textarea>
+            <button type="submit" class="btn btn--primary feedback-submit">
+              Send Message
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div data-partial="partials/footer.html"></div>
+
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/wallet.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/data/notifications.js"></script>
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+  <script src="assets/js/animations/buttons.js"></script>
+  <script src="assets/js/animations/transitions.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script>Accoom.loadPartials();</script>
+
+  <script>
+    (function () {
+      var backLink = document.querySelector('[data-help-back]');
+      var backLabel = document.querySelector('[data-help-back-label]');
+      if (!backLink) return;
+
+      // Came from somewhere else on this site with real browser history to
+      // go back to? Go back and relabel to say so. Otherwise (direct link,
+      // new tab, bookmark, or arriving from another site) fall back to
+      // home.html — the plain href already covers that case by default.
+        var cameFromSameSite = document.referrer && document.referrer.indexOf(window.location.origin) === 0;
+        if (cameFromSameSite && window.history.length > 1) {
+          if (backLabel) backLabel.textContent = 'Back';
+          backLink.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            // If there's genuinely nowhere for history.back() to land,
+            // the page just sits here — catch that and send it home
+            // instead of leaving the click looking like it did nothing.
+            var leftPage = false;
+            window.addEventListener('pagehide', function () { leftPage = true; }, { once: true });
+
+            window.history.back();
+
+            setTimeout(function () {
+              if (!leftPage) window.location.href = 'home.html';
+            }, 600);
+          });
+        }
+      })();
+
+      // FAQ accordion — smooth max-height transition instead of the
+      // native <details> snap. Multiple can be open at once.
+      (function () {
+        var items = document.querySelectorAll('[data-faq-item]');
+
+        items.forEach(function (item) {
+          var trigger = item.querySelector('[data-faq-trigger]');
+          var panel = item.querySelector('[data-faq-panel]');
+          if (!trigger || !panel) return;
+
+          if (item.classList.contains('is-open')) {
+            panel.style.maxHeight = panel.scrollHeight + 'px';
+          }
+
+          trigger.addEventListener('click', function () {
+            var isOpen = item.classList.contains('is-open');
+
+            if (isOpen) {
+              panel.style.maxHeight = panel.scrollHeight + 'px';
+              requestAnimationFrame(function () {
+                panel.style.maxHeight = '0px';
+              });
+              item.classList.remove('is-open');
+              trigger.setAttribute('aria-expanded', 'false');
+            } else {
+              item.classList.add('is-open');
+              trigger.setAttribute('aria-expanded', 'true');
+              panel.style.maxHeight = panel.scrollHeight + 'px';
+            }
+          });
+
+          // Once the open animation finishes, let it grow naturally —
+          // otherwise a fixed pixel max-height would clip text if the
+          // window gets resized/reflowed afterward.
+          panel.addEventListener('transitionend', function (e) {
+            if (e.propertyName === 'max-height' && item.classList.contains('is-open')) {
+              panel.style.maxHeight = 'none';
+            }
+          });
+        });
+      })();
+    </script>
+</body>
+</html>

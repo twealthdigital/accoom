@@ -47,6 +47,17 @@
           <strong data-payment-amount>&#8358;0</strong>
         </div>
 
+        <div class="payment-amount-entry" data-payment-amount-entry hidden>
+          <label>
+            Amount to deposit
+            <span class="payment-amount-input-wrap">
+              <span class="payment-amount-prefix" aria-hidden="true">&#8358;</span>
+              <input name="wallet-amount" type="number" min="100" step="50" inputmode="decimal" placeholder="Enter amount" data-payment-wallet-amount />
+            </span>
+          </label>
+          <p class="payment-field-help">Minimum deposit is &#8358;100. This is added to your ACCOOM wallet balance once your payment is verified.</p>
+        </div>
+
         <fieldset class="payment-methods">
           <legend>Choose payment method</legend>
           <div class="payment-method-options" role="radiogroup" aria-label="Payment method">
@@ -114,12 +125,16 @@
             </label>
             <label class="payment-upload-field">
               Transaction receipt
-              <span class="payment-upload-control">
+              <span class="payment-upload-control" data-payment-upload>
                 <input name="transfer-receipt" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" data-payment-receipt />
                 <span class="payment-upload-icon" aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"></path><polyline points="7 9 12 4 17 9"></polyline><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"></path></svg>
+                  <svg class="payment-upload-icon-svg payment-upload-icon-svg--default" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"></path><polyline points="7 9 12 4 17 9"></polyline><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"></path></svg>
+                  <svg class="payment-upload-icon-svg payment-upload-icon-svg--done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </span>
-                <span class="payment-upload-copy"><strong data-payment-receipt-label>Upload receipt</strong><small>JPG, PNG, WEBP or PDF, maximum 5MB</small></span>
+                <span class="payment-upload-copy"><strong data-payment-receipt-label>Upload receipt</strong><small data-payment-receipt-meta>JPG, PNG, WEBP or PDF, maximum 5MB</small></span>
+                <button type="button" class="payment-upload-remove" data-payment-receipt-remove hidden aria-label="Remove uploaded receipt">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
               </span>
               <small class="payment-field-help">Upload the receipt or screenshot from your banking app. This helps us verify your payment if there is an issue.</small>
             </label>
@@ -135,12 +150,16 @@
             </label>
             <label class="payment-upload-field">
               USSD transaction receipt
-              <span class="payment-upload-control">
+              <span class="payment-upload-control" data-payment-upload>
                 <input name="ussd-receipt" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" data-payment-receipt />
                 <span class="payment-upload-icon" aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"></path><polyline points="7 9 12 4 17 9"></polyline><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"></path></svg>
+                  <svg class="payment-upload-icon-svg payment-upload-icon-svg--default" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"></path><polyline points="7 9 12 4 17 9"></polyline><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"></path></svg>
+                  <svg class="payment-upload-icon-svg payment-upload-icon-svg--done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 </span>
-                <span class="payment-upload-copy"><strong data-payment-receipt-label>Upload receipt</strong><small>JPG, PNG, WEBP or PDF, maximum 5MB</small></span>
+                <span class="payment-upload-copy"><strong data-payment-receipt-label>Upload receipt</strong><small data-payment-receipt-meta>JPG, PNG, WEBP or PDF, maximum 5MB</small></span>
+                <button type="button" class="payment-upload-remove" data-payment-receipt-remove hidden aria-label="Remove uploaded receipt">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
               </span>
               <small class="payment-field-help">Upload the receipt or screenshot from your banking app so we can verify the payment.</small>
             </label>
@@ -170,9 +189,11 @@
 
   <script src="assets/js/core/dom.js"></script>
   <script src="assets/js/core/events.js"></script>
-  <script src="assets/js/core/storage.js"></script>
+<script src="assets/js/core/storage.js"></script>
+<script src="assets/js/core/wallet.js"></script>
   <script src="assets/js/core/partials.js"></script>
   <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/data/notifications.js"></script>
   <script src="assets/js/modules/dropdown.js"></script>
   <script src="assets/js/modules/offcanvas.js"></script>
   <script src="assets/js/modules/theme.js"></script>

@@ -35,7 +35,13 @@ window.Accoom = window.Accoom || {};
     (function initViewProfile() {
       function goToProfile(agent) {
         var currentProperty = Accoom.currentProperty || {};
-        agent.property = { id: currentProperty.id || '', name: currentProperty.name || '' };
+        agent.property = {
+          id: currentProperty.id || '',
+          name: currentProperty.name || '',
+          location: currentProperty.location || '',
+          price: currentProperty.price || '',
+          image: (currentProperty.images && currentProperty.images[0]) || ''
+        };
         Accoom.setStorage('accoom-active-agent', agent);
         window.location.href = 'agent-profile.html';
       }
@@ -44,12 +50,16 @@ window.Accoom = window.Accoom || {};
       if (mainBtn) {
         Accoom.on(mainBtn, 'click', function (e) {
           e.preventDefault();
+          var agentNameEl   = document.querySelector('[data-pd-agent-name]');
+          var agentAvatarEl = document.querySelector('[data-pd-agent-avatar]');
+          var agentStatsEl  = document.querySelector('[data-pd-agent-stats]');
+          var agentRatingEl = document.querySelector('[data-pd-agent-rating]');
           goToProfile({
-            name: (document.querySelector('[data-pd-agent-name]').textContent || '').trim(),
-            avatar: document.querySelector('[data-pd-agent-avatar]').getAttribute('src'),
+            name:     agentNameEl   ? (agentNameEl.textContent   || '').trim() : '',
+            avatar:   agentAvatarEl ? agentAvatarEl.getAttribute('src')        : '',
             verified: !!document.querySelector('[data-pd-agent-name] .pd-agent-verified-badge'),
-            stats: (document.querySelector('[data-pd-agent-stats]').textContent || '').trim(),
-            rating: (document.querySelector('[data-pd-agent-rating]').textContent || '').trim(),
+            stats:    agentStatsEl  ? (agentStatsEl.textContent  || '').trim() : '',
+            rating:   agentRatingEl ? (agentRatingEl.textContent || '').trim() : '',
             level: (Accoom.currentProperty && Accoom.currentProperty.agent) ? Accoom.currentProperty.agent.level : 'AL5'
           });
         });
@@ -94,6 +104,13 @@ window.Accoom = window.Accoom || {};
         control.classList.add('is-hidden');
       });
 
+      // "Become an Agent" is a logged-in-customer upsell — a guest has no
+      // account yet to upgrade, so hide it rather than send them into an
+      // onboarding flow with no account behind it.
+      Accoom.$$('[data-agent-cta]').forEach(function (el) {
+        el.classList.add('is-hidden');
+      });
+
       // Guests have no messages or notifications yet — strip every
       // hardcoded preview item so both panels fall back to their
       // existing empty states ("No Messages" / "No Notifications").
@@ -111,6 +128,17 @@ window.Accoom = window.Accoom || {};
         if (!gated) return;
         e.preventDefault();
         window.location.href = 'auth.html?mode=signup';
+      });
+    } else if (
+      Accoom.getStorage('accoom-user', {}).role === 'agent' &&
+      Accoom.getStorage('accoom-user', {}).agentProfileCompleted
+    ) {
+      // role flips to 'agent' as soon as onboarding is picked, but the CTA
+      // should only disappear once the agent-details page has actually been
+      // filled in and confirmed — otherwise it vanishes before there's a
+      // real agent profile behind it.
+      Accoom.$$('[data-agent-cta]').forEach(function (el) {
+        el.classList.add('is-hidden');
       });
     }
 
@@ -345,6 +373,27 @@ window.Accoom = window.Accoom || {};
     })();
 
     // Notifications dropdown + panel behavior (site-wide).
+    // Notifications dropdown — renders from Accoom.NotificationService,
+    // so every item's destination comes from real data (`link`), never
+    // a hardcoded href baked into the markup.
+    var NOTIF_ICON = {
+      order: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="M3.3 7 12 12l8.7-5"></path><path d="M12 22V12"></path></svg>',
+      message: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>',
+      accoom: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg>'
+    };
+
+    function timeAgo(iso) {
+      var diffMs = Date.now() - new Date(iso).getTime();
+      var mins = Math.round(diffMs / 60000);
+      if (mins < 60) return Math.max(mins, 1) + 'm ago';
+      var hours = Math.round(mins / 60);
+      if (hours < 24) return hours + 'h ago';
+      var days = Math.round(hours / 24);
+      if (days === 1) return 'Yesterday';
+      if (days < 7) return days + ' days ago';
+      return Math.round(days / 7) + 'w ago';
+    }
+
     Accoom.$$('.notif-dropdown').forEach(function (notifDropdown) {
       Accoom.initDropdown(notifDropdown);
 
@@ -353,31 +402,79 @@ window.Accoom = window.Accoom || {};
       if (!trigger || !list) return;
 
       var COLLAPSED_LINES = 2;
-
+      var countEl = notifDropdown.querySelector('[data-notif-count]');
       var emptyState = list.querySelector('[data-notif-empty]');
 
-      function refreshBadge() {
-        var hasUnread = !!list.querySelector('.notif-item.is-unread');
-        trigger.classList.toggle('has-unread', hasUnread);
-
-        if (emptyState) {
-          var hasItems = !!list.querySelector('[data-notif-item]');
-          emptyState.classList.toggle('is-visible', !hasItems);
-        }
-      }
-
-      list.querySelectorAll('[data-notif-content]').forEach(function (content) {
-        var btn = content.closest('.notif-item-body').querySelector('[data-notif-more]');
-        if (!btn) return;
-
+      function clampContent(content, btn) {
         var lineHeight = parseFloat(getComputedStyle(content).lineHeight) || 18;
         var collapsedHeight = lineHeight * COLLAPSED_LINES;
         content.style.maxHeight = collapsedHeight + 'px';
+        btn.textContent = 'more';
+        btn.dataset.expanded = 'false';
+        btn.classList.toggle('is-visible', content.scrollHeight > collapsedHeight + 1);
+      }
 
-        if (content.scrollHeight > collapsedHeight + 1) {
-          btn.classList.add('is-visible');
-        }
-      });
+      function refreshBadge(notifications) {
+        var muted = Accoom.getStorage('accoom-notifications-muted', false);
+        var unread = notifications.filter(function (n) { return !n.read; }).length;
+        trigger.classList.toggle('has-unread', unread > 0 && !muted);
+        if (countEl) countEl.textContent = muted ? 0 : unread;
+        if (emptyState) emptyState.classList.toggle('is-visible', !notifications.length);
+      }
+
+      function renderNotifications() {
+        if (!Accoom.NotificationService) return;
+        var notifications = Accoom.NotificationService.getAll();
+
+        list.querySelectorAll('[data-notif-item]').forEach(function (el) { el.remove(); });
+
+        notifications.forEach(function (notif) {
+          var item = document.createElement('div');
+          item.className = 'notif-item' + (notif.read ? '' : ' is-unread');
+          item.setAttribute('data-notif-item', '');
+          item.setAttribute('data-notif-id', notif.id);
+          item.setAttribute('data-notif-type', notif.type || 'accoom');
+
+          var iconSvg = NOTIF_ICON[notif.type] || NOTIF_ICON.accoom;
+          var bodyHtml =
+            '<span class="notif-item-icon notif-item-icon--' + (notif.type || 'accoom') + '">' + iconSvg + '</span>' +
+            '<span class="notif-item-body">' +
+              '<span class="notif-item-top">' +
+                '<span class="notif-item-title">' + notif.title + '</span>' +
+                '<span class="notif-item-time">' + timeAgo(notif.time) + '</span>' +
+              '</span>' +
+            '<span class="notif-item-text">' +
+                '<span class="notif-text-content" data-notif-content>' + notif.text + '</span>' +
+              '</span>' +
+              '<button type="button" class="notif-more-btn" data-notif-more>more</button>' +
+            '</span>';
+
+          var mainHtml = notif.link
+            ? '<a href="' + notif.link + '" class="notif-item-main" data-notif-link>' + bodyHtml + '</a>'
+            : '<div class="notif-item-main">' + bodyHtml + '</div>';
+
+          item.innerHTML =
+            mainHtml +
+            '<div class="notif-item-actions">' +
+              '<button type="button" class="notif-close" data-notif-close aria-label="Dismiss notification">' +
+                '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+              '</button>' +
+              '<button type="button" class="notif-item-msg-box ' + (notif.read ? 'is-read' : '') + '" data-notif-mark-read aria-label="' + (notif.read ? 'Mark as unread' : 'Mark as read') + '">' +
+                '<svg class="notif-mail-icon notif-mail-icon--closed" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>' +
+                '<svg class="notif-mail-icon notif-mail-icon--open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v2l-8 6-8-6Z"></path><path d="M2 8v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-9.1 6.8a1.5 1.5 0 0 1-1.8 0Z"></path></svg>' +
+              '</button>' +
+            '</div>';
+
+          list.insertBefore(item, emptyState.nextSibling);
+        });
+
+        list.querySelectorAll('[data-notif-content]').forEach(function (content) {
+          var btn = content.closest('.notif-item-body').querySelector('[data-notif-more]');
+          if (btn) clampContent(content, btn);
+        });
+
+        refreshBadge(notifications);
+      }
 
       list.addEventListener('click', function (e) {
         var moreBtn = e.target.closest('[data-notif-more]');
@@ -406,15 +503,10 @@ window.Accoom = window.Accoom || {};
         if (markReadBtn) {
           e.preventDefault();
           e.stopPropagation();
-          var toggleItem = markReadBtn.closest('[data-notif-item]');
-          var nowRead = markReadBtn.classList.toggle('is-read');
-
-          if (toggleItem) {
-            toggleItem.classList.toggle('is-unread', !nowRead);
-          }
-
-          markReadBtn.setAttribute('aria-label', nowRead ? 'Mark as unread' : 'Mark as read');
-          refreshBadge();
+          var toggleId = markReadBtn.closest('[data-notif-item]').getAttribute('data-notif-id');
+          var currentlyRead = markReadBtn.classList.contains('is-read');
+          Accoom.NotificationService.markRead(toggleId, !currentlyRead);
+          renderNotifications();
           return;
         }
 
@@ -422,20 +514,34 @@ window.Accoom = window.Accoom || {};
         if (notifCloseBtn) {
           e.preventDefault();
           e.stopPropagation();
-          var item = notifCloseBtn.closest('[data-notif-item]');
-          if (!item) return;
-          item.classList.add('is-removing');
+          var closeItem = notifCloseBtn.closest('[data-notif-item]');
+          if (!closeItem) return;
+          var closeId = closeItem.getAttribute('data-notif-id');
+          closeItem.classList.add('is-removing');
           setTimeout(function () {
-            item.remove();
-            refreshBadge();
+            Accoom.NotificationService.dismiss(closeId);
+            renderNotifications();
           }, 260);
+          return;
+        }
+
+        // Clicking through to the notification's actual page marks it read.
+        var navLink = e.target.closest('[data-notif-link]');
+        if (navLink) {
+          var navId = navLink.closest('[data-notif-item]').getAttribute('data-notif-id');
+          Accoom.NotificationService.markRead(navId, true);
         }
       });
 
-      refreshBadge();
+      Accoom.on(trigger, 'click', renderNotifications);
+      Accoom.on(document, Accoom.NOTIFICATIONS_CHANGED_EVENT, renderNotifications);
+      renderNotifications();
     });
 
     // Messages dropdown + unread badge (site-wide).
+    // Renders straight from the same 'accoom-conversations' record
+    // contact-agent.js reads/writes, so the dropdown is never a second,
+    // separately-hardcoded copy of the chat data.
     Accoom.$$('.msg-dropdown').forEach(function (msgDropdown) {
       Accoom.initDropdown(msgDropdown);
 
@@ -444,18 +550,110 @@ window.Accoom = window.Accoom || {};
       if (!msgTrigger || !msgList) return;
 
       var msgEmptyState = msgList.querySelector('[data-msg-empty]');
+      var MSG_COLLAPSED_LINES = 2;
+
+      function lastTimeLabel(msg) {
+        if (!msg) return '';
+        return msg.day && msg.day !== 'Today' ? msg.day : (msg.time || '');
+      }
+
+      function clampContent(content, btn) {
+        var lineHeight = parseFloat(getComputedStyle(content).lineHeight) || 18;
+        var collapsedHeight = lineHeight * MSG_COLLAPSED_LINES;
+        content.style.maxHeight = collapsedHeight + 'px';
+        btn.textContent = 'more';
+        btn.dataset.expanded = 'false';
+        btn.classList.toggle('is-visible', content.scrollHeight > collapsedHeight + 1);
+      }
 
       function refreshMsgBadge() {
         var hasUnread = !!msgList.querySelector('.notif-item.is-unread');
         msgTrigger.classList.toggle('has-unread', hasUnread);
-
-        if (msgEmptyState) {
-          var hasItems = !!msgList.querySelector('[data-msg-item]');
-          msgEmptyState.classList.toggle('is-visible', !hasItems);
-        }
       }
 
-      refreshMsgBadge();
+      // Rebuilds the list from scratch every time — one row per
+      // conversation, always keyed to that conversation's LAST message
+      // FROM THE AGENT (never one of "my" own sent messages), so nothing
+      // can duplicate no matter how many times this runs.
+      function lastIncomingMessage(conv) {
+        for (var i = conv.messages.length - 1; i >= 0; i--) {
+          if (conv.messages[i].from !== 'me') return conv.messages[i];
+        }
+        return null;
+      }
+
+      function renderMessages() {
+        var conversations = Accoom.getStorage('accoom-conversations', []) || [];
+        var withMessages = conversations.filter(function (c) {
+          return c.property && lastIncomingMessage(c);
+        });
+
+        msgList.querySelectorAll('[data-msg-item]').forEach(function (el) { el.remove(); });
+
+        withMessages.forEach(function (conv) {
+          var last = lastIncomingMessage(conv);
+
+          var item = document.createElement('div');
+          item.className = 'notif-item' + (conv.unread ? ' is-unread' : '');
+          item.setAttribute('data-msg-item', '');
+          item.innerHTML =
+            '<a href="contact-agent.html?open=' + encodeURIComponent(conv.property.id) + '" class="notif-item-main">' +
+              '<span class="notif-item-icon notif-item-icon--message">' +
+                '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' +
+              '</span>' +
+              '<span class="notif-item-body">' +
+                '<span class="notif-item-top">' +
+                  '<span class="notif-item-title">' + conv.name + '</span>' +
+                  '<span class="notif-item-time">' + lastTimeLabel(last) + '</span>' +
+                '</span>' +
+                '<span class="msg-item-property">' + conv.property.name + '</span>' +
+                '<span class="notif-item-text">' +
+                  '<span class="notif-text-content" data-notif-content>' + last.text + '</span>' +
+                '</span>' +
+                '<button type="button" class="notif-more-btn" data-notif-more>more</button>' +
+              '</span>' +
+            '</a>';
+          msgList.appendChild(item);
+        });
+
+        if (msgEmptyState) msgEmptyState.classList.toggle('is-visible', !withMessages.length);
+
+        msgList.querySelectorAll('[data-notif-content]').forEach(function (content) {
+          var btn = content.closest('.notif-item-body').querySelector('[data-notif-more]');
+          if (btn) clampContent(content, btn);
+        });
+
+        refreshMsgBadge();
+      }
+
+      // "more" / "show less" — identical mechanic to the notifications panel.
+      msgList.addEventListener('click', function (e) {
+        var moreBtn = e.target.closest('[data-notif-more]');
+        if (!moreBtn) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        var content = moreBtn.closest('.notif-item-body').querySelector('[data-notif-content]');
+        var lineHeight = parseFloat(getComputedStyle(content).lineHeight) || 18;
+        var collapsedHeight = lineHeight * MSG_COLLAPSED_LINES;
+        var isExpanded = moreBtn.dataset.expanded === 'true';
+
+        if (isExpanded) {
+          content.style.maxHeight = collapsedHeight + 'px';
+          moreBtn.textContent = 'more';
+          moreBtn.dataset.expanded = 'false';
+        } else {
+          content.style.maxHeight = content.scrollHeight + 'px';
+          moreBtn.textContent = 'show less';
+          moreBtn.dataset.expanded = 'true';
+        }
+      });
+
+      // Re-render right before the panel opens, so a message sent/received
+      // elsewhere on the same visit is never stale by the time it's checked.
+      Accoom.on(msgTrigger, 'click', renderMessages);
+
+      renderMessages();
     });
 
     // Desktop menu dropdown (hamburger: Account / Location / Theme / Help)
@@ -470,15 +668,18 @@ window.Accoom = window.Accoom || {};
     }
 
     // Balance amount show/hide toggle (site-wide)
+    // The figure itself always comes from Accoom.getWalletBalance() (see
+    // assets/js/core/wallet.js) so every page stays in sync with deposits
+    // and payments — the eye toggle only controls masking, not the value.
     Accoom.$$('[data-balance-toggle]').forEach(function (btn) {
       var amountEl = btn.querySelector('[data-balance-amount]');
       if (!amountEl) return;
 
-      var realValue = amountEl.textContent;
-      amountEl.setAttribute('data-balance-raw', realValue);
       var hidden = Accoom.getStorage('accoom-balance-hidden', false);
 
       function render() {
+        var realValue = Accoom.formatWalletAmount(Accoom.getWalletBalance());
+        amountEl.setAttribute('data-balance-raw', realValue);
         amountEl.textContent = hidden ? '••••••' : realValue;
         btn.classList.toggle('is-balance-masked', hidden);
         btn.setAttribute('aria-label', hidden ? 'Show balance' : 'Hide balance');
@@ -489,6 +690,8 @@ window.Accoom = window.Accoom || {};
         Accoom.setStorage('accoom-balance-hidden', hidden);
         render();
       });
+
+      document.addEventListener(Accoom.WALLET_UPDATED_EVENT, render);
 
       render();
     });

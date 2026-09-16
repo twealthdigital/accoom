@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Set up your account — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark' || t === null) document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+
+  <!--
+    SECURITY GATE — runs before anything renders.
+    This is a static front-end prototype (no server/session backend), so this
+    can only ever be a soft, client-side gate: it stops normal navigation
+    mistakes (refreshing here with no session, re-visiting after finishing
+    onboarding, deep-linking straight to this URL) but it cannot stop someone
+    who deliberately edits localStorage in devtools. Real enforcement of
+    "you must be authenticated / onboarded" has to happen on a server.
+  -->
+  <script>
+    (function () {
+      try {
+        var user = JSON.parse(localStorage.getItem('accoom-user'));
+        var isAgentUpgrade = /[?&]upgrade=agent\b/.test(window.location.search);
+
+        if (!user || !user.email) {
+          window.location.replace('auth.html');
+          return;
+        }
+        // Deliberately clicked "Become an Agent" — always show the
+        // onboarding question, even for an account that's already an
+        // agent. This MUST be checked before the role redirects below,
+        // or an existing agent gets silently bounced straight to
+        // agent-details instead of seeing this screen.
+        if (isAgentUpgrade) return;
+
+        if (user.role === 'agent') {
+          window.location.replace('agent-details.html');
+          return;
+        }
+        if (user.role === 'customer') {
+          window.location.replace('home.html');
+          return;
+        }
+      } catch (e) {
+        window.location.replace('auth.html');
+      }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/onboarding.css" />
+</head>
+<body class="onboarding-body">
+
+  <div class="onboarding-page" data-onboarding-step="role">
+
+    <header class="onboarding-topbar">
+      <span class="logo-link onboarding-logo">
+        <img src="assets/images/accoom-logo.png" alt="ACCOOM Logo" class="logo-dark" />
+        <img src="assets/images/accoom-white-logo.png" alt="ACCOOM Logo" class="logo-light" />
+      </span>
+
+      <button type="button" class="onboarding-theme-toggle" data-dark-toggle aria-label="Toggle dark mode">
+        <svg class="onboarding-theme-icon onboarding-theme-icon--sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+        <svg class="onboarding-theme-icon onboarding-theme-icon--moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg>
+      </button>
+    </header>
+
+    <main class="onboarding-main">
+
+      <!-- STEP 1 — ROLE -->
+      <section class="onboarding-panel" data-step-panel="role">
+        <span class="onboarding-eyebrow">Step 1 of 2</span>
+        <h1 class="heading-lg">How will you use ACCOOM?</h1>
+        <p class="text-body onboarding-sub">Pick the option that fits you best — you can't change this later without contacting support.</p>
+
+        <div class="onboarding-role-grid">
+          <button type="button" class="onboarding-role-card" data-role-card="customer" aria-pressed="false">
+            <span class="onboarding-role-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v10h14V10"></path></svg>
+            </span>
+            <span class="onboarding-role-title">I'm a Customer</span>
+            <span class="onboarding-role-desc">Browse verified listings, save favourites and message trusted agents to find a place to live.</span>
+            <span class="onboarding-role-arrow" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </button>
+
+          <button type="button" class="onboarding-role-card" data-role-card="agent" aria-pressed="false">
+            <span class="onboarding-role-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg>
+            </span>
+            <span class="onboarding-role-title">I'm an Agent</span>
+            <span class="onboarding-role-desc">List your properties, manage inquiries and connect with verified buyers and renters.</span>
+            <span class="onboarding-role-arrow" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 2A — CUSTOMER PREFERENCE (skippable) -->
+      <section class="onboarding-panel" data-step-panel="customer-pref">
+        <button type="button" class="onboarding-back" data-onboarding-back aria-label="Back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Back
+        </button>
+
+        <span class="onboarding-eyebrow">Step 2 of 2</span>
+        <h1 class="heading-lg">What are you looking for?</h1>
+        <p class="text-body onboarding-sub">Pick as many as apply — this just helps us show you better matches. You can skip this.</p>
+
+        <div class="onboarding-chip-grid" role="group" aria-label="Property types you're interested in">
+          <button type="button" class="onboarding-chip" data-pref-chip="single-room" aria-pressed="false">Single Room</button>
+          <button type="button" class="onboarding-chip" data-pref-chip="self-contain" aria-pressed="false">Self-Contain</button>
+          <button type="button" class="onboarding-chip" data-pref-chip="flat" aria-pressed="false">Mini Flat / Flat</button>
+          <button type="button" class="onboarding-chip" data-pref-chip="commercial" aria-pressed="false">Commercial Space</button>
+          <button type="button" class="onboarding-chip" data-pref-chip="land" aria-pressed="false">Land</button>
+          <button type="button" class="onboarding-chip" data-pref-chip="exploring" aria-pressed="false">Just Exploring</button>
+        </div>
+
+        <div class="onboarding-actions">
+          <button type="button" class="btn btn--ghost" data-customer-skip>Skip</button>
+          <button type="button" class="btn btn--primary" data-customer-continue>Continue</button>
+        </div>
+      </section>
+
+      <!-- STEP 2B — AGENT INTENT (required, no skip) -->
+      <section class="onboarding-panel" data-step-panel="agent-intent">
+        <button type="button" class="onboarding-back" data-onboarding-back aria-label="Back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Back
+        </button>
+
+        <span class="onboarding-eyebrow">Step 2 of 2</span>
+        <h1 class="heading-lg">What best describes you?</h1>
+        <p class="text-body onboarding-sub">This is required so we can set up the right tools for your account.</p>
+
+        <div class="onboarding-chip-grid" role="radiogroup" aria-label="Agent type">
+          <button type="button" class="onboarding-chip" data-agent-option="landlord" role="radio" aria-checked="false">Individual Landlord</button>
+          <button type="button" class="onboarding-chip" data-agent-option="manager" role="radio" aria-checked="false">Property Manager</button>
+          <button type="button" class="onboarding-chip" data-agent-option="agency" role="radio" aria-checked="false">Real Estate Agency</button>
+          <button type="button" class="onboarding-chip" data-agent-option="developer" role="radio" aria-checked="false">Developer</button>
+        </div>
+
+        <div class="onboarding-actions onboarding-actions--single">
+          <button type="button" class="btn btn--primary" data-agent-continue disabled>Continue</button>
+        </div>
+      </section>
+
+      <!-- STEP 3 — LOADING -->
+      <section class="onboarding-panel" data-step-panel="loading">
+        <div class="onboarding-loading-mark">
+          <img src="assets/images/accoom-logo.png" alt="ACCOOM" class="onboarding-loading-logo logo-dark" />
+          <img src="assets/images/accoom-white-logo.png" alt="ACCOOM" class="onboarding-loading-logo logo-light" />
+          <span class="onboarding-loading-horizon" aria-hidden="true"></span>
+          <p class="onboarding-loading-text">Setting things up…</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+<script src="assets/js/core/storage.js"></script>
+<script src="assets/js/core/wallet.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/onboarding.js"></script>
+</body>
+</html>

@@ -16,12 +16,43 @@
     })();
   </script>
 
+  <!--
+    SECURITY GATE — soft, client-side only (no backend/session to check
+    against here). Sends an already-onboarded visitor straight to their
+    page instead of showing the login/signup screen again. See
+    assets/js/pages/onboarding.js for the full caveat on what this can
+    and can't actually protect against.
+  -->
+  <script>
+    (function () {
+      try {
+        var user = JSON.parse(localStorage.getItem('accoom-user'));
+        if (user && user.email && user.role === 'agent') {
+          window.location.replace('agent-details.html');
+        } else if (user && user.email && user.role === 'customer') {
+          window.location.replace('home.html');
+        }
+      } catch (e) { /* malformed record — fall through to normal auth screen */ }
+    })();
+  </script>
+
   <link rel="stylesheet" href="assets/css/main.css" />
   <link rel="stylesheet" href="assets/css/pages/auth.css" />
 </head>
 <body class="auth-body">
 
   <div class="auth-page">
+
+    <!-- Shown briefly before leaving this page after signup/login — a
+         placeholder for real API latency once a backend is wired up. -->
+    <div class="auth-loading-overlay" data-auth-loading hidden>
+      <div class="auth-loading-mark">
+        <img src="assets/images/accoom-logo.png" alt="ACCOOM" class="auth-loading-logo logo-dark" />
+        <img src="assets/images/accoom-white-logo.png" alt="ACCOOM" class="auth-loading-logo logo-light" />
+        <span class="auth-loading-horizon" aria-hidden="true"></span>
+        <p class="auth-loading-text" data-auth-loading-text>Signing you in…</p>
+      </div>
+    </div>
 
     <!-- =========================================================
          VISUAL SIDE
@@ -145,6 +176,8 @@
             </span>
           </label>
 
+          <p class="auth-error" data-auth-error hidden></p>
+
           <button type="submit" class="btn btn--primary btn--block auth-submit">Login</button>
         </form>
 
@@ -236,7 +269,8 @@
 
   <script src="assets/js/core/dom.js"></script>
   <script src="assets/js/core/events.js"></script>
-  <script src="assets/js/core/storage.js"></script>
+<script src="assets/js/core/storage.js"></script>
+<script src="assets/js/core/wallet.js"></script>
   <script src="assets/js/modules/theme.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/pages/auth.js"></script>

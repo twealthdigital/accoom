@@ -11,7 +11,8 @@ window.Accoom = window.Accoom || {};
    * Initialize hero animations
    */
   Accoom.initHeroAnimations = function (options) {
-    var hero = document.querySelector('.hero');
+    var heroSelector = (options && options.selector) || '.hero';
+    var hero = document.querySelector(heroSelector);
     if (!hero) return;
 
     var elements = hero.querySelectorAll('[data-animate]');

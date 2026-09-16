@@ -398,6 +398,78 @@ html:not(.dark-mode) .auth-theme-icon--moon { display: block; }
   margin-top: 4px;
 }
 
+.auth-error {
+  margin: -4px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-s);
+  background: rgba(217, 83, 79, 0.12);
+  border: 1px solid rgba(217, 83, 79, 0.35);
+  color: #e6837f;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   LOADING OVERLAY (signup / login transition)
+   ============================================================ */
+.auth-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--black);
+}
+
+.auth-loading-overlay[hidden] {
+  display: none;
+}
+
+.auth-loading-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding-inline: 24px;
+  text-align: center;
+}
+
+.auth-loading-logo {
+  height: 56px;
+  width: auto;
+}
+
+.auth-loading-logo.logo-dark { display: block; }
+.auth-loading-logo.logo-light { display: none; }
+
+.auth-loading-horizon {
+  display: block;
+  height: 2px;
+  width: 160px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  background-size: 200% 100%;
+  animation: auth-loading-sweep 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.auth-loading-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-on-dark-soft);
+}
+
+@keyframes auth-loading-sweep {
+  0% { background-position: 200% 0; opacity: 0.4; }
+  50% { background-position: 0% 0; opacity: 1; }
+  100% { background-position: -200% 0; opacity: 0.4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-loading-horizon {
+    animation: none;
+  }
+}
+
 .auth-terms {
   margin-top: 4px;
   text-align: center;

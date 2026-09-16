@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account Settings — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark' || t === null) document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+
+  <script>
+    (function () {
+      try {
+        var user = JSON.parse(localStorage.getItem('accoom-user'));
+        if (!user) window.location.replace('auth.html');
+      } catch (e) {
+        window.location.replace('auth.html');
+      }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/profile.css" />
+  <link rel="stylesheet" href="assets/css/pages/account-settings.css" />
+</head>
+<body>
+
+  <div class="partial-mount" data-partial="partials/header.html"></div>
+
+  <main class="profile-page is-detail-open">
+    <div class="container profile-layout">
+
+      <!-- Sidebar (identical to every other account page) -->
+      <aside class="profile-sidebar">
+        <div class="profile-hero profile-hero--sidebar">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar" data-profile-avatar-side>AC</div>
+            <img class="profile-avatar-img" data-profile-avatar-img-side alt="" hidden />
+          </div>
+          <div class="profile-hero-text">
+            <h1>
+              Hello,
+              <span class="profile-name-display" data-profile-name-side>there</span>
+              <span class="profile-wave">&#128075;</span>
+            </h1>
+            <p class="profile-desc-display">Manage your account details and security settings.</p>
+            <p class="profile-member-since">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              Member since <span data-profile-member-since-side>&mdash;</span>
+            </p>
+          </div>
+        </div>
+
+        <nav class="profile-nav" aria-label="Account">
+          <a href="profile.html" class="profile-nav-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v10h14V10"></path></svg>
+            <span class="profile-nav-link-title" data-sub="Account summary and activity">Overview</span>
+          </a>
+          <a href="purchases.html" class="profile-nav-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            <span class="profile-nav-link-title" data-sub="Track and manage your orders">My Purchases</span>
+          </a>
+          <a href="saved-properties.html" class="profile-nav-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path></svg>
+            <span class="profile-nav-link-title" data-sub="Properties you've bookmarked">Saved Properties</span>
+          </a>
+          <a href="account-settings.html" class="profile-nav-link is-active">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.63a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"></path></svg>
+            <span class="profile-nav-link-title" data-sub="Manage your account preferences">Account Settings</span>
+          </a>
+          <a href="help-support.html" class="profile-nav-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span class="profile-nav-link-title" data-sub="Get help and answers">Help &amp; Support</span>
+          </a>
+        </nav>
+
+        <div class="profile-nav-divider"></div>
+
+        <button type="button" class="profile-nav-link profile-signout" data-profile-signout>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          Sign Out
+        </button>
+      </aside>
+
+      <!-- Main -->
+      <section class="profile-main as-main">
+
+        <div class="profile-main-topbar">
+          <a href="profile.html" class="profile-back-btn" aria-label="Back to account">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </a>
+          <h2 class="profile-main-topbar-title">Account Settings</h2>
+        </div>
+
+        <!-- Header banner -->
+        <div class="as-banner">
+          <div class="as-banner-left">
+            <div class="as-banner-avatar" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+            </div>
+            <div>
+              <h1>Account Settings</h1>
+              <p>Manage your personal information, security and preferences.</p>
+            </div>
+          </div>
+          <div class="as-banner-progress">
+            <span data-as-progress-label>Your profile is 0% complete</span>
+            <div class="as-progress-track">
+              <div class="as-progress-fill" data-as-progress-fill style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Information (read-only summary) -->
+        <div class="as-card as-profile-card">
+          <div class="as-card-head">
+            <div class="as-card-head-title">
+              <span class="as-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="10" r="3"></circle><path d="M6.5 19a6 6 0 0 1 11 0"></path></svg>
+              </span>
+              <div>
+                <h2>Profile Information</h2>
+                <p>This information will be visible to other users on the platform.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="as-profile-body">
+            <div class="as-avatar-block">
+              <div class="as-avatar-row">
+                <div class="profile-avatar-wrap">
+                  <div class="profile-avatar" data-as-avatar>AC</div>
+                  <img class="profile-avatar-img" data-as-avatar-img alt="" hidden />
+                  <input type="file" accept="image/*" class="profile-avatar-input" data-as-avatar-input hidden />
+                </div>
+          </div>
+              <button type="button" class="as-change-photo" data-as-avatar-trigger>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.71 5.63l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83a1 1 0 0 0 0-1.41zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path></svg>
+                Change photo
+              </button>
+            </div>
+
+            <div class="as-info-grid">
+              <div>
+                <span class="as-info-label">Full Name</span>
+                <span class="as-info-value" data-as-info="name">&mdash;</span>
+              </div>
+              <div>
+                <span class="as-info-label">Email Address</span>
+                <span class="as-info-value" data-as-info="email">&mdash;</span>
+              </div>
+              <div>
+                <span class="as-info-label">Phone Number</span>
+                <span class="as-info-value" data-as-info="phone">Not added yet</span>
+              </div>
+              <div>
+                <span class="as-info-label">Location</span>
+                <span class="as-info-value" data-as-info="location">Not added yet</span>
+              </div>
+              <div>
+                <span class="as-info-label">Account Type</span>
+                <span class="as-info-value as-info-value--icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path></svg>
+                  <span data-as-info="accountType">Buyer</span>
+                </span>
+              </div>
+              <div>
+                <span class="as-info-label">Date Joined</span>
+                <span class="as-info-value as-info-value--icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  <span data-as-info="dateJoined">&mdash;</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="as-grid">
+
+          <!-- Change Password -->
+          <div class="as-card">
+            <div class="as-card-head">
+              <div class="as-card-head-title">
+                <span class="as-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+                <div>
+                  <h2>Change Password</h2>
+                  <p>Keep your account secure with a strong password.</p>
+                </div>
+              </div>
+            </div>
+
+            <form class="as-form" data-password-form novalidate>
+              <div class="as-field">
+                <label for="as-current-password">Current Password</label>
+                <div class="as-password-wrap">
+                  <input class="input" type="password" id="as-current-password" autocomplete="current-password" required />
+                  <button type="button" class="as-password-toggle" data-as-toggle-password aria-label="Show password">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="as-field">
+                <label for="as-new-password">New Password</label>
+                <div class="as-password-wrap">
+                  <input class="input" type="password" id="as-new-password" autocomplete="new-password" minlength="8" required />
+                  <button type="button" class="as-password-toggle" data-as-toggle-password aria-label="Show password">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="as-field">
+                <label for="as-confirm-password">Confirm New Password</label>
+                <div class="as-password-wrap">
+                  <input class="input" type="password" id="as-confirm-password" autocomplete="new-password" minlength="8" required />
+                  <button type="button" class="as-password-toggle" data-as-toggle-password aria-label="Show password">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+              <p class="as-error" data-password-error hidden></p>
+              <p class="as-success" data-password-success hidden>Password updated.</p>
+              <button type="submit" class="btn btn--primary as-submit">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Update Password
+              </button>
+            </form>
+          </div>
+
+          <!-- Personal Details (editable) -->
+          <div class="as-card">
+            <div class="as-card-head">
+              <div class="as-card-head-title">
+                <span class="as-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg></span>
+                <div>
+                  <h2>Personal Details</h2>
+                  <p>Update your personal and contact information.</p>
+                </div>
+              </div>
+            </div>
+
+            <form class="as-form" data-details-form novalidate>
+              <div class="as-form-row">
+                <div class="as-field">
+                  <label for="as-full-name">Full Name</label>
+                  <input class="input" type="text" id="as-full-name" data-as-field="name" />
+                </div>
+                <div class="as-field">
+                  <label for="as-email">Email Address</label>
+                  <input class="input" type="email" id="as-email" data-as-field="email" />
+                </div>
+              </div>
+              <div class="as-form-row">
+                <div class="as-field">
+                  <label for="as-phone">Phone Number</label>
+                  <div class="as-phone-wrap">
+                    <span class="as-phone-prefix">&#127475;&#127468; +234</span>
+                    <input class="input" type="tel" id="as-phone" data-as-field="phone" maxlength="15" placeholder="901 234 5678" />
+                  </div>
+                </div>
+                <div class="as-field">
+                  <label>Location</label>
+                  <div class="dropdown select-dropdown" id="as-location-dropdown">
+                    <button type="button" class="select-dropdown-trigger dropdown-trigger input" aria-haspopup="listbox" aria-expanded="false">
+                      <span data-dropdown-label data-placeholder-text="Select state">Select state</span>
+                      <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <ul class="dropdown-panel select-dropdown-panel" role="listbox" data-dropdown-panel></ul>
+                    <input type="hidden" data-as-field="location" />
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn--primary as-submit">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                Save Changes
+              </button>
+            </form>
+          </div>
+
+          <!-- Preferences & Security -->
+          <div class="as-card">
+            <div class="as-card-head">
+              <div class="as-card-head-title">
+                <span class="as-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-3.5 7-10V5l-7-3-7 3v7c0 6.5 7 10 7 10Z"></path></svg></span>
+                <div>
+                  <h2>Preferences &amp; Security</h2>
+                  <p>Manage your account preferences and security options.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="as-pref-row">
+              <span class="as-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-3.5 7-10V5l-7-3-7 3v7c0 6.5 7 10 7 10Z"></path></svg></span>
+              <span class="as-pref-text">
+                <strong>Two-Factor Authentication (2FA)</strong>
+                <small>Add an extra layer of security to your account.</small>
+              </span>
+              <span class="switch">
+                <input type="checkbox" data-2fa-toggle />
+                <span class="track"></span>
+                <span class="thumb"></span>
+              </span>
+            </div>
+
+            <div class="as-pref-row">
+              <span class="as-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 16 14"></polyline></svg></span>
+              <span class="as-pref-text">
+                <strong>Login Activity</strong>
+                <small>See where and when your account was accessed.</small>
+              </span>
+              <button type="button" class="as-outline-btn" data-as-login-activity>View Activity</button>
+            </div>
+
+            <div class="as-danger-row">
+              <span class="as-pref-icon as-pref-icon--danger"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.7 18.3-9-15.6a1 1 0 0 0-1.7 0l-9 15.6a1 1 0 0 0 .8 1.5h18a1 1 0 0 0 .9-1.5Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
+              <span class="as-pref-text">
+                <strong class="as-danger-text">Danger Zone</strong>
+                <small>Permanently delete your account and all data.</small>
+              </span>
+              <button type="button" class="as-danger-btn" data-delete-account>Delete Account</button>
+            </div>
+          </div>
+
+          <!-- Notification Settings -->
+          <div class="as-card">
+            <div class="as-card-head">
+              <div class="as-card-head-title">
+                <span class="as-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg></span>
+                <div>
+                  <h2>Notification Settings</h2>
+                  <p>Choose what you want to be notified about.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="as-notif-list" data-notif-settings>
+              <label class="as-pref-row" data-notif-key="propertyMatches">
+                <span class="as-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v10h14V10"></path></svg></span>
+                <span class="as-pref-text">
+                  <strong>New Property Matches</strong>
+                  <small>Get notified about properties matching your search</small>
+                </span>
+                <span class="switch">
+                  <input type="checkbox" checked />
+                  <span class="track"></span>
+                  <span class="thumb"></span>
+                </span>
+              </label>
+              <label class="as-pref-row" data-notif-key="messages">
+                <span class="as-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
+                <span class="as-pref-text">
+                  <strong>Messages</strong>
+                  <small>Receive new message alerts</small>
+                </span>
+                <span class="switch">
+                  <input type="checkbox" checked />
+                  <span class="track"></span>
+                  <span class="thumb"></span>
+                </span>
+              </label>
+              <label class="as-pref-row" data-notif-key="bookings">
+                <span class="as-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
+                <span class="as-pref-text">
+                  <strong>Bookings &amp; Appointments</strong>
+                  <small>Updates on your bookings and schedules</small>
+                </span>
+                <span class="switch">
+                  <input type="checkbox" checked />
+                  <span class="track"></span>
+                  <span class="thumb"></span>
+                </span>
+              </label>
+              <label class="as-pref-row" data-notif-key="priceChanges">
+                <span class="as-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 8 4 3 6-7 6 7 4-3-2 11H4Z"></path></svg></span>
+                <span class="as-pref-text">
+                  <strong>Price Changes</strong>
+                  <small>Get notified when property prices change</small>
+                </span>
+                <span class="switch">
+                  <input type="checkbox" checked />
+                  <span class="track"></span>
+                  <span class="thumb"></span>
+                </span>
+              </label>
+              <label class="as-pref-row" data-notif-key="promotions">
+                <span class="as-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path></svg></span>
+                <span class="as-pref-text">
+                  <strong>Promotions &amp; Offers</strong>
+                  <small>Exclusive deals and discounts</small>
+                </span>
+                <span class="switch">
+                  <input type="checkbox" checked />
+                  <span class="track"></span>
+                  <span class="thumb"></span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- Login Activity modal -->
+  <div class="as-modal-overlay" data-as-login-modal aria-hidden="true">
+    <div class="as-modal" role="dialog" aria-modal="true" aria-label="Login activity">
+      <button type="button" class="as-modal-close" data-as-login-modal-close aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <h3>Login Activity</h3>
+      <p class="as-modal-sub">Recent sign-ins to your account.</p>
+      <ul class="as-login-list" data-as-login-list></ul>
+    </div>
+  </div>
+
+  <div data-partial="partials/footer.html"></div>
+
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/wallet.js"></script>
+  <script src="assets/js/core/skeleton.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/data/notifications.js"></script>
+  <script src="assets/js/data/locations.js"></script>
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+  <script>Accoom.loadPartials();</script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/account-settings.js"></script>
+
+</body>
+</html>

@@ -114,6 +114,15 @@
   background: var(--gold-soft);
 }
 
+/* Old Safari (pre 14.5) ignores gap in flexbox; use margins instead
+   so header icons keep their spacing from the label next to them. */
+@supports not (gap: 1px) {
+  .action-link > * + *,
+  .location-select > * + * {
+    margin-left: 6px;
+  }
+}
+
 /* ============================================================
    LOCATION DROPDOWN - FIXED (Same as original desktop style)
    ============================================================ */
@@ -256,6 +265,13 @@
   border: 1px solid transparent;
   transition: background var(--dur-fast) var(--ease),
               border var(--dur-fast) var(--ease);
+}
+
+@supports not (gap: 1px) {
+  .mobile-search > * + *,
+  .header-theme-toggle > * + * {
+    margin-left: 8px;
+  }
 }
 
 .header-search-suggestions {
@@ -886,6 +902,24 @@ html:not(.dark-mode) .balance-toggle {
   opacity: 0;
   transition: opacity var(--dur-med) var(--ease);
 }
+
+.notif-panel-footer {
+  display: block;
+  padding: 14px 20px;
+  margin-top: 4px;
+  border-top: 1px solid var(--line-page);
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.notif-panel-footer:hover {
+  color: var(--gold-dark);
+  background: var(--gold-soft);
+}
+
+
 
 .notif-empty.is-visible {
   display: flex;

@@ -83,6 +83,26 @@
   transform: translateY(-50%);
 }
 
+.select-dropdown-check {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border: 1.5px solid var(--line);
+  border-radius: 4px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.select-dropdown-option.is-active .select-dropdown-check {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.select-dropdown-option.is-active::after {
+  display: none;
+}
+
 .dropdown-panel a {
   display: flex;
   align-items: center;
@@ -115,4 +135,66 @@
   background: var(--gold);
   color: var(--navy-2);
   font-weight: 700;
+}
+
+/* Searchable select-style dropdown (State/Country etc.) */
+.select-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.select-dropdown-trigger[data-placeholder="true"] {
+  color: var(--ink-soft);
+}
+
+.select-dropdown-trigger .chevron {
+  flex-shrink: 0;
+  color: var(--ink-soft);
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.select-dropdown-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  margin: 0 0 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  color: var(--ink-soft);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--surface-page);
+}
+
+.select-dropdown-search svg {
+  flex-shrink: 0;
+}
+
+.select-dropdown-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  outline: none;
+  font-size: 0.92rem;
+  color: var(--on-page);
+}
+
+.select-dropdown-empty {
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .select-dropdown-panel {
+    max-height: 45vh;
+  }
 }

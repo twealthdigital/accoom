@@ -13,24 +13,49 @@
     // to real navigation, populate this from the clicked listing
     // (e.g. via a query string) instead of the hardcoded fallback.
     // ============================================================
-var params = new URLSearchParams(window.location.search);
+    var params = new URLSearchParams(window.location.search);
+    var propId = params.get('id');
 
     var stored = Accoom.getStorage('accoom-active-listing', null);
-    if (stored && String(stored.id) !== String(params.get('id'))) stored = null;
+    if (stored && propId && String(stored.id) !== String(propId)) stored = null;
+
+    if (!stored && propId && Accoom.PropertyService && Accoom.PropertyService.getById) {
+      stored = Accoom.PropertyService.getById(propId);
+    }
+
+    var defaultAgent = {
+      name: 'David O.',
+      avatar: 'assets/images/agent-images/agenticonimg.webp',
+      verified: true,
+      rating: 4.8,
+      reviews: 120,
+      online: true,
+      level: 'AL5'
+    };
+    var resolvedAgent = stored && stored.agent
+      ? Object.assign({}, defaultAgent, stored.agent)
+      : defaultAgent;
+    if (!resolvedAgent.avatar) {
+      resolvedAgent.avatar = 'assets/images/agent-images/agenticonimg.webp';
+    }
 
     var property = {
-      id: params.get('id') || 'ACCOM-24567',
-      name: params.get('name') || (stored ? stored.name : '2 Bedroom Detached Duplex'),
+      id: (stored && stored.id) || propId || 'ACCOM-24567',
+      name: (stored && stored.name) || params.get('name') || '2 Bedroom Detached Duplex',
       location: stored ? stored.location : 'Lekki Phase 1, Lagos, Nigeria',
-      price: stored ? ('\u20A6' + stored.price.toLocaleString('en-NG')) : '\u20A6460,000',
-      images: stored ? stored.images : [
+      priceValue: stored ? (typeof stored.price === 'number' ? stored.price : parseInt(String(stored.price).replace(/[^\d]/g, ''), 10) || 460000) : 460000,
+      price: stored ? (typeof stored.price === 'number' ? ('\u20A6' + stored.price.toLocaleString('en-NG')) : stored.price) : '\u20A6460,000',
+      beds: stored ? (stored.beds || 2) : 2,
+      baths: stored ? (stored.baths || 3) : 3,
+      typeLabel: stored ? (stored.typeLabel || 'Detached Duplex') : 'Detached Duplex',
+      images: (stored && stored.images && stored.images.length) ? stored.images : [
         'assets/images/home-properties/miniflat1.png',
         'assets/images/home-properties/miniflat.png',
         'assets/images/home-properties/placeholder.png',
         'assets/images/home-properties/miniflat.png'
       ],
       video: stored ? stored.video : null,
-      agent: stored && stored.agent ? stored.agent : { level: 'AL5' }
+      agent: resolvedAgent
     };
 
     // Expose to other modules (e.g. main.js's View Profile handler),
@@ -74,6 +99,44 @@ var params = new URLSearchParams(window.location.search);
       });
 
       levelEl.lastChild.textContent = ' ' + level;
+    })();
+
+    (function applyPropertyDetails() {
+      var setText = function (selector, value) {
+        var el = document.querySelector(selector);
+        if (el) el.textContent = value;
+      };
+
+      setText('[data-pd-location-text]', property.location);
+      setText('[data-pd-price]', property.price);
+      setText('[data-pd-beds-tag]', property.beds + ' Beds');
+      setText('[data-pd-baths-tag]', property.baths + ' Baths');
+      setText('[data-pd-type-tag]', property.typeLabel);
+      setText('[data-pd-quickfact-beds]', property.beds + ' Bedrooms');
+      setText('[data-pd-quickfact-baths]', property.baths + ' Bathrooms');
+      setText('[data-pd-overview-id]', property.id);
+      setText('[data-pd-overview-type]', property.typeLabel);
+
+      var agent = property.agent;
+      setText('[data-pd-agent-name-text]', agent.name || 'Agent');
+      var avatarEl = document.querySelector('[data-pd-agent-avatar]');
+      if (avatarEl && agent.avatar) avatarEl.setAttribute('src', agent.avatar);
+      var badge = document.querySelector('[data-pd-agent-name] .pd-agent-verified-badge');
+      if (badge) badge.classList.toggle('is-hidden', !agent.verified);
+      setText('[data-pd-agent-stats]', Math.max(1, Math.round((agent.reviews || 0) / 10)) + ' Properties \u00B7 ' + (agent.reviews || 0) + ' Deals');
+      setText('[data-pd-agent-rating]', (agent.rating || 0) + ' (' + (agent.reviews || 0) + ' reviews)');
+
+      var rent = property.priceValue;
+      var service = Math.round(rent * 0.1);
+      var legal = Math.round(rent * 0.1);
+      var agency = rent;
+      var total = rent + service + legal + agency;
+      var naira = function (n) { return '\u20A6' + n.toLocaleString('en-NG'); };
+      setText('[data-pd-price-rent]', naira(rent));
+      setText('[data-pd-price-service]', naira(service));
+      setText('[data-pd-price-legal]', naira(legal));
+      setText('[data-pd-price-agency]', naira(agency));
+      setText('[data-pd-price-total]', naira(total));
     })();
 
     // ============================================================
@@ -387,10 +450,10 @@ var params = new URLSearchParams(window.location.search);
         return isNaN(n) ? 0 : n;
       }
 
-      // Wallet balance lives in the header partial. It reads the raw
-      // (unmasked) value stashed by main.js so this works even while
-      // the user has their balance hidden via the eye toggle.
+      // Wallet balance is the single source of truth in assets/js/core/wallet.js
+      // (falls back to parsing the header figure if that script isn't loaded yet).
       function getWalletBalance() {
+        if (Accoom.getWalletBalance) return Accoom.getWalletBalance();
         var el = document.querySelector('[data-balance-amount]');
         if (!el) return 0;
         return parseAmount(el.getAttribute('data-balance-raw') || el.textContent);
@@ -624,6 +687,69 @@ var params = new URLSearchParams(window.location.search);
           copyLabel.textContent = 'Copied!';
           setTimeout(function () { copyLabel.textContent = 'Copy'; }, 1800);
         });
+      });
+    })();
+
+    // ============================================================
+    // CONTACT AGENT — create a chat for this agent and property
+    // ============================================================
+    (function initContactAgent() {
+      var contactBtn = document.querySelector('[data-pd-contact-agent]') ||
+                       document.querySelector('.pd-agent-actions a[href*="contact-agent"]');
+      if (!contactBtn) return;
+
+      Accoom.on(contactBtn, 'click', function (e) {
+        e.preventDefault();
+        var agent = property.agent || {};
+        var agentAvatarEl = document.querySelector('[data-pd-agent-avatar]');
+        var agentAvatar = (agentAvatarEl && agentAvatarEl.getAttribute('src')) || agent.avatar || 'assets/images/agent-images/agenticonimg.webp';
+
+        var thisPropObj = {
+          id: property.id,
+          name: property.name,
+          location: property.location || '',
+          price: property.price || '',
+          image: (property.images && property.images[0]) || 'assets/images/home-properties/placeholder.png',
+          beds: property.beds,
+          baths: property.baths
+        };
+
+        // Gather all properties belonging to this agent
+        var agentProps = [];
+        if (Accoom.PropertyService && Accoom.PropertyService.getAll && agent.name) {
+          var all = Accoom.PropertyService.getAll();
+          agentProps = all.filter(function (item) {
+            return item.agent && item.agent.name && item.agent.name.toLowerCase() === agent.name.toLowerCase();
+          }).map(function (item) {
+            return {
+              id: item.id,
+              name: item.name,
+              location: item.location,
+              price: typeof item.price === 'number' ? ('\u20A6' + item.price.toLocaleString('en-NG') + (item.priceLabel ? ' ' + item.priceLabel : '')) : item.price,
+              image: (item.images && item.images[0]) || 'assets/images/home-properties/placeholder.png',
+              beds: item.beds,
+              baths: item.baths
+            };
+          });
+        }
+
+        if (!agentProps.some(function (p) { return String(p.id) === String(thisPropObj.id); })) {
+          agentProps.unshift(thisPropObj);
+        }
+
+        Accoom.setStorage('accoom-contact-request', {
+          agentName: agent.name || 'David O.',
+          agentAvatar: agentAvatar,
+          verified: !!agent.verified,
+          online: agent.online !== false,
+          rating: agent.rating || 4.8,
+          reviews: agent.reviews || 120,
+          level: agent.level || 'AL5',
+          property: thisPropObj,
+          agentProperties: agentProps
+        });
+
+        window.location.href = 'contact-agent.html';
       });
     })();
 

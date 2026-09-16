@@ -498,14 +498,215 @@
 
 .msgs-property-extra-actions {
   display: flex;
+  align-items: center;
   gap: 8px;
   flex-shrink: 0;
   flex-wrap: nowrap;
   margin-left: auto;
 }
 
+/* ---- Agent properties switcher dropdown in chat ---- */
+.msgs-props-dropdown {
+  position: relative;
+}
+
+.msgs-props-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--surface-page);
+  color: var(--on-page);
+  border: 1px solid var(--line-page);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--dur-fast) var(--ease);
+}
+
+html.dark-mode .msgs-props-btn {
+  background: var(--surface-page-alt);
+  border-color: var(--line-page);
+}
+
+.msgs-props-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.msgs-props-chevron {
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.msgs-props-dropdown.is-open .msgs-props-chevron {
+  transform: rotate(180deg);
+}
+
+.msgs-props-panel {
+  min-width: 290px;
+  max-width: 360px;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  border-radius: 12px;
+  background: var(--white);
+  border: 1px solid var(--line-page);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22);
+  right: 0;
+  left: auto;
+  z-index: 100;
+  overflow: hidden !important;
+  max-height: min(360px, calc(100vh - 220px)) !important;
+}
+
+html.dark-mode .msgs-props-panel {
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+}
+
+.msgs-props-panel-header {
+  flex: 0 0 auto;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--line-page);
+  background: inherit;
+}
+
+.msgs-props-panel-header strong {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--on-page);
+}
+
+.msgs-props-panel-header span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--on-page-soft);
+  margin-top: 2px;
+}
+
+.msgs-props-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 8px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 250px;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+.msgs-props-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.msgs-props-list::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0 8px 0;
+}
+
+.msgs-props-list::-webkit-scrollbar-thumb {
+  background: var(--line-page);
+  border-radius: 10px;
+}
+
+.msgs-props-list::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
+}
+
+html.dark-mode .msgs-props-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+html.dark-mode .msgs-props-list::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
+}
+
+.msgs-props-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.msgs-props-item:hover {
+  background: rgba(223, 150, 46, 0.10);
+}
+
+.msgs-props-item.is-active {
+  background: var(--gold-soft);
+  border: 1px solid rgba(223, 150, 46, 0.35);
+}
+
+html.dark-mode .msgs-props-item:hover {
+  background: #262626;
+}
+
+html.dark-mode .msgs-props-item.is-active {
+  background: rgba(223, 150, 46, 0.20);
+  border-color: rgba(223, 150, 46, 0.45);
+}
+
+.msgs-props-item-img {
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.msgs-props-item-text {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.msgs-props-item-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--on-page);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.msgs-props-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--on-page-soft);
+  margin-top: 2px;
+}
+
+.msgs-props-item-price {
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.msgs-props-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--gold);
+  background: var(--gold-soft);
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
 .msgs-property-pay-btn,
-.msgs-property-review-btn {
+.msgs-property-approve-btn,
+.msgs-property-decline-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -525,12 +726,48 @@
 }
 .msgs-property-pay-btn:hover { filter: brightness(1.1); transform: scale(1.02); }
 
-.msgs-property-review-btn {
+.msgs-property-approve-btn {
+  background: rgba(45, 191, 118, 0.14);
+  color: #2dbf76;
+  border: 1px solid rgba(45, 191, 118, 0.4);
+}
+.msgs-property-approve-btn:hover { background: rgba(45, 191, 118, 0.24); }
+
+.msgs-property-decline-btn {
   background: rgba(224, 69, 95, 0.12);
   color: #e0455f;
   border: 1px solid rgba(224, 69, 95, 0.35);
 }
-.msgs-property-review-btn:hover { background: rgba(224, 69, 95, 0.2); }
+.msgs-property-decline-btn:hover { background: rgba(224, 69, 95, 0.2); }
+
+.msgs-property-pay-btn.is-loading,
+.msgs-property-approve-btn.is-loading,
+.msgs-property-decline-btn.is-loading,
+.msgs-payment-actions .btn.is-loading {
+  position: relative;
+  color: transparent !important;
+}
+
+.msgs-property-pay-btn.is-loading::after,
+.msgs-property-approve-btn.is-loading::after,
+.msgs-property-decline-btn.is-loading::after,
+.msgs-payment-actions .btn.is-loading::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border: 2px solid rgba(255, 255, 255, .45);
+  border-top-color: var(--white);
+  border-radius: 50%;
+  content: '';
+  animation: msgs-btn-spinner 800ms linear infinite;
+}
+
+@keyframes msgs-btn-spinner {
+  to { transform: rotate(360deg); }
+}
 
 /* ---- chat tabs row (Messages / Saved + Offer) ---- */
 .msgs-chat-tabs-row {
@@ -569,75 +806,27 @@
 .msgs-chat-tab.is-active { color: var(--gold); }
 .msgs-chat-tab.is-active::after { transform: scaleX(1); }
 
-/* ---- Offer hover menu ---- */
-/* ---- Offer menu (click to open, uses shared .dropdown/.dropdown-panel toggle) ---- */
-.msgs-offer-menu {
-  position: relative;
-  margin-bottom: 10px;
-}
-
-.msgs-offer-btn {
-  display: flex;
+/* ---- Property status badge (buyer side: Available / Pending / Sold / In Dispute) ---- */
+.msgs-property-status {
+  display: inline-flex;
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
   gap: 6px;
+  margin-bottom: 10px;
   padding: 7px 14px;
   border-radius: var(--radius-pill);
-  background: var(--gold);
-  color: var(--navy-2);
   font-size: 0.82rem;
   font-weight: 600;
   white-space: nowrap;
-  transition: filter var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
 }
-.msgs-offer-btn:hover { filter: brightness(1.1); transform: scale(1.02); }
-.msgs-offer-btn svg { flex-shrink: 0; }
+.msgs-property-status-icon { display: flex; flex-shrink: 0; }
+.msgs-property-status-icon svg { display: block; }
 
-.msgs-offer-chevron { transition: transform var(--dur-fast) var(--ease); }
-.msgs-offer-menu .dropdown-trigger[aria-expanded="true"] .msgs-offer-chevron { transform: rotate(180deg); }
-
-.msgs-offer-menu .dropdown-panel {
-  position: absolute !important;
-  top: calc(100% + 8px) !important;
-  bottom: auto !important;
-  right: 0 !important;
-  left: auto !important;
-  transform: none !important;
-  width: 240px;
-  padding: 6px;
-  z-index: 20;
-}
-
-.msgs-offer-item {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: flex-start;
-  gap: 10px;
-  width: 100%;
-  padding: 9px 10px;
-  border-radius: 8px;
-  text-align: left;
-  transition: background var(--dur-fast) var(--ease);
-}
-.msgs-offer-item:hover { background: var(--gold-soft); }
-
-.msgs-offer-item-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--surface-page-alt);
-  color: var(--gold);
-  flex-shrink: 0;
-}
-
-.msgs-offer-item-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.msgs-offer-item-text strong { font-size: 0.82rem; color: var(--on-page); }
-.msgs-offer-item-text em { font-size: 0.72rem; font-style: normal; color: var(--on-page-soft); }
+.msgs-property-status--available { background: var(--gold-soft); color: var(--gold); }
+.msgs-property-status--pending    { background: rgba(245, 166, 35, 0.16); color: #f5a623; }
+.msgs-property-status--sold       { background: rgba(46, 160, 67, 0.16); color: #2ea043; }
+.msgs-property-status--dispute    { background: rgba(224, 62, 62, 0.16); color: #e03e3e; }
 
 /* ---- thread ---- */
 .msgs-thread-wrap {
@@ -1212,7 +1401,8 @@
   }
 
   .msgs-property-pay-btn,
-  .msgs-property-review-btn {
+  .msgs-property-approve-btn,
+  .msgs-property-decline-btn {
     width: 34px;
     height: 34px;
     padding: 0;
@@ -1220,7 +1410,8 @@
   }
 
   .msgs-property-pay-btn span,
-  .msgs-property-review-btn span {
+  .msgs-property-approve-btn span,
+  .msgs-property-decline-btn span {
     display: none;
   }
 
@@ -1355,7 +1546,8 @@
   }
 
   .msgs-property-pay-btn,
-  .msgs-property-review-btn {
+  .msgs-property-approve-btn,
+  .msgs-property-decline-btn {
     width: 34px;
     height: 34px;
     padding: 0;
@@ -1363,7 +1555,8 @@
   }
 
   .msgs-property-pay-btn span,
-  .msgs-property-review-btn span {
+  .msgs-property-approve-btn span,
+  .msgs-property-decline-btn span {
     display: none;
   }
 
@@ -1375,7 +1568,7 @@
     gap: 8px;
   }
 
-  .msgs-offer-btn span {
+  .msgs-property-status-label {
     display: none;
   }
 }
@@ -1472,13 +1665,10 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
   background: rgba(239, 68, 68, 0.2);
 }
 
-.msgs-offer-menu.is-disabled {
-  pointer-events: none;
-  opacity: 0.45;
-}
 
 .msgs-property-pay-btn:disabled,
-.msgs-property-review-btn:disabled,
+.msgs-property-approve-btn:disabled,
+.msgs-property-decline-btn:disabled,
 .msgs-pay-btn:disabled {
   pointer-events: none;
   opacity: 0.45;

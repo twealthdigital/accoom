@@ -115,7 +115,57 @@
       });
     });
 
-    // Form submissions — no backend yet, so just route the UI forward
+    // Form submissions — no backend yet, so just route the UI forward.
+    //
+    // SECURITY NOTE: there is no server here to actually verify a password,
+    // so "login" below can only check whether a signup record for that
+    // email already exists in this browser's localStorage. That is a demo
+    // convenience, not authentication — anyone can still create their own
+    // local record via the signup form, or edit localStorage directly.
+    // Wiring this to a real backend (hashed passwords, server-side
+    // sessions, rate limiting on attempts) has to happen before this app
+    // handles real user data.
+    var loginErrorEl = document.querySelector('[data-auth-form="login"] [data-auth-error]');
+    var loadingOverlay = document.querySelector('[data-auth-loading]');
+    var loadingTextEl = document.querySelector('[data-auth-loading-text]');
+
+    // Shows the full-screen loading state, then navigates after a delay.
+    // This is a deliberate safety net: once this talks to a real backend,
+    // signup/login/onboarding calls won't resolve instantly like the
+    // localStorage version does, so every "leave this page" moment needs
+    // a visible in-between state rather than an instant redirect.
+    function goAfterDelay(message, url, delayMs) {
+      if (loadingTextEl) loadingTextEl.textContent = message;
+      if (loadingOverlay) loadingOverlay.hidden = false;
+      setTimeout(function () {
+        window.location.replace(url);
+      }, delayMs || 3000);
+    }
+
+    function showLoginError(message) {
+      if (!loginErrorEl) return;
+      loginErrorEl.textContent = message;
+      loginErrorEl.hidden = false;
+    }
+
+    function clearLoginError() {
+      if (!loginErrorEl) return;
+      loginErrorEl.hidden = true;
+      loginErrorEl.textContent = '';
+    }
+
+    // Send a signed-in user to the right place: unfinished onboarding first,
+    // then their role's home. Centralised so login and signup agree.
+    function routeAfterAuth(user) {
+      if (!user.role) {
+        goAfterDelay('Signing you in…', 'onboarding.html');
+      } else if (user.role === 'agent') {
+        goAfterDelay('Signing you in…', 'agent-details.html');
+      } else {
+        goAfterDelay('Signing you in…', 'home.html');
+      }
+    }
+
     forms.forEach(function (form) {
       if (form.tagName !== 'FORM') return;
 
@@ -137,11 +187,24 @@
             email: signupEmailInput ? signupEmailInput.value : '',
             createdAt: new Date().toISOString()
           });
-          window.location.href = 'home.html';
+          // New accounts always go through onboarding — there is no role yet.
+          goAfterDelay('Creating your account…', 'onboarding.html');
           return;
         }
 
-        console.log('ACCOOM auth: ' + kind + ' submitted (no backend wired up yet)');
+        if (kind === 'login') {
+          clearLoginError();
+          var loginEmailInput = form.querySelector('input[type="email"]');
+          var typedEmail = loginEmailInput ? loginEmailInput.value.trim().toLowerCase() : '';
+          var existing = Accoom.getStorage('accoom-user', null);
+
+          if (existing && existing.email && existing.email.trim().toLowerCase() === typedEmail) {
+            routeAfterAuth(existing);
+          } else {
+            showLoginError('We couldn\u2019t find an account with that email on this device. Try signing up instead.');
+          }
+          return;
+        }
       });
     });
 

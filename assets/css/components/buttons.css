@@ -20,6 +20,14 @@
   overflow: hidden;
 }
 
+/* iOS Safari below 14.5 does not support gap in flex containers.
+   Fall back to margins so the icon never sits flush against the label. */
+@supports not (gap: 1px) {
+  .btn > * + * {
+    margin-left: 8px;
+  }
+}
+
 .btn:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 3px;

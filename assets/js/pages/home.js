@@ -181,13 +181,13 @@ var AGENTS = [
         { images: ['assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/bedroomflat4.png'], video: 'assets/videos/home-properties/miniflat3.mp4' },
         { images: ['assets/images/home-properties/commercialspace2.png','assets/images/home-properties/commercialspace.png','assets/images/home-properties/land2.png'], video: null },
         { images: ['assets/images/home-properties/land3.png','assets/images/home-properties/land1.png','assets/images/home-properties/land2.png'], video: null },
-        { images: ['assets/images/home-properties/hall2.png','assets/images/home-properties/hall3.png','assets/images/home-properties/hall3.png'], video: null },
+        { images: ['assets/images/home-properties/hall2.png','assets/images/home-properties/hall3.png','assets/images/home-properties/hall2.png'], video: null },
         { images: ['assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/bedroomflat4.png','assets/images/home-properties/miniflat1.png'], video: null },
         { images: ['assets/images/home-properties/bedroomflat4.png','assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/singleroom3.png'], video: null },
         { images: ['assets/images/home-properties/singleroom3.png','assets/images/home-properties/miniflat1.png'], video: 'assets/videos/home-properties/selfcon3.mp4' },
         { images: ['assets/images/home-properties/singleroom3.png','assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/bedroomflat4.png'], video: null },
         { images: ['assets/images/home-properties/land1.png','assets/images/home-properties/land2.png','assets/images/home-properties/land3.png'], video: null },
-        { images: ['assets/images/home-properties/hall3.png','assets/images/home-properties/hall2.png','assets/images/home-properties/hall3.png'], video: null },
+        { images: ['assets/images/home-properties/hall3.png','assets/images/home-properties/hall2.png','assets/images/home-properties/hall2.png'], video: null },
         { images: ['assets/images/home-properties/selfcon4.png','assets/images/home-properties/selfcon1.png','assets/images/home-properties/selfcon2.png'], video: null },
         { images: ['assets/images/home-properties/selfcon3.png','assets/images/home-properties/selfcon4.png'], video: 'assets/videos/home-properties/selfcon3.mp4' },
         { images: ['assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/miniflat1.png','assets/images/home-properties/singleroom3.png'], video: null },
@@ -417,6 +417,13 @@ function getById(id) {
 
     if (listingsGrid && listingsPagination) {
 
+      function getPerPage() {
+        var w = window.innerWidth;
+        if (w >= 992) return 20; // desktop: 4 x 5
+        if (w >= 768) return 15; // tablet: 3 x 5
+        return 5;                // mobile: 1 x 5
+      }
+
 var currentPage = 1;
       var currentPerPage = getPerPage();
       var currentSort = 'newest';
@@ -442,13 +449,6 @@ var currentPage = 1;
           currentFilters.search = typeLabels.concat(savedFilterState.city || savedFilterState.location || []).join(' ').trim();
         }
       } catch (filterStateError) {}
-
-function getPerPage() {
-        var w = window.innerWidth;
-        if (w >= 992) return 20; // desktop: 4 x 5
-        if (w >= 768) return 15; // tablet: 3 x 5
-        return 5;                // mobile: 1 x 5
-      }
 
       function formatPrice(n) {
         return '₦' + n.toLocaleString('en-NG');
@@ -518,7 +518,7 @@ function cardTemplate(item) {
             '</div>' +
             '<div class="listing-card-body">' +
             '<p class="listing-name">' + item.name + '</p>' +
-              '<p class="listing-price">' + formatPrice(item.price) + ' <small>' + item.priceLabel + '</small></p>' +
+              '<p class="listing-price">' + formatPrice(item.price) + ' <small>/yr</small></p>' +
               '<p class="listing-location">' + item.location + '</p>' +
               '<div class="listing-meta">' +
                 '<span>' + item.beds + ' Bed</span><span>' + item.baths + ' Bath</span>' +
@@ -1135,7 +1135,12 @@ Accoom.delegate(listingsGrid, 'click', '.listing-card', function (e) {
         if (e.target.closest('button')) return;
         var id = this.getAttribute('data-listing-id');
         var item = PropertyService.getById(id);
-        if (item) Accoom.setStorage('accoom-active-listing', item);
+        if (item) {
+          if (item.agent && !item.agent.avatar) {
+            item.agent.avatar = 'assets/images/agent-images/agenticonimg.webp';
+          }
+          Accoom.setStorage('accoom-active-listing', item);
+        }
         var nameEl = this.querySelector('.listing-name');
         var url = 'property.html?id=' + encodeURIComponent(id) +
           (nameEl ? '&name=' + encodeURIComponent(nameEl.textContent.trim()) : '');
@@ -1149,7 +1154,7 @@ Accoom.delegate(listingsGrid, 'click', '.listing-card', function (e) {
       });
       
       var resizeTimer;
-      window.addEventListener('resize', function () {
+      Accoom.on(window, 'resize', function () {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(function () {
           var newPerPage = getPerPage();
@@ -1198,6 +1203,9 @@ Accoom.delegate(listingsGrid, 'click', '.listing-card', function (e) {
         var priceEl = card.querySelector('.suggested-property-price');
         var locationEl = card.querySelector('.suggested-property-location');
         var imgEl = card.querySelector('.suggested-property-media img');
+        var agentNameEl = card.querySelector('.suggested-agent-name');
+        var avatarEl = card.querySelector('.suggested-agent-avatar');
+        var verified = !!card.querySelector('.suggested-verified-badge');
 
         Accoom.setStorage('accoom-active-listing', {
           id: id,
@@ -1206,11 +1214,57 @@ Accoom.delegate(listingsGrid, 'click', '.listing-card', function (e) {
           location: locationEl ? locationEl.textContent.replace(/\s+/g, ' ').trim() : '',
           images: imgEl ? [imgEl.getAttribute('src')] : [],
           video: null,
-          agent: { level: 'AL5' }
+          agent: {
+            name: (agentNameEl && agentNameEl.childNodes[0]) ? agentNameEl.childNodes[0].nodeValue.trim() : 'David O.',
+            avatar: avatarEl ? avatarEl.getAttribute('src') : 'assets/images/agent-images/agenticonimg.webp',
+            verified: verified,
+            rating: 4.8,
+            reviews: 120,
+            level: 'AL5'
+          }
         });
 
         window.location.href = 'property.html?id=' + encodeURIComponent(id) +
           '&name=' + encodeURIComponent(name);
+      });
+
+      Accoom.delegate(track, 'click', '.suggested-property-media, .suggested-property-name', function (e) {
+        var card = this.closest('.suggested-card');
+        var viewDetailsBtn = card ? card.querySelector('.suggested-property-actions .btn--ghost') : null;
+        if (viewDetailsBtn) viewDetailsBtn.click();
+      });
+
+      // "Contact Agent" — each card carries its own agent + property info,
+      // so send that exact pair into contact-agent.html instead of always
+      // landing on whatever fixed conversation used to open by default.
+      Accoom.delegate(track, 'click', '.suggested-property-actions .btn--primary', function (e) {
+        e.preventDefault();
+        var card = this.closest('.suggested-card');
+        if (!card) return;
+
+        var propNameEl = card.querySelector('[data-id]');
+        if (!propNameEl) return;
+
+        var agentNameEl = card.querySelector('.suggested-agent-name');
+        var priceEl = card.querySelector('.suggested-property-price');
+        var locationEl = card.querySelector('.suggested-property-location');
+        var avatarEl = card.querySelector('.suggested-agent-avatar');
+        var imgEl = card.querySelector('.suggested-property-media img');
+
+        Accoom.setStorage('accoom-contact-request', {
+          agentName: (agentNameEl && agentNameEl.childNodes[0]) ? agentNameEl.childNodes[0].nodeValue.trim() : 'Agent',
+          agentAvatar: avatarEl ? avatarEl.getAttribute('src') : '',
+          verified: !!card.querySelector('.suggested-verified-badge'),
+          property: {
+            id: propNameEl.getAttribute('data-id'),
+            name: propNameEl.textContent.trim(),
+            location: locationEl ? locationEl.textContent.replace(/\s+/g, ' ').trim() : '',
+            price: (priceEl && priceEl.childNodes[0]) ? priceEl.childNodes[0].nodeValue.trim() : '',
+            image: imgEl ? imgEl.getAttribute('src') : ''
+          }
+        });
+
+        window.location.href = 'contact-agent.html';
       });
     })();
 

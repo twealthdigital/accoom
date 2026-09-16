@@ -290,10 +290,19 @@
 
   Accoom.ready(function () {
 
-    // Guests can't view real conversations — bounce straight to signup.
+    // Guests can't view real conversations — bounce straight to signup,
+    // but allow demo guest sessions if arriving from a listing's Contact Agent.
     if (!Accoom.isLoggedIn()) {
-      window.location.href = 'auth.html?mode=signup';
-      return;
+      if (Accoom.getStorage('accoom-contact-request', null)) {
+        Accoom.setStorage('accoom-user', {
+          name: 'Guest User',
+          email: 'guest@accoom.ng',
+          role: 'customer'
+        });
+      } else {
+        window.location.href = 'auth.html?mode=signup';
+        return;
+      }
     }
 
     var layout = Accoom.$('[data-msgs-layout]');
@@ -330,13 +339,19 @@
       propLocText: Accoom.$('[data-msgs-property-loc-text]'),
       propPrice: Accoom.$('[data-msgs-property-price]'),
       propPayBtn: Accoom.$('[data-msgs-property-pay-btn]'),
+      propApproveBtn: Accoom.$('[data-msgs-property-approve-btn]'),
+      propApproveLabel: Accoom.$('[data-msgs-approve-btn-label]'),
+      propDeclineBtn: Accoom.$('[data-msgs-property-decline-btn]'),
+      propDeclineLabel: Accoom.$('[data-msgs-decline-btn-label]'),
       propReviewBtn: Accoom.$('[data-msgs-property-review-btn]'),
+      propStatus: Accoom.$('[data-msgs-property-status]'),
+      propStatusIcon: Accoom.$('[data-msgs-property-status-icon]'),
+      propStatusLabel: Accoom.$('[data-msgs-property-status-label]'),
 
       chatTabs: Accoom.$$('[data-msgs-chat-tab]'),
       blockedBar: Accoom.$('[data-msgs-blocked-bar]'),
       unblockBtn: Accoom.$('[data-msgs-unblock]'),
       payBtn: Accoom.$('[data-msgs-pay-btn]'),
-      offerMenu: Accoom.$('[data-msgs-offer-menu]'),
       lightbox: Accoom.$('[data-msgs-lightbox]'),
       lightboxStage: Accoom.$('[data-msgs-lightbox-stage]'),
       lightboxCounter: Accoom.$('[data-msgs-lightbox-counter]'),
@@ -355,15 +370,22 @@
 
       composer: Accoom.$('[data-msgs-composer]'),
       input: Accoom.$('[data-msgs-input]'),
-      send: Accoom.$('[data-msgs-send]')
+      send: Accoom.$('[data-msgs-send]'),
+
+      propsDropdown: Accoom.$('[data-msgs-props-dropdown]'),
+      propsDropdownBtn: Accoom.$('[data-msgs-props-btn]'),
+      propsCount: Accoom.$('[data-msgs-props-count]'),
+      propsAgentName: Accoom.$('[data-msgs-props-agent-name]'),
+      propsList: Accoom.$('[data-msgs-props-list]')
     };
 
     Accoom.$$('.msgs-menu').forEach(function (menu) {
       Accoom.initDropdown(menu);
     });
 
+    var storedConvs = Accoom.getStorage('accoom-conversations', null);
     var state = {
-      conversations: seedConversations(),
+      conversations: (Array.isArray(storedConvs) && storedConvs.length) ? storedConvs : seedConversations(),
       activeId: null,
       activeChatTab: 'messages',
       listTab: 'all',
@@ -375,6 +397,14 @@
       msgSelectMode: false,
       msgSelected: {}
     };
+
+    function saveConversations() {
+      try {
+        Accoom.setStorage('accoom-conversations', state.conversations);
+      } catch (e) {
+        console.warn('Could not save conversations to localStorage', e);
+      }
+    }
 
     /* ---------------- MESSAGE LONG-PRESS SELECT (touch) ---------------- */
     function updateMsgSelectionBar() {
@@ -582,6 +612,7 @@
         state.savedConversations = state.savedConversations.filter(function (c) { return c.id !== id; });
       }
       delete state.selected[id];
+      saveConversations();
 
       if (wasActive) {
         var remaining = visibleConversations();
@@ -694,10 +725,17 @@
 
         // Jumping into Unread or Saved should never leave a previously-open
         // chat sitting on the right — force a pick from the filtered list.
-        if (key === 'unread' || key === 'saved') {
-          state.activeId = null;
-          showChatEmpty();
-        }
+    els.tabs.forEach(function (tab) {
+      Accoom.on(tab, 'click', function () {
+       var key = tab.getAttribute('data-msgs-tab');
+        state.listTab = key;
+        state.keepUnreadId = null;
+        setActiveTabUI(key);
+        updateMoveSavedLabel();
+
+        renderList();
+      });
+    });
 
         renderList();
       });
@@ -831,13 +869,175 @@
       }
     }
 
+    function getPropertiesForAgent(agentName, currentProp) {
+      var list = [];
+      if (currentProp && currentProp.id) {
+        list.push(currentProp);
+      }
+      if (Accoom.PropertyService && Accoom.PropertyService.getAll && agentName) {
+        var all = Accoom.PropertyService.getAll();
+        all.forEach(function (item) {
+          if (item.agent && item.agent.name && item.agent.name.toLowerCase() === agentName.toLowerCase()) {
+            if (!list.some(function (p) { return String(p.id) === String(item.id); })) {
+              list.push({
+                id: item.id,
+                name: item.name,
+                location: item.location,
+                price: typeof item.price === 'number' ? ('\u20A6' + item.price.toLocaleString('en-NG') + (item.priceLabel ? ' ' + item.priceLabel : '')) : item.price,
+                image: (item.images && item.images[0]) || 'assets/images/home-properties/placeholder.png',
+                beds: item.beds,
+                baths: item.baths
+              });
+            }
+          }
+        });
+      }
+      return list;
+    }
+
+    function renderAgentPropsDropdown(conv) {
+      if (!els.propsDropdown || !els.propsList) return;
+
+      var allProps = conv.allProperties && conv.allProperties.length
+        ? conv.allProperties
+        : getPropertiesForAgent(conv.name, conv.property);
+
+      conv.allProperties = allProps;
+
+      if (allProps.length <= 1) {
+        els.propsDropdown.classList.add('is-hidden');
+        return;
+      }
+
+      els.propsDropdown.classList.remove('is-hidden');
+      if (els.propsCount) els.propsCount.textContent = allProps.length + ' Properties';
+      if (els.propsAgentName) els.propsAgentName.textContent = conv.name + '\u2019s Properties';
+
+      els.propsList.innerHTML = allProps.map(function (item) {
+        var isCurrent = String(item.id) === String(conv.property.id);
+        return '<li class="msgs-props-item' + (isCurrent ? ' is-active' : '') + '" data-prop-id="' + item.id + '">' +
+          '<img class="msgs-props-item-img" src="' + (item.image || 'assets/images/home-properties/placeholder.png') + '" alt="" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.png\';" />' +
+          '<div class="msgs-props-item-text">' +
+            '<p class="msgs-props-item-name">' + item.name + '</p>' +
+            '<p class="msgs-props-item-meta">' +
+              '<span>' + (item.location || '') + '</span>' +
+              '<span class="msgs-props-item-price">' + (item.price || '') + '</span>' +
+            '</p>' +
+          '</div>' +
+          (isCurrent ? '<span class="msgs-props-badge">Active</span>' : '') +
+        '</li>';
+      }).join('');
+
+      Accoom.$$('.msgs-props-item', els.propsList).forEach(function (el) {
+        Accoom.on(el, 'click', function (e) {
+          e.preventDefault();
+          var propId = this.getAttribute('data-prop-id');
+          var selected = allProps.filter(function (p) { return String(p.id) === String(propId); })[0];
+          if (selected && String(selected.id) !== String(conv.property.id)) {
+            conv.property = selected;
+            renderPropertyCard(conv);
+
+            els.propsDropdown.classList.remove('is-open');
+            var panel = els.propsDropdown.querySelector('[data-dropdown-panel]');
+            if (panel) panel.classList.remove('is-open');
+
+            saveConversations();
+          }
+        });
+      });
+    }
+
     function renderPropertyCard(conv) {
       var p = conv.property;
-      els.propImg.src = p.image;
-      els.propImg.alt = p.name;
-      els.propName.textContent = p.name;
-      els.propLocText.textContent = p.location;
-      els.propPrice.textContent = p.price;
+      if (els.propImg) {
+        els.propImg.src = p.image || 'assets/images/home-properties/placeholder.png';
+        els.propImg.alt = p.name || 'Property';
+      }
+      if (els.propName) els.propName.textContent = p.name || 'Property';
+      if (els.propLocText) els.propLocText.textContent = p.location || '';
+      if (els.propPrice) els.propPrice.textContent = p.price || '';
+
+      Accoom.$$('[data-msgs-property-link]').forEach(function (link) {
+        link.href = 'property.html?id=' + encodeURIComponent(p.id) +
+          (p.name ? '&name=' + encodeURIComponent(p.name) : '');
+      });
+
+      renderPaymentState(conv);
+      renderAgentPropsDropdown(conv);
+    }
+
+    // Per-property payment/dispute state — an agent conversation can have
+    // several properties (see the Properties dropdown), and each one needs
+    // its own independent status. Nothing here is keyed by the
+    // conversation itself; it's always looked up by that property's id, so
+    // switching the active property never carries another property's
+    // status along with it.
+    function getPropState(conv, propId) {
+      if (!conv.propertyState) conv.propertyState = {};
+      var key = String(propId);
+      if (!conv.propertyState[key]) {
+        conv.propertyState[key] = { paymentStatus: 'idle', disputed: false, purchaseOrderId: null };
+      }
+      return conv.propertyState[key];
+    }
+
+    // Shorthand for "the state of whichever property this conversation is
+    // currently showing" — the dropdown swaps conv.property, this always
+    // follows it.
+    function activePropState(conv) {
+      return getPropState(conv, conv.property.id);
+    }
+
+    // Single source of truth for "what state is this property in right
+    // now" — anything that changes paymentStatus or disputed just needs
+    // to call renderPaymentState(conv) again, no separate wiring needed.
+    // A real backend only has to keep these two fields accurate; this
+    // function does the rest.
+    var PROPERTY_STATUS_ICONS = {
+      available: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="8 12.5 11 15.5 16 9"></polyline></svg>',
+      pending: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15 14"></polyline></svg>',
+      sold: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 12.7 12.7 20.6a2 2 0 0 1-2.8 0l-8-8a2 2 0 0 1-.6-1.4V4a2 2 0 0 1 2-2h7.3c.5 0 1 .2 1.4.6l8 8a2 2 0 0 1 0 2.8Z"></path><circle cx="7" cy="7" r="1"></circle></svg>',
+      dispute: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 1 21h22L12 2z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>'
+    };
+    var PROPERTY_STATUS_LABELS = { available: 'Available', pending: 'Pending', sold: 'Sold', dispute: 'In Dispute' };
+
+    function getPropertyStatusKey(conv) {
+      var propState = activePropState(conv);
+      if (propState.disputed) return 'dispute';
+      var status = propState.paymentStatus || 'idle';
+      if (status === 'approved') return 'sold';
+      if (status === 'review') return 'pending';
+      return 'available'; // idle (never paid) or declined (payment released back)
+    }
+
+    function renderPropertyStatus(conv) {
+      if (!els.propStatus) return;
+      var key = getPropertyStatusKey(conv);
+      els.propStatus.className = 'msgs-property-status msgs-property-status--' + key;
+      if (els.propStatusIcon) els.propStatusIcon.innerHTML = PROPERTY_STATUS_ICONS[key];
+      if (els.propStatusLabel) els.propStatusLabel.textContent = PROPERTY_STATUS_LABELS[key];
+    }
+
+    function renderPaymentState(conv) {
+      var status = activePropState(conv).paymentStatus || 'idle';
+
+      renderPropertyStatus(conv);
+
+      if (els.propPayBtn) els.propPayBtn.classList.toggle('is-hidden', status !== 'idle');
+      if (els.propApproveBtn) {
+        els.propApproveBtn.classList.remove('is-loading');
+        els.propApproveBtn.classList.toggle('is-hidden', status !== 'review' && status !== 'approved');
+        els.propApproveBtn.disabled = status === 'approved';
+        if (els.propApproveLabel) els.propApproveLabel.textContent = status === 'approved' ? 'Payment Approved' : 'Approve Payment';
+      }
+      if (els.propDeclineBtn) {
+        els.propDeclineBtn.classList.remove('is-loading');
+        els.propDeclineBtn.classList.toggle('is-hidden', status !== 'review' && status !== 'declined');
+        els.propDeclineBtn.disabled = status === 'declined';
+        if (els.propDeclineLabel) els.propDeclineLabel.textContent = status === 'declined' ? 'Declined' : 'Decline Payment';
+      }
+      if (status === 'approved' && els.propDeclineBtn) els.propDeclineBtn.classList.add('is-hidden');
+      if (status === 'declined' && els.propApproveBtn) els.propApproveBtn.classList.add('is-hidden');
     }
 
     /* ---------------- CHAT TABS (Messages / Saved) ---------------- */
@@ -1191,18 +1391,26 @@
           msg.replyTo = state.replyTo;
         }
 
-        conv.messages.push(msg);
-        els.input.value = '';
-        autoGrowInput();
-        closeLightbox();
-        hideReplyPreview();
-        renderThread(conv);
+    els.tabs.forEach(function (tab) {
+      Accoom.on(tab, 'click', function () {
+       var key = tab.getAttribute('data-msgs-tab');
+        state.listTab = key;
+        state.keepUnreadId = null;
+        setActiveTabUI(key);
+        updateMoveSavedLabel();
+
+        // Switching to Unread/Saved only filters the LEFT list — the open
+        // conversation on the right stays exactly as it is. It only
+        // changes when the person actually clicks a different conversation.
         renderList();
+      });
+    });
 
         // Simulate the agent reading + replying, like the reference chat.
         setTimeout(function () {
           msg.read = true;
           renderThread(conv);
+          saveConversations();
         }, 900);
       });
     }
@@ -1242,9 +1450,13 @@
     var paymentAmount = paymentModal.querySelector('[data-msgs-payment-amount]');
     var paymentIcon = paymentModal.querySelector('[data-msgs-payment-icon]');
     var paymentConfirm = paymentModal.querySelector('[data-msgs-payment-confirm]');
+    var paymentCancel = paymentModal.querySelector('[data-msgs-payment-cancel]');
     var paymentTarget = null;
 
+    var paymentProcessing = false;
+
     function closePaymentModal() {
+      if (paymentProcessing) return;
       paymentModal.classList.remove('is-open');
       paymentModal.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('no-scroll');
@@ -1254,7 +1466,7 @@
       var amount = parsePaymentAmount(conv.property.price);
       var balance = getBalance();
       var hasFunds = balance >= amount && amount > 0;
-      paymentTarget = { id: conv.property.id, amount: amount, mode: hasFunds ? 'checkout' : 'deposit' };
+      paymentTarget = { id: conv.property.id, property: conv.property, amount: amount, mode: hasFunds ? 'checkout' : 'deposit', convId: conv.id };
 
       paymentIcon.className = 'msgs-payment-icon ' + (hasFunds ? 'is-confirm' : 'is-warning');
       paymentIcon.innerHTML = hasFunds
@@ -1291,6 +1503,33 @@
     });
     Accoom.on(paymentConfirm, 'click', function () {
       if (!paymentTarget) return;
+
+      if (paymentTarget.mode === 'checkout') {
+        var payingConv = findConv(paymentTarget.convId);
+        paymentProcessing = true;
+        paymentConfirm.classList.add('is-loading');
+        paymentConfirm.disabled = true;
+        if (paymentCancel) paymentCancel.disabled = true;
+
+        window.setTimeout(function () {
+          Accoom.debitWallet(paymentTarget.amount);
+          paymentProcessing = false;
+          paymentConfirm.classList.remove('is-loading');
+          paymentConfirm.disabled = false;
+          if (paymentCancel) paymentCancel.disabled = false;
+          closePaymentModal();
+
+          if (payingConv) {
+            getPropState(payingConv, paymentTarget.id).paymentStatus = 'review';
+            upsertPurchaseRecord(payingConv, paymentTarget.property, 'upcoming');
+            if (state.activeId === payingConv.id && String(payingConv.property.id) === String(paymentTarget.id)) {
+              renderPaymentState(payingConv);
+            }
+          }
+        }, 3000);
+        return;
+      }
+
       window.location.href = 'payment.html?id=' + encodeURIComponent(paymentTarget.id)
         + '&amount=' + encodeURIComponent(paymentTarget.amount)
         + '&mode=' + paymentTarget.mode
@@ -1301,34 +1540,93 @@
       Accoom.on(els.propReviewBtn, 'click', function () {
         var conv = findConv(state.activeId);
         if (!conv) return;
+        // A report flips this property's status to "In Dispute" right
+        // away. A real backend can set/clear conv.disputed independently —
+        // renderPaymentState() will always reflect whatever it's set to.
+        activePropState(conv).disputed = true;
+        renderPaymentState(conv);
         // TODO: wire to real "request a review" flow using conv.property.id
         window.location.href = 'review-request.html?property=' + encodeURIComponent(conv.property.id);
       });
     }
 
-    /* ---------------- OFFER MENU ---------------- */
-    var offerMake = Accoom.$('[data-msgs-offer-make]');
-    var offerHistory = Accoom.$('[data-msgs-offer-history]');
-    var offerLearn = Accoom.$('[data-msgs-offer-learn]');
+    // Logs (or updates) this conversation's purchase record so purchases.html
+    // (My Purchases) shows it under the right tab with correct counts. The
+    // same record follows the property from 'upcoming' (paid, awaiting the
+    // agent's decision) through to 'completed'/'cancelled' — never
+    // duplicated, just moved between tabs by updating its status.
+    function upsertPurchaseRecord(conv, property, status) {
+      var propState = getPropState(conv, property.id);
+      var log = Accoom.getStorage('accoom-purchases-log', []);
+      if (!Array.isArray(log)) log = [];
 
-    if (offerMake) {
-      Accoom.on(offerMake, 'click', function () {
+      if (propState.purchaseOrderId) {
+        var existing = log.filter(function (r) { return r.id === propState.purchaseOrderId; })[0];
+        if (existing) {
+          existing.status = status;
+          Accoom.setStorage('accoom-purchases-log', log);
+          return;
+        }
+      }
+
+      var orderId = 'ACCOOM-' + Date.now();
+      propState.purchaseOrderId = orderId;
+      log.unshift({
+        id: orderId,
+        name: property.name,
+        location: property.location,
+        dates: new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }),
+        guests: property.beds || 1,
+        amount: property.price,
+        image: property.image,
+        status: status
+      });
+      Accoom.setStorage('accoom-purchases-log', log);
+    }
+
+    if (els.propApproveBtn) {
+      Accoom.on(els.propApproveBtn, 'click', function () {
         var conv = findConv(state.activeId);
         if (!conv) return;
-        // TODO: wire to real "make an offer" flow using conv.property.id
-        window.location.href = 'offer.html?property=' + encodeURIComponent(conv.property.id);
+        var targetProperty = conv.property;
+        var propState = getPropState(conv, targetProperty.id);
+        if (propState.paymentStatus !== 'review') return;
+        els.propApproveBtn.classList.add('is-loading');
+        els.propApproveBtn.disabled = true;
+        if (els.propDeclineBtn) els.propDeclineBtn.disabled = true;
+
+        window.setTimeout(function () {
+          propState.paymentStatus = 'approved';
+          upsertPurchaseRecord(conv, targetProperty, 'completed');
+          if (state.activeId === conv.id && String(conv.property.id) === String(targetProperty.id)) {
+            renderPaymentState(conv);
+          }
+        }, 2000);
       });
     }
-    if (offerHistory) {
-      Accoom.on(offerHistory, 'click', function () {
-        window.location.href = 'offers-history.html';
+
+    if (els.propDeclineBtn) {
+      Accoom.on(els.propDeclineBtn, 'click', function () {
+        var conv = findConv(state.activeId);
+        if (!conv) return;
+        var targetProperty = conv.property;
+        var propState = getPropState(conv, targetProperty.id);
+        if (propState.paymentStatus !== 'review') return;
+        els.propDeclineBtn.classList.add('is-loading');
+        els.propDeclineBtn.disabled = true;
+        if (els.propApproveBtn) els.propApproveBtn.disabled = true;
+
+        window.setTimeout(function () {
+          propState.paymentStatus = 'declined';
+          Accoom.creditWallet(parsePaymentAmount(targetProperty.price));
+          upsertPurchaseRecord(conv, targetProperty, 'cancelled');
+          if (state.activeId === conv.id && String(conv.property.id) === String(targetProperty.id)) {
+            renderPaymentState(conv);
+          }
+        }, 2000);
       });
     }
-    if (offerLearn) {
-      Accoom.on(offerLearn, 'click', function () {
-        window.location.href = 'about-offers.html';
-      });
-    }
+
 
     /* ---------------- LIGHTBOX ---------------- */
     state.lightboxIndex = 0;
@@ -1532,8 +1830,13 @@
 
       if (els.payBtn) els.payBtn.disabled = blocked;
       if (els.propPayBtn) els.propPayBtn.disabled = blocked;
-      if (els.propReviewBtn) els.propReviewBtn.disabled = blocked;
-      if (els.offerMenu) els.offerMenu.classList.toggle('is-disabled', blocked);
+      if (els.propApproveBtn) els.propApproveBtn.disabled = blocked || activePropState(conv).paymentStatus === 'approved';
+      if (els.propDeclineBtn) els.propDeclineBtn.disabled = blocked || activePropState(conv).paymentStatus === 'declined';
+      if (els.propReviewBtn) {
+        els.propReviewBtn.style.pointerEvents = blocked ? 'none' : '';
+        els.propReviewBtn.style.opacity = blocked ? '0.45' : '';
+      }
+
     }
 
     /* ---------------- INIT ---------------- */
@@ -1542,9 +1845,91 @@
     showChatEmpty();
     Accoom.initButtonAnimations();
 
-    // Auto-open the first conversation on desktop so the chat panel
-    // isn't blank on load (matches the reference screenshot).
-    if (window.innerWidth > 860 && state.conversations.length) {
+    // Coming back from a wallet deposit made mid-checkout: payment.js
+    // already covered and paid for the property, so land on that chat
+    // straight into the Approve/Decline state.
+    var justPaidId = new URLSearchParams(window.location.search).get('paid');
+    var justPaidConv = justPaidId ? state.conversations.filter(function (c) {
+      return String(c.property.id) === String(justPaidId);
+    })[0] : null;
+
+    // Coming back from payment.html's "Back to chat" / "Cancel" link
+    // without actually finishing the payment — just reopen the exact
+    // chat/property/agent, no paymentStatus change.
+    var reopenId = new URLSearchParams(window.location.search).get('open');
+    var reopenConv = reopenId ? state.conversations.filter(function (c) {
+      return c.property.id === reopenId;
+    })[0] : null;
+
+    // Coming from a property page's "Contact Agent" button: open (or
+    // create) the conversation for THAT exact property and agent.
+    var contactRequest = Accoom.getStorage('accoom-contact-request', null);
+
+    if (justPaidConv) {
+      getPropState(justPaidConv, justPaidId).paymentStatus = 'review';
+      upsertPurchaseRecord(justPaidConv, justPaidConv.property, 'upcoming');
+      openConversation(justPaidConv.id);
+      if (window.innerWidth <= 860) layout.setAttribute('data-view', 'chat');
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (reopenConv) {
+      openConversation(reopenConv.id);
+      if (window.innerWidth <= 860) layout.setAttribute('data-view', 'chat');
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (contactRequest && contactRequest.property && contactRequest.property.id) {
+      var reqProp = contactRequest.property;
+      var agentName = contactRequest.agentName || 'Agent';
+
+      var allProps = (contactRequest.agentProperties && contactRequest.agentProperties.length)
+        ? contactRequest.agentProperties
+        : getPropertiesForAgent(agentName, reqProp);
+
+      if (!allProps.some(function (p) { return String(p.id) === String(reqProp.id); })) {
+        allProps.unshift(reqProp);
+      }
+
+      // Match existing conversation by property id or agent name
+      var existingConv = state.conversations.filter(function (c) {
+        return (c.property && String(c.property.id) === String(reqProp.id)) ||
+               (c.name && c.name.toLowerCase() === agentName.toLowerCase());
+      })[0];
+
+      if (existingConv) {
+        existingConv.property = reqProp;
+        existingConv.allProperties = allProps;
+        if (contactRequest.agentAvatar) existingConv.avatar = contactRequest.agentAvatar;
+        if (contactRequest.verified !== undefined) existingConv.verified = !!contactRequest.verified;
+
+        // If it's a new contact request for this agent/property, ensure a clean new chat
+        existingConv.messages = [];
+
+        // Move to the top
+        state.conversations = [existingConv].concat(
+          state.conversations.filter(function (c) { return c.id !== existingConv.id; })
+        );
+      } else {
+        existingConv = {
+          id: 'conv-' + reqProp.id + '-' + Date.now().toString().slice(-4),
+          name: agentName,
+          role: 'Real Estate Agent',
+          avatar: contactRequest.agentAvatar || AVATAR,
+          online: contactRequest.online !== false,
+          verified: !!contactRequest.verified,
+          muted: false,
+          property: reqProp,
+          allProperties: allProps,
+          messages: []
+        };
+        state.conversations.unshift(existingConv);
+      }
+
+      saveConversations();
+      Accoom.removeStorage('accoom-contact-request');
+      renderList();
+      openConversation(existingConv.id);
+      layout.setAttribute('data-view', 'chat');
+    } else if (window.innerWidth > 860 && state.conversations.length) {
+      // Auto-open the first conversation on desktop so the chat panel
+      // isn't blank on load (matches the reference screenshot).
       openConversation(state.conversations[0].id);
     }
 

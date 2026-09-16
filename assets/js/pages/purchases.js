@@ -98,6 +98,14 @@
       { id: 'ACCOOM-2025-0001', name: 'Self-Contained Studio', location: 'Yaba, Lagos', dates: 'Jan 3 \u2013 Jan 6, 2025', guests: 1, amount: '\u20A675,000', image: 'assets/images/home-properties/selfcon1.png', status: 'completed' }
     ];
 
+    // Purchases logged from the chat's payment flow (contact-agent.js) —
+    // merge them ahead of the mock rows so a fresh approve/decline shows
+    // up at the top of "All" right away.
+    var LOGGED_PURCHASES = Accoom.getStorage('accoom-purchases-log', []);
+    if (Array.isArray(LOGGED_PURCHASES) && LOGGED_PURCHASES.length) {
+      MOCK_PURCHASES = LOGGED_PURCHASES.concat(MOCK_PURCHASES);
+    }
+
     var STATUS_LABEL = { upcoming: 'Upcoming', completed: 'Completed', cancelled: 'Cancelled' };
     var STATUS_CLASS = { upcoming: 'purchase-status--upcoming', completed: 'purchase-status--completed', cancelled: 'purchase-status--cancelled' };
     var PAGE_SIZE = 5;
@@ -156,6 +164,39 @@
       return article;
     }
 
+    // Builds a windowed page list: always pins the first 2 and last 2 pages,
+    // plus the current page and one neighbour on each side, and drops in
+    // '...' wherever a gap opens up. Slides as `current` moves so a middle
+    // page number only sticks around while it's actually a neighbour.
+    function numberRange(start, end) {
+      var out = [];
+      for (var i = start; i <= end; i++) out.push(i);
+      return out;
+    }
+
+    function getPageList(current, total) {
+      // Mobile has far less room, so it should start collapsing into "..."
+      // at a much lower page count than desktop does.
+      var isMobile = window.matchMedia('(max-width: 640px)').matches;
+      var boundary = isMobile ? 1 : 2;
+      var sibling = isMobile ? 0 : 1;
+
+      if (total <= boundary * 2 + sibling * 2 + 1) {
+        return numberRange(1, total);
+      }
+
+      var pages = numberRange(1, boundary);
+      var midStart = Math.max(boundary + 1, current - sibling);
+      var midEnd = Math.min(total - boundary, current + sibling);
+
+      if (midStart > boundary + 1) pages.push('...');
+      pages = pages.concat(numberRange(midStart, midEnd));
+      if (midEnd < total - boundary) pages.push('...');
+
+      pages = pages.concat(numberRange(total - boundary + 1, total));
+      return pages;
+    }
+
     function renderPagination(totalPages) {
       if (!paginationEl) return;
       if (totalPages <= 1) {
@@ -169,14 +210,23 @@
 
       if (pageNumbersEl) {
         pageNumbersEl.innerHTML = '';
-        for (var i = 1; i <= totalPages; i++) {
+        getPageList(state.page, totalPages).forEach(function (entry) {
+          if (entry === '...') {
+            var ellipsis = document.createElement('span');
+            ellipsis.className = 'purchases-page-ellipsis';
+            ellipsis.textContent = '...';
+            ellipsis.setAttribute('aria-hidden', 'true');
+            pageNumbersEl.appendChild(ellipsis);
+            return;
+          }
+
           var btn = document.createElement('button');
           btn.type = 'button';
-          btn.className = 'purchases-page-number' + (i === state.page ? ' is-active' : '');
-          btn.textContent = i;
-          btn.setAttribute('data-purchases-page-number', i);
+          btn.className = 'purchases-page-number' + (entry === state.page ? ' is-active' : '');
+          btn.textContent = entry;
+          btn.setAttribute('data-purchases-page-number', entry);
           pageNumbersEl.appendChild(btn);
-        }
+        });
       }
     }
 
@@ -276,6 +326,19 @@
     updateCounts();
     render();
     if (tabsEl) moveIndicator(tabsEl.querySelector('.is-active'));
+
+    // Re-run pagination if the viewport crosses the mobile breakpoint
+    // (rotating the phone, resizing a browser window), so the button
+    // count/ellipses update without needing another page click.
+    var mobileBreakpoint = window.matchMedia('(max-width: 640px)');
+    var wasMobile = mobileBreakpoint.matches;
+    window.addEventListener('resize', function () {
+      var isMobileNow = mobileBreakpoint.matches;
+      if (isMobileNow !== wasMobile) {
+        wasMobile = isMobileNow;
+        render();
+      }
+    });
 
   });
 

@@ -243,9 +243,30 @@
     })();
 
     // ============================================================
-    // CONTACT AGENT — link already points to contact-agent.html,
-    // nothing to intercept.
+    // CONTACT AGENT — carry this exact agent + property into
+    // contact-agent.html instead of leaving it a dead link.
     // ============================================================
+    (function initContact() {
+      var contactBtn = document.querySelector('[data-ap-contact]');
+      if (!contactBtn) return;
+
+      Accoom.on(contactBtn, 'click', function (e) {
+        e.preventDefault();
+        Accoom.setStorage('accoom-contact-request', {
+          agentName: agent.name,
+          agentAvatar: agent.avatar,
+          verified: agent.verified,
+          property: {
+            id: agent.property.id,
+            name: agent.property.name,
+            location: agent.property.location || '',
+            price: agent.property.price || '',
+            image: agent.property.image || ''
+          }
+        });
+        window.location.href = 'contact-agent.html';
+      });
+    })();
 
     console.log('ACCOOM agent profile page initialized');
   });

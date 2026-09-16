@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Setup — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark' || t === null) document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+
+  <!--
+    SECURITY GATE — see assets/js/pages/agent-details.js for the full note.
+    Same soft, client-side-only caveat as onboarding.html applies here.
+  -->
+  <script>
+    (function () {
+      try {
+        var user = JSON.parse(localStorage.getItem('accoom-user'));
+        if (!user || !user.email) {
+          window.location.replace('auth.html');
+          return;
+        }
+        if (!user.role) {
+          window.location.replace('onboarding.html');
+          return;
+        }
+        if (user.role === 'customer') {
+          window.location.replace('home.html');
+          return;
+        }
+      } catch (e) {
+        window.location.replace('auth.html');
+      }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/agent-details.css" />
+</head>
+<body>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================= -->
+<div class="partial-mount" data-partial="partials/header.html"></div>
+
+  <!-- =========================================================
+       AGENT DETAILS
+  ========================================================= -->
+  <main class="ad-page">
+
+    <section class="ad-hero">
+      <div class="ad-hero-bg">
+        <div class="ad-hero-bg-track">
+          <img src="assets/images/home-images/home-hero.png" alt="" />
+          <img src="assets/images/home-images/home-hero2.png" alt="" />
+          <img src="assets/images/home-images/home-hero3.png" alt="" />
+          <img src="assets/images/home-images/home-hero4.png" alt="" />
+          <img src="assets/images/home-images/home-hero5.png" alt="" />
+        </div>
+      </div>
+      <div class="ad-hero-overlay"></div>
+      <div class="container ad-hero-inner">
+        <span class="ad-eyebrow">Agent Setup</span>
+        <h1 class="ad-hero-title">Complete Your <br /><span class="ad-hero-title-accent">Agent Profile</span></h1>
+        <p class="text-body ad-hero-sub">Help guests trust you and make it easier to manage your listings.<br />Fill in your details below to get started.</p>
+
+      </div>
+    </section>
+
+    <div class="container ad-layout">
+
+      <form class="ad-form" data-agent-details-form novalidate>
+
+        <!-- PROFILE PHOTO -->
+        <section class="ad-section ad-photo-section">
+          <input type="file" accept="image/png, image/jpeg" data-agent-photo-input hidden />
+          <div class="ad-photo-frame">
+            <img data-agent-photo-preview hidden alt="" />
+            <svg data-agent-photo-placeholder width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+          </div>
+          <div>
+            <p class="ad-photo-title">Profile photo <span class="ad-required">*</span></p>
+            <p class="ad-section-desc">A clear photo of your face helps guests recognise and trust you.</p>
+            <button type="button" class="btn btn--ghost ad-photo-upload-btn" data-agent-photo-trigger>Upload photo</button>
+          </div>
+        </section>
+
+        <!-- PERSONAL INFORMATION -->
+        <section class="ad-section">
+          <div class="ad-section-head">
+            <span class="ad-section-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </span>
+            <div>
+              <h2 class="ad-section-title">Personal Information</h2>
+              <p class="ad-section-desc">Tell us about yourself. This helps guests know who they're booking with.</p>
+            </div>
+          </div>
+
+          <div class="ad-field-row">
+            <div class="ad-field">
+              <label for="ad-name">Full name <span class="ad-required">*</span></label>
+              <input class="input" type="text" id="ad-name" data-field="name" data-preview="name" autocomplete="name" placeholder="Enter your full name" required />
+            </div>
+            <div class="ad-field">
+              <label for="ad-nin">NIN (National Identification Number) <span class="ad-required">*</span></label>
+              <div class="ad-nin-row">
+                <input class="input" type="text" id="ad-nin" data-field="nin" inputmode="numeric" pattern="\d{11}" maxlength="11" autocomplete="off" placeholder="Enter your 11-digit NIN" required />
+                <button type="button" class="btn btn--ghost ad-nin-verify" data-nin-verify>Verify</button>
+              </div>
+              <small class="ad-hint" data-nin-status></small>
+            </div>
+          </div>
+
+
+        </section>
+
+        <!-- CONTACT INFORMATION -->
+        <section class="ad-section">
+          <div class="ad-section-head">
+            <span class="ad-section-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92z"></path></svg>
+            </span>
+            <div>
+              <h2 class="ad-section-title">Contact Information</h2>
+              <p class="ad-section-desc">Make it easy for guests and our team to reach you.</p>
+            </div>
+          </div>
+
+          <div class="ad-field-row">
+            <div class="ad-field">
+              <label for="ad-email">Email address <span class="ad-required">*</span></label>
+              <input class="input" type="email" id="ad-email" data-field="email" autocomplete="email" placeholder="you@example.com" required />
+            </div>
+            <div class="ad-field">
+              <label for="ad-phone">Phone number <span class="ad-required">*</span></label>
+              <input class="input" type="tel" id="ad-phone" data-field="phone" autocomplete="tel" placeholder="+234 801 234 5678" required />
+            </div>
+          </div>
+
+
+        </section>
+
+        <!-- BUSINESS / AGENCY DETAILS -->
+        <section class="ad-section">
+          <div class="ad-section-head">
+            <span class="ad-section-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            </span>
+            <div>
+              <h2 class="ad-section-title">Business / Agency Details</h2>
+              <p class="ad-section-desc">Tell us about your agency or business (if applicable).</p>
+            </div>
+          </div>
+
+          <div class="ad-field-row">
+            <div class="ad-field">
+              <label for="ad-business">Agency / Company name <span class="ad-required">*</span></label>
+              <input class="input" type="text" id="ad-business" data-field="businessName" data-preview="business" autocomplete="organization" placeholder="e.g. Fortune Realty Ltd" required />
+            </div>
+            <div class="ad-field">
+              <label for="ad-business-type">Business type <span class="ad-required">*</span></label>
+              <div class="dropdown" id="ad-business-type">
+                <button type="button" class="input select-dropdown-trigger dropdown-trigger" aria-haspopup="listbox" aria-expanded="false" data-placeholder="true">
+                  <span data-dropdown-label data-placeholder-text="Select business type">Select business type</span>
+                  <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="dropdown-panel" data-dropdown-panel>
+                  <li role="option" data-value="landlord">Individual Landlord</li>
+                  <li role="option" data-value="manager">Property Manager</li>
+                  <li role="option" data-value="agency">Real Estate Agency</li>
+                  <li role="option" data-value="agent">Agent</li>
+                </ul>
+                <input type="hidden" data-field="agentType" required />
+              </div>
+            </div>
+          </div>
+
+          <div class="ad-field-row">
+            <div class="ad-field">
+              <label for="ad-reg-number">Business registration number <span class="ad-optional">(optional)</span></label>
+              <input class="input" type="text" id="ad-reg-number" data-field="businessRegNumber" placeholder="e.g. RC 1234567" />
+            </div>
+            <div class="ad-field">
+              <label for="ad-website">Website <span class="ad-optional">(optional)</span></label>
+              <input class="input" type="url" id="ad-website" data-field="website" placeholder="https://yourwebsite.com" />
+            </div>
+          </div>
+        </section>
+
+        <!-- ADDRESS & LOCATION -->
+        <section class="ad-section">
+          <div class="ad-section-head">
+            <span class="ad-section-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </span>
+            <div>
+              <h2 class="ad-section-title">Address & Location</h2>
+              <p class="ad-section-desc">Let guests know where you are based.</p>
+            </div>
+          </div>
+
+          <div class="ad-field">
+            <label for="ad-office-address">Office address <span class="ad-required">*</span></label>
+            <input class="input" type="text" id="ad-office-address" data-field="officeAddress" placeholder="Enter your office address" required />
+          </div>
+
+          <div class="ad-field-row ad-field-row--3">
+            <div class="ad-field">
+              <label for="ad-city">City <span class="ad-required">*</span></label>
+              <input class="input" type="text" id="ad-city" data-field="city" data-preview="city" placeholder="e.g. Lagos" required />
+            </div>
+            <div class="ad-field ad-field--wide">
+              <label for="ad-state">State <span class="ad-required">*</span></label>
+              <div class="dropdown" id="ad-state">
+                <button type="button" class="input select-dropdown-trigger dropdown-trigger" aria-haspopup="listbox" aria-expanded="false" data-placeholder="true">
+                  <span data-dropdown-label data-placeholder-text="Select state">Select state</span>
+                  <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="dropdown-panel select-dropdown-panel" data-dropdown-panel>
+                  <div class="select-dropdown-search">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.6" y2="16.6"></line></svg>
+                    <input type="text" data-dropdown-search placeholder="Search state..." />
+                  </div>
+                  <ul class="dropdown-options" data-dropdown-options><!-- populated from assets/js/data/locations.js --></ul>
+                  <p class="select-dropdown-empty" data-dropdown-empty hidden>No states match your search.</p>
+                </div>
+                <input type="hidden" data-field="state" data-preview="state" required />
+              </div>
+            </div>
+            <div class="ad-field">
+              <label for="ad-country">Country <span class="ad-required">*</span></label>
+              <input class="input" type="text" id="ad-country" value="Nigeria" data-field="country" readonly />
+            </div>
+          </div>
+        </section>
+
+        <!-- PROFESSIONAL INFORMATION -->
+        <section class="ad-section">
+          <div class="ad-section-head">
+            <span class="ad-section-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8M12 17v4"></path></svg>
+            </span>
+            <div>
+              <h2 class="ad-section-title">Professional Information</h2>
+              <p class="ad-section-desc">Add a few more details about your experience and expertise.</p>
+            </div>
+          </div>
+
+          <div class="ad-field-row">
+            <div class="ad-field">
+              <label for="ad-experience">Years of experience <span class="ad-required">*</span></label>
+              <div class="dropdown" id="ad-experience">
+                <button type="button" class="input select-dropdown-trigger dropdown-trigger" aria-haspopup="listbox" aria-expanded="false" data-placeholder="true">
+                  <span data-dropdown-label data-placeholder-text="Select experience range">Select experience range</span>
+                  <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <ul class="dropdown-panel" data-dropdown-panel>
+                  <li role="option" data-value="Less than 1 year">Less than 1 year</li>
+                  <li role="option" data-value="1–2 years">1–2 years</li>
+                  <li role="option" data-value="3–5 years">3–5 years</li>
+                  <li role="option" data-value="6–10 years">6–10 years</li>
+                  <li role="option" data-value="10+ years">10+ years</li>
+                </ul>
+                <input type="hidden" data-field="yearsExperience" data-preview="experience" required />
+              </div>
+            </div>
+            <div class="ad-field">
+              <label for="ad-languages">Languages spoken <span class="ad-required">*</span></label>
+              <div class="dropdown" id="ad-languages" data-dropdown-multiple>
+                <button type="button" class="input select-dropdown-trigger dropdown-trigger" aria-haspopup="listbox" aria-expanded="false" data-placeholder="true">
+                  <span data-dropdown-label data-placeholder-text="Select languages">Select languages</span>
+                  <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="dropdown-panel select-dropdown-panel" data-dropdown-panel>
+                  <div class="select-dropdown-search">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.6" y2="16.6"></line></svg>
+                    <input type="text" data-dropdown-search placeholder="Search language..." />
+                  </div>
+                  <ul class="dropdown-options" data-dropdown-options><!-- populated from assets/js/data/languages.js --></ul>
+                  <p class="select-dropdown-empty" data-dropdown-empty hidden>No languages match your search.</p>
+                </div>
+                <input type="hidden" data-field="languages" data-preview="languages" required />
+              </div>
+              <small class="ad-hint">Common languages are shown first; pick as many as apply.</small>
+            </div>
+          </div>
+
+          <div class="ad-field">
+            <label for="ad-about">About you <span class="ad-required">*</span></label>
+            <textarea class="input ad-textarea" id="ad-about" data-field="about" rows="4" placeholder="Tell guests a little about yourself, your experience and what makes you unique…" required></textarea>
+          </div>
+        </section>
+
+        <p class="ad-error" data-agent-details-error hidden></p>
+
+        <label class="ad-confirm">
+          <input type="checkbox" data-agent-details-confirm required />
+          I confirm that all the information provided is true and accurate.
+        </label>
+
+        <div class="ad-actions">
+          <button type="submit" class="btn btn--primary ad-submit" data-agent-details-submit>
+            Save & Continue
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+  ============================================================= -->
+<div data-partial="partials/footer.html"></div>
+
+  <!-- =========================================================
+       SCRIPTS
+  ========================================================= -->
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+<script src="assets/js/core/storage.js"></script>
+<script src="assets/js/core/wallet.js"></script>
+  <script src="assets/js/core/skeleton.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/data/notifications.js"></script>
+  <script src="assets/js/data/locations.js"></script>
+  <script src="assets/js/data/languages.js"></script>
+
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+
+  <script src="assets/js/animations/hero.js"></script>
+
+  <script>Accoom.loadPartials();</script>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/agent-details.js"></script>
+</body>
+</html>
