@@ -77,3 +77,14 @@ html.dark-mode {
   --on-page-soft: var(--ink-on-dark-soft);
   --line-page: var(--line-dark);
 }
+
+/* Instant theme switch — every transition is killed for one frame
+   while the dark-mode class flips, so the whole UI snaps to the new
+   theme at once instead of dozens of elements cross-fading on their
+   own separate timers. */
+.theme-switching,
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}

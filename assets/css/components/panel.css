@@ -40,6 +40,10 @@
   box-shadow: -4px 0 30px rgba(0, 0, 0, 0.3);
 }
 
+html.dark-mode .side-panel {
+  background: var(--surface-page-alt);
+}
+
 .side-panel.is-open {
   transform: translateX(0);
 }

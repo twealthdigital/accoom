@@ -556,6 +556,10 @@ function cardTemplate(item) {
                   levelDotsTemplate(parseInt(item.agent.level.replace('AL', ''), 10)) +
                   item.agent.level +
                 '</span>' +
+                '<button type="button" class="listing-view-btn" data-view-listing>' +
+                  '<span>View</span>' +
+                  '<svg class="listing-view-btn-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>' +
+                '</button>' +
               '</div>' +
             '</div>' +
           '</article>'
@@ -1129,11 +1133,13 @@ Accoom.$$('.media-dot', mediaEl).forEach(function (d, i) {
         setActiveSlide(mediaEl, (current + 1) % slides.length);
       });
 
-      // Open the property detail page when a card is clicked
-      // (ignore clicks on the save/share buttons and media nav/dots)
-Accoom.delegate(listingsGrid, 'click', '.listing-card', function (e) {
-        if (e.target.closest('button')) return;
-        var id = this.getAttribute('data-listing-id');
+      // Open the property detail page — only via the dedicated View
+      // button now. Clicking the card or its photo no longer navigates.
+Accoom.delegate(listingsGrid, 'click', '[data-view-listing]', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var card = this.closest('.listing-card');
+        var id = card.getAttribute('data-listing-id');
         var item = PropertyService.getById(id);
         if (item) {
           if (item.agent && !item.agent.avatar) {
@@ -1141,7 +1147,7 @@ Accoom.delegate(listingsGrid, 'click', '.listing-card', function (e) {
           }
           Accoom.setStorage('accoom-active-listing', item);
         }
-        var nameEl = this.querySelector('.listing-name');
+        var nameEl = card.querySelector('.listing-name');
         var url = 'property.html?id=' + encodeURIComponent(id) +
           (nameEl ? '&name=' + encodeURIComponent(nameEl.textContent.trim()) : '');
         window.location.href = url;
@@ -1206,13 +1212,16 @@ Accoom.delegate(listingsGrid, 'click', '.listing-card', function (e) {
         var agentNameEl = card.querySelector('.suggested-agent-name');
         var avatarEl = card.querySelector('.suggested-agent-avatar');
         var verified = !!card.querySelector('.suggested-verified-badge');
+        var propertyImages = imgEl
+          ? [imgEl.getAttribute('src'), imgEl.getAttribute('data-image-2'), imgEl.getAttribute('data-image-3')].filter(Boolean)
+          : [];
 
         Accoom.setStorage('accoom-active-listing', {
           id: id,
           name: name,
           price: priceEl ? parseInt(priceEl.textContent.replace(/[^\d]/g, ''), 10) : 0,
           location: locationEl ? locationEl.textContent.replace(/\s+/g, ' ').trim() : '',
-          images: imgEl ? [imgEl.getAttribute('src')] : [],
+          images: propertyImages,
           video: null,
           agent: {
             name: (agentNameEl && agentNameEl.childNodes[0]) ? agentNameEl.childNodes[0].nodeValue.trim() : 'David O.',

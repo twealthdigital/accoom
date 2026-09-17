@@ -38,6 +38,52 @@ window.Accoom = window.Accoom || {};
       return panelEl.classList.contains(openClass);
     }
 
+    // Swipe-to-close (touch) — waits until the gesture clearly commits
+    // to an axis before doing anything, so it never fights the panel's
+    // own vertical scroll (.panel-scroll).
+    (function initSwipeToClose() {
+      var startX = 0, startY = 0, currentX = 0, dragging = null, panelWidth = 0;
+
+      Accoom.on(panelEl, 'touchstart', function (e) {
+        if (!isOpen()) return;
+        var t = e.touches[0];
+        startX = currentX = t.clientX;
+        startY = t.clientY;
+        dragging = null;
+        panelWidth = panelEl.offsetWidth;
+        panelEl.style.transition = 'none';
+      }, { passive: true });
+
+      Accoom.on(panelEl, 'touchmove', function (e) {
+        if (!isOpen()) return;
+        var t = e.touches[0];
+        var dx = t.clientX - startX;
+        var dy = t.clientY - startY;
+
+        if (dragging === null) {
+          if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+          dragging = Math.abs(dx) > Math.abs(dy) && dx > 0;
+          if (!dragging) return;
+        }
+        if (!dragging) return;
+
+        e.preventDefault();
+        currentX = t.clientX;
+        panelEl.style.transform = 'translateX(' + Math.max(0, dx) + 'px)';
+      }, { passive: false });
+
+      Accoom.on(panelEl, 'touchend', function () {
+        if (!isOpen()) return;
+        panelEl.style.transition = '';
+        panelEl.style.transform = '';
+
+        if (dragging && (currentX - startX) > panelWidth * 0.3) {
+          close();
+        }
+        dragging = null;
+      });
+    })();
+
     // Open trigger - FIXED to prevent multiple bindings
     Accoom.on(triggerEl, 'click', function (e) {
       e.preventDefault();

@@ -534,6 +534,12 @@
       items.forEach(function (conv) {
         var msg = lastMessage(conv);
         var unread = unreadCount(conv);
+        var preview = '';
+        if (conv.draft) {
+          preview = '<span style="color: #e5484d; font-weight: 600;">Draft:</span> ' + conv.draft;
+        } else {
+          preview = previewText(msg);
+        }
         void 0; // placeholder, spawnRipple defined below renderList
 
         var li = document.createElement('li');
@@ -556,7 +562,7 @@
               '<span class="msgs-list-item-time">' + (msg ? msg.time : '') + '</span>' +
             '</span>' +
             '<span class="msgs-list-item-bottom">' +
-              '<span class="msgs-list-item-preview">' + previewText(msg) + '</span>' +
+              '<span class="msgs-list-item-preview">' + preview + '</span>' +
               (unread ? '<span class="msgs-list-item-badge">' + unread + '</span>' : '') +
             '</span>' +
           '</span>' +
@@ -796,6 +802,11 @@
     }
 
     function openConversation(id) {
+      if (state.activeId && els.input) {
+        var currentConv = findConv(state.activeId);
+        if (currentConv) currentConv.draft = els.input.value;
+      }
+
       var conv = findConv(id);
       if (!conv) return;
 
@@ -824,6 +835,7 @@
       state.replyTo = null;
       state.msgSelectMode = false;
       state.msgSelected = {};
+      if (els.input) els.input.value = conv.draft || '';
       updateMsgSelectionBar();
 
       // Stay on the Unread tab after reading it — it keeps showing until
@@ -1371,6 +1383,26 @@
 
     /* ---------------- COMPOSER ---------------- */
     if (els.composer) {
+      if (els.input) {
+        Accoom.on(els.input, 'input', function () {
+          var conv = findConv(state.activeId);
+          if (conv) {
+            conv.draft = els.input.value;
+            renderList();
+          }
+        });
+        Accoom.on(els.input, 'keydown', function(e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (els.send) {
+              els.send.click();
+            } else {
+              els.composer.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            }
+          }
+        });
+      }
+
       Accoom.on(els.composer, 'submit', function (e) {
         e.preventDefault();
         var conv = findConv(state.activeId);
@@ -1390,21 +1422,17 @@
         if (state.replyTo) {
           msg.replyTo = state.replyTo;
         }
-
-    els.tabs.forEach(function (tab) {
-      Accoom.on(tab, 'click', function () {
-       var key = tab.getAttribute('data-msgs-tab');
-        state.listTab = key;
-        state.keepUnreadId = null;
-        setActiveTabUI(key);
-        updateMoveSavedLabel();
-
-        // Switching to Unread/Saved only filters the LEFT list — the open
-        // conversation on the right stays exactly as it is. It only
-        // changes when the person actually clicks a different conversation.
+        
+        conv.messages.push(msg);
+        els.input.value = '';
+        conv.draft = '';
+        hideReplyPreview();
+        
+        renderThread(conv);
         renderList();
-      });
-    });
+        saveConversations();
+        
+        if (els.thread) els.thread.scrollTop = els.thread.scrollHeight;
 
         // Simulate the agent reading + replying, like the reference chat.
         setTimeout(function () {

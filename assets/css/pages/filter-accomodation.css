@@ -92,3 +92,10 @@
   .filter-form-actions .btn { width: 100%; }
 }
 @media (max-width: 380px) { .filter-option-grid { grid-template-columns: 1fr; } }
+
+/* Dark mode — give the filter panel the same elevated surface as the cards */
+html.dark-mode .filter-form-panel,
+html.dark-mode .filter-summary {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.07);
+}

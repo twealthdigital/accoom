@@ -165,7 +165,52 @@
     };
 
     function getOrder(id, cb) {
-      cb(MOCK_ORDER_DETAILS[id] || null);
+      if (MOCK_ORDER_DETAILS[id]) {
+        cb(MOCK_ORDER_DETAILS[id]);
+        return;
+      }
+      
+      var MOCK_PURCHASES_FALLBACK = [
+        { id: 'ACCOOM-2025-0008', name: '2 Bedroom Apartment', location: 'Lekki Phase 1, Lagos', dates: 'Aug 20 \u2013 Aug 25, 2025', guests: 2, amount: '\u20A6250,000', image: 'assets/images/home-properties/miniflat.png', status: 'upcoming' },
+        { id: 'ACCOOM-2025-0007', name: 'Modern Detached Duplex', location: 'Ikoyi, Lagos', dates: 'Jul 10 \u2013 Jul 15, 2025', guests: 4, amount: '\u20A6450,000', image: 'assets/images/home-properties/hall2.png', status: 'completed' },
+        { id: 'ACCOOM-2025-0006', name: '1 Bedroom Apartment', location: 'Victoria Island, Lagos', dates: 'Jun 25 \u2013 Jun 28, 2025', guests: 1, amount: '\u20A6120,000', image: 'assets/images/home-properties/bedroomflat3.png', status: 'completed' },
+        { id: 'ACCOOM-2025-0005', name: 'Self-Contained Studio', location: 'Yaba, Lagos', dates: 'May 15 \u2013 May 18, 2025', guests: 1, amount: '\u20A680,000', image: 'assets/images/home-properties/selfcon1.png', status: 'cancelled' },
+        { id: 'ACCOOM-2025-0004', name: '3 Bedroom Apartment', location: 'Lekki Phase 1, Lagos', dates: 'Apr 10 \u2013 Apr 15, 2025', guests: 3, amount: '\u20A6350,000', image: 'assets/images/home-properties/miniflat1.png', status: 'completed' },
+        { id: 'ACCOOM-2025-0003', name: 'Mini Flat', location: 'Surulere, Lagos', dates: 'Mar 5 \u2013 Mar 8, 2025', guests: 2, amount: '\u20A6180,000', image: 'assets/images/home-properties/miniflat.png', status: 'completed' },
+        { id: 'ACCOOM-2025-0002', name: '4 Bedroom Detached Duplex', location: 'Ajah, Lagos', dates: 'Feb 12 \u2013 Feb 17, 2025', guests: 5, amount: '\u20A6460,000', image: 'assets/images/home-properties/hall2.png', status: 'completed' },
+        { id: 'ACCOOM-2025-0001', name: 'Self-Contained Studio', location: 'Yaba, Lagos', dates: 'Jan 3 \u2013 Jan 6, 2025', guests: 1, amount: '\u20A675,000', image: 'assets/images/home-properties/selfcon1.png', status: 'completed' }
+      ];
+
+      var log = Accoom.getStorage('accoom-purchases-log', []);
+      var allPurchases = log.concat(MOCK_PURCHASES_FALLBACK);
+      
+      var found = allPurchases.filter(function(r) { return r.id === id; })[0];
+      
+      if (found) {
+        var parts = (found.dates || '').split(' \u2013 ');
+        var checkIn = parts[0] || 'TBD';
+        var checkOut = parts[1] || 'TBD';
+        cb({
+          id: found.id,
+          name: found.name,
+          location: found.location,
+          image: found.image,
+          status: found.status,
+          guests: found.guests || 1,
+          checkIn: checkIn,
+          checkOut: checkOut,
+          bookingDate: checkIn + ' \u00B7 10:00 AM',
+          totalAmount: found.amount,
+          propertyPrice: found.amount,
+          serviceFee: '\u20A60',
+          paymentMethod: 'Card',
+          timeline: [
+            { title: 'Purchase Confirmed', desc: 'Your purchase has been confirmed.', date: checkIn, state: 'done' }
+          ]
+        });
+      } else {
+        cb(null);
+      }
     }
 
     function renderTimeline(steps) {

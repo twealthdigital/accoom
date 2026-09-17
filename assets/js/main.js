@@ -298,6 +298,18 @@ window.Accoom = window.Accoom || {};
       Accoom.initThemeToggle(themeToggles);
     }
 
+    // Account sidebar — clear the "last active section" memory the
+    // instant any link back to Overview is clicked, from ANY account
+    // page (My Purchases, Saved Properties, Account Settings, the
+    // mobile back arrow, etc). Without this, profile.js reads the
+    // stale value on load and re-highlights whichever tab you came
+    // from instead of Overview, until you click Overview a second time.
+    Accoom.on(document, 'click', function (e) {
+      var link = e.target.closest('a[href="profile.html"]');
+      if (!link) return;
+      try { sessionStorage.setItem('accoom-last-account-section', 'profile'); } catch (err) {}
+    });
+
     // Initialize off-canvas panel (site-wide)
     var hamburgerBtn = document.querySelector('[data-panel-open]');
     var panelCloseBtn = document.querySelector('[data-panel-close]');

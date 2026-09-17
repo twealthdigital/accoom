@@ -20,7 +20,10 @@ window.Accoom = window.Accoom || {};
 
     function apply(theme) {
       var isDark = theme === 'dark';
-      document.documentElement.classList.toggle(themeClass, isDark);
+      var root = document.documentElement;
+
+      root.classList.add('theme-switching');
+      root.classList.toggle(themeClass, isDark);
       els.forEach(function (el) {
         if (el.type === 'checkbox') {
           el.checked = isDark;
@@ -29,6 +32,14 @@ window.Accoom = window.Accoom || {};
         }
       });
       Accoom.dispatch(document, 'theme:change', { theme: theme });
+
+      // Let the instant flip actually paint, then hand transitions
+      // back so hovers, button ripples, etc. keep animating normally.
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          root.classList.remove('theme-switching');
+        });
+      });
     }
 
     function toggle() {

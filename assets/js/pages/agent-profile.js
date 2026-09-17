@@ -185,6 +185,8 @@
       document.body.appendChild(modal);
 
       var closeBtn = modal.querySelector('[data-share-close]');
+      var modalTitle = modal.querySelector('.share-modal-title');
+      var modalSubtitle = modal.querySelector('.share-modal-subtitle');
       var previewImg = modal.querySelector('[data-share-preview-img]');
       var previewName = modal.querySelector('[data-share-preview-name]');
       var previewMeta = modal.querySelector('[data-share-preview-meta]');
@@ -192,15 +194,19 @@
       var copyBtn = modal.querySelector('[data-share-copy]');
       var copyLabel = modal.querySelector('[data-share-copy-label]');
 
-      function openModal() {
-        previewImg.src = agent.avatar;
-        previewName.textContent = agent.name;
-        previewMeta.textContent = agent.stats;
+      function openModal(subject) {
+        subject = subject || { img: agent.avatar, name: agent.name, meta: agent.stats, url: window.location.href };
 
-        var shareUrl = window.location.href;
+        modalTitle.textContent = subject.title || 'Share this agent';
+        modalSubtitle.textContent = subject.subtitle || 'Send this profile to someone who needs an agent.';
+        previewImg.src = subject.img;
+        previewName.textContent = subject.name;
+        previewMeta.textContent = subject.meta;
+
+        var shareUrl = subject.url;
         linkInput.value = shareUrl;
 
-        var shareText = encodeURIComponent(agent.name + ' \u2014 ACCOOM Agent \u00B7 ' + agent.stats);
+        var shareText = encodeURIComponent(subject.name + ' \u2014 ACCOOM \u00B7 ' + subject.meta);
         var encodedUrl = encodeURIComponent(shareUrl);
 
         modal.querySelector('[data-share-whatsapp]').href = 'https://wa.me/?text=' + shareText + '%20' + encodedUrl;
@@ -221,6 +227,32 @@
       Accoom.on(trigger, 'click', function (e) {
         e.preventDefault();
         openModal();
+      });
+
+      // Per-property share buttons on the Available Properties cards
+      document.querySelectorAll('.ap-card-share-btn').forEach(function (btn) {
+        Accoom.on(btn, 'click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          var card = btn.closest('.ap-listing-card');
+          if (!card) return;
+
+          var img = card.querySelector('img');
+          var name = card.querySelector('.listing-name');
+          var price = card.querySelector('.listing-price');
+          var location = card.querySelector('.listing-location');
+          var link = card.querySelector('a.ap-card-link');
+
+          openModal({
+            img: img ? img.src : '',
+            name: name ? name.textContent.trim() : 'Property on ACCOOM',
+            meta: (price ? price.textContent.trim() : '') + (location ? ' \u00B7 ' + location.textContent.trim() : ''),
+            url: link ? new URL(link.getAttribute('href'), window.location.href).href : window.location.href,
+            title: 'Share this property',
+            subtitle: 'Send this listing to someone looking for a home.'
+          });
+        });
       });
 
       Accoom.on(closeBtn, 'click', closeModal);
@@ -272,3 +304,5 @@
   });
 
 })(window.Accoom);
+
+

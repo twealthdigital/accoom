@@ -439,7 +439,9 @@ html.dark-mode .pd-card {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(223, 150, 46, 0.5);
+  backdrop-filter: blur(4px);
   color: #fff;
   transition: background var(--dur-fast) var(--ease),
               color var(--dur-fast) var(--ease);
@@ -452,20 +454,24 @@ html.dark-mode .pd-card {
 }
 
 .pd-lightbox-close {
-  top: -52px;
-  right: 0;
+  top: 14px;
+  right: 14px;
+  z-index: 6;
 }
 
-.pd-lightbox-prev { left: -14px; top: 50%; transform: translate(-100%, -50%); }
-.pd-lightbox-next { right: -14px; top: 50%; transform: translate(100%, -50%); }
+.pd-lightbox-prev { left: 14px; top: 50%; transform: translateY(-50%); z-index: 6; }
+.pd-lightbox-next { right: 14px; top: 50%; transform: translateY(-50%); z-index: 6; }
 
 .pd-lightbox-counter {
   position: absolute;
-  bottom: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 0.82rem;
+  top: 14px;
+  left: 14px;
+  z-index: 6;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(0, 0, 0, 0.55);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.78rem;
   font-weight: 600;
 }
 
@@ -527,10 +533,6 @@ html.dark-mode .pd-card {
   }
 }
 
-@media (max-width: 600px) {
-  .pd-lightbox-prev { left: 6px; transform: translateY(-50%); }
-  .pd-lightbox-next { right: 6px; transform: translateY(-50%); }
-}
 
 /* ============================================================
    SIDEBAR — TITLE / PRICE CARD

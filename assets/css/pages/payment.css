@@ -409,10 +409,12 @@ body > .payment-success-overlay.is-open {
 
 .payment-processing-spinner {
   display: none;
+  position: absolute;
+  inset: 0;
+  margin: auto;
   width: 34px;
   height: 34px;
-  margin: 0 auto;
-  border: 3px solid var(--line-page);
+  border: 3px solid rgba(255,255,255,0.15);
   border-top-color: var(--gold);
   border-radius: 50%;
   animation: payment-spinner 800ms linear infinite;
@@ -452,6 +454,7 @@ body > .payment-success-overlay.is-open {
 }
 
 .payment-success-icon {
+  position: relative;
   display: grid;
   width: 76px;
   height: 76px;

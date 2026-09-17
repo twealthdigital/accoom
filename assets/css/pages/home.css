@@ -1450,8 +1450,50 @@ html.dark-mode .listing-card {
 
 .listing-agent-level-row {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
   margin-top: 4px;
+}
+
+.listing-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--gold);
+  background: var(--gold);
+  color: var(--navy-2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+              color var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+}
+
+.listing-view-btn:hover {
+  background: transparent;
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.listing-view-btn-icon {
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.listing-view-btn:hover .listing-view-btn-icon {
+  animation: btnIconSlideBounce 0.7s ease-out;
+}
+
+.listing-view-btn span {
+  transition: letter-spacing var(--dur-med) var(--ease);
+}
+
+.listing-view-btn:hover span {
+  letter-spacing: 0.5px;
 }
 
 .listing-agent-level {
@@ -1552,14 +1594,21 @@ html.dark-mode .listing-card {
   cursor: not-allowed;
 }
 
-/* Tablet: 4 columns */
+/* Large phone / small tablet: 2 columns */
+@media (min-width: 576px) and (max-width: 767px) {
+  .listings-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet: 3 columns */
 @media (min-width: 768px) and (max-width: 991px) {
   .listings-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* Desktop: 5 columns */
+/* Desktop: 4 columns */
 @media (min-width: 992px) {
   .listings-grid {
     grid-template-columns: repeat(4, 1fr);

@@ -927,7 +927,7 @@ html:not(.dark-mode) .balance-toggle {
 }
 
 .notif-list::-webkit-scrollbar {
-  width: 5px;
+  width: 4px;
 }
 
 .notif-list::-webkit-scrollbar-track {
@@ -935,12 +935,12 @@ html:not(.dark-mode) .balance-toggle {
 }
 
 .notif-list::-webkit-scrollbar-thumb {
-  background: var(--gold-soft);
+  background: color-mix(in srgb, var(--on-page-soft) 35%, transparent);
   border-radius: var(--radius-pill);
 }
 
 .notif-list::-webkit-scrollbar-thumb:hover {
-  background: var(--gold);
+  background: color-mix(in srgb, var(--on-page-soft) 55%, transparent);
 }
 
 .notif-list::-webkit-scrollbar-button {
