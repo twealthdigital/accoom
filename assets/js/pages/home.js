@@ -588,13 +588,21 @@ function loadPage(page) {
         var perPage = getPerPage();
         Accoom.showSkeleton(listingsGrid, 'listingCard', perPage);
         PropertyService.fetchPage(page, perPage, currentSort, currentFilters).then(function (res) {
-          var totalPages = Math.max(1, Math.ceil(res.total / perPage));
-          currentPage = Math.min(page, totalPages);
-          renderGrid(res.items);
-          renderPagination(currentPage, totalPages);
-          if (resultsCountEl) {
-            resultsCountEl.textContent = res.total + (res.total === 1 ? ' property found' : ' properties found');
-          }
+          Accoom.hideSkeleton(listingsGrid, function () {
+            var totalPages = Math.max(1, Math.ceil(res.total / perPage));
+            currentPage = Math.min(page, totalPages);
+            renderGrid(res.items);
+            renderPagination(currentPage, totalPages);
+            if (resultsCountEl) {
+              resultsCountEl.textContent = res.total + (res.total === 1 ? ' property found' : ' properties found');
+            }
+          });
+        }).catch(function () {
+          Accoom.hideSkeleton(listingsGrid, function () {
+            renderGrid([]);
+            renderPagination(1, 1);
+            if (resultsCountEl) resultsCountEl.textContent = '0 properties found';
+          });
         });
       }
 

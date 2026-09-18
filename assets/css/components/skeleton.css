@@ -55,3 +55,21 @@ html.dark-mode .skeleton::after {
 
 .skeleton-card-media { width: 100%; aspect-ratio: 4 / 3; border-radius: 0; }
 .skeleton-card-body  { padding: 12px; }
+
+/* Swap transition — used by Accoom.hideSkeleton(). Same box, same
+   dimensions; only opacity crossfades so nothing jumps when the
+   skeleton is replaced by real content. Reduced-motion is already
+   handled globally in reset.css. */
+.skeleton-swap-out {
+  opacity: 0;
+  transition: opacity 180ms var(--ease, ease);
+}
+
+.skeleton-swap-in {
+  animation: skeletonContentIn 320ms var(--ease, ease);
+}
+
+@keyframes skeletonContentIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
