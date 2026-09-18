@@ -1391,16 +1391,6 @@
             renderList();
           }
         });
-        Accoom.on(els.input, 'keydown', function(e) {
-          if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            if (els.send) {
-              els.send.click();
-            } else {
-              els.composer.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-            }
-          }
-        });
       }
 
       Accoom.on(els.composer, 'submit', function (e) {
