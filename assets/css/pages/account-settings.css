@@ -468,6 +468,88 @@
   background: rgba(230, 85, 63, 0.18);
 }
 
+/* ---- 2FA modal extras ---- */
+.as-modal-link {
+  display: block;
+  margin-top: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gold);
+  cursor: pointer;
+}
+
+.as-modal-link:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ---- Loading states (Verify & Enable / Resend code) ---- */
+.as-submit:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  position: relative;
+  color: transparent !important;
+}
+
+.as-submit:disabled::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 15px;
+  height: 15px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid rgba(0, 0, 0, 0.25);
+  border-top-color: var(--on-page);
+  border-radius: 50%;
+  animation: as-spin 0.7s linear infinite;
+}
+
+.as-modal-link:disabled {
+  color: var(--on-page-soft);
+}
+
+@keyframes as-spin {
+  to { transform: rotate(360deg); }
+}
+
+.as-2fa-success {
+  text-align: center;
+  padding-top: 4px;
+}
+
+.as-2fa-success-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(52, 168, 83, 0.14);
+  color: #34a853;
+  margin-bottom: 12px;
+}
+
+.as-2fa-success .as-submit {
+  justify-self: center;
+  margin: 0 auto;
+}
+
+.as-2fa-confirm-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.as-2fa-confirm-actions .btn,
+.as-2fa-confirm-actions .as-danger-btn {
+  flex: 1;
+  justify-content: center;
+}
+
 .as-notif-list .as-pref-row {
   align-items: flex-start;
 }
@@ -550,6 +632,28 @@ body > .as-modal-overlay.is-open {
   font-size: 0.82rem;
   color: var(--on-page-soft);
   margin-bottom: 16px;
+}
+
+/* ---- 2FA code input: outlined, same fill as the modal itself ---- */
+.as-modal input[type="text"] {
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  color: var(--on-page);
+}
+
+.as-modal input[type="text"]:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
+.as-modal input[type="text"]::placeholder {
+  color: var(--line-page);
+}
+
+/* Breathing room between the code field and the Verify & Enable button */
+.as-modal .as-field {
+  margin-bottom: 14px;
 }
 
 .as-login-list {

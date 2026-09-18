@@ -258,17 +258,166 @@
     }
 
     // ----------------------------------------------------------------
-    // Two-Factor Authentication toggle
-    // SWAP FOR BACKEND: POST /api/account/2fa { enabled } here.
+    // Two-Factor Authentication — pops the same dialog style used for
+    // Login Activity above, and walks through the real enable/disable
+    // flow. The toggle never flips on its own; it only reflects the
+    // outcome of the modal. Every call below is mocked and marked.
+    // SWAP FOR BACKEND:
+    //   - POST /api/account/2fa/send-code     (enable step 1, on open, and on Resend)
+    //   - POST /api/account/2fa/verify { code } -> { success }  (enable step 2)
+    //   - POST /api/account/2fa/disable { }   -> { success }    (disable confirm)
     // ----------------------------------------------------------------
+    // SWAP FOR BACKEND: remove this — the real /verify endpoint replaces it.
+    var MOCK_2FA_CODE = '123456';
+
     var twoFaToggle = document.querySelector('[data-2fa-toggle]');
+    var twoFaModal = document.querySelector('[data-as-2fa-modal]');
+    var twoFaModalBody = document.querySelector('[data-as-2fa-modal-body]');
+    var twoFaModalClose = document.querySelector('[data-as-2fa-modal-close]');
+
     if (twoFaToggle) {
       twoFaToggle.checked = !!user.twoFactorEnabled;
-      Accoom.on(twoFaToggle, 'change', function () {
-        user.twoFactorEnabled = twoFaToggle.checked;
-        Accoom.setStorage('accoom-user', user);
+    }
+
+    function open2faModal() {
+      if (!twoFaModal) return;
+      twoFaModal.classList.add('is-open');
+      document.body.classList.add('no-scroll');
+    }
+
+    function close2faModal() {
+      if (!twoFaModal) return;
+      twoFaModal.classList.remove('is-open');
+      document.body.classList.remove('no-scroll');
+    }
+
+    function render2faEnableStep() {
+      if (!twoFaModalBody) return;
+
+      // SWAP FOR BACKEND: POST /api/account/2fa/send-code — fire this
+      // the moment the step renders, since that's the real "code sent" moment.
+
+      twoFaModalBody.innerHTML =
+        '<h3>Set Up Two-Factor Authentication</h3>' +
+        '<p class="as-modal-sub">We\u2019ve sent a 6-digit code to your registered phone/email. Enter it below to turn 2FA on.</p>' +
+        '<form data-2fa-verify-form novalidate>' +
+          '<div class="as-field">' +
+            '<label for="as-2fa-code">Verification Code</label>' +
+            '<input class="input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="as-2fa-code" autocomplete="one-time-code" placeholder="Enter Code" required />' +
+          '</div>' +
+          '<p class="as-error" data-2fa-error hidden>That code didn\u2019t match. Try again.</p>' +
+          '<button type="submit" class="btn btn--primary as-submit">Verify &amp; Enable</button>' +
+          '<button type="button" class="as-modal-link" data-2fa-resend>Resend code</button>' +
+        '</form>';
+
+      var form = twoFaModalBody.querySelector('[data-2fa-verify-form]');
+      var codeInput = twoFaModalBody.querySelector('#as-2fa-code');
+      var errorEl = twoFaModalBody.querySelector('[data-2fa-error]');
+      var resendBtn = twoFaModalBody.querySelector('[data-2fa-resend]');
+      var submitBtn = form.querySelector('.as-submit');
+
+      Accoom.on(form, 'submit', function (e) {
+        e.preventDefault();
+        errorEl.hidden = true;
+        submitBtn.disabled = true;
+
+        // SWAP FOR BACKEND: POST /api/account/2fa/verify { code: codeInput.value }
+        // Replace this whole setTimeout with the real fetch() call — keep the
+        // success/error branches inside it, just drive them off the response
+        // instead of MOCK_2FA_CODE.
+        setTimeout(function () {
+          if (codeInput.value.trim() !== MOCK_2FA_CODE) {
+            errorEl.hidden = false;
+            submitBtn.disabled = false;
+            return;
+          }
+
+          user.twoFactorEnabled = true;
+          Accoom.setStorage('accoom-user', user);
+          twoFaToggle.checked = true;
+          render2faSuccessStep();
+        }, 900);
+      });
+
+      Accoom.on(resendBtn, 'click', function () {
+        resendBtn.textContent = 'Sending...';
+        resendBtn.disabled = true;
+
+        // SWAP FOR BACKEND: POST /api/account/2fa/send-code — replace this
+        // setTimeout with the real fetch() call; move the "Code sent!" block
+        // into its success handler.
+        setTimeout(function () {
+          resendBtn.textContent = 'Code sent!';
+          setTimeout(function () {
+            resendBtn.textContent = 'Resend code';
+            resendBtn.disabled = false;
+          }, 2000);
+        }, 800);
       });
     }
+
+    function render2faSuccessStep() {
+      if (!twoFaModalBody) return;
+      twoFaModalBody.innerHTML =
+        '<div class="as-2fa-success">' +
+          '<span class="as-2fa-success-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></span>' +
+          '<h3>Two-Factor Authentication Enabled</h3>' +
+          '<p class="as-modal-sub">Your account now needs a verification code at every sign-in.</p>' +
+          '<button type="button" class="btn btn--primary as-submit" data-2fa-done>Done</button>' +
+        '</div>';
+
+      Accoom.on(twoFaModalBody.querySelector('[data-2fa-done]'), 'click', close2faModal);
+    }
+
+    function render2faDisableStep() {
+      if (!twoFaModalBody) return;
+      twoFaModalBody.innerHTML =
+        '<h3>Turn Off Two-Factor Authentication?</h3>' +
+        '<p class="as-modal-sub">Your account will only need a password to sign in. This makes it easier to access, but less secure.</p>' +
+        '<div class="as-2fa-confirm-actions">' +
+          '<button type="button" class="btn btn--ghost as-submit" data-2fa-cancel>Keep it on</button>' +
+          '<button type="button" class="as-danger-btn" data-2fa-confirm-disable>Turn Off</button>' +
+        '</div>';
+
+      Accoom.on(twoFaModalBody.querySelector('[data-2fa-cancel]'), 'click', function () {
+        twoFaToggle.checked = true;
+        close2faModal();
+      });
+
+      Accoom.on(twoFaModalBody.querySelector('[data-2fa-confirm-disable]'), 'click', function () {
+        // SWAP FOR BACKEND: POST /api/account/2fa/disable
+        user.twoFactorEnabled = false;
+        Accoom.setStorage('accoom-user', user);
+        twoFaToggle.checked = false;
+        close2faModal();
+      });
+    }
+
+    if (twoFaToggle) {
+      Accoom.on(twoFaToggle, 'change', function () {
+        if (twoFaToggle.checked) {
+          // Hold the switch off visually until a code is actually verified.
+          twoFaToggle.checked = false;
+          render2faEnableStep();
+          open2faModal();
+        } else {
+          // It was on — confirm before actually turning it off.
+          twoFaToggle.checked = true;
+          render2faDisableStep();
+          open2faModal();
+        }
+      });
+    }
+
+    if (twoFaModalClose) Accoom.on(twoFaModalClose, 'click', close2faModal);
+    if (twoFaModal) {
+      Accoom.on(twoFaModal, 'click', function (e) {
+        if (e.target === twoFaModal) close2faModal();
+      });
+    }
+    Accoom.on(document, 'keydown', function (e) {
+      if (e.key === 'Escape' && twoFaModal && twoFaModal.classList.contains('is-open')) close2faModal();
+    });
 
     // ----------------------------------------------------------------
     // Notification Settings — each toggle's state is persisted, keyed

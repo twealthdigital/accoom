@@ -13,7 +13,7 @@ window.Accoom = window.Accoom || {};
   Accoom.initThemeToggle = function (toggleEls, options) {
     var storageKey = (options && options.storageKey) || 'accoom-theme';
     var themeClass = (options && options.themeClass) || 'dark-mode';
-    var defaultTheme = (options && options.defaultTheme) || 'dark';
+    var defaultTheme = (options && options.defaultTheme) || 'light';
 
     var els = !toggleEls ? [] :
       (toggleEls.length !== undefined ? Array.prototype.slice.call(toggleEls) : [toggleEls]);

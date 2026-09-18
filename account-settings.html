@@ -9,7 +9,7 @@
     (function () {
       try {
         var t = JSON.parse(localStorage.getItem('accoom-theme'));
-        if (t === 'dark' || t === null) document.documentElement.classList.add('dark-mode');
+        if (t === 'dark') document.documentElement.classList.add('dark-mode');
       } catch (e) {
         document.documentElement.classList.add('dark-mode');
       }
@@ -417,6 +417,16 @@
       <h3>Login Activity</h3>
       <p class="as-modal-sub">Recent sign-ins to your account.</p>
       <ul class="as-login-list" data-as-login-list></ul>
+    </div>
+  </div>
+
+  <!-- Two-Factor Authentication modal (enable / disable flow) -->
+  <div class="as-modal-overlay" data-as-2fa-modal aria-hidden="true">
+    <div class="as-modal" role="dialog" aria-modal="true" aria-label="Two-factor authentication">
+      <button type="button" class="as-modal-close" data-as-2fa-modal-close aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <div data-as-2fa-modal-body></div>
     </div>
   </div>
 
