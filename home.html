@@ -17,6 +17,8 @@
   </script>
 
   <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="preload" href="partials/header.html" as="fetch" crossorigin>
+  <link rel="preload" href="partials/footer.html" as="fetch" crossorigin>
   <link rel="stylesheet" href="assets/css/pages/home.css" />
 </head>
 <body>
@@ -432,7 +434,25 @@
     <p class="listings-empty" data-listings-empty>No properties match your search. Try a different name, location or type.</p>
 
     <nav class="pagination" data-listings-pagination aria-label="Listings pagination">
-      <!-- Page controls rendered by home.js -->
+      <script>
+      /* Skeleton placeholders: on screen from the very first paint, replaced
+         when home.js renders the real cards and pagination. */
+      (function () {
+        var grid = document.querySelector('[data-listings-grid]');
+        var pager = document.querySelector('[data-listings-pagination]');
+        if (!grid || !pager) return;
+        var w = window.innerWidth;
+        var count = w >= 992 ? 20 : (w >= 768 ? 15 : 5);
+        var card = '<article class="listing-card skeleton-scope" aria-hidden="true"><div class="listing-card-media skeleton-ink"><img class="media-slide is-active skeleton-hide" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt=""></div><div class="listing-card-body"><p class="listing-name skeleton-ink skeleton-round skeleton-fit">3 Bedroom Flat, Surulere, Lagos</p><p class="listing-price skeleton-ink skeleton-round skeleton-fit">\u20A6205,000 <small class="skeleton-ink skeleton-round">/yr</small></p><p class="listing-location skeleton-ink skeleton-round skeleton-fit">Surulere, Lagos</p><div class="listing-meta"><span class="skeleton-ink skeleton-round">2 Bed</span><span class="skeleton-ink skeleton-round">1 Bath</span><span class="listing-share-wrap"><button type="button" class="listing-share skeleton-ink" tabindex="-1"></button></span></div><div class="listing-agent"><div class="listing-agent-id"><span class="listing-agent-avatar"><img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="" class="skeleton-ink skeleton-media"></span><span class="listing-agent-name skeleton-ink skeleton-round">StayWell Agents</span></div><span class="listing-rating skeleton-ink skeleton-round">4.9 (210)</span></div><div class="listing-agent-level-row"><span class="listing-agent-level level-al1 skeleton-ink">AL1</span><button type="button" class="listing-view-btn skeleton-ink" tabindex="-1"><span class="skeleton-ink skeleton-round">View</span></button></div></div></article>';
+        var cards = '';
+        for (var i = 0; i < count; i++) cards += card;
+        grid.innerHTML = cards;
+        var btn = function (label) {
+          return '<button type="button" class="skeleton-scope skeleton-ink" tabindex="-1" disabled aria-hidden="true">' + label + '</button>';
+        };
+        pager.innerHTML = btn('\u2039') + btn('1') + btn('2') + btn('3') + btn('4') + btn('5') + btn('\u203A');
+      })();
+    </script>
     </nav>
 
 </div>

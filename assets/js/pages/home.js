@@ -586,22 +586,34 @@ function cardTemplate(item) {
 
 function loadPage(page) {
         var perPage = getPerPage();
+// A previous empty search hides the grid; un-hide it so the skeleton is visible.
+        listingsGrid.classList.remove('is-hidden');
+        if (listingsEmpty) listingsEmpty.classList.remove('is-visible');
         Accoom.showSkeleton(listingsGrid, 'listingCard', perPage);
+        if (resultsCountEl) Accoom.showSkeleton(resultsCountEl, 'self');
+        // First load only: reserve the pagination bar so nothing jumps when it appears.
+        if (!listingsPagination.children.length) {
+          listingsPagination.innerHTML = '<button type="button" tabindex="-1" disabled>&lsaquo;</button><button type="button" class="is-active" tabindex="-1" disabled>1</button><button type="button" tabindex="-1" disabled>2</button><button type="button" tabindex="-1" disabled>3</button><button type="button" tabindex="-1" disabled>4</button><button type="button" tabindex="-1" disabled>5</button><button type="button" tabindex="-1" disabled>&rsaquo;</button>';
+          Accoom.showSkeleton(listingsPagination, 'self');
+        }
         PropertyService.fetchPage(page, perPage, currentSort, currentFilters).then(function (res) {
           Accoom.hideSkeleton(listingsGrid, function () {
             var totalPages = Math.max(1, Math.ceil(res.total / perPage));
             currentPage = Math.min(page, totalPages);
             renderGrid(res.items);
+            Accoom.clearSkeleton(listingsPagination);
             renderPagination(currentPage, totalPages);
             if (resultsCountEl) {
               resultsCountEl.textContent = res.total + (res.total === 1 ? ' property found' : ' properties found');
+              Accoom.clearSkeleton(resultsCountEl);
             }
           });
         }).catch(function () {
           Accoom.hideSkeleton(listingsGrid, function () {
             renderGrid([]);
+            Accoom.clearSkeleton(listingsPagination);
             renderPagination(1, 1);
-            if (resultsCountEl) resultsCountEl.textContent = '0 properties found';
+            if (resultsCountEl) { resultsCountEl.textContent = '0 properties found'; Accoom.clearSkeleton(resultsCountEl); }
           });
         });
       }

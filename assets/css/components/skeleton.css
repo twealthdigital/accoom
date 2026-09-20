@@ -56,6 +56,195 @@ html.dark-mode .skeleton::after {
 .skeleton-card-media { width: 100%; aspect-ratio: 4 / 3; border-radius: 0; }
 .skeleton-card-body  { padding: 12px; }
 
+/* ==========================================================================
+   Skeleton v2 — colour tokens + in-place ("self") skeleton mode.
+   Accoom.showSkeleton(el, 'self') adds .skeleton-scope to a region that is
+   already rendered and marks its text/images/controls with .skeleton-ink,
+   so the skeleton IS the real layout (no separate markup to keep in sync).
+   ========================================================================== */
+:root {
+  --skeleton-base: #E9E5DD;
+  --skeleton-shine: rgba(255, 255, 255, 0.7);
+}
+
+html.dark-mode {
+  --skeleton-base: #2B2B2B;
+  --skeleton-shine: rgba(255, 255, 255, 0.09);
+}
+
+.skeleton-scope {
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.skeleton-scope,
+.skeleton-scope *,
+.skeleton-scope *::before,
+.skeleton-scope *::after {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  text-shadow: none !important;
+  caret-color: transparent !important;
+}
+
+.skeleton-scope *::before,
+.skeleton-scope *::after {
+  visibility: hidden !important;
+}
+
+.skeleton-scope ::placeholder {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.skeleton-scope.skeleton-hide,
+.skeleton-scope .skeleton-hide {
+  visibility: hidden !important;
+}
+
+.skeleton-scope.skeleton-ink,
+.skeleton-scope .skeleton-ink {
+  background-color: var(--skeleton-base) !important;
+  background-image: linear-gradient(90deg, transparent 40%, var(--skeleton-shine) 50%, transparent 60%) !important;
+  background-size: 300% 100% !important;
+  background-repeat: no-repeat !important;
+  background-position: 100% 0;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  text-decoration: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  transition: none !important;
+  animation: skeletonSweep 1.4s ease-in-out infinite !important;
+}
+
+.skeleton-scope.skeleton-round,
+.skeleton-scope .skeleton-round { border-radius: 4px !important; }
+
+.skeleton-scope.skeleton-media,
+.skeleton-scope .skeleton-media {
+  object-fit: none !important;
+  object-position: -99999px 0 !important;
+}
+
+.skeleton-scope.skeleton-fit,
+.skeleton-scope .skeleton-fit {
+  width: -moz-fit-content;
+  width: fit-content !important;
+  max-width: 100% !important;
+}
+
+.skeleton-scope.skeleton-fit-c,
+.skeleton-scope .skeleton-fit-c { margin-left: auto !important; margin-right: auto !important; }
+.skeleton-scope.skeleton-fit-r,
+.skeleton-scope .skeleton-fit-r { margin-left: auto !important; }
+
+.skeleton-scope.skeleton-lines,
+.skeleton-scope .skeleton-lines {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 15%, #000 15%, #000 85%, transparent 85%);
+  mask-image: linear-gradient(to bottom, transparent 15%, #000 15%, #000 85%, transparent 85%);
+  -webkit-mask-size: 100% var(--sk-lh, 1.5em);
+  mask-size: 100% var(--sk-lh, 1.5em);
+  -webkit-mask-repeat: repeat-y;
+  mask-repeat: repeat-y;
+}
+
+@keyframes skeletonSweep {
+  to { background-position: 0% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-scope.skeleton-ink,
+  .skeleton-scope .skeleton-ink {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   Per-element loading skeletons: each image / map / video / CSS background
+   image shows its OWN skeleton while it is still loading, and swaps to the
+   real thing the moment that one is ready. Header and footer get a
+   placeholder (pure CSS, so it is there from the very first paint) until
+   their partial has been fetched.
+   ========================================================================== */
+img.sk-pending,
+.sk-pending-bg,
+.sk-pending-box {
+  background-color: var(--skeleton-base) !important;
+  background-image: linear-gradient(90deg, transparent 40%, var(--skeleton-shine) 50%, transparent 60%) !important;
+  background-size: 300% 100% !important;
+  background-repeat: no-repeat !important;
+  background-position: 100% 0;
+  animation: skeletonSweep 1.4s ease-in-out infinite;
+}
+
+img.sk-pending { color: transparent !important; }
+
+[data-partial$="header.html"]:empty {
+  content: '';
+  display: block;
+  height: var(--header-h);
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--line, #E7E2D9);
+  background-color: var(--surface-header, #fff);
+  background-image:
+    linear-gradient(90deg, transparent 40%, var(--skeleton-shine) 50%, transparent 60%),
+    linear-gradient(var(--skeleton-base), var(--skeleton-base)),
+    linear-gradient(var(--skeleton-base), var(--skeleton-base)),
+    linear-gradient(var(--skeleton-base), var(--skeleton-base)),
+    linear-gradient(var(--skeleton-base), var(--skeleton-base));
+  background-repeat: no-repeat;
+  background-size: 300% 100%, 70px 44px, 46px 38px, 74px 38px, 216px 44px;
+  background-position: 100% 0, 24px 50%, 200px 50%, 286px 50%, calc(100% - 24px) 50%;
+  animation: skeletonHeaderSweep 1.4s ease-in-out infinite;
+}
+
+@keyframes skeletonHeaderSweep {
+  to { background-position: 0% 0, 24px 50%, 200px 50%, 286px 50%, calc(100% - 24px) 50%; }
+}
+
+[data-partial$="footer.html"]:empty {
+  content: '';
+  display: block;
+  min-height: 368px;
+  background-color: var(--skeleton-base);
+  background-image: linear-gradient(90deg, transparent 40%, var(--skeleton-shine) 50%, transparent 60%);
+  background-size: 300% 100%;
+  background-repeat: no-repeat;
+  background-position: 100% 0;
+  animation: skeletonSweep 1.4s ease-in-out infinite;
+}
+
+@media (max-width: 991px) {
+  [data-partial$="header.html"]:empty {
+    height: var(--header-h-mobile);
+    background-size: 300% 100%, 60px 40px, 0 0, 0 0, 120px 40px;
+    background-position: 100% 0, 16px 50%, 0 0, 0 0, calc(100% - 16px) 50%;
+    animation-name: skeletonHeaderSweepMobile;
+  }
+  [data-partial$="footer.html"]:empty { min-height: 612px; }
+}
+
+@keyframes skeletonHeaderSweepMobile {
+  to { background-position: 0% 0, 16px 50%, 0 0, 0 0, calc(100% - 16px) 50%; }
+}
+
+@media (max-width: 575px) {
+  [data-partial$="footer.html"]:empty { min-height: 819px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  img.sk-pending,
+  .sk-pending-bg,
+  .sk-pending-box,
+  [data-partial$="header.html"]:empty,
+  [data-partial$="footer.html"]:empty {
+    animation: none;
+  }
+}
+
 /* Swap transition — used by Accoom.hideSkeleton(). Same box, same
    dimensions; only opacity crossfades so nothing jumps when the
    skeleton is replaced by real content. Reduced-motion is already
