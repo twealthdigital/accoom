@@ -1857,8 +1857,33 @@
 
     }
 
+    function reconcilePaidProperties() {
+      var paidMap = Accoom.getStorage('accoom-paid-properties', {}) || {};
+      if (!Object.keys(paidMap).length) return;
+      var changed = false;
+      state.conversations.forEach(function (conv) {
+        var ids = [conv.property && conv.property.id]
+          .concat((conv.allProperties || []).map(function (p) { return p.id; }))
+          .filter(Boolean);
+        ids.forEach(function (id) {
+          if (!paidMap[String(id)]) return;
+          var propState = getPropState(conv, id);
+          if (propState.paymentStatus === 'idle') {
+            propState.paymentStatus = 'review';
+            var propRecord = (conv.property && String(conv.property.id) === String(id))
+              ? conv.property
+              : (conv.allProperties || []).filter(function (p) { return String(p.id) === String(id); })[0];
+            if (propRecord) upsertPurchaseRecord(conv, propRecord, 'upcoming');
+            changed = true;
+          }
+        });
+      });
+      if (changed) saveConversations();
+    }
+
     /* ---------------- INIT ---------------- */
     updateMoveSavedLabel();
+    reconcilePaidProperties();
     renderList();
     showChatEmpty();
     Accoom.initButtonAnimations();
@@ -1942,6 +1967,7 @@
 
       saveConversations();
       Accoom.removeStorage('accoom-contact-request');
+      reconcilePaidProperties();
       renderList();
       openConversation(existingConv.id);
       layout.setAttribute('data-view', 'chat');

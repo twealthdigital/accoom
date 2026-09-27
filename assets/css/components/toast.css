@@ -1,0 +1,107 @@
+/* ==========================================================================
+   ACCOOM — Toast (site-wide pop-up notification)
+   Built by Accoom.showToast() in main.js. Loaded via main.css, so it's
+   available — and themed — on every page, not just the one that fired it.
+   ========================================================================== */
+
+.accoom-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 360px;
+  padding: 14px 14px 14px 16px;
+  border-radius: var(--radius-m);
+  background: var(--surface-panel);
+  color: var(--on-page);
+  border: 1px solid var(--line-page);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, .2);
+  opacity: 0;
+  transform: translateY(-16px);
+  transition: opacity var(--dur-med) var(--ease), transform var(--dur-med) var(--ease);
+  pointer-events: none;
+}
+
+.accoom-toast.is-open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.accoom-toast.is-leaving {
+  opacity: 0;
+  transform: translateY(-16px);
+}
+
+.accoom-toast-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(24, 121, 78, 0.14);
+  color: #18794e;
+}
+
+.accoom-toast-text {
+  flex: 1;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--on-page);
+}
+
+.accoom-toast-view {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.accoom-toast-view:hover { text-decoration: underline; }
+
+.accoom-toast-close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--on-page-soft);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+.accoom-toast-close:hover {
+  background: var(--line-page);
+  color: var(--on-page);
+}
+
+/* Mobile: full-width banner sliding down from the top edge, never
+   from the side — easier to read and to dismiss with a thumb. */
+@media (max-width: 520px) {
+  .accoom-toast {
+    left: 12px;
+    right: 12px;
+    top: max(12px, env(safe-area-inset-top, 0px));
+    max-width: none;
+    transform: translateY(-120%);
+  }
+
+  .accoom-toast.is-open {
+    transform: translateY(0);
+  }
+
+  .accoom-toast.is-leaving {
+    transform: translateY(-120%);
+  }
+}

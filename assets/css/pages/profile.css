@@ -828,12 +828,16 @@
     border-bottom: 1px solid var(--line-page);
   }
   .profile-nav-link:last-child { border-bottom: none; }
+  /* Mobile: no highlight on the menu rows. A highlighted row here was
+     confusing — it kept jumping back to "Overview" whenever you
+     returned from a page like Purchases. Desktop has its own separate
+     .is-active rule further down (@media min-width: 900px) and is not
+     touched by this. */
   .profile-nav-link.is-active {
-    background: var(--gold-soft);
-    color: var(--gold-dark);
-    border-radius: var(--radius-s, 10px);
-    border-bottom-color: transparent;
-    margin: 2px 0;
+    background: none;
+    color: inherit;
+    border-radius: 0;
+    margin: 0;
   }
 
   .profile-nav-link > svg:first-child {

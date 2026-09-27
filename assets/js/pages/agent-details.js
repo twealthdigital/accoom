@@ -232,31 +232,19 @@
           return;
         }
 
-        ninVerifyBtn.disabled = true;
+ninVerifyBtn.disabled = true;
         ninVerifyBtn.textContent = 'Verifying…';
         setNinStatus('Verifying with NIMC…');
 
-        fetch('/api/verify-nin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nin: nin })
-        })
-          .then(function (res) { return res.json(); })
-          .then(function (data) {
-            ninVerified = !!data.valid;
-            setNinStatus(
-              ninVerified ? 'NIN verified' + (data.name ? ' — ' + data.name : '') + '.' : 'We couldn\u2019t verify that NIN.',
-              !ninVerified
-            );
-          })
-          .catch(function () {
-            ninVerified = false;
-            setNinStatus('Verification service unavailable. Please try again.', true);
-          })
-          .finally(function () {
-            ninVerifyBtn.disabled = false;
-            ninVerifyBtn.textContent = 'Verify';
-          });
+        // TEMP MOCK — no backend yet, so just accept any 11-digit NIN.
+        // Swap this back to the real fetch('/api/verify-nin', ...) call
+        // above once a verification endpoint exists.
+        setTimeout(function () {
+          ninVerified = true;
+          setNinStatus('NIN verified.', false);
+          ninVerifyBtn.disabled = false;
+          ninVerifyBtn.textContent = 'Verify';
+        }, 500);
       });
     }
 
@@ -333,7 +321,7 @@
       user.agentProfileCompletedAt = new Date().toISOString();
 
       Accoom.setStorage('accoom-user', user);
-      window.location.replace('home.html');
+      window.location.replace('agent-dashboard.html');
     });
   });
 

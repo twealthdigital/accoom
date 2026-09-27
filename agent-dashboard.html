@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Dashboard — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark') document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+
+  <!--
+    SECURITY GATE — same soft, client-side-only caveat as every other
+    gated page here (see onboarding.html / agent-details.html).
+  -->
+  <script>
+    (function () {
+      try {
+        var user = JSON.parse(localStorage.getItem('accoom-user'));
+        if (!user || !user.email) {
+          window.location.replace('auth.html');
+          return;
+        }
+        if (!user.role) {
+          window.location.replace('onboarding.html');
+          return;
+        }
+        if (user.role === 'customer') {
+          window.location.replace('home.html');
+          return;
+        }
+        if (user.role === 'agent' && !user.agentProfileCompleted) {
+          window.location.replace('agent-details.html');
+          return;
+        }
+      } catch (e) {
+        window.location.replace('auth.html');
+      }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="preload" href="partials/header.html" as="fetch" crossorigin>
+  <link rel="preload" href="partials/footer.html" as="fetch" crossorigin>
+  <link rel="stylesheet" href="assets/css/pages/agent-dashboard.css" />
+</head>
+<body>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================= -->
+  <div class="partial-mount" data-partial="partials/header.html"></div>
+
+  <!-- =========================================================
+       AGENT DASHBOARD — full-height split panel, sidebar ~24% width
+       on desktop; on mobile it becomes a slide-out drawer opened by
+       the hamburger button above the greeting.
+  ========================================================= -->
+  <main class="ag-dash-page">
+    <div class="ag-dash-layout">
+
+      <div class="ag-dash-backdrop" data-ag-backdrop hidden></div>
+
+      <!-- Sidebar -->
+      <aside class="ag-dash-sidebar" data-ag-sidebar>
+        <div class="ag-dash-identity">
+          <div class="ag-dash-avatar-wrap">
+            <span class="ag-dash-avatar" data-ag-avatar>AG</span>
+            <img class="ag-dash-avatar-img" data-ag-avatar-img alt="" hidden />
+            <span class="ag-dash-verified" data-ag-verified-badge hidden title="NIN verified">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+          </div>
+          <div class="ag-dash-identity-text">
+            <p class="ag-dash-name" data-ag-name>Agent</p>
+            <p class="ag-dash-role" data-ag-type>Individual Landlord</p>
+          </div>
+        </div>
+
+        <nav class="ag-dash-nav" aria-label="Dashboard">
+          <a href="agent-dashboard.html" class="ag-dash-nav-link is-active">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+            <span>Overview</span>
+          </a>
+          <a href="#" class="ag-dash-nav-link" data-ag-soon>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg>
+            <span>My Listings</span>
+          </a>
+          <a href="#" class="ag-dash-nav-link" data-ag-soon>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92z"></path></svg>
+            <span>Inquiries</span>
+          </a>
+          <a href="#" class="ag-dash-nav-link" data-ag-soon>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            <span>Payouts</span>
+          </a>
+          <a href="account-settings.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.63a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"></path></svg>
+            <span>Account Settings</span>
+          </a>
+          <a href="help-support.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span>Help &amp; Support</span>
+          </a>
+        </nav>
+
+        <button type="button" class="ag-dash-nav-link ag-dash-signout" data-ag-signout>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          <span>Sign Out</span>
+        </button>
+      </aside>
+
+      <!-- Main -->
+      <section class="ag-dash-main">
+
+        <button type="button" class="ag-dash-mobile-toggle" data-ag-mobile-toggle aria-label="Open menu" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <span>Menu</span>
+        </button>
+
+        <div class="ag-dash-topbar">
+          <div>
+            <p class="ag-dash-greeting">Welcome back, <span data-ag-first-name>there</span></p>
+            <p class="ag-dash-sub">Here's what's live on ACCOOM under your account.</p>
+          </div>
+          <a href="agent-details.html" class="btn btn--ghost ag-dash-edit-profile">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
+            Edit agent profile
+          </a>
+        </div>
+
+        <!-- Verification notice — only shows if NIN isn't verified yet -->
+        <div class="ag-dash-notice" data-ag-verify-notice hidden>
+          <p>Your NIN hasn't been verified yet. Verified agents get shown higher and see more inquiries.</p>
+          <a href="agent-details.html" class="ag-dash-notice-link">Verify now</a>
+        </div>
+
+        <!-- Stats -->
+        <div class="ag-dash-stats">
+          <div class="ag-dash-stat">
+            <span class="ag-dash-stat-number" data-ag-stat="total">0</span>
+            <span class="ag-dash-stat-label">Listings uploaded</span>
+          </div>
+          <div class="ag-dash-stat">
+            <span class="ag-dash-stat-number" data-ag-stat="live">0</span>
+            <span class="ag-dash-stat-label">Live on ACCOOM</span>
+          </div>
+          <div class="ag-dash-stat">
+            <span class="ag-dash-stat-number" data-ag-stat="pending">0</span>
+            <span class="ag-dash-stat-label">Pending review</span>
+          </div>
+        </div>
+
+        <!-- Uploads, organised as folders — one per listing -->
+        <div class="ag-dash-section">
+          <div class="ag-dash-section-head">
+            <div>
+              <h2>Your uploads</h2>
+              <p>Every property you've submitted, grouped the way you uploaded it.</p>
+            </div>
+            <a href="#" class="ag-dash-view-all" data-ag-soon>View all</a>
+          </div>
+
+          <div class="ag-dash-folder-grid" data-ag-folders>
+            <!-- folder cards injected by agent-dashboard.js -->
+          </div>
+
+          <p class="ag-dash-folder-empty" data-ag-folders-empty hidden>
+            You haven't uploaded a property yet. Once you add one, it'll show up here as its own folder — photos, videos and documents all in one place.
+          </p>
+        </div>
+
+        <!-- Recent activity -->
+        <div class="ag-dash-section">
+          <div class="ag-dash-section-head">
+            <div>
+              <h2>Recent activity</h2>
+              <p>What's happened with your listings on the site.</p>
+            </div>
+          </div>
+
+          <ul class="ag-dash-activity" data-ag-activity>
+            <li class="ag-dash-activity-empty" data-ag-activity-empty>Nothing to show yet.</li>
+          </ul>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+  ============================================================= -->
+  <div data-partial="partials/footer.html"></div>
+
+  <!-- =========================================================
+       SCRIPTS
+  ========================================================= -->
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/wallet.js"></script>
+  <script src="assets/js/core/skeleton.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/data/notifications.js"></script>
+
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+
+  <script>Accoom.loadPartials();</script>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/agent-dashboard.js"></script>
+</body>
+</html>

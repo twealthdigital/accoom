@@ -511,3 +511,5 @@ body > .payment-success-overlay.is-open {
   .pay-confirm-actions { flex-direction: column; align-items: stretch; }
   .pay-confirm-actions .btn { max-width: none; }
 }
+
+

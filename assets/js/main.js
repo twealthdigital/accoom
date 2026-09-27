@@ -12,6 +12,100 @@ window.Accoom = window.Accoom || {};
   // (not shipped via a [data-partial]), so this can run on plain
   // Accoom.ready as before.
   Accoom.ready(function () {
+    // ============================================================
+    // TOAST — small site-wide pop-up notification (theme-aware,
+    // styled in components/toast.css). Anything on any page can call
+    // Accoom.pushToast({ message, link, linkLabel, duration }) and it
+    // will keep showing across page navigations until it expires or
+    // the person closes it — see resumeActiveToast() below, which is
+    // what makes a toast started on one page (e.g. payment.html)
+    // still be visible after an auto-redirect to another page.
+    // ============================================================
+    var TOAST_STORAGE_KEY = 'accoom-active-toast';
+
+    Accoom.showToast = function (options) {
+      options = options || {};
+      var toast = document.createElement('div');
+      toast.className = 'accoom-toast';
+      toast.setAttribute('role', 'status');
+      var viewHtml = options.link
+        ? '<a href="' + options.link + '" class="accoom-toast-view">' + (options.linkLabel || 'View') + '</a>'
+        : '';
+      toast.innerHTML =
+        '<span class="accoom-toast-icon">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>' +
+        '</span>' +
+        '<span class="accoom-toast-text"></span>' +
+        viewHtml +
+        '<button type="button" class="accoom-toast-close" aria-label="Close notification">' +
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+        '</button>';
+      toast.querySelector('.accoom-toast-text').textContent = options.message || '';
+      document.body.appendChild(toast);
+
+      var hideTimer;
+
+      function closeToast(clearPersisted) {
+        if (toast.classList.contains('is-leaving')) return;
+        window.clearTimeout(hideTimer);
+        toast.classList.remove('is-open');
+        toast.classList.add('is-leaving');
+        window.setTimeout(function () { toast.remove(); }, 320);
+        if (clearPersisted !== false) Accoom.removeStorage(TOAST_STORAGE_KEY);
+      }
+
+      Accoom.on(toast.querySelector('.accoom-toast-close'), 'click', function () {
+        closeToast(true);
+      });
+
+      // Double rAF so the browser paints the initial (hidden) state
+      // before the class flips — otherwise the transition gets skipped.
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { toast.classList.add('is-open'); });
+      });
+
+      var duration = typeof options.duration === 'number' ? options.duration : 10000;
+      hideTimer = window.setTimeout(function () { closeToast(true); }, duration);
+
+      return { close: closeToast };
+    };
+
+    // Shows a toast AND remembers it (with an absolute expiry) so it
+    // survives a full page navigation instead of vanishing with the
+    // page that created it.
+    Accoom.pushToast = function (options) {
+      options = options || {};
+      var duration = typeof options.duration === 'number' ? options.duration : 10000;
+      Accoom.setStorage(TOAST_STORAGE_KEY, {
+        message: options.message,
+        link: options.link,
+        linkLabel: options.linkLabel,
+        expiresAt: Date.now() + duration
+      });
+      Accoom.showToast({
+        message: options.message,
+        link: options.link,
+        linkLabel: options.linkLabel,
+        duration: duration
+      });
+    };
+
+    (function resumeActiveToast() {
+      var active = Accoom.getStorage(TOAST_STORAGE_KEY, null);
+      if (!active || !active.expiresAt) return;
+      var remaining = active.expiresAt - Date.now();
+      if (remaining <= 200) {
+        Accoom.removeStorage(TOAST_STORAGE_KEY);
+        return;
+      }
+      Accoom.showToast({
+        message: active.message,
+        link: active.link,
+        linkLabel: active.linkLabel,
+        duration: remaining
+      });
+    })();
+
     // Dark/light mode toggle — init here (not only in partials:ready)
     // so pages with no [data-partial] includes, like auth.html, still
     // get the click handler bound to their static toggle button.
@@ -371,9 +465,10 @@ window.Accoom = window.Accoom || {};
       var ICON_PROFILE = '<svg class="account-menu-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
       var ICON_SIGNOUT = '<svg class="account-menu-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>';
 
+      var accountHref = (user.role === 'agent') ? 'agent-dashboard.html' : 'profile.html';
       Accoom.$$('[aria-label="Account"] [data-value="signin"] a').forEach(function (a) {
         a.closest('li').setAttribute('data-value', 'profile');
-        a.setAttribute('href', 'profile.html');
+        a.setAttribute('href', accountHref);
         a.innerHTML = ICON_PROFILE + '<span class="account-menu-name">' + displayName + '</span>';
       });
 
@@ -477,7 +572,7 @@ window.Accoom = window.Accoom || {};
               '</button>' +
             '</div>';
 
-          list.insertBefore(item, emptyState.nextSibling);
+          list.appendChild(item);
         });
 
         list.querySelectorAll('[data-notif-content]').forEach(function (content) {

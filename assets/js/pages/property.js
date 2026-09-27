@@ -129,7 +129,7 @@
       var rent = property.priceValue;
       var service = Math.round(rent * 0.1);
       var legal = Math.round(rent * 0.1);
-      var agency = rent;
+      var agency = (stored && typeof stored.agencyFee === 'number') ? stored.agencyFee : 20000;
       var total = rent + service + legal + agency;
       var naira = function (n) { return '\u20A6' + n.toLocaleString('en-NG'); };
       setText('[data-pd-price-rent]', naira(rent));
@@ -553,7 +553,8 @@
         var url = 'payment.html'
           + '?id=' + encodeURIComponent(property.id)
           + '&amount=' + encodeURIComponent(state.payable.value)
-          + '&mode=' + (state.hasFunds ? 'checkout' : 'deposit');
+          + '&mode=' + (state.hasFunds ? 'checkout' : 'deposit')
+          + '&return=contact-agent.html';
         window.location.href = url;
       });
     })();

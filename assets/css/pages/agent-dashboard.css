@@ -1,0 +1,466 @@
+/* ==========================================================================
+   ACCOOM — Agent Dashboard
+   Full-height split panel (sidebar ~24% width, like a chat app) on
+   desktop. On mobile the sidebar becomes a slide-out drawer, opened by
+   the hamburger above the greeting, closed by the backdrop or a swipe.
+   No bold type, no decorative card icons — just the numbers, the
+   folders, and the activity.
+   ========================================================================== */
+
+.ag-dash-page {
+  background: var(--surface-page);
+  min-height: calc(100vh - var(--header-h));
+}
+
+.ag-dash-layout {
+  display: flex;
+  align-items: stretch;
+  min-height: calc(100vh - var(--header-h));
+}
+
+/* ---------------------------------------------------------------------
+   Sidebar — flush to the edge, full height, own scroll. ~24% of the
+   screen on desktop, clamped so it never gets absurdly wide or narrow.
+   --------------------------------------------------------------------- */
+.ag-dash-sidebar {
+  flex: 0 0 24%;
+  width: 24%;
+  min-width: 230px;
+  max-width: 300px;
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  overflow-y: auto;
+  background: var(--surface-page-alt);
+  border-right: 1px solid var(--line-page);
+  padding: 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+html.dark-mode .ag-dash-sidebar {
+  background: var(--black);
+}
+
+.ag-dash-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px 14px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line-page);
+}
+
+.ag-dash-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+}
+
+.ag-dash-avatar,
+.ag-dash-avatar-img {
+  position: absolute;
+  inset: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+.ag-dash-avatar-img { object-fit: cover; }
+
+.ag-dash-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.ag-dash-verified {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--navy-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--surface-page-alt);
+  z-index: 1;
+}
+
+.ag-dash-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--on-page);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ag-dash-role {
+  font-size: 11.5px;
+  color: var(--on-page-soft);
+}
+
+.ag-dash-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ag-dash-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 9px;
+  border-radius: var(--radius-s);
+  font-size: 13px;
+  color: var(--on-page-soft);
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+.ag-dash-nav-link svg { flex-shrink: 0; opacity: 0.8; }
+
+.ag-dash-nav-link:hover {
+  background: var(--gold-soft);
+  color: var(--on-page);
+}
+
+.ag-dash-nav-link.is-active {
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+}
+
+.ag-dash-signout {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-page);
+  border-radius: 0;
+}
+
+.ag-dash-signout:hover {
+  background: rgba(217, 79, 79, 0.1);
+  color: #C0392B;
+}
+
+/* ---------------------------------------------------------------------
+   Main
+   --------------------------------------------------------------------- */
+.ag-dash-main {
+  flex: 1;
+  min-width: 0;
+  padding: 22px 32px 60px;
+}
+
+/* Hamburger — hidden on desktop, shown only under the mobile breakpoint */
+.ag-dash-mobile-toggle {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--on-page);
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-s);
+  padding: 8px 14px;
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+
+.ag-dash-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.ag-dash-greeting {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--on-page);
+}
+
+.ag-dash-sub {
+  font-size: 13px;
+  color: var(--on-page-soft);
+  margin-top: 2px;
+}
+
+.ag-dash-edit-profile { font-size: 12.5px; padding: 8px 14px; }
+
+.ag-dash-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--gold-soft);
+  border: 1px solid rgba(223, 150, 46, 0.35);
+  border-radius: var(--radius-m);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  color: var(--on-page);
+}
+
+.ag-dash-notice p { font-size: 12.5px; flex: 1; }
+.ag-dash-notice-link {
+  font-size: 12.5px;
+  color: var(--gold-dark);
+  flex-shrink: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Stats — number + label only, no icon well */
+.ag-dash-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.ag-dash-stat {
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-m);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ag-dash-stat-number {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--on-page);
+  line-height: 1.2;
+}
+
+.ag-dash-stat-label {
+  font-size: 11.5px;
+  color: var(--on-page-soft);
+}
+
+/* Section shell shared by "Your uploads" + "Recent activity" */
+.ag-dash-section { margin-bottom: 22px; }
+
+.ag-dash-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.ag-dash-section-head h2 {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--on-page);
+}
+
+.ag-dash-section-head p {
+  font-size: 12px;
+  color: var(--on-page-soft);
+  margin-top: 1px;
+}
+
+.ag-dash-view-all {
+  font-size: 12.5px;
+  color: var(--gold-dark);
+  flex-shrink: 0;
+}
+
+/* Uploads as folders — the actual property photo, nothing else layered
+   on top of it. */
+.ag-dash-folder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.ag-dash-folder-card {
+  display: block;
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  transition: border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+
+.ag-dash-folder-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.ag-dash-folder-cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--line-page);
+}
+
+.ag-dash-folder-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ag-dash-folder-status {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+.ag-dash-folder-status--live { background: rgba(56, 161, 105, 0.85); color: #fff; }
+.ag-dash-folder-status--pending { background: rgba(183, 121, 31, 0.85); color: #fff; }
+.ag-dash-folder-status--draft { background: rgba(0, 0, 0, 0.6); color: #fff; }
+
+.ag-dash-folder-body { padding: 11px 13px 13px; }
+
+.ag-dash-folder-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--on-page);
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ag-dash-folder-loc {
+  font-size: 11.5px;
+  color: var(--on-page-soft);
+  margin-bottom: 9px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ag-dash-folder-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-page);
+  font-size: 11px;
+  color: var(--on-page-soft);
+}
+
+.ag-dash-folder-empty {
+  font-size: 12.5px;
+  color: var(--on-page-soft);
+  background: var(--surface-page-alt);
+  border: 1px dashed var(--line-page);
+  border-radius: var(--radius-m);
+  padding: 20px 16px;
+  text-align: center;
+}
+
+/* Recent activity */
+.ag-dash-activity {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+
+.ag-dash-activity-item,
+.ag-dash-activity-empty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: var(--on-page);
+}
+
+.ag-dash-activity-item + .ag-dash-activity-item {
+  border-top: 1px solid var(--line-page);
+}
+
+.ag-dash-activity-empty { color: var(--on-page-soft); }
+
+.ag-dash-activity-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+
+.ag-dash-activity-text { flex: 1; min-width: 0; }
+.ag-dash-activity-time { font-size: 11px; color: var(--on-page-soft); flex-shrink: 0; }
+
+/* ---------------------------------------------------------------------
+   Responsive — under 899px the sidebar detaches from the layout and
+   becomes a fixed drawer, pinned to pure black regardless of the
+   site's light/dark theme (variables below are scoped to the drawer
+   itself, so every child using var(--on-page) etc. stays readable).
+   --------------------------------------------------------------------- */
+@media (max-width: 899px) {
+  .ag-dash-mobile-toggle { display: inline-flex; }
+
+  .ag-dash-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 55;
+  }
+
+  .ag-dash-sidebar {
+    --on-page: #fff;
+    --on-page-soft: rgba(255, 255, 255, 0.62);
+    --line-page: rgba(255, 255, 255, 0.14);
+    --gold-soft: rgba(223, 150, 46, 0.2);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 60;
+    width: min(82%, 300px);
+    max-width: none;
+    height: 100vh;
+    background: var(--black);
+    border-right: none;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+    transform: translateX(-100%);
+    transition: transform var(--dur-med) var(--ease);
+    touch-action: pan-y;
+  }
+
+  .ag-dash-sidebar.is-open { transform: translateX(0); }
+
+  .ag-dash-signout { margin-top: auto; }
+
+  .ag-dash-main { padding: 18px 18px 50px; }
+}
+
+@media (max-width: 640px) {
+  .ag-dash-stats { grid-template-columns: repeat(2, 1fr); }
+  .ag-dash-folder-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 420px) {
+  .ag-dash-folder-grid { grid-template-columns: 1fr; }
+}

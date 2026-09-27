@@ -110,6 +110,24 @@ window.Accoom = window.Accoom || {};
     Accoom.dispatch(document, CHANGED_EVENT);
   }
 
+  // Pushes a brand-new notification to the top of the list (e.g. "payment
+  // received") and re-broadcasts, so the header dropdown and
+  // notifications.html — both already listening for CHANGED_EVENT — pick
+  // it up immediately without any extra wiring.
+  NotificationService.add = function (notif) {
+    var list = readAll();
+    var entry = Object.assign({
+      id: 'notif-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+      type: 'accoom',
+      read: false,
+      time: new Date().toISOString()
+    }, notif);
+    list.unshift(entry);
+    writeAll(list);
+    broadcast();
+    return entry;
+  };
+
   NotificationService.markRead = function (id, read) {
     var list = readAll();
     var target = list.filter(function (n) { return n.id === id; })[0];

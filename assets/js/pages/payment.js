@@ -43,6 +43,74 @@
       return Number(walletAmountInput && walletAmountInput.value) || 0;
     }
 
+    // Marks a property as paid in a small shared record so ANY page that
+    // opens this property's agent chat later (whether the buyer got here
+    // via the property page's "Make Payment" card or the chat's own Pay
+    // button) can pick it up and flip that property to "awaiting
+    // agent review" — see contact-agent.js's reconcilePaidProperties().
+    // Also fires a toast right here and registers a real notification
+    // (shows in the header dropdown + notifications.html), so the buyer
+    // knows the payment went through even if they never click through.
+    function markPropertyPaid(id, paidAmount) {
+      if (!id) return;
+      var paidMap = Accoom.getStorage('accoom-paid-properties', {}) || {};
+      paidMap[String(id)] = true;
+      Accoom.setStorage('accoom-paid-properties', paidMap);
+      notifyPaymentSuccess(id, paidAmount);
+    }
+
+    // Short two-tone chime built with the Web Audio API — no audio file
+    // needed. Wrapped in try/catch since some browsers/contexts (or a
+    // very stale user gesture) can refuse to let audio play.
+    function playPaymentSound() {
+      try {
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        var ctx = new Ctx();
+        var now = ctx.currentTime;
+        [659.25, 880].forEach(function (freq, i) {
+          var start = now + i * 0.12;
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0, start);
+          gain.gain.linearRampToValueAtTime(0.16, start + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.3);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(start);
+          osc.stop(start + 0.32);
+        });
+      } catch (soundError) {
+        // Silently skip — a missing chime should never break payment.
+      }
+    }
+
+    function notifyPaymentSuccess(id, paidAmount) {
+      var prop = (Accoom.PropertyService && Accoom.PropertyService.getById) ? Accoom.PropertyService.getById(id) : null;
+      var propName = prop ? prop.name : ('property ' + id);
+      var amountText = Accoom.formatWalletAmount(paidAmount || 0);
+      var message = 'Payment of ' + amountText + ' for ' + propName + ' was successful.';
+
+      // Accoom.pushToast (main.js) — not a page-local toast — is what
+      // makes this keep showing after the auto-redirect into the agent
+      // chat instead of disappearing the moment this page unloads.
+      if (Accoom.pushToast) {
+        Accoom.pushToast({ message: message, link: 'notifications.html', linkLabel: 'View', duration: 10000 });
+      }
+      playPaymentSound();
+
+      if (Accoom.NotificationService && Accoom.NotificationService.add) {
+        Accoom.NotificationService.add({
+          type: 'order',
+          title: 'Payment received',
+          text: message + ' Tap to open your chat with the agent.',
+          link: 'contact-agent.html?open=' + encodeURIComponent(id)
+        });
+      }
+    }
+
     if (isWalletTopUp) {
       if (amountEntry) amountEntry.hidden = false;
       if (walletAmountInput) walletAmountInput.required = true;
@@ -227,6 +295,7 @@
           Accoom.creditWallet(walletMovedAmount);
         } else if (mode === 'checkout') {
           Accoom.debitWallet(amount);
+          if (!isWalletTopUp) markPropertyPaid(propertyId, amount);
         }
 
         var pendingVerification = selectedMethod === 'transfer' || selectedMethod === 'ussd';
@@ -341,6 +410,7 @@
 
                 window.setTimeout(function () {
                   Accoom.debitWallet(amount);
+                  markPropertyPaid(propertyId, amount);
 
                   var backHref = returnPage || ('property.html?id=' + encodeURIComponent(propertyId));
                   backHref += (backHref.indexOf('?') === -1 ? '?' : '&') + 'paid=' + encodeURIComponent(propertyId);
@@ -397,6 +467,11 @@
             if (returnPage === 'contact-agent.html') {
               successAction.textContent = 'Back to chat';
               successAction.href = 'contact-agent.html?paid=' + encodeURIComponent(propertyId);
+              // Land the buyer straight in the agent chat — no need to
+              // press "Contact Agent" or click this button themselves.
+              window.setTimeout(function () {
+                window.location.href = successAction.href;
+              }, 1600);
             } else {
               successAction.textContent = 'View purchases';
               successAction.href = 'purchases.html';
