@@ -17,12 +17,23 @@
   </script>
 
   <!-- Profile is a signed-in-only page: bounce guests to auth before the
-       page paints, same way theme.js avoids a flash on other pages. -->
+       page paints, same way theme.js avoids a flash on other pages.
+       It's also a customer-only page: an agent account has its own hub
+       at agent-dashboard.html, so any agent landing here (typed URL,
+       stale bookmark, a Back/Overview link from Purchases or Saved
+       Properties) gets sent there instead, before anything paints. -->
   <script>
     (function () {
       try {
         var user = JSON.parse(localStorage.getItem('accoom-user'));
-        if (!user) window.location.replace('auth.html');
+        if (!user) {
+          window.location.replace('auth.html');
+          return;
+        }
+        if (user.role === 'agent') {
+          window.location.replace('agent-dashboard.html');
+          return;
+        }
       } catch (e) {
         window.location.replace('auth.html');
       }

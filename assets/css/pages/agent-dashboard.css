@@ -228,7 +228,7 @@ html.dark-mode .ag-dash-sidebar {
 /* Stats — number + label only, no icon well */
 .ag-dash-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   margin-bottom: 22px;
 }
@@ -241,6 +241,16 @@ html.dark-mode .ag-dash-sidebar {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+a.ag-dash-stat {
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease;
+}
+
+a.ag-dash-stat:hover {
+  border-color: var(--gold);
 }
 
 .ag-dash-stat-number {

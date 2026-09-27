@@ -16,9 +16,14 @@
     var user = Accoom.getStorage('accoom-user', null);
 
     // Belt-and-braces: the inline <head> script already bounces guests
-    // before paint, this just covers it if storage changed mid-session.
+    // (and agents) before paint, this just covers it if storage changed
+    // mid-session, e.g. another tab just finished the agent upgrade.
     if (!user) {
       window.location.href = 'auth.html';
+      return;
+    }
+    if (user.role === 'agent') {
+      window.location.href = 'agent-dashboard.html';
       return;
     }
 

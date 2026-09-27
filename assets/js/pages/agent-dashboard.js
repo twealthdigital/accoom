@@ -184,8 +184,22 @@
 
     Accoom.$$('[data-ag-stat]').forEach(function (el) {
       var key = el.getAttribute('data-ag-stat');
+      if (key === 'wallet') return; // handled by renderWalletStat() below
       el.textContent = stats[key] || 0;
     });
+
+    // ----------------------------------------------------------------
+    // Wallet balance — same account-wide balance the buyer view shows
+    // (Accoom.getWalletBalance/WALLET_UPDATED_EVENT), so it carries
+    // over untouched when a customer upgrades to agent, and stays in
+    // sync live if it changes in another tab.
+    // ----------------------------------------------------------------
+    function renderWalletStat() {
+      var el = document.querySelector('[data-ag-stat="wallet"]');
+      if (el) el.textContent = Accoom.formatWalletAmount(Accoom.getWalletBalance());
+    }
+    renderWalletStat();
+    document.addEventListener(Accoom.WALLET_UPDATED_EVENT, renderWalletStat);
 
     // ----------------------------------------------------------------
     // Recent activity — swap for a real activity feed once one exists.

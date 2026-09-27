@@ -446,7 +446,8 @@ window.Accoom = window.Accoom || {};
         } else if (value === 'signin') {
           window.location.href = 'auth.html';
         } else if (value === 'profile') {
-          window.location.href = 'profile.html';
+          var acctUser = Accoom.getStorage('accoom-user', null);
+          window.location.href = (acctUser && acctUser.role === 'agent') ? 'agent-dashboard.html' : 'profile.html';
         } else if (value === 'signout') {
           Accoom.setStorage('accoom-user', null);
           window.location.href = 'home.html';
