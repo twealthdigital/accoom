@@ -51,6 +51,7 @@
   <link rel="preload" href="partials/header.html" as="fetch" crossorigin>
   <link rel="preload" href="partials/footer.html" as="fetch" crossorigin>
   <link rel="stylesheet" href="assets/css/pages/agent-dashboard.css" />
+<link rel="stylesheet" href="assets/css/components/listing-actions.css" />
 </head>
 <body>
 
@@ -171,38 +172,55 @@
           </a>
         </div>
 
-        <!-- Uploads, organised as folders — one per listing -->
+        <!-- Listings, categorised by status -->
         <div class="ag-dash-section">
           <div class="ag-dash-section-head">
             <div>
-              <h2>Your uploads</h2>
-              <p>Every property you've submitted, grouped the way you uploaded it.</p>
+              <h2>Your Listings</h2>
+              <p>Every property you've submitted, grouped by status.</p>
             </div>
             <a href="#" class="ag-dash-view-all" data-ag-soon>View all</a>
           </div>
 
+          <!-- Status tabs — the last three (Delisted / In Dispute / Reported)
+               are agent-only: buyers never see these on the public site. -->
+          <div class="ag-dash-listing-tabs" data-ag-listing-tabs role="tablist">
+            <button type="button" class="ag-dash-listing-tab is-active" data-ag-listing-tab="available" role="tab" aria-selected="true">
+              Available Properties
+              <span class="ag-dash-listing-tab-count" data-ag-listing-count="available">0</span>
+            </button>
+            <button type="button" class="ag-dash-listing-tab" data-ag-listing-tab="in_progress" role="tab" aria-selected="false">
+              In Progress
+              <span class="ag-dash-listing-tab-count" data-ag-listing-count="in_progress">0</span>
+            </button>
+            <button type="button" class="ag-dash-listing-tab" data-ag-listing-tab="sold" role="tab" aria-selected="false">
+              Sold Properties
+              <span class="ag-dash-listing-tab-count" data-ag-listing-count="sold">0</span>
+            </button>
+            <button type="button" class="ag-dash-listing-tab" data-ag-listing-tab="delisted" role="tab" aria-selected="false">
+              Delisted
+              <span class="ag-dash-listing-tab-count" data-ag-listing-count="delisted">0</span>
+            </button>
+            <button type="button" class="ag-dash-listing-tab" data-ag-listing-tab="in_dispute" role="tab" aria-selected="false">
+              In Dispute
+              <span class="ag-dash-listing-tab-count" data-ag-listing-count="in_dispute">0</span>
+            </button>
+            <button type="button" class="ag-dash-listing-tab" data-ag-listing-tab="reported" role="tab" aria-selected="false">
+              Reported
+              <span class="ag-dash-listing-tab-count" data-ag-listing-count="reported">0</span>
+            </button>
+          </div>
+          <p class="ag-dash-listing-tabs-note">Delisted, In Dispute and Reported listings are only visible to you here — they never show up to buyers on ACCOOM.</p>
+
           <div class="ag-dash-folder-grid" data-ag-folders>
-            <!-- folder cards injected by agent-dashboard.js -->
+            <!-- listing cards injected by agent-dashboard.js -->
           </div>
 
           <p class="ag-dash-folder-empty" data-ag-folders-empty hidden>
-            You haven't uploaded a property yet. Once you add one, it'll show up here as its own folder — photos, videos and documents all in one place.
+            Nothing here yet.
           </p>
         </div>
 
-        <!-- Recent activity -->
-        <div class="ag-dash-section">
-          <div class="ag-dash-section-head">
-            <div>
-              <h2>Recent activity</h2>
-              <p>What's happened with your listings on the site.</p>
-            </div>
-          </div>
-
-          <ul class="ag-dash-activity" data-ag-activity>
-            <li class="ag-dash-activity-empty" data-ag-activity-empty>Nothing to show yet.</li>
-          </ul>
-        </div>
 
       </section>
     </div>
@@ -234,5 +252,6 @@
 
   <script src="assets/js/main.js"></script>
   <script src="assets/js/pages/agent-dashboard.js"></script>
+<script src="assets/js/modules/listing-actions.js"></script>
 </body>
 </html>

@@ -294,6 +294,77 @@ a.ag-dash-stat:hover {
   flex-shrink: 0;
 }
 
+/* Listing status tabs — same pattern as the Purchases page tabs, so
+   switching between "kinds of list" feels the same across the app. */
+.ag-dash-listing-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--line-page);
+}
+
+.ag-dash-listing-tabs::-webkit-scrollbar { display: none; }
+
+.ag-dash-listing-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-page-soft);
+  background: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ag-dash-listing-tab::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--gold);
+  border-radius: var(--radius-pill);
+  transform: scaleX(0);
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.ag-dash-listing-tab.is-active::after { transform: scaleX(1); }
+.ag-dash-listing-tab:hover { color: var(--on-page); }
+.ag-dash-listing-tab.is-active { color: var(--gold-dark); }
+
+.ag-dash-listing-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--gold-soft);
+  color: var(--gold-dark);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ag-dash-listing-tab.is-active .ag-dash-listing-tab-count {
+  background: var(--gold);
+  color: #fff;
+}
+
+.ag-dash-listing-tabs-note {
+  font-size: 11px;
+  color: var(--on-page-soft);
+  margin: 8px 0 14px;
+}
+
 /* Uploads as folders — the actual property photo, nothing else layered
    on top of it. */
 .ag-dash-folder-grid {
@@ -330,20 +401,26 @@ a.ag-dash-stat:hover {
   display: block;
 }
 
-.ag-dash-folder-status {
+.ag-dash-folder-share {
   position: absolute;
   top: 8px;
   right: 8px;
-  font-size: 10px;
-  padding: 3px 8px;
-  border-radius: var(--radius-pill);
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(17, 24, 39, 0.55);
+  color: #fff;
   backdrop-filter: blur(4px);
+  cursor: pointer;
 }
 
-.ag-dash-folder-status--live { background: rgba(56, 161, 105, 0.85); color: #fff; }
-.ag-dash-folder-status--pending { background: rgba(183, 121, 31, 0.85); color: #fff; }
-.ag-dash-folder-status--draft { background: rgba(0, 0, 0, 0.6); color: #fff; }
+/* When both the status pill (left) and share button (right) are present,
+   the pill sits alone at top-left — nothing else changes needed since
+   they're on opposite corners. */
 
 .ag-dash-folder-body { padding: 11px 13px 13px; }
 
@@ -357,13 +434,34 @@ a.ag-dash-stat:hover {
   white-space: nowrap;
 }
 
+.ag-dash-folder-price {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold-dark);
+  margin-bottom: 3px;
+}
+
+.ag-dash-folder-price small {
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--on-page-soft);
+}
+
 .ag-dash-folder-loc {
   font-size: 11.5px;
   color: var(--on-page-soft);
-  margin-bottom: 9px;
+  margin-bottom: 6px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.ag-dash-folder-specs {
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--on-page-soft);
+  margin-bottom: 9px;
 }
 
 .ag-dash-folder-meta {
@@ -440,10 +538,6 @@ a.ag-dash-stat:hover {
   }
 
   .ag-dash-sidebar {
-    --on-page: #fff;
-    --on-page-soft: rgba(255, 255, 255, 0.62);
-    --line-page: rgba(255, 255, 255, 0.14);
-    --gold-soft: rgba(223, 150, 46, 0.2);
     position: fixed;
     top: 0;
     left: 0;
@@ -451,15 +545,29 @@ a.ag-dash-stat:hover {
     width: min(82%, 300px);
     max-width: none;
     height: 100vh;
-    background: var(--black);
-    border-right: none;
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+    background: var(--surface-page-alt);
+    border-right: 1px solid var(--line-page);
+    box-shadow: none;
     transform: translateX(-100%);
-    transition: transform var(--dur-med) var(--ease);
+    transition: transform var(--dur-med) var(--ease), box-shadow var(--dur-med) var(--ease);
     touch-action: pan-y;
   }
 
-  .ag-dash-sidebar.is-open { transform: translateX(0); }
+  /* Dark mode only: pure black drawer with white text */
+  html.dark-mode .ag-dash-sidebar {
+    --on-page: #fff;
+    --on-page-soft: rgba(255, 255, 255, 0.62);
+    --line-page: rgba(255, 255, 255, 0.14);
+    --gold-soft: rgba(223, 150, 46, 0.2);
+    background: var(--black);
+  }
+
+  /* Shadow only while open, so it never bleeds onto the page edge */
+  .ag-dash-sidebar.is-open {
+    transform: translateX(0);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.18);
+  }
+  html.dark-mode .ag-dash-sidebar.is-open { box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4); }
 
   .ag-dash-signout { margin-top: auto; }
 
