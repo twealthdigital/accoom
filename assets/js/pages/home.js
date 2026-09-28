@@ -375,7 +375,7 @@ function getById(id) {
     // upstream (admin dashboard, seller dashboard, or a real API).
     function syncPopularCounts() {
       var all = PropertyService.getAll();
-      Accoom.$$('.popular-card[data-popular-type]').forEach(function (card) {
+      Accoom.$$('[data-popular-type]').forEach(function (card) {
         var titleEl = card.querySelector('h3');
         var countEl = card.querySelector('[data-popular-count]');
         if (!titleEl || !countEl) return;
@@ -388,7 +388,7 @@ function getById(id) {
 
     // Clicking/activating a card filters "All Property Listings" using
     // its own title as the search term (identical pattern to the pills above).
-    Accoom.$$('.popular-card[data-popular-type]').forEach(function (card) {
+    Accoom.$$('[data-popular-type]').forEach(function (card) {
       function activate() {
         var titleEl = card.querySelector('h3');
         var query = titleEl ? titleEl.textContent.trim() : '';
@@ -419,9 +419,10 @@ function getById(id) {
 
       function getPerPage() {
         var w = window.innerWidth;
-        if (w >= 992) return 20; // desktop: 4 x 5
-        if (w >= 768) return 15; // tablet: 3 x 5
-        return 5;                // mobile: 1 x 5
+        if (w >= 992) return 8;  // desktop: 4 cols x 2 rows
+        if (w >= 768) return 6;  // tablet:  3 cols x 2 rows
+        if (w >= 576) return 4;  // large phone: 2 cols x 2 rows
+        return 2;                // phone: 1 col x 2 rows
       }
 
 var currentPage = 1;

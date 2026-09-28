@@ -2271,3 +2271,376 @@ html.dark-mode .listing-card {
   margin-top: 10px;
   margin-bottom: 16px;
 }
+
+
+
+/* ============================================================
+   HOME REDESIGN — Why Choose / Find What Suits / Tips
+   ============================================================ */
+
+.all-listings { scroll-margin-top: calc(var(--header-h-mobile) + 8px); }
+@media (min-width: 992px) { .all-listings { scroll-margin-top: calc(var(--header-h) + 8px); } }
+
+/* ---------- shared bits ---------- */
+.hp-eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.hp-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: clamp(20px, 3vw, 32px);
+}
+
+.hp-heading {
+  margin: 0;
+  font-size: clamp(22px, 4.6vw, 30px);
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--on-page);
+}
+
+.hp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold);
+  transition: gap var(--dur-fast) var(--ease);
+}
+.hp-link:hover { gap: 10px; }
+.hp-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
+
+/* ---------- WHY CHOOSE ---------- */
+.why {
+  /* ==========================================================
+     ADJUST THE IMAGE HERE  (these 3 lines are the only knobs)
+     --why-img-w : how BIG the image is (its width; height follows)
+     --why-img-x : nudge sideways  (negative = left, positive = right)
+     --why-img-y : nudge vertically (negative = up,   positive = down)
+     Phones & tablets use the value below; desktop overrides it in
+     the @media (min-width: 900px) block further down.
+     ========================================================== */
+  --why-img-w: min(100%, 760px);
+  --why-img-x: 0px;
+  --why-img-y: 0px;
+
+  background: var(--gold-soft);
+  padding: clamp(36px, 7vw, 72px) 0 0;   /* no bottom padding: the image sits on the section edge */
+  overflow: hidden;
+}
+
+.why-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(24px, 5vw, 48px);
+  align-items: center;
+}
+
+.why-title {
+  margin: 0;
+  font-size: clamp(24px, 5.4vw, 36px);
+  line-height: 1.15;
+  font-weight: 800;
+  color: var(--on-page);
+  text-wrap: balance;
+}
+.why-title-line { display: block; }
+
+.why-lead {
+  margin: 14px 0 0;
+  max-width: 520px;
+  font-size: clamp(14px, 1.6vw, 16px);
+  line-height: 1.6;
+  color: var(--on-page-soft);
+}
+
+.why-list {
+  list-style: none;
+  margin: clamp(18px, 3vw, 28px) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px 16px;
+}
+
+.why-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.why-icon {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-page);
+  color: var(--gold);
+}
+
+.why-item-text { min-width: 0; }
+.why-item-text h3 { margin: 0; font-size: 14px; font-weight: 700; line-height: 1.3; color: var(--on-page); }
+.why-item-text p  { margin: 2px 0 0; font-size: 12px; line-height: 1.4; color: var(--on-page-soft); }
+
+/* Image: no circle, no border, no background — just the picture */
+.why-visual {
+  align-self: end;
+  width: var(--why-img-w);
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.why-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: translate(var(--why-img-x), var(--why-img-y));
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Light / dark image swap (same pattern as the logo) */
+.why-photo--dark { display: none; }
+html.dark-mode .why-photo--light { display: none; }
+html.dark-mode .why-photo--dark  { display: block; }
+/* if the dark image file is missing, fall back to the light one */
+html.dark-mode .why-visual.no-dark .why-photo--dark  { display: none; }
+html.dark-mode .why-visual.no-dark .why-photo--light { display: block; }
+
+@media (min-width: 480px) {
+  .why-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ---- DESKTOP: image gets its own column, sized by --why-img-w ---- */
+@media (min-width: 900px) {
+  .why { --why-img-w: clamp(420px, 54vw, 640px); }   /* <- desktop size: min, fluid, max */
+  .why-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--why-img-w));
+    gap: clamp(20px, 3vw, 48px);
+    container-type: inline-size;                     /* lets the heading measure the whole row (cqw) */
+  }
+  .why-content { position: relative; z-index: 2; padding-bottom: clamp(36px, 7vw, 72px); }
+
+  /* HEADING: stays on 2 lines by growing as wide as it needs, running across the
+     empty top of the image column. It only wraps when it truly runs out of room.
+     The 0.3 = how far into the image box it may reach (0.3 = 30% of the image width).
+     Raise it for more room, lower it to keep the heading further from the image. */
+  .why-title {
+    font-size: clamp(26px, 3.3vw, 36px);
+    width: max-content;
+    max-width: 100%;                                  /* fallback for very old browsers */
+    max-width: calc(100cqw - var(--why-img-w) * 0.3);
+  }
+  .why-visual { margin-inline: 0; }
+}
+
+/* Wide screens: all four in one horizontal row, icon above text */
+@media (min-width: 1320px) {
+  .why-list { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .why-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+/* ---------- FIND WHAT SUITS YOU BEST ---------- */
+.suits {
+  background: var(--surface-page);
+  padding-block: clamp(36px, 6vw, 64px);
+}
+
+.suits-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.suit-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  cursor: pointer;
+  transition: transform var(--dur-med) var(--ease),
+              box-shadow var(--dur-med) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+}
+.suit-card:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+.suit-media {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--gold-soft);
+}
+.suit-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease);
+}
+
+.suit-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px 12px;
+}
+.suit-text { min-width: 0; }
+.suit-text h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--on-page);
+}
+.suit-text p { margin: 2px 0 0; font-size: 12px; color: var(--on-page-soft); }
+
+.suit-arrow {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  color: var(--gold);
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+@media (hover: hover) {
+  .suit-card:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14); }
+  .suit-card:hover .suit-media img { transform: scale(1.06); }
+  .suit-card:hover .suit-arrow { background: var(--gold); color: var(--navy-2); }
+}
+
+@media (min-width: 576px) {
+  .suits-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .suit-text h3 { font-size: 15px; }
+}
+
+@media (min-width: 1100px) {
+  .suits-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
+  .suit-body { padding: 12px 12px 14px; }
+}
+
+/* ---------- TIPS FOR A BETTER LIVING ---------- */
+.tips {
+  background: var(--gold-soft);
+  padding-block: clamp(36px, 6vw, 64px);
+}
+
+.tips-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 32px);
+  align-items: center;
+}
+
+.tips-lead {
+  margin: 12px 0 20px;
+  max-width: 460px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--on-page-soft);
+}
+.tips-cta { max-width: 100%; }
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.tip-card {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--surface-page);
+  border: 1px solid var(--line-page);
+  color: inherit;
+  transition: transform var(--dur-med) var(--ease),
+              box-shadow var(--dur-med) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+}
+.tip-card:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+.tip-media {
+  position: relative;
+  flex: 0 0 38%;
+  min-height: 110px;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.9);
+}
+.tip-media--a { background: linear-gradient(135deg, #111F35, #2a4a7a); }
+.tip-media--b { background: linear-gradient(135deg, #9D5F16, #DF962E); }
+.tip-media--c { background: linear-gradient(135deg, #0B1220, #1f6f5c); }
+
+.tip-tag {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  max-width: calc(100% - 16px);
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: #fff;
+  color: var(--navy-2);
+}
+
+.tip-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+}
+.tip-body h3 { margin: 0; font-size: 14px; line-height: 1.35; font-weight: 700; color: var(--on-page); }
+.tip-meta { font-size: 12px; color: var(--on-page-soft); }
+
+@media (hover: hover) {
+  .tip-card:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14); }
+}
+
+@media (min-width: 768px) {
+  .tips-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .tip-card { flex-direction: column; }
+  .tip-media { flex: none; aspect-ratio: 16 / 10; min-height: 0; }
+  .tip-body { justify-content: flex-start; padding: 16px; }
+  .tip-body h3 { font-size: 15px; }
+}
+
+@media (min-width: 1100px) {
+  .tips-inner { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .suit-card, .tip-card, .suit-media img, .hp-link { transition: none; }
+  .suit-card:hover, .tip-card:hover { transform: none; }
+  .suit-card:hover .suit-media img { transform: none; }
+}

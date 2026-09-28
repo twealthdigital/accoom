@@ -179,102 +179,6 @@
 </section>
 
 
-<section class="popular-accommodation">
-  <div class="container">
-    <div class="popular-header">
-      <h2 class="section-title">Popular Accommodation</h2>
-    </div>
-
-    <div class="popular-scroll">
-
-      <div class="popular-card" data-popular-type role="button" tabindex="0">
-        <span class="popular-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 21h16"/>
-            <path d="M6 21V9l6-5 6 5v12"/>
-            <path d="M10 15v-2a2 2 0 0 1 4 0v2"/>
-          </svg>
-        </span>
-        <div class="popular-text">
-          <h3>Single Rooms</h3>
-          <p><span data-popular-count>0</span> available</p>
-        </div>
-      </div>
-
-      <div class="popular-card" data-popular-type role="button" tabindex="0">
-        <span class="popular-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="7" width="20" height="14" rx="2"/>
-            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-          </svg>
-        </span>
-        <div class="popular-text">
-          <h3>Self Contained</h3>
-          <p><span data-popular-count>0</span> available</p>
-        </div>
-      </div>
-
-      <div class="popular-card" data-popular-type role="button" tabindex="0">
-        <span class="popular-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-          </svg>
-        </span>
-        <div class="popular-text">
-          <h3>Mini Flats</h3>
-          <p><span data-popular-count>0</span> available</p>
-        </div>
-      </div>
-
-      <div class="popular-card" data-popular-type role="button" tabindex="0">
-        <span class="popular-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-        </span>
-        <div class="popular-text">
-          <h3>Shared Apartments</h3>
-          <p><span data-popular-count>0</span> available</p>
-        </div>
-      </div>
-
-      <div class="popular-card" data-popular-type role="button" tabindex="0">
-        <span class="popular-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 21v-6h8v6"/>
-            <rect x="2" y="9" width="20" height="12" rx="2"/>
-            <path d="M18 9V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v3"/>
-          </svg>
-        </span>
-        <div class="popular-text">
-          <h3>Beds in Hostel</h3>
-          <p><span data-popular-count>0</span> available</p>
-        </div>
-      </div>
-
-      <div class="popular-card" data-popular-type role="button" tabindex="0">
-        <span class="popular-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="4" y="6" width="16" height="12" rx="1"/>
-            <path d="M8 10h8"/>
-            <path d="M8 14h4"/>
-          </svg>
-        </span>
-        <div class="popular-text">
-          <h3>Studio Apartments</h3>
-          <p><span data-popular-count>0</span> available</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
-
 <!-- =========================================================
      ALL LISTINGS
 ============================================================= -->
@@ -283,8 +187,9 @@
 
 <div class="listings-header">
       <div>
-        <h2 class="section-title">All Property Listings</h2>
-        <p class="listings-subtitle">Browse through verified properties from top agents</p>
+        <span class="hp-eyebrow">Trending properties</span>
+        <h2 class="section-title">Popular Accommodation</h2>
+        <p class="listings-subtitle">Handpicked properties from verified agents.</p>
       </div>
 
       <div class="listings-filters-bar">
@@ -442,7 +347,7 @@
         var pager = document.querySelector('[data-listings-pagination]');
         if (!grid || !pager) return;
         var w = window.innerWidth;
-        var count = w >= 992 ? 20 : (w >= 768 ? 15 : 5);
+        var count = w >= 992 ? 8 : (w >= 768 ? 6 : (w >= 576 ? 4 : 2));
         var card = '<article class="listing-card skeleton-scope" aria-hidden="true"><div class="listing-card-media skeleton-ink"><img class="media-slide is-active skeleton-hide" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt=""></div><div class="listing-card-body"><p class="listing-name skeleton-ink skeleton-round skeleton-fit">3 Bedroom Flat, Surulere, Lagos</p><p class="listing-price skeleton-ink skeleton-round skeleton-fit">\u20A6205,000 <small class="skeleton-ink skeleton-round">/yr</small></p><p class="listing-location skeleton-ink skeleton-round skeleton-fit">Surulere, Lagos</p><div class="listing-meta"><span class="skeleton-ink skeleton-round">2 Bed</span><span class="skeleton-ink skeleton-round">1 Bath</span><span class="listing-share-wrap"><button type="button" class="listing-share skeleton-ink" tabindex="-1"></button></span></div><div class="listing-agent"><div class="listing-agent-id"><span class="listing-agent-avatar"><img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="" class="skeleton-ink skeleton-media"></span><span class="listing-agent-name skeleton-ink skeleton-round">StayWell Agents</span></div><span class="listing-rating skeleton-ink skeleton-round">4.9 (210)</span></div><div class="listing-agent-level-row"><span class="listing-agent-level level-al1 skeleton-ink">AL1</span><button type="button" class="listing-view-btn skeleton-ink" tabindex="-1"><span class="skeleton-ink skeleton-round">View</span></button></div></div></article>';
         var cards = '';
         for (var i = 0; i < count; i++) cards += card;
@@ -459,406 +364,188 @@
 </section>
 
 <!-- =========================================================
-     SUGGESTED FOR YOU
+     WHY CHOOSE ACCOOM
 ============================================================= -->
-<section class="suggested-for-you">
+<section class="why">
   <div class="container">
-    <div class="suggested-header">
-      <div>
-        <h2 class="section-title">Suggested for <span class="text-gold">you</span></h2>
-        <p class="listings-subtitle">Top verified agents with quality properties that match your search.</p>
-      </div>
-    </div>
+    <div class="why-inner">
 
-    <div class="suggested-carousel">
-      <button type="button" class="suggested-nav suggested-nav-prev" data-suggested-prev aria-label="Previous suggestions">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-      </button>
+      <div class="why-content">
+        <span class="hp-eyebrow">Why choose ACCOOM</span>
+        <h2 class="why-title">More Than Just a Place, <span class="why-title-line">It's a Better Living Experience.</span></h2>
+        <p class="why-lead">From verified listings to dedicated support, we make finding a home simple, safe and stress-free.</p>
 
-      <div class="suggested-grid" data-suggested-track>
-
-      <article class="suggested-card">
-        <div class="suggested-agent-row">
-          <img src="assets/images/agent-images/agenticonimg.webp" alt="David O." class="suggested-agent-avatar" />
-          <div class="suggested-agent-info">
-            <p class="suggested-agent-name">
-              David O.
-              <span class="suggested-verified-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle><path d="m8 12 3 3 5-5" stroke="var(--white)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                Verified Agent
-              </span>
-            </p>
-            <p class="suggested-agent-location">Lekki, Lagos</p>
-            <p class="suggested-agent-rating">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
-              4.8 <span>(120)</span>
-            </p>
-</div>
-          <button type="button" class="suggested-favorite" aria-label="Save agent">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
-          </button>
-        </div>
-
-        <div class="suggested-property-media">
-          <img src="assets/images/home-properties/miniflat1.png" alt="4 Bedroom Detached Duplex" data-image-2="assets/images/home-properties/hall3.png" data-image-3="assets/images/home-properties/singleroom3.png" />
-          <span class="listing-tag">Featured</span>
-        </div>
-
-        <div class="suggested-property-body">
-          <div class="suggested-property-top">
-<h3 class="suggested-property-name" data-id="suggested-1">4 Bedroom Detached Duplex</h3>
-            <p class="suggested-property-price">&#8358;460,000<span> / year</span></p>
-          </div>
-          <p class="suggested-property-location">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
-            Lekki Phase 1, Lagos
-          </p>
-
-          <div class="listing-agent-level-row">
-            <span class="listing-agent-level level-al5">
-              <span class="listing-agent-level-dots">
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-              </span>
-              AL5
+        <ul class="why-list">
+          <li class="why-item">
+            <span class="why-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.4 9-8 11-4.6-2-8-6-8-11V5l8-3z"></path><path d="M9 12l2 2 4-4"></path></svg>
             </span>
-          </div>
-
-          <div class="suggested-property-stats">
-            <span>4 Beds</span>
-            <span>5 Baths</span>
-            <span>250 sqm</span>
-            <span class="suggested-property-type">Duplex</span>
-          </div>
-
-          <div class="suggested-property-actions">
-<a href="#" class="btn btn--ghost btn--sm" data-suggested-view>View Details</a>
-            <a href="contact-agent.html" class="btn btn--primary btn--sm">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-              Contact Agent
-            </a>
-          </div>
-        </div>
-      </article>
-
-      <article class="suggested-card">
-        <div class="suggested-agent-row">
-          <img src="assets/images/agent-images/agenticonimg.webp" alt="Sarah M." class="suggested-agent-avatar" />
-          <div class="suggested-agent-info">
-            <p class="suggested-agent-name">
-              Sarah M.
-              <span class="suggested-verified-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle><path d="m8 12 3 3 5-5" stroke="var(--white)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                Verified Agent
-              </span>
-            </p>
-            <p class="suggested-agent-location">Victoria Island, Lagos</p>
-            <p class="suggested-agent-rating">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
-              4.9 <span>(98)</span>
-            </p>
+            <div class="why-item-text">
+              <h3>Verified Agents</h3>
+              <p>Levels, ratings and reviews.</p>
             </div>
-          <button type="button" class="suggested-favorite" aria-label="Save agent">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
-          </button>
-        </div>
-
-        <div class="suggested-property-media">
-          <img src="assets/images/home-properties/miniflat.png" alt="2 Bedroom Apartment" data-image-2="assets/images/home-properties/selfcon2.png" data-image-3="assets/images/home-properties/bedroomflat4.png" />
-          <span class="listing-tag">Featured</span>
-        </div>
-
-        <div class="suggested-property-body">
-          <div class="suggested-property-top">
-<h3 class="suggested-property-name" data-id="suggested-2">2 Bedroom Apartment</h3>
-            <p class="suggested-property-price">&#8358;325,000<span> / year</span></p>
-          </div>
-          <p class="suggested-property-location">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
-            Victoria Island, Lagos
-          </p>
-
-          <div class="listing-agent-level-row">
-            <span class="listing-agent-level level-al4">
-              <span class="listing-agent-level-dots">
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot"></span>
-              </span>
-              AL4
+          </li>
+          <li class="why-item">
+            <span class="why-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
             </span>
-          </div>
-
-          <div class="suggested-property-stats">
-            <span>2 Beds</span>
-            <span>3 Baths</span>
-            <span>120 sqm</span>
-            <span class="suggested-property-type">Apartment</span>
-          </div>
-
-          <div class="suggested-property-actions">
-            <a href="#" class="btn btn--ghost btn--sm">View Details</a>
-            <a href="contact-agent.html" class="btn btn--primary btn--sm">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-              Contact Agent
-            </a>
-          </div>
-        </div>
-      </article>
-
-      <article class="suggested-card">
-        <div class="suggested-agent-row">
-          <img src="assets/images/agent-images/agenticonimg.webp" alt="Michael B." class="suggested-agent-avatar" />
-          <div class="suggested-agent-info">
-            <p class="suggested-agent-name">
-              Michael B.
-              <span class="suggested-verified-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle><path d="m8 12 3 3 5-5" stroke="var(--white)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                Verified Agent
-              </span>
-            </p>
-            <p class="suggested-agent-location">Ikeja, Lagos</p>
-            <p class="suggested-agent-rating">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
-              4.7 <span>(95)</span>
-            </p>
-          </div>
-          <button type="button" class="suggested-favorite" aria-label="Save agent">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
-          </button>
-        </div>
-
-        <div class="suggested-property-media">
-          <img src="assets/images/home-properties/selfcon1.png" alt="Self-Contained Studio" data-image-2="assets/images/home-properties/selfcon4.png" data-image-3="assets/images/home-properties/selfcon5.png" />          <span class="listing-tag">Featured</span>
-        </div>
-
-        <div class="suggested-property-body">
-          <div class="suggested-property-top">
-<h3 class="suggested-property-name" data-id="suggested-3">Self-Contained Studio</h3>
-            <p class="suggested-property-price">&#8358;280,000<span> / year</span></p>
-          </div>
-          <p class="suggested-property-location">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
-            Ikeja GRA, Lagos
-          </p>
-
-          <div class="listing-agent-level-row">
-            <span class="listing-agent-level level-al3">
-              <span class="listing-agent-level-dots">
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot"></span>
-                <span class="level-dot"></span>
-              </span>
-              AL3
+            <div class="why-item-text">
+              <h3>Secure Payments</h3>
+              <p>Pay safely on the platform.</p>
+            </div>
+          </li>
+          <li class="why-item">
+            <span class="why-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
             </span>
-          </div>
-
-          <div class="suggested-property-stats">
-            <span>1 Bed</span>
-            <span>1 Bath</span>
-            <span>45 sqm</span>
-            <span class="suggested-property-type">Self-Con</span>
-          </div>
-
-          <div class="suggested-property-actions">
-            <a href="#" class="btn btn--ghost btn--sm">View Details</a>
-            <a href="contact-agent.html" class="btn btn--primary btn--sm">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-              Contact Agent
-            </a>
-          </div>
-        </div>
-      </article>
-
-      <article class="suggested-card">
-        <div class="suggested-agent-row">
-          <img src="assets/images/agent-images/agenticonimg.webp" alt="Grace A." class="suggested-agent-avatar" />
-          <div class="suggested-agent-info">
-            <p class="suggested-agent-name">
-              Grace A.
-              <span class="suggested-verified-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle><path d="m8 12 3 3 5-5" stroke="var(--white)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                Verified Agent
-              </span>
-            </p>
-            <p class="suggested-agent-location">Yaba, Lagos</p>
-            <p class="suggested-agent-rating">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
-              4.6 <span>(72)</span>
-            </p>
-          </div>
-          <button type="button" class="suggested-favorite" aria-label="Save agent">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
-          </button>
-        </div>
-
-        <div class="suggested-property-media">
-        <img src="assets/images/home-properties/hall2.png" alt="3 Bedroom Flat" data-image-2="assets/images/home-properties/hall3.png" data-image-3="assets/images/home-properties/bedroomflat3.png" />
-          <span class="listing-tag">Featured</span>
-        </div>
-
-        <div class="suggested-property-body">
-          <div class="suggested-property-top">
-<h3 class="suggested-property-name" data-id="suggested-4">3 Bedroom Flat</h3>
-            <p class="suggested-property-price">&#8358;550,000<span> / year</span></p>
-          </div>
-          <p class="suggested-property-location">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
-            Yaba, Lagos
-          </p>
-
-          <div class="listing-agent-level-row">
-            <span class="listing-agent-level level-al2">
-              <span class="listing-agent-level-dots">
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot"></span>
-                <span class="level-dot"></span>
-                <span class="level-dot"></span>
-              </span>
-              AL2
+            <div class="why-item-text">
+              <h3>Dedicated Support</h3>
+              <p>Real people, ready to help.</p>
+            </div>
+          </li>
+          <li class="why-item">
+            <span class="why-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
             </span>
-          </div>
-
-          <div class="suggested-property-stats">
-            <span>3 Beds</span>
-            <span>3 Baths</span>
-            <span>140 sqm</span>
-            <span class="suggested-property-type">Flat</span>
-          </div>
-
-          <div class="suggested-property-actions">
-            <a href="#" class="btn btn--ghost btn--sm">View Details</a>
-            <a href="contact-agent.html" class="btn btn--primary btn--sm">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-              Contact Agent
-            </a>
-          </div>
-        </div>
-      </article>
-
-      <article class="suggested-card">
-        <div class="suggested-agent-row">
-          <img src="assets/images/agent-images/agenticonimg.webp" alt="Tunde K." class="suggested-agent-avatar" />
-          <div class="suggested-agent-info">
-            <p class="suggested-agent-name">
-              Tunde K.
-              <span class="suggested-verified-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle><path d="m8 12 3 3 5-5" stroke="var(--white)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                Verified Agent
-              </span>
-            </p>
-            <p class="suggested-agent-location">Surulere, Lagos</p>
-            <p class="suggested-agent-rating">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.9 1.2 7-6.2-3.4L5.8 21 7 14 2 9.1l7-.9L12 2z"></path></svg>
-              5.0 <span>(140)</span>
-            </p>
-          </div>
-          <button type="button" class="suggested-favorite" aria-label="Save agent">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path></svg>
-          </button>
-        </div>
-
-        <div class="suggested-property-media">
-        <img src="assets/images/home-properties/bedroomflat3.png" alt="Mini Flat" data-image-2="assets/images/home-properties/miniflat.png" data-image-3="assets/images/home-properties/selfcon3.png" />
-          <span class="listing-tag">Featured</span>
-        </div>
-
-        <div class="suggested-property-body">
-          <div class="suggested-property-top">
-<h3 class="suggested-property-name" data-id="suggested-5">Mini Flat</h3>
-            <p class="suggested-property-price">&#8358;310,000<span> / year</span></p>
-          </div>
-          <p class="suggested-property-location">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
-            Surulere, Lagos
-          </p>
-
-          <div class="listing-agent-level-row">
-            <span class="listing-agent-level level-al5">
-              <span class="listing-agent-level-dots">
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-                <span class="level-dot is-filled"></span>
-              </span>
-              AL5
-            </span>
-          </div>
-
-          <div class="suggested-property-stats">
-            <span>2 Beds</span>
-            <span>2 Baths</span>
-            <span>85 sqm</span>
-            <span class="suggested-property-type">Mini Flat</span>
-          </div>
-
-          <div class="suggested-property-actions">
-            <a href="#" class="btn btn--ghost btn--sm">View Details</a>
-            <a href="contact-agent.html" class="btn btn--primary btn--sm">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-              Contact Agent
-            </a>
-          </div>
-        </div>
-      </article>
-
+            <div class="why-item-text">
+              <h3>Saved &amp; Alerts</h3>
+              <p>Save homes, get updates.</p>
+            </div>
+          </li>
+        </ul>
       </div>
 
-      <button type="button" class="suggested-nav suggested-nav-next" data-suggested-next aria-label="Next suggestions">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-      </button>
+      <div class="why-visual">
+        <img class="why-photo why-photo--light" src="assets/images/home-images/why-choose-accoom-section-image.png" alt="" loading="lazy" onerror="this.style.display='none'">
+        <img class="why-photo why-photo--dark" src="assets/images/home-images/why-choose-accoom-section-image2.png" alt="" loading="lazy" onerror="this.parentNode.classList.add('no-dark')">
+      </div>
+
     </div>
   </div>
 </section>
 
 <!-- =========================================================
-     TRUST BADGES
+     FIND WHAT SUITS YOU BEST
 ============================================================= -->
-<section class="trust-badges">
+<section class="suits">
   <div class="container">
-    <div class="trust-badges-grid">
+    <div class="hp-head">
+      <div>
+        <span class="hp-eyebrow">Explore by type</span>
+        <h2 class="hp-heading">Find What Suits You Best</h2>
+      </div>
+      <a href="#all-listings" class="hp-link">Browse all properties
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </a>
+    </div>
 
-      <div class="trust-badge">
-        <span class="trust-badge-icon">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.4 9-8 11-4.6-2-8-6-8-11V5l8-3z"></path><path d="M12 8v4"></path><circle cx="12" cy="15.5" r="0.6" fill="currentColor" stroke="none"></circle></svg>
-        </span>
-        <h4>Verified &amp; Trusted</h4>
-        <p>Every agent and listing is verified for your peace of mind.</p>
+    <div class="suits-grid">
+
+      <div class="suit-card" data-popular-type role="button" tabindex="0">
+        <div class="suit-media"><img src="assets/images/home-properties/singleroom.png" alt="" loading="lazy"></div>
+        <div class="suit-body">
+          <div class="suit-text"><h3>Single Rooms</h3><p><span data-popular-count>0</span> available</p></div>
+          <span class="suit-arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+        </div>
       </div>
 
-      <div class="trust-badge">
-        <span class="trust-badge-icon">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"></circle><path d="M8.2 12.8 6 21l6-3 6 3-2.2-8.2"></path></svg>
-        </span>
-        <h4>Quality Listings</h4>
-        <p>Handpicked properties that meet our quality standards.</p>
+      <div class="suit-card" data-popular-type role="button" tabindex="0">
+        <div class="suit-media"><img src="assets/images/home-properties/selfcon.png" alt="" loading="lazy"></div>
+        <div class="suit-body">
+          <div class="suit-text"><h3>Self Contained</h3><p><span data-popular-count>0</span> available</p></div>
+          <span class="suit-arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+        </div>
       </div>
 
-      <div class="trust-badge">
-        <span class="trust-badge-icon">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
-        </span>
-        <h4>Secure &amp; Safe</h4>
-        <p>Your data and payments are protected with top security.</p>
+      <div class="suit-card" data-popular-type role="button" tabindex="0">
+        <div class="suit-media"><img src="assets/images/home-properties/miniflat.png" alt="" loading="lazy"></div>
+        <div class="suit-body">
+          <div class="suit-text"><h3>Mini Flats</h3><p><span data-popular-count>0</span> available</p></div>
+          <span class="suit-arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+        </div>
       </div>
 
-      <div class="trust-badge">
-        <span class="trust-badge-icon">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-        </span>
-        <h4>Customer First</h4>
-        <p>We're here to support you every step of the way.</p>
+      <div class="suit-card" data-popular-type role="button" tabindex="0">
+        <div class="suit-media"><img src="assets/images/home-properties/bedroomflat4.png" alt="" loading="lazy"></div>
+        <div class="suit-body">
+          <div class="suit-text"><h3>Shared Apartments</h3><p><span data-popular-count>0</span> available</p></div>
+          <span class="suit-arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+        </div>
       </div>
 
+      <div class="suit-card" data-popular-type role="button" tabindex="0">
+        <div class="suit-media"><img src="assets/images/home-properties/bedroomflat3.png" alt="" loading="lazy"></div>
+        <div class="suit-body">
+          <div class="suit-text"><h3>Beds in Hostel</h3><p><span data-popular-count>0</span> available</p></div>
+          <span class="suit-arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+        </div>
+      </div>
+
+      <div class="suit-card" data-popular-type role="button" tabindex="0">
+        <div class="suit-media"><img src="assets/images/home-properties/hall3.png" alt="" loading="lazy"></div>
+        <div class="suit-body">
+          <div class="suit-text"><h3>Studio Apartments</h3><p><span data-popular-count>0</span> available</p></div>
+          <span class="suit-arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     TIPS FOR A BETTER LIVING
+============================================================= -->
+<section class="tips">
+  <div class="container">
+    <div class="tips-inner">
+
+      <div class="tips-intro">
+        <span class="hp-eyebrow">Guides &amp; insights</span>
+        <h2 class="hp-heading">Tips for a Better Living</h2>
+        <p class="tips-lead">Useful guides, neighbourhood insights and expert tips to make finding and keeping a home simple and stress-free.</p>
+        <a href="help-support.html" class="btn btn--primary tips-cta">
+          Visit Resource Center
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+      </div>
+
+      <div class="tips-grid">
+
+        <a href="help-support.html" class="tip-card">
+          <div class="tip-media tip-media--a" aria-hidden="true">
+            <span class="tip-tag">Area Guide</span>
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          </div>
+          <div class="tip-body">
+            <h3>Top 10 Best Areas to Live in Lagos</h3>
+            <span class="tip-meta">5 min read</span>
+          </div>
+        </a>
+
+        <a href="help-support.html" class="tip-card">
+          <div class="tip-media tip-media--b" aria-hidden="true">
+            <span class="tip-tag">Budgeting</span>
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line><line x1="6" y1="15" x2="10" y2="15"></line></svg>
+          </div>
+          <div class="tip-body">
+            <h3>How to Budget Your Rent Like a Pro</h3>
+            <span class="tip-meta">7 min read</span>
+          </div>
+        </a>
+
+        <a href="help-support.html" class="tip-card">
+          <div class="tip-media tip-media--c" aria-hidden="true">
+            <span class="tip-tag">Renting Tips</span>
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+          </div>
+          <div class="tip-body">
+            <h3>What to Check Before Renting an Apartment</h3>
+            <span class="tip-meta">6 min read</span>
+          </div>
+        </a>
+
+      </div>
     </div>
   </div>
 </section>
