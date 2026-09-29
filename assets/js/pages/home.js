@@ -573,13 +573,54 @@ function cardTemplate(item) {
         if (listingsEmpty) listingsEmpty.classList.toggle('is-visible', items.length === 0);
       }
 
+      // Builds the visible page-number list: always the first page, the
+      // last page, and a window of numbers around the current page — with
+      // '…' standing in for any run of 2+ hidden pages (a single hidden
+      // page is just shown, since an ellipsis wouldn't save any space).
+      // siblingCount controls how wide that middle window is; see
+      // getPaginationSiblingCount() below for how it varies by screen size.
+      function paginationRange(current, total, siblingCount, boundaryCount) {
+        var set = {};
+        var i;
+        for (i = 1; i <= Math.min(boundaryCount, total); i++) set[i] = true;
+        for (i = Math.max(1, total - boundaryCount + 1); i <= total; i++) set[i] = true;
+        for (i = Math.max(1, current - siblingCount); i <= Math.min(total, current + siblingCount); i++) set[i] = true;
+        var nums = Object.keys(set).map(Number).sort(function (a, b) { return a - b; });
+        var out = [];
+        for (i = 0; i < nums.length; i++) {
+          if (i > 0) {
+            var gap = nums[i] - nums[i - 1];
+            if (gap === 2) out.push(nums[i - 1] + 1);
+            else if (gap > 2) out.push('…');
+          }
+          out.push(nums[i]);
+        }
+        return out;
+      }
+
+      // How many numbers appear on each side of the current page.
+      // 0 on mobile = just "first … current … last".
+      // Desktop caps out at 1 (first) + 1 (last) + 5 (window) = 9 numbers.
+      function getPaginationSiblingCount() {
+        var w = window.innerWidth;
+        if (w < 576) return 0;
+        if (w < 992) return 1;
+        return 2;
+      }
+
       function renderPagination(page, totalPages) {
         if (totalPages <= 1) { listingsPagination.innerHTML = ''; return; }
 
+        var pages = paginationRange(page, totalPages, getPaginationSiblingCount(), 1);
+
         var html = '<button type="button" data-page="prev" ' + (page === 1 ? 'disabled' : '') + ' aria-label="Previous page">‹</button>';
-        for (var p = 1; p <= totalPages; p++) {
-          html += '<button type="button" class="' + (p === page ? 'is-active' : '') + '" data-page="' + p + '">' + p + '</button>';
-        }
+        pages.forEach(function (p) {
+          if (p === '…') {
+            html += '<button type="button" class="is-ellipsis" disabled aria-hidden="true">…</button>';
+          } else {
+            html += '<button type="button" class="' + (p === page ? 'is-active' : '') + '" data-page="' + p + '"' + (p === page ? ' aria-current="page"' : '') + '>' + p + '</button>';
+          }
+        });
         html += '<button type="button" data-page="next" ' + (page === totalPages ? 'disabled' : '') + ' aria-label="Next page">›</button>';
 
         listingsPagination.innerHTML = html;
@@ -1460,7 +1501,28 @@ var nameEl = card.querySelector('.listing-name');
       });
     }
 
-// Footer year (footer is now an async partial, so wait for it)
+// Tips cards — spread out from below like a dealt hand of cards, once
+    // the section actually scrolls into view. No JS / no IntersectionObserver
+    // support / prefers-reduced-motion all fall back to the cards simply
+    // being visible, since the CSS only hides them once .tip-anim-ready
+    // is added here.
+    (function initTipsReveal() {
+      var grid = document.querySelector('.tips-grid');
+      if (!grid || !('IntersectionObserver' in window)) return;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      grid.classList.add('tip-anim-ready');
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            grid.classList.add('is-in-view');
+            io.disconnect();
+          }
+        });
+      }, { threshold: 0.25 });
+      io.observe(grid);
+    })();
+
+    // Footer year (footer is now an async partial, so wait for it)
     Accoom.on(document, 'partial:loaded', function (e) {
       if (e.detail.url === 'partials/footer.html') {
         var yearEl = document.querySelector('[data-current-year]');

@@ -91,7 +91,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
             <span>Overview</span>
           </a>
-          <a href="#" class="ag-dash-nav-link" data-ag-soon>
+          <a href="my-listings.html" class="ag-dash-nav-link">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg>
             <span>My Listings</span>
           </a>
@@ -179,7 +179,10 @@
               <h2>Your Listings</h2>
               <p>Every property you've submitted, grouped by status.</p>
             </div>
-            <a href="#" class="ag-dash-view-all" data-ag-soon>View all</a>
+            <div style="display:flex;align-items:center;gap:14px;">
+              <a href="my-listings.html" class="ag-dash-view-all">+ Add new listing</a>
+              <a href="my-listings.html" class="ag-dash-view-all">View all</a>
+            </div>
           </div>
 
           <!-- Status tabs — the last three (Delisted / In Dispute / Reported)
@@ -253,5 +256,6 @@
   <script src="assets/js/main.js"></script>
   <script src="assets/js/pages/agent-dashboard.js"></script>
 <script src="assets/js/modules/listing-actions.js"></script>
+<script>Accoom.ListingActions.configure({ editHref: 'my-listings.html' });</script>
 </body>
 </html>

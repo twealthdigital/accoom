@@ -1166,16 +1166,43 @@
       views: d.views
     };
 
-    // Saved agent uploads (if the upload flow wrote them)
+    // Saved agent uploads (from the My Listings form) — pull the WHOLE
+    // record, not just media, so the View dialog tallies exactly with
+    // what the agent filled in rather than quietly falling back to
+    // placeholder copy for anything they actually supplied.
     try {
       var saved = JSON.parse(window.localStorage.getItem('accoom-agent-listings'));
       if (Array.isArray(saved)) {
         saved.forEach(function (s) {
-          if (String(s.id) === String(p.id)) {
-            if (s.images && s.images.length) p.images = s.images;
-            else if (s.cover && !d.images) p.images = [s.cover];
-            if (s.video && !p.video) p.video = s.video;
+          if (String(s.id) !== String(p.id)) return;
+          if (s.images && s.images.length) p.images = s.images;
+          else if (s.cover && !d.images) p.images = [s.cover];
+          if (s.video && !p.video) p.video = s.video;
+          if (Array.isArray(s.videosAll) && s.videosAll.length > 1) {
+            // extra videos beyond the primary one join the gallery as slides too
+            p.extraVideos = s.videosAll.filter(function (v) { return v !== p.video; });
           }
+          if (s.about) p.about = s.about;
+          if (Array.isArray(s.description) && s.description.length) p.description = s.description;
+          if (Array.isArray(s.amenities) && s.amenities.length) p.amenities = s.amenities;
+          if (Array.isArray(s.quickFacts) && s.quickFacts.length) p.quickFacts = s.quickFacts;
+          if (s.furnishing) p.furnishing = s.furnishing;
+          if (s.yearBuilt) p.yearBuilt = s.yearBuilt;
+          if (s.parking != null) p.parking = s.parking + (s.parking === 1 ? ' Car' : ' Cars');
+          if (s.dateAdded) p.dateAdded = s.dateAdded;
+          if (s.views != null) p.views = s.views;
+          if (s.typeLabel && !d.type) p.typeLabel = s.typeLabel;
+          if (s.location && !d.location) p.location = s.location;
+          if (s.priceValue != null && !d.images /* agent-authored, trust it over the DOM-scraped price */) {
+            p.priceValue = s.priceValue;
+            p.price = formatNaira(s.priceValue);
+          }
+          if (s.period) p.period = s.period;
+          if (s.beds != null) p.beds = s.beds;
+          if (s.baths != null) p.baths = s.baths;
+          if (s.totalPayable != null) p.totalPayable = s.totalPayable;
+          if (s.agencyFeePct != null) p.agencyFeePct = s.agencyFeePct;
+          if (s.legalFeePct != null) p.legalFeePct = s.legalFeePct;
         });
       }
     } catch (e) { /* ignore */ }
@@ -1277,22 +1304,32 @@
     return list;
   }
 
+  var MAX_SLIDES = 10; // property photos + all videos combined, same cap the upload form enforces
+
   function buildSlides(p) {
     var slides = [];
     var images = ensureMinImages(p, 3);
     if (!images.length) images = [PLACEHOLDER_IMG];
     if (p.video) slides.push({ type: 'video', src: p.video, poster: images[0] });
     images.forEach(function (src) { slides.push({ type: 'image', src: src }); });
-    return slides;
+    (p.extraVideos || []).forEach(function (src) { slides.push({ type: 'video', src: src, poster: images[0] }); });
+    return slides.slice(0, MAX_SLIDES);
   }
+
+  var THUMBS_VISIBLE = 3; // buyer view stays uncluttered; the rest is one tap away via "+N"
 
   function galleryHtml(p, slides, statusLabel) {
     var multi = slides.length > 1;
-    var thumbs = multi ? '<div class="lax-thumbs" data-lax-thumbs>' + slides.map(function (s, i) {
+    var visibleCount = Math.min(THUMBS_VISIBLE, slides.length);
+    var hiddenCount = slides.length - visibleCount;
+    var thumbs = multi ? '<div class="lax-thumbs" data-lax-thumbs>' + slides.slice(0, visibleCount).map(function (s, i) {
       var poster = s.type === 'video' ? s.poster : s.src;
-      return '<button type="button" class="lax-thumb" data-index="' + i + '" aria-label="' + (s.type === 'video' ? 'Play video' : 'Photo ' + (i + 1)) + '">' +
+      var isLastVisible = i === visibleCount - 1 && hiddenCount > 0;
+      return '<button type="button" class="lax-thumb' + (isLastVisible ? ' lax-thumb-more' : '') + '" data-index="' + i + '" aria-label="' +
+        (isLastVisible ? ('Show ' + hiddenCount + ' more') : (s.type === 'video' ? 'Play video' : 'Photo ' + (i + 1))) + '">' +
         '<img src="' + esc(poster) + '" alt="" loading="lazy" />' +
-        (s.type === 'video' ? '<span class="lax-thumb-play"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg></span>' : '') +
+        (s.type === 'video' && !isLastVisible ? '<span class="lax-thumb-play"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg></span>' : '') +
+        (isLastVisible ? '<span class="lax-thumb-more-badge">+' + hiddenCount + '</span>' : '') +
         '</button>';
     }).join('') + '</div>' : '';
 
@@ -1388,6 +1425,17 @@
     '</div>';
   }
 
+  // Rough, honest stand-in for real adaptive streaming (which needs a
+  // server transcoding multiple renditions): on a slow or metered
+  // connection we only preload metadata and never autoplay, so a big
+  // video file doesn't stall the page on a weak network.
+  function connectionIsSlow() {
+    var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (!c) return false;
+    if (c.saveData) return true;
+    return /^(slow-2g|2g|3g)$/.test(c.effectiveType || '');
+  }
+
   function initGallery(root, p, slides, dlg) {
     var main = root.querySelector('[data-lax-main]');
     var img = root.querySelector('[data-lax-img]');
@@ -1397,6 +1445,8 @@
     var viewBtn = root.querySelector('[data-lax-open-lightbox]');
     var index = 0;
     var imageSlides = slides.filter(function (s) { return s.type === 'image'; });
+    var slowNet = connectionIsSlow();
+    video.setAttribute('preload', slowNet ? 'none' : 'metadata');
 
     function loaded() { main.classList.remove('is-loading'); }
 
@@ -1419,8 +1469,13 @@
         video.style.display = 'block';
         video.setAttribute('poster', slide.poster || '');
         if (video.getAttribute('src') !== slide.src) video.setAttribute('src', slide.src);
-        var pr = video.play && video.play();
-        if (pr && pr.catch) pr.catch(function () {});
+        // Don't force autoplay on a slow connection — let the person tap play themselves.
+        if (!slowNet) {
+          var pr = video.play && video.play();
+          if (pr && pr.catch) pr.catch(function () {});
+        } else {
+          loaded();
+        }
         if (viewBtn) viewBtn.style.display = imageSlides.length ? '' : 'none';
       } else {
         if (video.pause) video.pause();
@@ -1454,7 +1509,11 @@
     if (thumbs) {
       thumbs.addEventListener('click', function (e) {
         var t = e.target.closest('.lax-thumb');
-        if (t) setActive(parseInt(t.getAttribute('data-index'), 10));
+        if (!t) return;
+        var i = parseInt(t.getAttribute('data-index'), 10);
+        setActive(i);
+        // "+N" tile: jump straight into the full-screen viewer so the rest is one tap away
+        if (t.classList.contains('lax-thumb-more') && viewBtn) viewBtn.click();
       });
     }
 

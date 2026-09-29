@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Listings — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark') document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+
+  <!--
+    SECURITY GATE — same soft, client-side-only caveat as every other
+    gated page here (see onboarding.html / agent-details.html).
+  -->
+  <script>
+    (function () {
+      try {
+        var user = JSON.parse(localStorage.getItem('accoom-user'));
+        if (!user || !user.email) {
+          window.location.replace('auth.html');
+          return;
+        }
+        if (!user.role) {
+          window.location.replace('onboarding.html');
+          return;
+        }
+        if (user.role === 'customer') {
+          window.location.replace('home.html');
+          return;
+        }
+        if (user.role === 'agent' && !user.agentProfileCompleted) {
+          window.location.replace('agent-details.html');
+          return;
+        }
+      } catch (e) {
+        window.location.replace('auth.html');
+      }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="preload" href="partials/header.html" as="fetch" crossorigin>
+  <link rel="preload" href="partials/footer.html" as="fetch" crossorigin>
+  <link rel="stylesheet" href="assets/css/pages/agent-dashboard.css" />
+  <link rel="stylesheet" href="assets/css/components/listing-actions.css" />
+  <link rel="stylesheet" href="assets/css/pages/my-listings.css" />
+</head>
+<body>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================= -->
+  <div class="partial-mount" data-partial="partials/header.html"></div>
+
+  <!-- =========================================================
+       MY LISTINGS — same sidebar shell as the dashboard, so an
+       agent moving between the two never loses their bearings.
+  ========================================================= -->
+  <main class="ag-dash-page">
+    <div class="ag-dash-layout">
+
+      <div class="ag-dash-backdrop" data-ag-backdrop hidden></div>
+
+      <!-- Sidebar -->
+      <aside class="ag-dash-sidebar" data-ag-sidebar>
+        <div class="ag-dash-identity">
+          <div class="ag-dash-avatar-wrap">
+            <span class="ag-dash-avatar" data-ag-avatar>AG</span>
+            <img class="ag-dash-avatar-img" data-ag-avatar-img alt="" hidden />
+            <span class="ag-dash-verified" data-ag-verified-badge hidden title="NIN verified">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+          </div>
+          <div class="ag-dash-identity-text">
+            <p class="ag-dash-name" data-ag-name>Agent</p>
+            <p class="ag-dash-role" data-ag-type>Individual Landlord</p>
+          </div>
+        </div>
+
+        <nav class="ag-dash-nav" aria-label="Dashboard">
+          <a href="agent-dashboard.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+            <span>Overview</span>
+          </a>
+          <a href="my-listings.html" class="ag-dash-nav-link is-active">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l8-4 8 4v14"></path><path d="M9 9h1"></path><path d="M9 13h1"></path><path d="M14 9h1"></path><path d="M14 13h1"></path><path d="M9 21v-4a3 3 0 0 1 6 0v4"></path></svg>
+            <span>My Listings</span>
+          </a>
+          <a href="#" class="ag-dash-nav-link" data-ag-soon>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            <span>Inquiries</span>
+          </a>
+          <a href="#" class="ag-dash-nav-link" data-ag-soon>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            <span>Payouts</span>
+          </a>
+          <a href="purchases.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            <span>My Purchases</span>
+          </a>
+          <a href="saved-properties.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21 12 16l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+            <span>Saved Properties</span>
+          </a>
+          <a href="account-settings.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <span>Account Settings</span>
+          </a>
+          <a href="help-support.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span>Help &amp; Support</span>
+          </a>
+        </nav>
+
+        <button type="button" class="ag-dash-nav-link ag-dash-signout" data-ag-signout>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          <span>Sign Out</span>
+        </button>
+      </aside>
+
+      <!-- Main -->
+      <section class="ag-dash-main">
+
+        <button type="button" class="ag-dash-mobile-toggle" data-ag-mobile-toggle aria-label="Open menu" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <span>Menu</span>
+        </button>
+
+        <div class="ml-topbar">
+          <div>
+            <h1 class="ml-title" data-ml-title>Add a new listing</h1>
+            <p class="ml-sub">Fill in everything a buyer would need to see — it all shows up on the property page exactly as you enter it here.</p>
+          </div>
+          <a href="agent-dashboard.html" class="ml-back">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Back to dashboard
+          </a>
+        </div>
+
+        <form class="ml-form" data-ml-form novalidate>
+
+          <!-- ============================================================
+               CATEGORY, TYPE & TITLE
+          ============================================================= -->
+          <section class="ml-card">
+            <h2 class="ml-card-title">Listing basics</h2>
+
+            <div class="ml-field">
+              <label class="ml-label">What are you listing this for? <span class="ml-req">*</span></label>
+              <div class="ml-segmented" data-ml-category role="radiogroup" aria-label="Category">
+                <button type="button" class="ml-segmented-btn is-active" data-value="rent" role="radio" aria-checked="true">For Rent</button>
+                <button type="button" class="ml-segmented-btn" data-value="sale" role="radio" aria-checked="false">For Sale</button>
+              </div>
+            </div>
+
+            <div class="ml-row">
+              <div class="ml-field" data-ml-select-mount="propertyType">
+                <label class="ml-label" for="ml-type-search">Property type <span class="ml-req">*</span></label>
+              </div>
+
+              <div class="ml-field" data-ml-period-field>
+                <label class="ml-label" for="ml-period-search">Billed per <span class="ml-req">*</span></label>
+                <div data-ml-select-mount="period"></div>
+              </div>
+            </div>
+
+            <div class="ml-field">
+              <label class="ml-label" for="ml-title">Listing title <span class="ml-req">*</span></label>
+              <input type="text" class="ml-input" id="ml-title" data-ml-field="name" maxlength="90" placeholder="e.g. 2 Bedroom Detached Duplex" autocomplete="off" />
+              <p class="ml-hint" data-ml-count="ml-title">0 / 90</p>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               LOCATION + MAP
+          ============================================================= -->
+          <section class="ml-card">
+            <h2 class="ml-card-title">Location</h2>
+            <p class="ml-card-sub">The map updates as you type, using the same address a buyer will see on the property page.</p>
+
+            <div class="ml-row">
+              <div class="ml-field" data-ml-select-mount="state">
+                <label class="ml-label">State <span class="ml-req">*</span></label>
+              </div>
+              <div class="ml-field">
+                <label class="ml-label" for="ml-area">Area / Neighbourhood <span class="ml-req">*</span></label>
+                <input type="text" class="ml-input" id="ml-area" data-ml-field="area" placeholder="e.g. Lekki Phase 1" autocomplete="off" />
+              </div>
+            </div>
+
+            <div class="ml-field">
+              <label class="ml-label" for="ml-address">Full street address <span class="ml-req">*</span></label>
+              <input type="text" class="ml-input" id="ml-address" data-ml-field="address" data-ml-guard placeholder="e.g. 12 Admiralty Way" autocomplete="off" />
+              <p class="ml-hint">Shown to buyers only after they've paid — keep it accurate.</p>
+            </div>
+
+            <div class="ml-map" data-ml-map>
+              <iframe data-ml-map-frame title="Property location preview" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              <div class="ml-map-empty" data-ml-map-empty>Add a state and area to preview the map</div>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               PRICING & FEES
+          ============================================================= -->
+          <section class="ml-card">
+            <h2 class="ml-card-title">Pricing &amp; fees</h2>
+            <p class="ml-card-sub">Agency and legal fees are added on top automatically — buyers see the full total before they pay, never a surprise on checkout.</p>
+
+            <div class="ml-row ml-row--3">
+              <div class="ml-field">
+                <label class="ml-label" for="ml-price">Price (&#8358;) <span class="ml-req">*</span></label>
+                <input type="text" inputmode="numeric" class="ml-input" id="ml-price" data-ml-field="price" placeholder="e.g. 460,000" autocomplete="off" />
+              </div>
+              <div class="ml-field">
+                <label class="ml-label" for="ml-agency-fee">Agency fee (%) <span class="ml-req">*</span></label>
+                <input type="number" min="0" max="100" step="0.5" class="ml-input" id="ml-agency-fee" data-ml-field="agencyFeePct" value="5" autocomplete="off" />
+              </div>
+              <div class="ml-field">
+                <label class="ml-label" for="ml-legal-fee">Legal fee (%) <span class="ml-req">*</span></label>
+                <input type="number" min="0" max="100" step="0.5" class="ml-input" id="ml-legal-fee" data-ml-field="legalFeePct" value="5" autocomplete="off" />
+              </div>
+            </div>
+
+            <div class="ml-price-breakdown" data-ml-price-breakdown>
+              <div class="ml-price-row"><span>Listed price</span><span data-ml-price-out>&#8358;0</span></div>
+              <div class="ml-price-row"><span data-ml-agency-label>Agency fee</span><span data-ml-agency-out>&#8358;0</span></div>
+              <div class="ml-price-row"><span data-ml-legal-label>Legal fee</span><span data-ml-legal-out>&#8358;0</span></div>
+              <div class="ml-price-row ml-price-row--total"><span>Total the buyer pays</span><span data-ml-total-out>&#8358;0</span></div>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               SPECIFICATIONS
+          ============================================================= -->
+          <section class="ml-card">
+            <h2 class="ml-card-title">Specifications</h2>
+
+            <div class="ml-row ml-row--4">
+              <div class="ml-field">
+                <label class="ml-label" for="ml-beds">Bedrooms <span class="ml-req">*</span></label>
+                <input type="number" min="0" max="20" class="ml-input" id="ml-beds" data-ml-field="beds" placeholder="0" autocomplete="off" />
+              </div>
+              <div class="ml-field">
+                <label class="ml-label" for="ml-baths">Bathrooms <span class="ml-req">*</span></label>
+                <input type="number" min="0" max="20" class="ml-input" id="ml-baths" data-ml-field="baths" placeholder="0" autocomplete="off" />
+              </div>
+              <div class="ml-field">
+                <label class="ml-label" for="ml-kitchens">Kitchens <span class="ml-req">*</span></label>
+                <input type="number" min="0" max="10" class="ml-input" id="ml-kitchens" data-ml-field="kitchens" placeholder="0" autocomplete="off" />
+              </div>
+              <div class="ml-field">
+                <label class="ml-label" for="ml-living">Living rooms <span class="ml-req">*</span></label>
+                <input type="number" min="0" max="10" class="ml-input" id="ml-living" data-ml-field="livingRooms" placeholder="0" autocomplete="off" />
+              </div>
+            </div>
+
+            <div class="ml-row">
+              <div class="ml-field">
+                <label class="ml-label" for="ml-parking">Parking spaces <span class="ml-req">*</span></label>
+                <input type="number" min="0" max="20" class="ml-input" id="ml-parking" data-ml-field="parking" placeholder="0" autocomplete="off" />
+              </div>
+              <div class="ml-field">
+                <label class="ml-label" for="ml-year">Year built <span class="ml-req">*</span></label>
+                <input type="number" min="1950" max="2026" class="ml-input" id="ml-year" data-ml-field="yearBuilt" placeholder="e.g. 2024" autocomplete="off" />
+              </div>
+            </div>
+
+            <div class="ml-field" data-ml-select-mount="furnishing">
+              <label class="ml-label">Furnishing <span class="ml-req">*</span></label>
+            </div>
+
+            <div class="ml-field">
+              <label class="ml-label">Quick facts buyers will see first <span class="ml-req">*</span></label>
+              <p class="ml-hint">Pick everything that applies — this is exactly what shows under "About this property".</p>
+              <div class="ml-check-grid" data-ml-quickfacts></div>
+              <div class="ml-custom-add" data-ml-custom-add="quickFacts">
+                <input type="text" class="ml-input" data-ml-guard placeholder="Add a custom quick fact (e.g. Rooftop Terrace)" />
+                <button type="button" class="ml-add-btn">Add</button>
+              </div>
+              <div class="ml-chip-list" data-ml-chip-list="quickFacts"></div>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               AMENITIES
+          ============================================================= -->
+          <section class="ml-card">
+            <h2 class="ml-card-title">Amenities &amp; features</h2>
+            <p class="ml-hint">Not there? Add it below — anything you add here shows up on the property page too.</p>
+            <div class="ml-check-grid" data-ml-amenities></div>
+            <div class="ml-custom-add" data-ml-custom-add="amenities">
+              <input type="text" class="ml-input" data-ml-guard placeholder="Add a custom amenity (e.g. Solar Backup)" />
+              <button type="button" class="ml-add-btn">Add</button>
+            </div>
+            <div class="ml-chip-list" data-ml-chip-list="amenities"></div>
+          </section>
+
+          <!-- ============================================================
+               ABOUT / DESCRIPTION
+          ============================================================= -->
+          <section class="ml-card">
+            <h2 class="ml-card-title">About &amp; description</h2>
+
+            <div class="ml-field">
+              <label class="ml-label" for="ml-about">Short summary <span class="ml-req">*</span></label>
+              <textarea class="ml-input ml-textarea" id="ml-about" data-ml-field="about" data-ml-guard rows="2" maxlength="220" placeholder="One or two lines a buyer sees first."></textarea>
+              <p class="ml-hint" data-ml-count="ml-about">0 / 220</p>
+            </div>
+
+            <div class="ml-field">
+              <label class="ml-label" for="ml-description">Detailed description <span class="ml-req">*</span></label>
+              <textarea class="ml-input ml-textarea" id="ml-description" data-ml-field="description" data-ml-guard rows="6" maxlength="2000" placeholder="Describe the property in full. Do not include phone numbers, emails, links or social media handles — all contact and payment happens on ACCOOM."></textarea>
+              <p class="ml-hint" data-ml-count="ml-description">0 / 2000</p>
+            </div>
+
+            <div class="ml-notice">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="8" x2="12" y2="13"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <p>Phone numbers, emails, links and social media handles are not allowed anywhere on this page — including disguised ones. See our <a href="#">Privacy Policy</a> for why every transaction has to stay on ACCOOM.</p>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               UPLOADS
+          ============================================================= -->
+          <section class="ml-card">
+            <h2 class="ml-card-title">Property photos</h2>
+            <p class="ml-card-sub">At least 3 photos, up to 10.</p>
+            <div class="ml-upload" data-ml-upload="images" data-ml-min="3" data-ml-max="10" data-ml-accept="image/*">
+              <input type="file" accept="image/*" multiple hidden data-ml-upload-input />
+              <div class="ml-upload-grid" data-ml-upload-grid></div>
+              <button type="button" class="ml-upload-btn" data-ml-upload-btn>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <span>Add photos</span>
+              </button>
+              <p class="ml-upload-count" data-ml-upload-count>0 of 10 photos added (minimum 3)</p>
+            </div>
+          </section>
+
+          <section class="ml-card">
+            <h2 class="ml-card-title">Property video</h2>
+            <p class="ml-card-sub">Optional to add, but if you add one, up to 2 short walk-through videos.</p>
+            <div class="ml-upload" data-ml-upload="videos" data-ml-min="0" data-ml-max="2" data-ml-accept="video/*">
+              <input type="file" accept="video/*" multiple hidden data-ml-upload-input />
+              <div class="ml-upload-grid" data-ml-upload-grid></div>
+              <button type="button" class="ml-upload-btn" data-ml-upload-btn>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2"></rect></svg>
+                <span>Add video</span>
+              </button>
+              <p class="ml-upload-count" data-ml-upload-count>0 of 2 videos added</p>
+            </div>
+          </section>
+
+          <section class="ml-card">
+            <h2 class="ml-card-title">Surroundings &amp; environment</h2>
+            <p class="ml-card-sub">Street, compound, neighbourhood — photos or short clips of what's around the property. Up to 10.</p>
+            <div class="ml-upload" data-ml-upload="environment" data-ml-min="0" data-ml-max="10" data-ml-accept="image/*,video/*">
+              <input type="file" accept="image/*,video/*" multiple hidden data-ml-upload-input />
+              <div class="ml-upload-grid" data-ml-upload-grid></div>
+              <button type="button" class="ml-upload-btn" data-ml-upload-btn>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l4.5-4.5a2 2 0 0 1 2.8 0L15 15"></path><path d="M13 13l1.5-1.5a2 2 0 0 1 2.8 0L21 15"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
+                <span>Add surroundings media</span>
+              </button>
+              <p class="ml-upload-count" data-ml-upload-count>0 of 10 added</p>
+            </div>
+          </section>
+
+          <!-- ============================================================
+               SUBMIT
+          ============================================================= -->
+          <div class="ml-submit-bar">
+            <p class="ml-submit-note" data-ml-submit-note>Fill in every required field to save this listing.</p>
+            <button type="submit" class="ml-save-btn" data-ml-save>
+              <span data-ml-save-label>Save listing</span>
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+  ============================================================= -->
+  <div data-partial="partials/footer.html"></div>
+
+  <!-- Lockout overlay, injected/controlled by my-listings.js -->
+  <div class="ml-lock" data-ml-lock hidden>
+    <div class="ml-lock-box">
+      <div class="ml-lock-icon">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      </div>
+      <h2>This page has been locked</h2>
+      <p>Repeated attempts to add contact details, links or social media handles were blocked. Every ACCOOM transaction has to stay on the platform — see our <a href="#">Privacy Policy</a>.</p>
+      <p class="ml-lock-timer"><span data-ml-lock-seconds>30</span>s remaining, then this form clears and you can start again.</p>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       SCRIPTS
+  ========================================================= -->
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/wallet.js"></script>
+  <script src="assets/js/core/skeleton.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/data/notifications.js"></script>
+  <script src="assets/js/data/locations.js"></script>
+
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+
+  <script>Accoom.loadPartials();</script>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/agent-dashboard.js"></script>
+  <script src="assets/js/pages/my-listings.js"></script>
+</body>
+</html>

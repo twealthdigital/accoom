@@ -1594,6 +1594,14 @@ html.dark-mode .listing-card {
   cursor: not-allowed;
 }
 
+/* The "…" gap-filler: plain muted text, not a dimmed disabled button */
+.pagination button.is-ellipsis {
+  opacity: 1;
+  cursor: default;
+  background: transparent;
+  color: var(--on-page-soft);
+}
+
 /* Large phone / small tablet: 2 columns */
 @media (min-width: 576px) and (max-width: 767px) {
   .listings-grid {
@@ -2231,18 +2239,27 @@ html.dark-mode .listing-card {
   min-width: 220px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1100px) {
   .feedback-inner {
     flex-direction: row;
+    flex-wrap: wrap;              /* form drops to its own full-width line instead of
+                                      squeezing the heading down to a single word per line */
     align-items: center;
     justify-content: space-between;
+    row-gap: 24px;
+  }
+
+  .feedback-text {
+    flex: 1 1 260px;              /* text never shrinks past a readable width */
+    min-width: 260px;
   }
 
   .feedback-form {
+    flex: 1 1 380px;              /* was a fixed width: 600px — that's what forced the wrap */
+    max-width: 600px;
+    min-width: 280px;
     flex-direction: row;
     align-items: flex-start;
-    flex-shrink: 0;
-    width: 600px;
   }
 
   .feedback-input {
@@ -2251,6 +2268,7 @@ html.dark-mode .listing-card {
 
   .feedback-submit {
     align-self: stretch;
+    flex-shrink: 0;
   }
 }
 
@@ -2624,15 +2642,82 @@ html.dark-mode .why-visual.no-dark .why-photo--light { display: block; }
 .tip-meta { font-size: 12px; color: var(--on-page-soft); }
 
 @media (hover: hover) {
-  .tip-card:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14); }
+  .tip-card:hover { transform: translateY(-6px); border-color: var(--gold); --tip-shadow: 0 18px 38px rgba(0, 0, 0, 0.16); }
+  .tip-card:hover .tip-media svg { transform: scale(1.12) rotate(-6deg); }
+}
+
+/* Scroll-in reveal — cards fan out from below like a dealt hand of cards, and
+   SETTLE into the fanned pose below (not flat) — see the --tip-fan-* vars in
+   the ≥768px block. .tip-anim-ready is added by home.js only when JS +
+   IntersectionObserver are available, so without JS the cards simply sit in
+   their resting fan pose already — never stuck hidden. */
+.tips-grid.tip-anim-ready .tip-card {
+  opacity: 0;
+  transform: translateY(64px) scale(0.92) rotate(var(--tip-rot, 0deg));
+  transition: opacity 0.65s var(--ease), transform 0.65s var(--ease);
+  transform-origin: 50% 100%;
+}
+.tips-grid.tip-anim-ready .tip-card:nth-child(1) { --tip-rot: -8deg; transition-delay: 0ms; }
+.tips-grid.tip-anim-ready .tip-card:nth-child(2) { --tip-rot: 0deg;  transition-delay: 110ms; }
+.tips-grid.tip-anim-ready .tip-card:nth-child(3) { --tip-rot: 8deg;  transition-delay: 220ms; }
+
+.tips-grid.tip-anim-ready.is-in-view .tip-card {
+  opacity: 1;
+  transform: translateY(var(--tip-fan-y, 0)) scale(1) rotate(var(--tip-fan-rot, 0deg));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tips-grid.tip-anim-ready .tip-card { opacity: 1; transform: translateY(var(--tip-fan-y, 0)) rotate(var(--tip-fan-rot, 0deg)); transition: none; }
 }
 
 @media (min-width: 768px) {
-  .tips-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  /* Whot-style card fan: the 3 cards overlap and sit at a slight angle,
+     like a hand of cards, instead of separate grid boxes.
+     ADJUST THE FAN HERE:
+       --tip-fan-rot  = how far each card tilts (outer cards only; middle stays straight)
+       --tip-fan-y    = how far the outer cards drop below the middle one
+       margin-left    = how much each card overlaps the one before it (bigger negative = more overlap) */
+  .tips-grid {
+    display: flex;
+    flex-wrap: wrap;               /* safety net: drops to one-per-row instead of squeezing if ever too narrow */
+    justify-content: center;
+    align-items: flex-end;
+    gap: 20px;                     /* only used if flex-wrap above ever kicks in */
+    padding: 24px 20px 0;          /* top: room to lift on hover · sides: room for the tilted outer cards */
+    overflow-x: hidden;            /* clips the tilted outer cards' corners on very tight widths — vertical hover lift is unaffected */
+  }
+
   .tip-card { flex-direction: column; }
+  .tip-card {
+    flex: 1 1 240px;
+    max-width: 280px;
+    margin-left: -44px;
+    transform-origin: 50% 100%;
+    transform: translateY(var(--tip-fan-y, 0)) rotate(var(--tip-fan-rot, 0deg));
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+    position: relative;
+  }
+  .tip-card:first-child { margin-left: 0; }
+
+  .tip-card:nth-child(1) { --tip-fan-rot: -7deg; --tip-fan-y: 14px; z-index: 1; }
+  .tip-card:nth-child(2) { --tip-fan-rot: 0deg;  --tip-fan-y: 0px;  z-index: 2; }
+  .tip-card:nth-child(3) { --tip-fan-rot: 7deg;  --tip-fan-y: 14px; z-index: 3; }
+
   .tip-media { flex: none; aspect-ratio: 16 / 10; min-height: 0; }
   .tip-body { justify-content: flex-start; padding: 16px; }
   .tip-body h3 { font-size: 15px; }
+}
+
+/* Hover: the card straightens up and lifts above its neighbours — only
+   where a real pointer is present, and only once the fan itself exists.
+   Overrides the plain lift rule above for this breakpoint. */
+@media (min-width: 768px) and (hover: hover) {
+  .tip-card:hover {
+    transform: translateY(calc(var(--tip-fan-y, 0) - 16px)) rotate(0deg) scale(1.04);
+    z-index: 10;
+    border-color: var(--gold);
+    --tip-shadow: 0 20px 36px rgba(0, 0, 0, 0.18);
+  }
 }
 
 @media (min-width: 1100px) {
