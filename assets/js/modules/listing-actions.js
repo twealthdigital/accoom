@@ -1306,7 +1306,7 @@
     return list;
   }
 
-  var MAX_SLIDES = 10; // property photos + all videos combined, same cap the upload form enforces
+  // No cap: every photo, video and surroundings item is shown.
 
   function buildSlides(p) {
     var slides = [];
@@ -1315,7 +1315,7 @@
     if (p.video) slides.push({ type: 'video', src: p.video, poster: images[0] });
     images.forEach(function (src) { slides.push({ type: 'image', src: src }); });
     (p.extraVideos || []).forEach(function (src) { slides.push({ type: 'video', src: src, poster: images[0] }); });
-    return slides.slice(0, MAX_SLIDES);
+    return slides;
   }
 
   var THUMBS_VISIBLE = 3; // buyer view stays uncluttered; the rest is one tap away via "+N"

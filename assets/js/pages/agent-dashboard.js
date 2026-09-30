@@ -238,6 +238,13 @@
     // site without a buyer ever encountering those states.
     // ----------------------------------------------------------------
     var listingState = { tab: 'available', kind: 'all' };
+    (function readLandingParams() {
+      var q = window.location.search;
+      var t = /[?&]tab=([a-z_]+)/.exec(q);
+      var k = /[?&]kind=(rent|sale)/.exec(q);
+      if (t && ['available', 'in_progress', 'sold', 'delisted', 'in_dispute', 'reported'].indexOf(t[1]) !== -1) listingState.tab = t[1];
+      if (k && listingState.tab === 'available') listingState.kind = k[1];
+    })();
 
     function updateListingCounts() {
       Object.keys(STATUS_LABEL).forEach(function (key) {
@@ -290,6 +297,14 @@
           x.setAttribute('aria-selected', on ? 'true' : 'false');
         });
         setListingTab(listingState.tab);
+      });
+    }
+
+    if (kindTabs) {
+      kindTabs.querySelectorAll('[data-ag-kind]').forEach(function (x) {
+        var on = x.getAttribute('data-ag-kind') === listingState.kind;
+        x.classList.toggle('is-active', on);
+        x.setAttribute('aria-selected', on ? 'true' : 'false');
       });
     }
 

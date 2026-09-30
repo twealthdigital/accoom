@@ -430,6 +430,14 @@ html.dark-mode .pd-card {
   user-select: none;
 }
 
+.pd-lightbox-slide video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #000;
+}
+
 .pd-lightbox-close,
 .pd-lightbox-nav {
   position: absolute;

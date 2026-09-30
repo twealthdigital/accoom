@@ -596,6 +596,56 @@
         cb(out);
       });
     }
+    // Photos are saved as files in the browser's big storage (not as text in
+    // the small 5MB storage), so a listing can hold every photo and video.
+    function shrinkToBlob(file, maxSide, quality, cb) {
+      var url;
+      try { url = URL.createObjectURL(file); } catch (e) { cb(null); return; }
+      var img = new Image();
+      function finish(blob) { try { URL.revokeObjectURL(url); } catch (e) { /* ignore */ } cb(blob); }
+      img.onload = function () {
+        try {
+          var w = img.naturalWidth, h = img.naturalHeight;
+          if (!w || !h) { finish(null); return; }
+          var scale = Math.min(1, maxSide / Math.max(w, h));
+          var cw = Math.max(1, Math.round(w * scale));
+          var ch = Math.max(1, Math.round(h * scale));
+          var canvas = document.createElement('canvas');
+          canvas.width = cw;
+          canvas.height = ch;
+          var ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, cw, ch);
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, cw, ch);
+          if (canvas.toBlob) canvas.toBlob(function (b) { finish(b); }, 'image/jpeg', quality);
+          else finish(null);
+        } catch (e) { finish(null); }
+      };
+      img.onerror = function () { finish(null); };
+      img.src = url;
+    }
+
+    // Right before saving: any old text-based photo/video (from an older
+    // listing) is moved into the file storage, and the other saved listings
+    // are cleaned the same way. The saved text stays tiny, so saving can
+    // never run out of space.
+    function prepareMedia() {
+      var MS = Accoom.MediaStore;
+      if (!MS) return Promise.resolve();
+      var jobs = [];
+      ['images', 'videos', 'environment'].forEach(function (k) {
+        uploads[k].forEach(function (u) {
+          if (typeof u.dataUrl === 'string' && u.dataUrl.indexOf('data:') === 0) {
+            jobs.push(MS.fromDataUrl(u.dataUrl).then(function (ref) { u.dataUrl = ref; }, function () { /* keep as it was */ }));
+          }
+        });
+      });
+      return Promise.all(jobs)
+        .then(function () { return MS.migrateLegacy(); })
+        .then(null, function () { /* never block a save */ });
+    }
+
     var imgQueue = [];
     var imgActive = 0;
     var IMG_CONCURRENCY = 3;
@@ -723,15 +773,24 @@
         var startBar = cell.querySelector('.ml-upload-progress-bar');
         if (startBar) startBar.style.width = '65%';
 
-        if (isImage) {
+        if (!Accoom.MediaStore) {
+          failRead('Uploads can\u2019t be saved in this browser.');
+        } else if (isImage) {
           enqueueImage(function (done) {
-            shrinkFile(file, IMG_MAX_SIDE, IMG_QUALITY, function (small) {
+            shrinkToBlob(file, IMG_MAX_SIDE, IMG_QUALITY, function (blob) {
               done();
-              if (small) onReady(small); else failRead();
+              if (!blob) { failRead(); return; }
+              var photoKey = Accoom.MediaStore.newKey();
+              item.isNew = true;
+              item.mediaKey = photoKey;
+              previewUrl = URL.createObjectURL(blob);
+              Accoom.MediaStore.put(photoKey, blob).then(function () {
+                onReady(Accoom.MediaStore.refOf(photoKey), previewUrl);
+              }, function () {
+                failRead('Couldn\u2019t save "' + file.name + '" \u2014 your browser may be out of space.');
+              });
             });
           });
-        } else if (!Accoom.MediaStore) {
-          failRead('Videos can\u2019t be saved in this browser.');
         } else {
           var mediaKey = Accoom.MediaStore.newKey();
           item.isNew = true;
@@ -1004,7 +1063,10 @@
       var id = editingId || ('LST-' + Date.now());
       var existing = list.filter(function (l) { return String(l.id) === String(id); })[0];
 
-      var record = {
+      var envImageCount = uploads.environment.filter(function (u) { return u.type === 'image'; }).length;
+      var envVideoCount = uploads.environment.filter(function (u) { return u.type === 'video'; }).length;
+
+      var record = Object.assign({}, existing || {}, {
         id: id,
         name: data.name,
         location: data.location,
@@ -1031,8 +1093,10 @@
         photos: images.length, videos: videos.length, documents: existing ? existing.documents : 0,
         dateAdded: existing ? existing.dateAdded : todayLabel(),
         views: existing ? existing.views : '0',
+        envImageCount: envImageCount,
+        envVideoCount: envVideoCount,
         updatedAt: new Date().toISOString()
-      };
+      });
 
       var idx = list.findIndex ? list.findIndex(function (l) { return String(l.id) === String(id); }) : -1;
       if (idx === -1) list.push(record); else list[idx] = record;
@@ -1061,8 +1125,12 @@
     }
 
     function trySave(data) {
+      prepareMedia().then(function () { finishSave(data); });
+    }
+
+    function finishSave(data) {
       try {
-        persistListing(data);
+        var saved = persistListing(data);
         try {
           if (Accoom.NotificationService) {
             Accoom.NotificationService.add({
@@ -1077,16 +1145,13 @@
         } catch (err) { /* a notification problem must never stop a save */ }
         try { sessionStorage.removeItem(DRAFT_KEY); } catch (err) { /* ignore */ }
         setSaving(false);
-        toast(editingId ? 'Listing updated.' : 'Listing saved and sent for review.', { link: 'agent-dashboard.html', linkLabel: 'View dashboard' });
-        window.location.href = 'agent-dashboard.html';
+        var landing = 'agent-dashboard.html?tab=' + encodeURIComponent(saved.status || 'available') +
+          '&kind=' + (saved.category === 'sale' ? 'sale' : 'rent');
+        toast(editingId ? 'Listing updated.' : 'Listing published.', { link: landing, linkLabel: 'View dashboard' });
+        window.location.href = landing;
       } catch (err) {
-        if (err && err.name === 'QuotaExceededError' && retryWithSmallerImages(data)) return;
         setSaving(false);
-        if (err && err.name === 'QuotaExceededError') {
-          submitNote.textContent = 'This listing is too big to save here. Remove a few photos and try again.';
-        } else {
-          submitNote.textContent = 'Something went wrong saving this listing. Please try again.';
-        }
+        submitNote.textContent = 'Something went wrong saving this listing. Please try again.';
         submitNote.style.color = 'var(--danger, #d64545)';
         toast('Couldn\u2019t save this listing.');
       }
@@ -1106,7 +1171,7 @@
       window.setTimeout(function () {
         shrinkStep = 0;
         trySave(data);
-      }, 900);
+      }, 250);
     });
 
     /* ======================================================================
@@ -1161,8 +1226,14 @@
       });
       renderChips('quickFacts'); renderChips('amenities');
 
-      (record.images || []).forEach(function (src) { uploadApi.images.addExisting({ type: 'image', dataUrl: src }); });
-      if (record.video) uploadApi.videos.addExisting({ type: 'video', dataUrl: record.video });
+      var allImages = record.images || [];
+      var envImgN = Math.min(record.envImageCount || 0, allImages.length);
+      allImages.slice(0, allImages.length - envImgN).forEach(function (src) { uploadApi.images.addExisting({ type: 'image', dataUrl: src }); });
+      allImages.slice(allImages.length - envImgN).forEach(function (src) { uploadApi.environment.addExisting({ type: 'image', dataUrl: src }); });
+      var allVideos = (record.videosAll && record.videosAll.length) ? record.videosAll : (record.video ? [record.video] : []);
+      var envVidN = Math.min(record.envVideoCount || 0, allVideos.length);
+      allVideos.slice(0, allVideos.length - envVidN).forEach(function (src) { uploadApi.videos.addExisting({ type: 'video', dataUrl: src }); });
+      allVideos.slice(allVideos.length - envVidN).forEach(function (src) { uploadApi.environment.addExisting({ type: 'video', dataUrl: src }); });
 
       recomputePrice(); scheduleMapUpdate();
       [titleInput, descInput].forEach(function (el) {

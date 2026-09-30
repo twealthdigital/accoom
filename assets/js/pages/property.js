@@ -55,6 +55,9 @@
         'assets/images/home-properties/miniflat.png'
       ],
       video: stored ? stored.video : null,
+      extraVideos: (stored && Array.isArray(stored.extraVideos)) ? stored.extraVideos
+        : ((stored && Array.isArray(stored.videosAll))
+          ? stored.videosAll.filter(function (v) { return v && v !== stored.video; }) : []),
       agent: resolvedAgent
     };
 
@@ -163,6 +166,9 @@
       property.images.forEach(function (src) {
         slides.push({ type: 'image', src: src });
       });
+      property.extraVideos.forEach(function (src) {
+        slides.push({ type: 'video', src: src, poster: property.images[0] });
+      });
 
       function renderThumbs() {
         thumbsWrap.innerHTML = slides.map(function (slide, i) {
@@ -248,10 +254,19 @@
     // LIGHTBOX — full photo viewer
     // ============================================================
     var Lightbox = (function initLightbox() {
-      var total = property.images.length;
+      // Same order as the gallery above: first video, every photo, then the other videos.
+      var lbSlides = [];
+      if (property.video) lbSlides.push({ type: 'video', src: property.video, poster: property.images[0] });
+      property.images.forEach(function (src) { lbSlides.push({ type: 'image', src: src }); });
+      property.extraVideos.forEach(function (src) { lbSlides.push({ type: 'video', src: src, poster: property.images[0] }); });
+      var total = lbSlides.length;
 
-      var slidesHtml = property.images.map(function (src) {
-        return '<div class="pd-lightbox-slide"><img src="' + src + '" alt="' + property.name + '" draggable="false" /></div>';
+      var slidesHtml = lbSlides.map(function (s) {
+        if (s.type === 'video') {
+          return '<div class="pd-lightbox-slide pd-lightbox-slide--video"><video src="' + s.src + '"' +
+            (s.poster ? ' poster="' + s.poster + '"' : '') + ' controls playsinline preload="metadata"></video></div>';
+        }
+        return '<div class="pd-lightbox-slide"><img src="' + s.src + '" alt="' + property.name + '" draggable="false" /></div>';
       }).join('');
 
       var box = document.createElement('div');
@@ -291,7 +306,12 @@
       var counter = box.querySelector('[data-pd-lightbox-counter]');
       var current = 0;
 
+      function pauseVideos() {
+        Array.prototype.forEach.call(track.querySelectorAll('video'), function (v) { if (v.pause) v.pause(); });
+      }
+
       function render(instant) {
+        pauseVideos();
         track.style.transition = instant ? 'none' : '';
         track.style.transform = 'translateX(' + (-current * 100) + '%)';
         counter.textContent = (current + 1) + ' / ' + total;
@@ -306,6 +326,7 @@
       }
 
       function close() {
+        pauseVideos();
         box.classList.remove('is-open');
         document.body.classList.remove('no-scroll');
       }
@@ -341,7 +362,7 @@
       var dragState = null;
 
       Accoom.on(track, 'pointerdown', function (e) {
-        if (total < 2) return;
+        if (total < 2 || (e.target && e.target.closest && e.target.closest('video'))) return;
         dragState = { startX: e.clientX, dx: 0 };
         track.style.transition = 'none';
         track.setPointerCapture(e.pointerId);
@@ -394,6 +415,7 @@
 
       Accoom.on(frame, 'click', function () {
         if (dragState && Math.abs(dragState.dx) > 6) return;
+        if (!currentImg()) return;
         zoomIn();
       });
 
