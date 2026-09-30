@@ -406,6 +406,7 @@
       if (m) return { match: m[0], label: 'an email address' };
       m = URL_RE.exec(text);
       if (m) return { match: m[0], label: 'a link' };
+      if (window.Accoom && Accoom.ContentGuard) return Accoom.ContentGuard.scan(text);
       m = PHRASE_RE.exec(text);
       if (m) return { match: m[0], label: 'off-platform contact language' };
       for (var i = 0; i < APP_PATTERNS.length; i++) {
@@ -480,7 +481,7 @@
           '<h3>That can\u2019t stay in this listing</h3>' +
           '<p>You wrote:</p>' +
           '<p class="ml-warn-quote" data-ml-warn-quote></p>' +
-          '<p>Every ACCOOM transaction happens on the platform \u2014 phone numbers, emails, links and social media handles aren\u2019t allowed in listings. See our <a href="#" target="_blank" rel="noopener">Privacy Policy</a> for why.</p>' +
+          '<p data-ml-warn-msg>Every ACCOOM transaction happens on the platform \u2014 phone numbers, emails, links and social media handles aren\u2019t allowed in listings. See our <a href="#" target="_blank" rel="noopener">Privacy Policy</a> for why.</p>' +
           '<button type="button" class="ml-warn-dismiss" data-ml-warn-dismiss>Dismiss</button>' +
         '</div>';
       document.body.appendChild(warnOverlay);
@@ -493,6 +494,13 @@
       ensureWarnOverlay();
       var info = warnQueue.shift();
       warnOverlay.querySelector('[data-ml-warn-quote]').textContent = '\u201C' + info.match.trim() + '\u201D';
+      var msgEl = warnOverlay.querySelector('[data-ml-warn-msg]');
+      if (msgEl) {
+        if (!msgEl.__default) msgEl.__default = msgEl.innerHTML;
+        if (info.kind === 'profanity') msgEl.innerHTML = 'Please keep listings professional \u2014 offensive or inappropriate language isn\u2019t allowed on ACCOOM.';
+        else if (info.kind === 'payment') msgEl.innerHTML = 'All payments on ACCOOM happen through the platform \u2014 payment details and off-platform payment wording aren\u2019t allowed in listings.';
+        else msgEl.innerHTML = msgEl.__default;
+      }
       warnOverlay.classList.add('is-open');
       var btn = warnOverlay.querySelector('[data-ml-warn-dismiss]');
       function onDismiss() {
@@ -525,6 +533,15 @@
       var info = scanForbidden(valueOverride != null ? valueOverride : el.value);
       if (!info) return false;
       handleViolation(el, info);
+      // A paste can hold several violations: keep cleaning until the field is clean.
+      if (valueOverride == null) {
+        var guardLoops = 0;
+        while (guardLoops++ < 10 && !isLocked()) {
+          var more = scanForbidden(el.value);
+          if (!more) break;
+          handleViolation(el, more);
+        }
+      }
       return true;
     }
     function attachGuard(el) {
@@ -562,6 +579,35 @@
        ====================================================================== */
     var uploads = { images: [], videos: [], environment: [] };
     var uploadSeq = 0;
+    var IMG_MAX_SIDE = 1600;
+    var IMG_QUALITY = 0.8;
+    var IMG_MAX_INPUT_MB = 30;
+    var VIDEO_MAX_MB = 2;
+
+    // Redraws an image smaller and re-encodes it as JPEG. cb(null) if it can't be read.
+    function shrinkDataUrl(src, maxSide, quality, cb) {
+      var img = new Image();
+      img.onload = function () {
+        try {
+          var w = img.naturalWidth, h = img.naturalHeight;
+          if (!w || !h) { cb(null); return; }
+          var scale = Math.min(1, maxSide / Math.max(w, h));
+          var cw = Math.max(1, Math.round(w * scale));
+          var ch = Math.max(1, Math.round(h * scale));
+          var canvas = document.createElement('canvas');
+          canvas.width = cw;
+          canvas.height = ch;
+          var ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, cw, ch);
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, cw, ch);
+          cb(canvas.toDataURL('image/jpeg', quality));
+        } catch (e) { cb(null); }
+      };
+      img.onerror = function () { cb(null); };
+      img.src = src;
+    }
     var CLOSE_SVG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
 
     function setupUpload(wrapper) {
@@ -583,11 +629,16 @@
 
       function addFile(file) {
         if (uploads[key].length >= max) { toast('You\u2019ve reached the ' + max + '-upload limit here.'); return; }
-        var isVideo = file.type.indexOf('video') === 0;
-        var isImage = file.type.indexOf('image') === 0;
-        if (!isVideo && !isImage) { toast('"' + file.name + '" isn\u2019t a photo or video.'); return; }
-        var maxBytes = isVideo ? 80 * 1024 * 1024 : 10 * 1024 * 1024;
-        if (file.size > maxBytes) { toast('"' + file.name + '" is too large (' + (isVideo ? '80MB' : '10MB') + ' max).'); return; }
+        var ext = (file.name.split('.').pop() || '').toLowerCase();
+        var isVideo = file.type === 'video/mp4' || (!file.type && ext === 'mp4');
+        var isImage = file.type === 'image/png' || file.type === 'image/jpeg' ||
+          (!file.type && (ext === 'png' || ext === 'jpg' || ext === 'jpeg'));
+        if ((!isVideo && !isImage) || (key === 'images' && !isImage) || (key === 'videos' && !isVideo)) {
+          toast('"' + file.name + '" isn\u2019t allowed. Photos: PNG, JPG or JPEG. Videos: MP4 only.');
+          return;
+        }
+        if (isImage && file.size > IMG_MAX_INPUT_MB * 1024 * 1024) { toast('"' + file.name + '" is too large (' + IMG_MAX_INPUT_MB + 'MB max per photo).'); return; }
+        if (isVideo && file.size > VIDEO_MAX_MB * 1024 * 1024) { toast('"' + file.name + '" is too large. Videos must be ' + VIDEO_MAX_MB + 'MB or less to save here.'); return; }
 
         var item = { id: 'u' + (++uploadSeq), name: file.name, type: isVideo ? 'video' : 'image', dataUrl: null };
         uploads[key].push(item);
@@ -608,7 +659,13 @@
           if (bar) bar.style.width = Math.round((e.loaded / e.total) * 100) + '%';
         };
         reader.onload = function () {
-          item.dataUrl = reader.result;
+          if (!isImage) { onReady(reader.result); return; }
+          shrinkDataUrl(reader.result, IMG_MAX_SIDE, IMG_QUALITY, function (small) {
+            if (small) onReady(small); else reader.onerror();
+          });
+        };
+        function onReady(result) {
+          item.dataUrl = result;
           cell.classList.remove('is-loading');
           var mediaHtml = isVideo
             ? '<video src="' + item.dataUrl + '" muted playsinline preload="metadata"></video>'
@@ -924,6 +981,45 @@
       return record;
     }
 
+    var shrinkStep = 0;
+    var SHRINK_STEPS = [[1280, 0.72], [1024, 0.62], [800, 0.55]];
+
+    function retryWithSmallerImages(data) {
+      if (shrinkStep >= SHRINK_STEPS.length) return false;
+      var media = uploads.images.concat(uploads.environment).filter(function (u) { return u.type === 'image' && u.dataUrl; });
+      if (!media.length) return false;
+      var step = SHRINK_STEPS[shrinkStep++];
+      var pending = media.length;
+      media.forEach(function (u) {
+        shrinkDataUrl(u.dataUrl, step[0], step[1], function (small) {
+          if (small) u.dataUrl = small;
+          pending--;
+          if (pending === 0) trySave(data);
+        });
+      });
+      return true;
+    }
+
+    function trySave(data) {
+      try {
+        persistListing(data);
+        try { sessionStorage.removeItem(DRAFT_KEY); } catch (err) { /* ignore */ }
+        setSaving(false);
+        toast(editingId ? 'Listing updated.' : 'Listing saved and sent for review.', { link: 'agent-dashboard.html', linkLabel: 'View dashboard' });
+        window.location.href = 'agent-dashboard.html';
+      } catch (err) {
+        if (err && err.name === 'QuotaExceededError' && retryWithSmallerImages(data)) return;
+        setSaving(false);
+        if (err && err.name === 'QuotaExceededError') {
+          submitNote.textContent = 'This listing is too big to save here. Remove the video or a few photos and try again.';
+        } else {
+          submitNote.textContent = 'Something went wrong saving this listing. Please try again.';
+        }
+        submitNote.style.color = 'var(--danger, #d64545)';
+        toast('Couldn\u2019t save this listing.');
+      }
+    }
+
     function setSaving(on) {
       saveBtn.disabled = on;
       saveLabel.innerHTML = on ? '<span class="ml-save-spinner" aria-hidden="true"></span> Saving\u2026' : (editingId ? 'Save changes' : 'Save listing');
@@ -936,22 +1032,8 @@
       if (!data) return;
       setSaving(true);
       window.setTimeout(function () {
-        try {
-          persistListing(data);
-          try { sessionStorage.removeItem(DRAFT_KEY); } catch (err) { /* ignore */ }
-          setSaving(false);
-          toast(editingId ? 'Listing updated.' : 'Listing saved and sent for review.', { link: 'agent-dashboard.html', linkLabel: 'View dashboard' });
-          window.location.href = 'agent-dashboard.html';
-        } catch (err) {
-          setSaving(false);
-          if (err && err.name === 'QuotaExceededError') {
-            submitNote.textContent = 'This listing\u2019s photos/video are too large to save here. Remove one and try again.';
-          } else {
-            submitNote.textContent = 'Something went wrong saving this listing. Please try again.';
-          }
-          submitNote.style.color = 'var(--danger, #d64545)';
-          toast('Couldn\u2019t save this listing.');
-        }
+        shrinkStep = 0;
+        trySave(data);
       }, 900);
     });
 

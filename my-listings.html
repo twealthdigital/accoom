@@ -336,7 +336,7 @@
             <h2 class="ml-card-title">Property photos</h2>
             <p class="ml-card-sub">At least 3 photos, up to 10.</p>
             <div class="ml-upload" data-ml-upload="images" data-ml-min="3" data-ml-max="10" data-ml-accept="image/*">
-              <input type="file" accept="image/*" multiple hidden data-ml-upload-input />
+              <input type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" multiple hidden data-ml-upload-input />
               <div class="ml-upload-grid" data-ml-upload-grid></div>
               <button type="button" class="ml-upload-btn" data-ml-upload-btn>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
@@ -350,7 +350,7 @@
             <h2 class="ml-card-title">Property video</h2>
             <p class="ml-card-sub">Optional to add, but if you add one, up to 2 short walk-through videos.</p>
             <div class="ml-upload" data-ml-upload="videos" data-ml-min="0" data-ml-max="2" data-ml-accept="video/*">
-              <input type="file" accept="video/*" multiple hidden data-ml-upload-input />
+              <input type="file" accept=".mp4,video/mp4" multiple hidden data-ml-upload-input />
               <div class="ml-upload-grid" data-ml-upload-grid></div>
               <button type="button" class="ml-upload-btn" data-ml-upload-btn>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2"></rect></svg>
@@ -364,7 +364,7 @@
             <h2 class="ml-card-title">Surroundings &amp; environment</h2>
             <p class="ml-card-sub">Street, compound, neighbourhood — photos or short clips of what's around the property. Up to 10.</p>
             <div class="ml-upload" data-ml-upload="environment" data-ml-min="0" data-ml-max="10" data-ml-accept="image/*,video/*">
-              <input type="file" accept="image/*,video/*" multiple hidden data-ml-upload-input />
+              <input type="file" accept=".png,.jpg,.jpeg,.mp4,image/png,image/jpeg,video/mp4" multiple hidden data-ml-upload-input />
               <div class="ml-upload-grid" data-ml-upload-grid></div>
               <button type="button" class="ml-upload-btn" data-ml-upload-btn>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l4.5-4.5a2 2 0 0 1 2.8 0L15 15"></path><path d="M13 13l1.5-1.5a2 2 0 0 1 2.8 0L21 15"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
@@ -427,6 +427,9 @@
 
   <script src="assets/js/main.js"></script>
   <script src="assets/js/pages/agent-dashboard.js"></script>
+  <script src="assets/js/vendor/obscenity.bundle.js"></script>
+  <script src="assets/js/data/blocked-terms.js"></script>
+  <script src="assets/js/modules/content-guard.js"></script>
   <script src="assets/js/pages/my-listings.js"></script>
 </body>
 </html>
