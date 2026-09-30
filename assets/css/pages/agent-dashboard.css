@@ -202,7 +202,42 @@ html.dark-mode .ag-dash-sidebar {
   margin-top: 2px;
 }
 
-.ag-dash-edit-profile { font-size: 12.5px; padding: 8px 14px; }
+/* "+ List a product" — gold pill with black text in light and dark mode */
+.btn.ag-dash-list-btn,
+.btn.ag-dash-list-btn:visited,
+.btn.ag-dash-list-btn:hover,
+.btn.ag-dash-list-btn:focus {
+  color: #000;
+}
+.btn.ag-dash-list-btn {
+  background: var(--gold);
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(223, 150, 46, 0.3);
+}
+.btn.ag-dash-list-btn:hover { filter: brightness(1.08); }
+
+/* Small screens: plus icon only */
+@media (max-width: 640px) {
+  .ag-dash-topbar { flex-wrap: nowrap; align-items: center; }
+  .ag-dash-topbar > div { min-width: 0; }
+  .btn.ag-dash-list-btn {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+  }
+  .ag-dash-list-btn-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
 
 .ag-dash-notice {
   display: flex;
@@ -306,6 +341,49 @@ a.ag-dash-stat:hover {
 }
 
 .ag-dash-listing-tabs::-webkit-scrollbar { display: none; }
+
+/* For Rent / For Sale pills under the "Available" tab */
+.ag-dash-kind-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 4px;
+}
+.ag-dash-kind-tabs[hidden] { display: none; }
+.ag-dash-kind-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--line-page);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--on-page);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+.ag-dash-kind-tab span { opacity: 0.7; font-weight: 700; }
+.ag-dash-kind-tab:hover { border-color: var(--gold); }
+.ag-dash-kind-tab.is-active { background: var(--gold); border-color: var(--gold); color: #14100a; }
+.ag-dash-kind-tab.is-active span { opacity: 0.85; }
+
+/* Badge on each listing card */
+.ag-dash-folder-kind {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  z-index: 2;
+}
+.ag-dash-folder-kind--rent { background: rgba(0, 0, 0, 0.7); color: #fff; }
+.ag-dash-folder-kind--sale { background: var(--gold); color: #14100a; }
 
 .ag-dash-listing-tab {
   position: relative;

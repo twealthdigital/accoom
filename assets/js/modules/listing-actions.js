@@ -1203,6 +1203,8 @@
           if (s.totalPayable != null) p.totalPayable = s.totalPayable;
           if (s.agencyFeePct != null) p.agencyFeePct = s.agencyFeePct;
           if (s.legalFeePct != null) p.legalFeePct = s.legalFeePct;
+          if (s.agencyFee != null) p.agencyFee = s.agencyFee;
+          if (s.legalFee != null) p.legalFee = s.legalFee;
         });
       }
     } catch (e) { /* ignore */ }
@@ -1530,10 +1532,9 @@
     }, { passive: true });
 
     function openLightboxFromCurrent() {
-      if (!imageSlides.length) return;
-      var cur = slides[index];
-      var at = cur.type === 'image' ? imageSlides.indexOf(cur) : 0;
-      openLightbox(dlg, imageSlides, Math.max(0, at));
+      if (!slides.length) return;
+      if (video.pause) video.pause();
+      openLightbox(dlg, slides, index);
     }
     main.addEventListener('click', function (e) {
       if (e.target.closest('button')) return;
@@ -1561,12 +1562,15 @@
     box.className = 'lax-lb';
     box.setAttribute('role', 'dialog');
     box.setAttribute('aria-modal', 'true');
-    box.setAttribute('aria-label', 'Property photos');
+    box.setAttribute('aria-label', 'Property photos and videos');
     box.innerHTML =
       '<div class="lax-lb-stage">' +
         '<div class="lax-lb-frame" data-lb-frame>' +
           '<div class="lax-lb-track" data-lb-track>' +
             imgs.map(function (im) {
+              if (im.type === 'video') {
+                return '<div class="lax-lb-slide lax-lb-slide--video"><video src="' + esc(im.src) + '"' + (im.poster ? ' poster="' + esc(im.poster) + '"' : '') + ' controls playsinline preload="metadata"></video></div>';
+              }
               return '<div class="lax-lb-slide"><img src="' + esc(im.src) + '" alt="" draggable="false" /></div>';
             }).join('') +
           '</div>' +
@@ -1599,8 +1603,8 @@
     });
 
     function setZoom(level) {
-      zoom = Math.max(1, Math.min(3, level));
       var im = track.children[current] && track.children[current].querySelector('img');
+      zoom = im ? Math.max(1, Math.min(3, level)) : 1;
       if (im) im.style.transform = 'scale(' + zoom + ')';
       frame.classList.toggle('is-zoomed', zoom > 1);
     }
@@ -1615,6 +1619,8 @@
       // reset zoom on the slide we are leaving
       var old = track.children[current] && track.children[current].querySelector('img');
       if (old) old.style.transform = '';
+      var oldVideo = track.children[current] && track.children[current].querySelector('video');
+      if (oldVideo && oldVideo.pause) oldVideo.pause();
       current = (n + total) % total;
       setZoom(1);
       render();
@@ -1647,7 +1653,7 @@
 
     // drag / swipe
     track.addEventListener('pointerdown', function (e) {
-      if (total < 2 || zoom > 1) return;
+      if (total < 2 || zoom > 1 || (e.target && e.target.closest && e.target.closest('video'))) return;
       drag = { startX: e.clientX, dx: 0 };
       track.style.transition = 'none';
       if (track.setPointerCapture) { try { track.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } }
@@ -1675,6 +1681,7 @@
     // zoom: click = in, right-click = out, buttons + reset
     frame.addEventListener('click', function () {
       if (lastDrag > 6) { lastDrag = 0; return; }
+      if (track.children[current] && track.children[current].querySelector('video')) return;
       setZoom(zoom + 0.5);
     });
     frame.addEventListener('contextmenu', function (e) { e.preventDefault(); setZoom(zoom - 0.5); });

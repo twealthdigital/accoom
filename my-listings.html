@@ -103,19 +103,19 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
             <span>Payouts</span>
           </a>
-          <a href="purchases.html" class="ag-dash-nav-link">
+          <a href="#" class="ag-dash-nav-link" data-ag-soon>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
             <span>My Purchases</span>
           </a>
-          <a href="saved-properties.html" class="ag-dash-nav-link">
+          <a href="#" class="ag-dash-nav-link" data-ag-soon>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21 12 16l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
             <span>Saved Properties</span>
           </a>
-          <a href="account-settings.html" class="ag-dash-nav-link">
+          <a href="#" class="ag-dash-nav-link" data-ag-soon>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             <span>Account Settings</span>
           </a>
-          <a href="help-support.html" class="ag-dash-nav-link">
+          <a href="#" class="ag-dash-nav-link" data-ag-soon>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
             <span>Help &amp; Support</span>
           </a>
@@ -222,12 +222,12 @@
                 <input type="text" inputmode="numeric" class="ml-input" id="ml-price" data-ml-field="price" placeholder="e.g. 460,000" autocomplete="off" />
               </div>
               <div class="ml-field">
-                <label class="ml-label" for="ml-agency-fee">Agency fee (%) <span class="ml-req">*</span></label>
-                <input type="number" min="0" max="100" step="0.5" class="ml-input" id="ml-agency-fee" data-ml-field="agencyFeePct" value="5" autocomplete="off" />
+                <label class="ml-label" for="ml-agency-fee">Agency fee (&#8358;)</label>
+                <input type="text" inputmode="numeric" class="ml-input" id="ml-agency-fee" data-ml-field="agencyFee" placeholder="e.g. 25,000" autocomplete="off" />
               </div>
               <div class="ml-field">
-                <label class="ml-label" for="ml-legal-fee">Legal fee (%) <span class="ml-req">*</span></label>
-                <input type="number" min="0" max="100" step="0.5" class="ml-input" id="ml-legal-fee" data-ml-field="legalFeePct" value="5" autocomplete="off" />
+                <label class="ml-label" for="ml-legal-fee">Legal fee (&#8358;)</label>
+                <input type="text" inputmode="numeric" class="ml-input" id="ml-legal-fee" data-ml-field="legalFee" placeholder="e.g. 30,000" autocomplete="off" />
               </div>
             </div>
 
@@ -309,13 +309,7 @@
                ABOUT / DESCRIPTION
           ============================================================= -->
           <section class="ml-card">
-            <h2 class="ml-card-title">About &amp; description</h2>
-
-            <div class="ml-field">
-              <label class="ml-label" for="ml-about">Short summary <span class="ml-req">*</span></label>
-              <textarea class="ml-input ml-textarea" id="ml-about" data-ml-field="about" data-ml-guard rows="2" maxlength="220" placeholder="One or two lines a buyer sees first."></textarea>
-              <p class="ml-hint" data-ml-count="ml-about">0 / 220</p>
-            </div>
+            <h2 class="ml-card-title">Description</h2>
 
             <div class="ml-field">
               <label class="ml-label" for="ml-description">Detailed description <span class="ml-req">*</span></label>

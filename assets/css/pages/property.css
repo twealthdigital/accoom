@@ -828,6 +828,8 @@ html.dark-mode .pd-card {
   line-height: 1.65;
   color: var(--on-page-soft);
   margin-bottom: 18px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .pd-quickfacts {
@@ -869,6 +871,8 @@ html.dark-mode .pd-card {
   font-size: 0.92rem;
   line-height: 1.7;
   color: var(--on-page-soft);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .pd-description p + p {

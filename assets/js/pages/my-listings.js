@@ -229,8 +229,6 @@
     var priceInput = document.getElementById('ml-price');
     var agencyInput = document.getElementById('ml-agency-fee');
     var legalInput = document.getElementById('ml-legal-fee');
-    var aboutField = document.getElementById('ml-about').closest('.ml-field');
-    var aboutInput = document.getElementById('ml-about');
     var descField = document.getElementById('ml-description').closest('.ml-field');
     var descInput = document.getElementById('ml-description');
     var yearField = document.getElementById('ml-year').closest('.ml-field');
@@ -284,14 +282,12 @@
 
     function recomputePrice() {
       var price = parseNumber(priceInput.value);
-      var agencyPct = parseFloat(agencyInput.value) || 0;
-      var legalPct = parseFloat(legalInput.value) || 0;
-      var agencyFee = price * agencyPct / 100;
-      var legalFee = price * legalPct / 100;
+      var agencyFee = parseNumber(agencyInput.value);
+      var legalFee = parseNumber(legalInput.value);
       var total = price + agencyFee + legalFee;
       priceOut.textContent = NAIRA + formatNumber(price);
-      agencyLabelOut.textContent = 'Agency fee (' + agencyPct + '%)';
-      legalLabelOut.textContent = 'Legal fee (' + legalPct + '%)';
+      agencyLabelOut.textContent = 'Agency fee';
+      legalLabelOut.textContent = 'Legal fee';
       agencyOut.textContent = NAIRA + formatNumber(agencyFee);
       legalOut.textContent = NAIRA + formatNumber(legalFee);
       totalOut.textContent = NAIRA + formatNumber(total);
@@ -301,7 +297,13 @@
       priceInput.value = digits ? formatNumber(digits) : '';
       recomputePrice();
     });
-    [agencyInput, legalInput].forEach(function (el) { el.addEventListener('input', recomputePrice); });
+    [agencyInput, legalInput].forEach(function (el) {
+      el.addEventListener('input', function () {
+        var digits = el.value.replace(/[^\d]/g, '');
+        el.value = digits ? formatNumber(digits) : '';
+        recomputePrice();
+      });
+    });
     recomputePrice();
 
     /* ======================================================================
@@ -559,13 +561,13 @@
       el.addEventListener('input', update);
       update();
     }
-    [titleInput, aboutInput, descInput].forEach(attachCounter);
+    [titleInput, descInput].forEach(attachCounter);
 
     /* ======================================================================
        Wire the guard to every free-text field, including ones created
        dynamically by the custom selects.
        ====================================================================== */
-    [titleInput, areaInput, addressInput, aboutInput, descInput].forEach(attachGuard);
+    [titleInput, areaInput, addressInput, descInput].forEach(attachGuard);
     toArray(document.querySelectorAll('[data-ml-custom-add] input')).forEach(attachGuard);
     [propertyTypeSelect, furnishingSelect].forEach(function (sel) {
       if (sel && sel.el) {
@@ -705,6 +707,8 @@
         function onReady(result, preview) {
           item.dataUrl = result;
           cell.classList.remove('is-loading');
+          var spin = cell.querySelector('.ml-upload-spinner');
+          if (spin) spin.className = 'ml-upload-done';
           var src = preview || item.dataUrl;
           var mediaHtml = isVideo
             ? '<video src="' + src + '" muted playsinline preload="metadata"></video>'
@@ -800,13 +804,13 @@
           propertyType: propertyTypeSelect.getValue(), propertyTypeLabel: propertyTypeSelect.getLabel(), propertyTypeCustom: propertyTypeSelect.isCustom(),
           period: periodSelect.getValue(),
           title: titleInput.value, state: stateSelect.getValue(), area: areaInput.value, address: addressInput.value,
-          price: priceInput.value, agencyFeePct: agencyInput.value, legalFeePct: legalInput.value,
+          price: priceInput.value, agencyFee: agencyInput.value, legalFee: legalInput.value,
           beds: byField('beds'), baths: byField('baths'), kitchens: byField('kitchens'), livingRooms: byField('livingRooms'),
           parking: byField('parking'), yearBuilt: byField('yearBuilt'),
           furnishing: furnishingSelect.getValue(), furnishingCustom: furnishingSelect.isCustom(),
           quickFactsChecked: checkedValues(quickFactsGrid), amenitiesChecked: checkedValues(amenitiesGrid),
           customQuickFacts: customChips.quickFacts, customAmenities: customChips.amenities,
-          about: aboutInput.value, description: descInput.value
+          description: descInput.value
         }));
       } catch (e) { /* storage full/unavailable — draft just won't persist */ }
     }
@@ -840,12 +844,12 @@
       if (d.furnishingCustom) furnishingSelect.setValue(null, d.furnishingLabel || d.furnishing, true);
       else if (d.furnishing) furnishingSelect.setValue(d.furnishing);
       titleInput.value = d.title || ''; areaInput.value = d.area || ''; addressInput.value = d.address || '';
-      priceInput.value = d.price || ''; agencyInput.value = d.agencyFeePct || 5; legalInput.value = d.legalFeePct || 5;
+      priceInput.value = d.price || ''; agencyInput.value = d.agencyFee || ''; legalInput.value = d.legalFee || '';
       ['beds', 'baths', 'kitchens', 'livingRooms', 'parking', 'yearBuilt'].forEach(function (name) {
         var el = document.querySelector('[data-ml-field="' + name + '"]');
         if (el && d[name] != null) el.value = d[name];
       });
-      aboutInput.value = d.about || ''; descInput.value = d.description || '';
+      descInput.value = d.description || '';
       (d.quickFactsChecked || []).forEach(function (v) {
         var i = quickFactsGrid.querySelector('input[value="' + CSS.escape(v) + '"]'); if (i) i.checked = true;
       });
@@ -856,7 +860,7 @@
       customChips.amenities = (d.customAmenities || []).slice();
       renderChips('quickFacts'); renderChips('amenities');
       recomputePrice(); scheduleMapUpdate();
-      [titleInput, aboutInput, descInput].forEach(function (el) {
+      [titleInput, descInput].forEach(function (el) {
         var counter = document.querySelector('[data-ml-count="' + el.id + '"]');
         if (counter) counter.textContent = el.value.length + ' / ' + el.getAttribute('maxlength');
       });
@@ -876,13 +880,13 @@
       });
       periodField.hidden = false;
       [propertyTypeSelect, periodSelect, stateSelect, furnishingSelect].forEach(function (s) { s.setValue(null, '', false); });
-      agencyInput.value = 5; legalInput.value = 5;
+      agencyInput.value = ''; legalInput.value = '';
       recomputePrice();
       mapFrame.src = ''; mapEl.classList.remove('is-ready');
       customChips.quickFacts = []; customChips.amenities = [];
       renderChips('quickFacts'); renderChips('amenities');
       Object.keys(uploadApi).forEach(function (k) { uploadApi[k].clear(); });
-      [titleInput, aboutInput, descInput].forEach(function (el) {
+      [titleInput, descInput].forEach(function (el) {
         var counter = document.querySelector('[data-ml-count="' + el.id + '"]');
         if (counter) counter.textContent = '0 / ' + el.getAttribute('maxlength');
       });
@@ -933,9 +937,9 @@
 
       data.priceValue = parseNumber(priceInput.value);
       if (!data.priceValue) bad(priceField);
-      data.agencyFeePct = parseFloat(agencyInput.value) || 0;
-      data.legalFeePct = parseFloat(legalInput.value) || 0;
-      data.totalPayable = data.priceValue + data.priceValue * (data.agencyFeePct + data.legalFeePct) / 100;
+      data.agencyFee = parseNumber(agencyInput.value);
+      data.legalFee = parseNumber(legalInput.value);
+      data.totalPayable = data.priceValue + data.agencyFee + data.legalFee;
       data.price = NAIRA + formatNumber(data.priceValue);
 
       ['beds', 'baths', 'kitchens', 'livingRooms', 'parking'].forEach(function (name) {
@@ -961,8 +965,6 @@
       data.amenities = amChecked.concat(customChips.amenities.slice());
       if (!data.amenities.length) bad(amenitiesField);
 
-      data.about = aboutInput.value.trim();
-      if (!data.about) bad(aboutField);
       data.descriptionRaw = descInput.value.trim();
       if (!data.descriptionRaw) bad(descField);
       data.description = data.descriptionRaw ? data.descriptionRaw.split(/\n{2,}/).map(function (s) { return s.trim(); }).filter(Boolean) : [];
@@ -1009,7 +1011,7 @@
         state: data.state,
         area: data.area,
         address: data.address,
-        status: existing ? existing.status : 'in_progress',
+        status: existing ? existing.status : 'available',
         category: data.category,
         typeLabel: data.typeLabel,
         period: data.period,
@@ -1019,12 +1021,12 @@
         videosAll: videos,
         price: data.priceValue,
         priceValue: data.priceValue,
-        agencyFeePct: data.agencyFeePct,
-        legalFeePct: data.legalFeePct,
+        agencyFee: data.agencyFee,
+        legalFee: data.legalFee,
         totalPayable: data.totalPayable,
         beds: data.beds, baths: data.baths, kitchens: data.kitchens, livingRooms: data.livingRooms,
         parking: data.parking, yearBuilt: String(data.yearBuilt), furnishing: data.furnishing,
-        about: data.about, description: data.description,
+        description: data.description,
         amenities: data.amenities, quickFacts: data.quickFacts,
         photos: images.length, videos: videos.length, documents: existing ? existing.documents : 0,
         dateAdded: existing ? existing.dateAdded : todayLabel(),
@@ -1061,6 +1063,18 @@
     function trySave(data) {
       try {
         persistListing(data);
+        try {
+          if (Accoom.NotificationService) {
+            Accoom.NotificationService.add({
+              type: 'accoom',
+              title: editingId ? 'Listing updated' : 'Listing published',
+              text: editingId
+                ? '\u201C' + data.name + '\u201D was updated successfully.'
+                : '\u201C' + data.name + '\u201D is now live under Available Properties on your dashboard.',
+              link: 'agent-dashboard.html'
+            });
+          }
+        } catch (err) { /* a notification problem must never stop a save */ }
         try { sessionStorage.removeItem(DRAFT_KEY); } catch (err) { /* ignore */ }
         setSaving(false);
         toast(editingId ? 'Listing updated.' : 'Listing saved and sent for review.', { link: 'agent-dashboard.html', linkLabel: 'View dashboard' });
@@ -1125,14 +1139,15 @@
       areaInput.value = record.area || '';
       addressInput.value = record.address || '';
       priceInput.value = record.priceValue ? formatNumber(record.priceValue) : '';
-      agencyInput.value = record.agencyFeePct != null ? record.agencyFeePct : 5;
-      legalInput.value = record.legalFeePct != null ? record.legalFeePct : 5;
+      agencyInput.value = record.agencyFee != null ? formatNumber(record.agencyFee)
+        : (record.agencyFeePct != null ? formatNumber(Math.round((record.priceValue || 0) * record.agencyFeePct / 100)) : '');
+      legalInput.value = record.legalFee != null ? formatNumber(record.legalFee)
+        : (record.legalFeePct != null ? formatNumber(Math.round((record.priceValue || 0) * record.legalFeePct / 100)) : '');
       ['beds', 'baths', 'kitchens', 'livingRooms', 'parking'].forEach(function (name) {
         var el = document.querySelector('[data-ml-field="' + name + '"]');
         if (el) el.value = record[name] != null ? record[name] : '';
       });
       document.querySelector('[data-ml-field="yearBuilt"]').value = record.yearBuilt || '';
-      aboutInput.value = record.about || '';
       descInput.value = (record.description || []).join('\n\n');
 
       (record.quickFacts || []).forEach(function (qf) {
@@ -1150,7 +1165,7 @@
       if (record.video) uploadApi.videos.addExisting({ type: 'video', dataUrl: record.video });
 
       recomputePrice(); scheduleMapUpdate();
-      [titleInput, aboutInput, descInput].forEach(function (el) {
+      [titleInput, descInput].forEach(function (el) {
         var counter = document.querySelector('[data-ml-count="' + el.id + '"]');
         if (counter) counter.textContent = el.value.length + ' / ' + el.getAttribute('maxlength');
       });

@@ -353,6 +353,21 @@ html.dark-mode .ml-notice a { color: var(--gold); }
 }
 @keyframes ml-spin { to { transform: rotate(360deg); } }
 
+/* Finished upload: a green tick replaces the spinner */
+.ml-upload-done {
+  position: absolute;
+  bottom: 8px;
+  left: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #22a559 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") center / 13px no-repeat;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  z-index: 2;
+  animation: ml-pop 260ms ease-out;
+}
+@keyframes ml-pop { from { transform: scale(0.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
 .ml-upload-btn {
   display: inline-flex;
   align-items: center;

@@ -89,10 +89,29 @@ window.Accoom = window.Accoom || {};
 
   // All notifications, newest first. Empty for a guest — a real backend
   // would 401/require auth for this endpoint anyway.
+  // Pages that belong to the buyer account. An agent's notifications never
+  // send them there (for now the notification is shown but not clickable).
+  var BUYER_ONLY_PAGES = [
+    'purchase-details.html', 'purchases.html', 'saved-properties.html',
+    'account-settings.html', 'help-support.html', 'profile.html',
+    'contact-agent.html', 'payment.html'
+  ];
+
+  function isAgentUser() {
+    var u = Accoom.getStorage('accoom-user', null);
+    return !!(u && u.role === 'agent');
+  }
+
   NotificationService.getAll = function () {
     if (!Accoom.isLoggedIn()) return [];
+    var agent = isAgentUser();
     return readAll().slice().sort(function (a, b) {
       return new Date(b.time) - new Date(a.time);
+    }).map(function (n) {
+      if (agent && n.link && BUYER_ONLY_PAGES.some(function (p) { return String(n.link).indexOf(p) === 0; })) {
+        return Object.assign({}, n, { link: '' });
+      }
+      return n;
     });
   };
 

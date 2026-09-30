@@ -207,18 +207,20 @@
         var specsBits = [];
         if (f.beds) specsBits.push(f.beds + (f.beds === 1 ? ' Bed' : ' Beds'));
         if (f.baths) specsBits.push(f.baths + (f.baths === 1 ? ' Bath' : ' Baths'));
+        var kind = f.category === 'sale' ? 'sale' : 'rent';
 
         return (
           '<a class="ag-dash-folder-card" href="property.html?id=' + encodeURIComponent(f.id) + '">' +
             '<div class="ag-dash-folder-cover">' +
               '<img src="' + f.cover + '" alt="" />' +
+              '<span class="ag-dash-folder-kind ag-dash-folder-kind--' + kind + '">' + (kind === 'sale' ? 'For Sale' : 'For Rent') + '</span>' +
               '<button type="button" class="ag-dash-folder-share" aria-label="Share listing">' +
                 '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"></line><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"></line></svg>' +
               '</button>' +
             '</div>' +
             '<div class="ag-dash-folder-body">' +
               '<p class="ag-dash-folder-name">' + f.name + '</p>' +
-              '<p class="ag-dash-folder-price">' + formatPrice(f.price) + ' <small>/ year</small></p>' +
+              '<p class="ag-dash-folder-price">' + formatPrice(f.price) + (kind === 'sale' ? '' : ' <small>/ ' + (f.period || 'year') + '</small>') + '</p>' +
               '<p class="ag-dash-folder-loc">' + f.location + '</p>' +
               (specsBits.length ? '<div class="ag-dash-folder-specs">' + specsBits.map(function (s) { return '<span>' + s + '</span>'; }).join('') + '</div>' : '') +
             '</div>' +
@@ -235,7 +237,7 @@
     // here, so an agent can see why a listing dropped off the public
     // site without a buyer ever encountering those states.
     // ----------------------------------------------------------------
-    var listingState = { tab: 'available' };
+    var listingState = { tab: 'available', kind: 'all' };
 
     function updateListingCounts() {
       Object.keys(STATUS_LABEL).forEach(function (key) {
@@ -256,9 +258,42 @@
         });
       }
 
-      renderFolders(folders.filter(function (f) { return f.status === tab; }));
+      var kindTabsEl = document.querySelector('[data-ag-kind-tabs]');
+      if (kindTabsEl) kindTabsEl.hidden = tab !== 'available';
+
+      renderFolders(folders.filter(function (f) {
+        if (f.status !== tab) return false;
+        if (tab !== 'available' || listingState.kind === 'all') return true;
+        return (f.category === 'sale' ? 'sale' : 'rent') === listingState.kind;
+      }));
     }
 
+    function updateKindCounts() {
+      var live = folders.filter(function (f) { return f.status === 'available'; });
+      var counts = { all: live.length, rent: 0, sale: 0 };
+      live.forEach(function (f) { counts[f.category === 'sale' ? 'sale' : 'rent']++; });
+      Object.keys(counts).forEach(function (k) {
+        var el = document.querySelector('[data-ag-kind-count="' + k + '"]');
+        if (el) el.textContent = counts[k];
+      });
+    }
+
+    var kindTabs = document.querySelector('[data-ag-kind-tabs]');
+    if (kindTabs) {
+      Accoom.on(kindTabs, 'click', function (e) {
+        var b = e.target.closest('[data-ag-kind]');
+        if (!b) return;
+        listingState.kind = b.getAttribute('data-ag-kind');
+        kindTabs.querySelectorAll('[data-ag-kind]').forEach(function (x) {
+          var on = x === b;
+          x.classList.toggle('is-active', on);
+          x.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        setListingTab(listingState.tab);
+      });
+    }
+
+    updateKindCounts();
     updateListingCounts();
     setListingTab(listingState.tab);
 
