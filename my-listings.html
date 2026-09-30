@@ -200,7 +200,7 @@
             <div class="ml-field">
               <label class="ml-label" for="ml-address">Full street address <span class="ml-req">*</span></label>
               <input type="text" class="ml-input" id="ml-address" data-ml-field="address" data-ml-guard placeholder="e.g. 12 Admiralty Way" autocomplete="off" />
-              <p class="ml-hint">Shown to buyers only after they've paid — keep it accurate.</p>
+              <p class="ml-hint">This will be shown to your buyers, keep it accurate.</p>
             </div>
 
             <div class="ml-map" data-ml-map>
@@ -334,7 +334,7 @@
           ============================================================= -->
           <section class="ml-card">
             <h2 class="ml-card-title">Property photos</h2>
-            <p class="ml-card-sub">At least 3 photos, up to 10.</p>
+            <p class="ml-card-sub">At least 3 photos, up to 10. PNG, JPG or JPEG only.</p>
             <div class="ml-upload" data-ml-upload="images" data-ml-min="3" data-ml-max="10" data-ml-accept="image/*">
               <input type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" multiple hidden data-ml-upload-input />
               <div class="ml-upload-grid" data-ml-upload-grid></div>
@@ -348,7 +348,7 @@
 
           <section class="ml-card">
             <h2 class="ml-card-title">Property video</h2>
-            <p class="ml-card-sub">Optional to add, but if you add one, up to 2 short walk-through videos.</p>
+            <p class="ml-card-sub">Recommended — buyers love a walk-through. MP4 only, up to 50MB each, up to 2 videos.</p>
             <div class="ml-upload" data-ml-upload="videos" data-ml-min="0" data-ml-max="2" data-ml-accept="video/*">
               <input type="file" accept=".mp4,video/mp4" multiple hidden data-ml-upload-input />
               <div class="ml-upload-grid" data-ml-upload-grid></div>
@@ -361,16 +361,16 @@
           </section>
 
           <section class="ml-card">
-            <h2 class="ml-card-title">Surroundings &amp; environment</h2>
-            <p class="ml-card-sub">Street, compound, neighbourhood — photos or short clips of what's around the property. Up to 10.</p>
+            <h2 class="ml-card-title">Surroundings &amp; environment (Video or Image)</h2>
+            <p class="ml-card-sub">A short video of the street, compound and neighbourhood works best — or add photos. Video: MP4, up to 50MB. Image: PNG, JPG or JPEG. Up to 10.</p>
             <div class="ml-upload" data-ml-upload="environment" data-ml-min="0" data-ml-max="10" data-ml-accept="image/*,video/*">
               <input type="file" accept=".png,.jpg,.jpeg,.mp4,image/png,image/jpeg,video/mp4" multiple hidden data-ml-upload-input />
               <div class="ml-upload-grid" data-ml-upload-grid></div>
               <button type="button" class="ml-upload-btn" data-ml-upload-btn>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l4.5-4.5a2 2 0 0 1 2.8 0L15 15"></path><path d="M13 13l1.5-1.5a2 2 0 0 1 2.8 0L21 15"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
-                <span>Add surroundings media</span>
+                <span>Add a surroundings video or image</span>
               </button>
-              <p class="ml-upload-count" data-ml-upload-count>0 of 10 added</p>
+              <p class="ml-upload-count" data-ml-upload-count>0 of 10 added media</p>
             </div>
           </section>
 
@@ -413,6 +413,7 @@
   <script src="assets/js/core/storage.js"></script>
   <script src="assets/js/core/wallet.js"></script>
   <script src="assets/js/core/skeleton.js"></script>
+<script src="assets/js/core/media-store.js"></script>
   <script src="assets/js/core/partials.js"></script>
   <script src="assets/js/data/properties.js"></script>
   <script src="assets/js/data/notifications.js"></script>

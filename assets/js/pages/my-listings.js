@@ -582,7 +582,47 @@
     var IMG_MAX_SIDE = 1600;
     var IMG_QUALITY = 0.8;
     var IMG_MAX_INPUT_MB = 30;
-    var VIDEO_MAX_MB = 2;
+    var VIDEO_MAX_MB = 50;
+
+    // Photos are shrunk straight from the picked file (no slow text conversion),
+    // a few at a time so phones don't run out of memory.
+    function shrinkFile(file, maxSide, quality, cb) {
+      var url;
+      try { url = URL.createObjectURL(file); } catch (e) { cb(null); return; }
+      shrinkDataUrl(url, maxSide, quality, function (out) {
+        try { URL.revokeObjectURL(url); } catch (e) { /* ignore */ }
+        cb(out);
+      });
+    }
+    var imgQueue = [];
+    var imgActive = 0;
+    var IMG_CONCURRENCY = 3;
+    function pumpImages() {
+      while (imgActive < IMG_CONCURRENCY && imgQueue.length) {
+        imgActive++;
+        (function (task) { task(function () { imgActive--; pumpImages(); }); })(imgQueue.shift());
+      }
+    }
+    function enqueueImage(task) { imgQueue.push(task); pumpImages(); }
+
+    // Save stays switched off until every upload has finished.
+    var PENDING_NOTE = 'Uploads are finishing \u2014 you can save once they\u2019re done.';
+    function updateSaveGate() {
+      if (!saveBtn) return;
+      var pending = ['images', 'videos', 'environment'].some(function (k) {
+        return uploads[k].some(function (u) { return !u.dataUrl; });
+      });
+      saveBtn.disabled = pending;
+      saveBtn.setAttribute('aria-busy', pending ? 'true' : 'false');
+      if (!submitNote) return;
+      if (pending) {
+        submitNote.textContent = PENDING_NOTE;
+        submitNote.style.color = '';
+      } else if (submitNote.textContent === PENDING_NOTE) {
+        submitNote.textContent = 'Fill in every required field to save this listing.';
+        submitNote.style.color = '';
+      }
+    }
 
     // Redraws an image smaller and re-encodes it as JPEG. cb(null) if it can't be read.
     function shrinkDataUrl(src, maxSide, quality, cb) {
@@ -623,8 +663,9 @@
         var n = uploads[key].length;
         if (key === 'images') countEl.textContent = n + ' of ' + max + ' photos added (minimum ' + min + ')';
         else if (key === 'videos') countEl.textContent = n + ' of ' + max + ' videos added';
-        else countEl.textContent = n + ' of ' + max + ' added';
+        else countEl.textContent = n + ' of ' + max + ' videos or images added';
         btn.disabled = n >= max;
+        updateSaveGate();
       }
 
       function addFile(file) {
@@ -652,40 +693,57 @@
           '<button type="button" class="ml-upload-remove" aria-label="Remove ' + esc(file.name) + '">' + CLOSE_SVG + '</button>';
         grid.appendChild(cell);
 
-        var reader = new FileReader();
-        reader.onprogress = function (e) {
-          if (!e.lengthComputable) return;
-          var bar = cell.querySelector('.ml-upload-progress-bar');
-          if (bar) bar.style.width = Math.round((e.loaded / e.total) * 100) + '%';
-        };
-        reader.onload = function () {
-          if (!isImage) { onReady(reader.result); return; }
-          shrinkDataUrl(reader.result, IMG_MAX_SIDE, IMG_QUALITY, function (small) {
-            if (small) onReady(small); else reader.onerror();
-          });
-        };
-        function onReady(result) {
+        // Quick path: the original file is never read as text, so this is near-instant.
+        var previewUrl = null;
+        function failRead(msg) {
+          uploads[key] = uploads[key].filter(function (u) { return u.id !== item.id; });
+          if (previewUrl) { try { URL.revokeObjectURL(previewUrl); } catch (e) { /* ignore */ } }
+          cell.remove();
+          renderCount();
+          toast(msg || 'Couldn\u2019t read "' + file.name + '". Please try again.');
+        }
+        function onReady(result, preview) {
           item.dataUrl = result;
           cell.classList.remove('is-loading');
+          var src = preview || item.dataUrl;
           var mediaHtml = isVideo
-            ? '<video src="' + item.dataUrl + '" muted playsinline preload="metadata"></video>'
-            : '<img src="' + item.dataUrl + '" alt="" />';
+            ? '<video src="' + src + '" muted playsinline preload="metadata"></video>'
+            : '<img src="' + src + '" alt="" />';
           cell.insertAdjacentHTML('afterbegin', mediaHtml);
           var bar = cell.querySelector('.ml-upload-progress-bar');
           if (bar) bar.style.width = '100%';
           window.setTimeout(function () { var p = cell.querySelector('.ml-upload-progress'); if (p) p.remove(); }, 300);
+          updateSaveGate();
           autosaveDraftSoon();
-        };
-        reader.onerror = function () {
-          uploads[key] = uploads[key].filter(function (u) { return u.id !== item.id; });
-          cell.remove();
-          renderCount();
-          toast('Couldn\u2019t read "' + file.name + '". Please try again.');
-        };
-        reader.readAsDataURL(file);
+        }
+        var startBar = cell.querySelector('.ml-upload-progress-bar');
+        if (startBar) startBar.style.width = '65%';
+
+        if (isImage) {
+          enqueueImage(function (done) {
+            shrinkFile(file, IMG_MAX_SIDE, IMG_QUALITY, function (small) {
+              done();
+              if (small) onReady(small); else failRead();
+            });
+          });
+        } else if (!Accoom.MediaStore) {
+          failRead('Videos can\u2019t be saved in this browser.');
+        } else {
+          var mediaKey = Accoom.MediaStore.newKey();
+          item.isNew = true;
+          item.mediaKey = mediaKey;
+          previewUrl = URL.createObjectURL(file);
+          Accoom.MediaStore.put(mediaKey, file).then(function () {
+            onReady(Accoom.MediaStore.refOf(mediaKey), previewUrl);
+          }, function () {
+            failRead('Couldn\u2019t save "' + file.name + '" \u2014 your browser may be out of space.');
+          });
+        }
 
         cell.querySelector('.ml-upload-remove').addEventListener('click', function () {
           uploads[key] = uploads[key].filter(function (u) { return u.id !== item.id; });
+          if (item.isNew && item.mediaKey && Accoom.MediaStore) { Accoom.MediaStore.remove(item.mediaKey).catch(function () {}); }
+          if (previewUrl) { try { URL.revokeObjectURL(previewUrl); } catch (e) { /* ignore */ } }
           cell.remove();
           renderCount();
         });
@@ -1011,7 +1069,7 @@
         if (err && err.name === 'QuotaExceededError' && retryWithSmallerImages(data)) return;
         setSaving(false);
         if (err && err.name === 'QuotaExceededError') {
-          submitNote.textContent = 'This listing is too big to save here. Remove the video or a few photos and try again.';
+          submitNote.textContent = 'This listing is too big to save here. Remove a few photos and try again.';
         } else {
           submitNote.textContent = 'Something went wrong saving this listing. Please try again.';
         }
