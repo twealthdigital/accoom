@@ -83,6 +83,8 @@
     // ----------------------------------------------------------------
     var folders = Accoom.getStorage('accoom-agent-listings', null);
     if (!Array.isArray(folders)) folders = [];
+    // Strip permanently deleted listings — they should never come back after refresh
+    folders = folders.filter(function (f) { return f.status !== 'deleted'; });
 
     var STATUS_LABEL = {
       available: 'Available',
@@ -90,7 +92,8 @@
       sold: 'Sold',
       delisted: 'Delisted',
       in_dispute: 'In Dispute',
-      reported: 'Reported'
+      reported: 'Reported',
+      hold: 'Hold'
     };
     function formatPrice(n) {
       return '₦' + Number(n || 0).toLocaleString('en-NG');
@@ -159,7 +162,7 @@
       var q = window.location.search;
       var t = /[?&]tab=([a-z_]+)/.exec(q);
       var k = /[?&]kind=(rent|sale)/.exec(q);
-      if (t && ['available', 'in_progress', 'sold', 'delisted', 'in_dispute', 'reported'].indexOf(t[1]) !== -1) listingState.tab = t[1];
+      if (t && ['available', 'in_progress', 'sold', 'delisted', 'in_dispute', 'reported', 'hold'].indexOf(t[1]) !== -1) listingState.tab = t[1];
       if (k && listingState.tab === 'available') listingState.kind = k[1];
     })();
 

@@ -248,35 +248,35 @@
             <div class="ml-row ml-row--4">
               <div class="ml-field">
                 <label class="ml-label" for="ml-beds">Bedrooms <span class="ml-req">*</span></label>
-                <input type="number" min="0" max="20" class="ml-input" id="ml-beds" data-ml-field="beds" placeholder="0" autocomplete="off" />
+                <input type="text" inputmode="numeric" pattern="[0-9]*" class="ml-input" id="ml-beds" data-ml-field="beds" placeholder="0" autocomplete="off" />
               </div>
               <div class="ml-field">
                 <label class="ml-label" for="ml-baths">Bathrooms <span class="ml-req">*</span></label>
-                <input type="number" min="0" max="20" class="ml-input" id="ml-baths" data-ml-field="baths" placeholder="0" autocomplete="off" />
+                <input type="text" inputmode="numeric" pattern="[0-9]*" class="ml-input" id="ml-baths" data-ml-field="baths" placeholder="0" autocomplete="off" />
               </div>
               <div class="ml-field">
                 <label class="ml-label" for="ml-kitchens">Kitchens <span class="ml-req">*</span></label>
-                <input type="number" min="0" max="10" class="ml-input" id="ml-kitchens" data-ml-field="kitchens" placeholder="0" autocomplete="off" />
+                <input type="text" inputmode="numeric" pattern="[0-9]*" class="ml-input" id="ml-kitchens" data-ml-field="kitchens" placeholder="0" autocomplete="off" />
               </div>
               <div class="ml-field">
                 <label class="ml-label" for="ml-living">Living rooms <span class="ml-req">*</span></label>
-                <input type="number" min="0" max="10" class="ml-input" id="ml-living" data-ml-field="livingRooms" placeholder="0" autocomplete="off" />
+                <input type="text" inputmode="numeric" pattern="[0-9]*" class="ml-input" id="ml-living" data-ml-field="livingRooms" placeholder="0" autocomplete="off" />
               </div>
             </div>
 
             <div class="ml-row">
               <div class="ml-field">
                 <label class="ml-label" for="ml-parking">Parking spaces <span class="ml-req">*</span></label>
-                <input type="number" min="0" max="20" class="ml-input" id="ml-parking" data-ml-field="parking" placeholder="0" autocomplete="off" />
+                <input type="text" inputmode="numeric" pattern="[0-9]*" class="ml-input" id="ml-parking" data-ml-field="parking" placeholder="0" autocomplete="off" />
               </div>
-              <div class="ml-field">
+              <div class="ml-field" data-ml-year-wrapper>
                 <label class="ml-label" for="ml-year">Year built <span class="ml-req">*</span></label>
-                <input type="number" min="1950" max="2026" class="ml-input" id="ml-year" data-ml-field="yearBuilt" placeholder="e.g. 2024" autocomplete="off" />
+                <input type="date" class="ml-input" id="ml-year" data-ml-field="yearBuilt" autocomplete="off" />
               </div>
             </div>
 
             <div class="ml-field" data-ml-select-mount="furnishing">
-              <label class="ml-label">Furnishing <span class="ml-req">*</span></label>
+              <label class="ml-label">Furnishing <span class="ml-req" data-ml-furnishing-req>*</span></label>
             </div>
 
             <div class="ml-field">

@@ -178,6 +178,9 @@ html.dark-mode .ml-select-option.is-selected { color: var(--gold); }
 .ml-price-row--total span:last-child { color: var(--gold); }
 
 /* checkbox / chip grids */
+.ml-qf-categories { display: flex; flex-direction: column; gap: 16px; margin-bottom: 12px; }
+.ml-qf-category { display: flex; flex-direction: column; gap: 8px; }
+.ml-qf-cat-title { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--gold); margin: 0; }
 .ml-check-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 @media (min-width: 560px) { .ml-check-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (min-width: 900px) { .ml-check-grid { grid-template-columns: repeat(4, 1fr); } }
@@ -442,19 +445,17 @@ html.dark-mode .ml-submit-bar { box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.3); }
 /* ---------- contact / social-media warning dialog ---------- */
 .ml-warn-overlay {
   position: fixed !important;
-  inset: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  z-index: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  z-index: 99999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   padding: 20px;
+  box-sizing: border-box;
   background: rgba(8, 10, 16, 0.6);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
@@ -473,11 +474,11 @@ html.dark-mode .ml-warn-overlay { background: rgba(0, 0, 0, 0.7); }
   background: var(--surface-page-alt);
   border: 1px solid var(--line-page);
   text-align: center;
-  transform: scale(0.88) translateY(10px);
+  transform: scale(0.88);
   opacity: 0;
   transition: transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 180ms ease;
 }
-.ml-warn-overlay.is-open .ml-warn-box { transform: none; opacity: 1; }
+.ml-warn-overlay.is-open .ml-warn-box { transform: scale(1); opacity: 1; }
 .ml-warn-icon {
   width: 52px;
   height: 52px;

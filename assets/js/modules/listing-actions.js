@@ -466,6 +466,7 @@
     if (/report/.test(t)) return 'reported';
     if (/\bsold\b/.test(t)) return 'sold';
     if (/progress/.test(t)) return 'in-progress';
+    if (/\bhold\b/.test(t)) return 'hold';
     if (/available/.test(t)) return 'available';
     return null;
   }
@@ -616,7 +617,6 @@
       if (cfg.cardSelector) {
         toArray(scope.querySelectorAll(cfg.cardSelector)).forEach(decorate);
       }
-      syncHeld();
     } finally {
       enhancing = false;
     }
@@ -661,12 +661,21 @@
   function menuItemsFor(status) {
     var items = [
       { action: 'delete', label: 'Delete', icon: 'trash', danger: true },
-      { action: 'hold', label: 'Hold', icon: 'pause' },
-      { action: 'edit', label: 'Edit', icon: 'edit' },
-      { action: 'view', label: 'View', icon: 'eye' }
+      { action: 'hold',            label: 'Hold',           icon: 'pause' },
+      { action: 'make-available',  label: 'Make Available', icon: 'check' },
+      { action: 'edit',            label: 'Edit',           icon: 'edit'  },
+      { action: 'view',            label: 'View',           icon: 'eye'   }
     ];
-    // Already on hold -> nothing to hold
-    return items.filter(function (i) { return !(i.action === 'hold' && status === 'delisted'); });
+    // On Hold tab: show Make Available, hide Hold
+    if (status === 'hold') {
+      return items.filter(function (i) { return i.action !== 'hold'; });
+    }
+    // Everywhere else: hide Make Available, and also hide Hold if already delisted
+    return items.filter(function (i) {
+      if (i.action === 'make-available') return false;
+      if (i.action === 'hold' && status === 'delisted') return false;
+      return true;
+    });
   }
 
   function positionMenu() {
@@ -955,7 +964,8 @@
   /* ------------------------------------------------------------------------
      Delete / Hold
      ------------------------------------------------------------------------ */
-  var held = []; // session registry of held cards so the Delisted tab can show them
+  // Persistence is now fully handled via accoom-agent-listings in localStorage.
+  // syncHeld() and the in-memory held[] array are no longer needed.
 
   var mockService = {
     remove: function () { return delay(700); },
@@ -971,6 +981,28 @@
     var store = getStore();
     store[id] = { status: status, name: name, at: new Date().toISOString() };
     setStore(store);
+    // Also update accoom-agent-listings so the status survives a page refresh
+    persistListingStatus(id, status);
+  }
+
+  // Write the new status directly into accoom-agent-listings (the source of truth
+  // for agent-dashboard.js). 'deleted' entries are stripped on load so they vanish.
+  function persistListingStatus(id, newStatus) {
+    try {
+      var key = 'accoom-agent-listings';
+      var raw = window.localStorage.getItem(key);
+      var list = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(list)) return;
+      var found = false;
+      list = list.map(function (f) {
+        if (String(f.id) === String(id)) {
+          found = true;
+          return Object.assign({}, f, { status: newStatus, updatedAt: new Date().toISOString() });
+        }
+        return f;
+      });
+      if (found) window.localStorage.setItem(key, JSON.stringify(list));
+    } catch (e) { /* never break the action over a storage failure */ }
   }
 
   function ensureEmptyNote(parent) {
@@ -988,9 +1020,10 @@
 
   function afterSuccess(kind, card, info, status) {
     var container = findContainer(card);
-    var action = kind === 'remove' ? 'delete' : 'hold';
+    var action = kind === 'remove' ? 'delete' : kind === 'make-available' ? 'make-available' : 'hold';
+    var newStatus = kind === 'remove' ? 'deleted' : kind === 'make-available' ? 'available' : 'hold';
 
-    persistState(info.id, kind === 'remove' ? 'deleted' : 'delisted', info.name);
+    persistState(info.id, newStatus, info.name);
 
     var evt;
     try {
@@ -1004,28 +1037,10 @@
     if (proceed) {
       // tab counters
       adjustTabCount(container, status, -1);
-      if (action === 'hold' && status !== 'delisted') adjustTabCount(container, 'delisted', 1);
+      if (action === 'hold') adjustTabCount(container, 'hold', 1);
+      if (action === 'make-available') adjustTabCount(container, 'available', 1);
 
-      // remember held cards for the Delisted tab (session only)
-      if (action === 'hold') {
-        var clone = card.cloneNode(true);
-        toArray(clone.querySelectorAll('.lax-controls')).forEach(function (n) { n.parentNode.removeChild(n); });
-        toArray(clone.querySelectorAll('[data-lax-href]')).forEach(function (a) {
-          a.setAttribute('href', a.getAttribute('data-lax-href'));
-          a.removeAttribute('data-lax-href');
-        });
-        clone.removeAttribute('data-lax-enhanced');
-        clone.classList.remove('lax-card', 'is-leaving');
-        clone.removeAttribute('data-lax-id');
-        clone.setAttribute('data-lax-held', info.id);
-        clone.style.position = '';
-        held = held.filter(function (h) { return h.id !== info.id; });
-        held.push({ id: info.id, html: clone.outerHTML });
-      } else {
-        held = held.filter(function (h) { return h.id !== info.id; });
-      }
-
-      // animate out, then remove
+      // animate out, then remove from current tab
       var parent = card.parentElement;
       card.classList.add('is-leaving');
       window.setTimeout(function () {
@@ -1035,32 +1050,15 @@
     }
 
     if (action === 'delete') {
-      notify('Listing deleted', '\u201C' + info.name + '\u201D was deleted from your listings.');
-    } else {
-      notify('Listing put on hold', '\u201C' + info.name + '\u201D was moved to your Delisted tab.');
+      notify('Listing deleted', '\u201C' + info.name + '\u201D was permanently deleted from your listings.');
+    } else if (action === 'hold') {
+      notify('Listing put on hold', '\u201C' + info.name + '\u201D was moved to your Hold tab.');
+    } else if (action === 'make-available') {
+      notify('Listing restored', '\u201C' + info.name + '\u201D is back on the Available tab.');
     }
   }
 
-  function syncHeld() {
-    if (!held.length) return;
-    var scope = scopeEl();
-    var visible = toArray(scope.querySelectorAll('.lax-card')).filter(function (c) { return c.offsetParent !== null; });
-    if (!visible.length) return;
-    var container = findContainer(visible[0]);
-    if (activeTabStatus(container) !== 'delisted') return;
-    var grid = visible[0].parentElement;
-    if (!grid) return;
-    held.forEach(function (h) {
-      var present = toArray(grid.children).some(function (c) {
-        return c.getAttribute('data-lax-id') === h.id || c.getAttribute('data-lax-held') === h.id;
-      });
-      if (!present) grid.insertAdjacentHTML('beforeend', h.html);
-    });
-    var empty = grid.querySelector(':scope > .lax-empty');
-    if (empty) empty.parentNode.removeChild(empty);
-  }
-
-  // Tab clicks re-render cards; give that a moment then sync + re-decorate.
+  // Tab clicks re-render cards; give that a moment then re-decorate.
   document.addEventListener('click', function (e) {
     var t = e.target && e.target.closest && e.target.closest('[role="tab"], button, a, li');
     if (!t || isOurs(t) || t.closest('.lax-card')) return;
@@ -1116,9 +1114,29 @@
     }
   }
 
+  function actionMakeAvailable(card, btn) {
+    var info = readCard(card);
+    var status = getStatus(card);
+    openConfirm({
+      returnFocus: btn,
+      tone: 'gold',
+      icon: 'check',
+      title: 'Make this listing available?',
+      text: 'It will move back to your Available tab and buyers will be able to see it on ACCOOM again.',
+      name: info.name,
+      busyLabel: 'Restoring\u2026',
+      onConfirm: function () {
+        return Promise.resolve(service('hold')(info.id, info)).then(function () {
+          afterSuccess('make-available', card, info, status);
+        });
+      }
+    });
+  }
+
   function runAction(action, card, btn) {
     if (action === 'delete') actionDelete(card, btn);
     else if (action === 'hold') actionHold(card, btn);
+    else if (action === 'make-available') actionMakeAvailable(card, btn);
     else if (action === 'edit') actionEdit(card);
     else if (action === 'view') openView(card, btn);
   }
@@ -1377,9 +1395,9 @@
     if (!p.generatedId) overviewRows.push(['Property ID', p.id]);
     overviewRows.push(['Property Type', p.typeLabel || 'Property']);
     overviewRows.push(['Status', statusLabel]);
-    overviewRows.push(['Furnishing', p.furnishing || DEFAULTS.furnishing]);
-    overviewRows.push(['Year Built', p.yearBuilt || DEFAULTS.yearBuilt]);
-    overviewRows.push(['Parking Space', p.parking || DEFAULTS.parking]);
+    if (p.furnishing) overviewRows.push(['Furnishing', p.furnishing]);
+    if (p.category === 'sale' && p.yearBuilt) overviewRows.push(['Year Built', p.yearBuilt]);
+    if (p.parking && p.parking !== '0' && p.parking !== 0) overviewRows.push(['Parking Space', p.parking]);
     overviewRows.push(['Date Added', p.dateAdded || DEFAULTS.dateAdded]);
     overviewRows.push(['Views', p.views || DEFAULTS.views]);
 
@@ -1392,10 +1410,15 @@
     // content blocks
     var about = p.about || ('This ' + (p.typeLabel || 'property').toLowerCase() + (p.location ? ' is located in ' + p.location : ' is listed on ACCOOM') + '.');
 
-    var facts = Array.isArray(p.quickFacts) ? p.quickFacts.slice() : [];
+    var facts = Array.isArray(p.quickFacts) ? p.quickFacts.filter(function (f) {
+      if (!f || !f.text) return false;
+      var text = String(f.text).toLowerCase();
+      if (text.indexOf(' 0 ') !== -1 || text.indexOf('0 ') === 0 || text === '0') return false;
+      return true;
+    }) : [];
     if (!facts.length) {
-      if (p.beds != null) facts.push({ icon: 'bed', text: p.beds + (p.beds === 1 ? ' Bedroom' : ' Bedrooms') });
-      if (p.baths != null) facts.push({ icon: 'bath', text: p.baths + (p.baths === 1 ? ' Bathroom' : ' Bathrooms') });
+      if (p.beds && p.beds !== 0 && p.beds !== '0') facts.push({ icon: 'bed', text: p.beds + (p.beds === 1 ? ' Bedroom' : ' Bedrooms') });
+      if (p.baths && p.baths !== 0 && p.baths !== '0') facts.push({ icon: 'bath', text: p.baths + (p.baths === 1 ? ' Bathroom' : ' Bathrooms') });
       if (residential) facts = facts.concat(DEFAULTS.quickFacts);
     }
 

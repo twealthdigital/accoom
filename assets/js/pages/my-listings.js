@@ -60,15 +60,43 @@
 
     var FURNISHING_OPTIONS = ['Furnished', 'Semi Furnished', 'Unfurnished'].map(function (t) { return { value: t, label: t }; });
 
-    var QUICKFACT_OPTIONS = [
-      { id: 'security', icon: 'shield', text: '24/7 Security' },
-      { id: 'power', icon: 'bolt', text: 'Constant Power' },
-      { id: 'water', icon: 'drop', text: 'Borehole Water' },
-      { id: 'ceiling', icon: 'ceiling', text: 'Pop Ceiling' },
-      { id: 'tiles', icon: 'tiles', text: 'Tiled Floor' },
-      { id: 'estate', icon: 'shield', text: 'Gated Estate' },
-      { id: 'road', icon: 'car', text: 'Good Access Road' }
+    var QUICKFACT_CATEGORIES = [
+      {
+        category: 'Water Supply',
+        options: [
+          { id: 'water_borehole', icon: 'drop', text: 'Borehole Water' },
+          { id: 'water_state', icon: 'drop', text: 'State Water Corporation' },
+          { id: 'water_treatment', icon: 'drop', text: 'Treated Water Plant' },
+          { id: 'water_well', icon: 'drop', text: 'Well Water' },
+          { id: 'water_tanker', icon: 'drop', text: 'Water Tanker Supply' }
+        ]
+      },
+      {
+        category: 'Electricity / Power',
+        options: [
+          { id: 'power_247', icon: 'bolt', text: '24/7 Constant Power' },
+          { id: 'power_solar', icon: 'bolt', text: 'Solar System Backup' },
+          { id: 'power_gen', icon: 'bolt', text: 'Central Generator Backup' },
+          { id: 'power_prepaid', icon: 'bolt', text: 'Prepaid Meter Installed' },
+          { id: 'power_phcn', icon: 'bolt', text: 'PHCN / National Grid Only' }
+        ]
+      },
+      {
+        category: 'Security',
+        options: [
+          { id: 'sec_247', icon: 'shield', text: '24/7 Uniformed Security' },
+          { id: 'sec_gated', icon: 'shield', text: 'Gated Estate Security' },
+          { id: 'sec_cctv', icon: 'shield', text: 'CCTV Surveillance System' },
+          { id: 'sec_fence', icon: 'shield', text: 'Electric / Razor Wire Fence' },
+          { id: 'sec_police', icon: 'shield', text: 'Police / Military Patrol' }
+        ]
+      }
     ];
+
+    var QUICKFACT_OPTIONS = [];
+    QUICKFACT_CATEGORIES.forEach(function (c) {
+      QUICKFACT_OPTIONS = QUICKFACT_OPTIONS.concat(c.options);
+    });
 
     var AMENITY_OPTIONS = [
       'Fitted Kitchen', 'Wardrobes', 'En-suite Rooms', 'Guest Toilet', 'Air Conditioning',
@@ -253,10 +281,20 @@
     var furnishingSelect = buildSelect('furnishing', { options: FURNISHING_OPTIONS, placeholder: 'Select furnishing', allowCustom: true });
 
     /* ======================================================================
-       Category (rent / sale)
+       Category (rent / sale) & conditional requirements
        ====================================================================== */
     var categoryValue = 'rent';
     var categoryButtons = toArray(document.querySelectorAll('[data-ml-category] .ml-segmented-btn'));
+    var yearWrapper = document.querySelector('[data-ml-year-wrapper]');
+    var furnishingReqBadge = document.querySelector('[data-ml-furnishing-req]');
+
+    function updateCategoryFields() {
+      var isSale = categoryValue === 'sale';
+      periodField.hidden = isSale;
+      if (yearWrapper) yearWrapper.hidden = !isSale;
+      if (furnishingReqBadge) furnishingReqBadge.hidden = !isSale;
+    }
+
     categoryButtons.forEach(function (btn) {
       btn.addEventListener('click', function () {
         categoryValue = btn.getAttribute('data-value');
@@ -265,10 +303,11 @@
           b.classList.toggle('is-active', on);
           b.setAttribute('aria-checked', on ? 'true' : 'false');
         });
-        periodField.hidden = categoryValue === 'sale';
+        updateCategoryFields();
         autosaveDraftSoon();
       });
     });
+    updateCategoryFields();
 
     /* ======================================================================
        Price breakdown
@@ -329,12 +368,20 @@
     [areaInput, addressInput].forEach(function (el) { el.addEventListener('input', scheduleMapUpdate); });
 
     /* ======================================================================
-       Quick facts + amenities: checkbox grid, plus custom chip add-ons
+       Quick facts + amenities: categorized checkbox grid, plus custom chip add-ons
        ====================================================================== */
     var quickFactsGrid = document.querySelector('[data-ml-quickfacts]');
     var quickFactsField = quickFactsGrid.closest('.ml-field');
-    quickFactsGrid.innerHTML = QUICKFACT_OPTIONS.map(function (o) {
-      return '<label class="ml-check"><input type="checkbox" value="' + esc(o.id) + '" /><span>' + esc(o.text) + '</span></label>';
+    quickFactsGrid.className = 'ml-qf-categories';
+    quickFactsGrid.innerHTML = QUICKFACT_CATEGORIES.map(function (cat) {
+      return '<div class="ml-qf-category">' +
+        '<h4 class="ml-qf-cat-title">' + esc(cat.category) + '</h4>' +
+        '<div class="ml-check-grid">' +
+          cat.options.map(function (o) {
+            return '<label class="ml-check"><input type="checkbox" value="' + esc(o.id) + '" /><span>' + esc(o.text) + '</span></label>';
+          }).join('') +
+        '</div>' +
+      '</div>';
     }).join('');
 
     var amenitiesGrid = document.querySelector('[data-ml-amenities]');
@@ -477,6 +524,21 @@
       if (warnOverlay) return;
       warnOverlay = document.createElement('div');
       warnOverlay.className = 'ml-warn-overlay';
+      // Force true center — inline styles win over any stylesheet
+      warnOverlay.style.cssText = [
+        'position:fixed',
+        'top:0',
+        'left:0',
+        'width:100vw',
+        'height:100vh',
+        'margin:0',
+        'z-index:99999',
+        'display:flex',
+        'align-items:center',
+        'justify-content:center',
+        'box-sizing:border-box',
+        'padding:20px'
+      ].join(';');
       warnOverlay.innerHTML =
         '<div class="ml-warn-box" role="alertdialog" aria-modal="true" tabindex="-1">' +
           '<div class="ml-warn-icon">' + WARN_ICON + '</div>' +
@@ -895,7 +957,7 @@
         b.classList.toggle('is-active', on); b.setAttribute('aria-checked', on ? 'true' : 'false');
         if (on) categoryValue = d.category;
       });
-      periodField.hidden = categoryValue === 'sale';
+      updateCategoryFields();
       if (d.propertyTypeCustom) propertyTypeSelect.setValue(null, d.propertyTypeLabel, true);
       else if (d.propertyType) propertyTypeSelect.setValue(d.propertyType);
       if (d.period) periodSelect.setValue(d.period);
@@ -937,7 +999,7 @@
         var on = b.getAttribute('data-value') === 'rent';
         b.classList.toggle('is-active', on); b.setAttribute('aria-checked', on ? 'true' : 'false');
       });
-      periodField.hidden = false;
+      updateCategoryFields();
       [propertyTypeSelect, periodSelect, stateSelect, furnishingSelect].forEach(function (s) { s.setValue(null, '', false); });
       agencyInput.value = ''; legalInput.value = '';
       recomputePrice();
@@ -1007,11 +1069,16 @@
         data[name] = parseInt(el.value, 10) || 0;
       });
       var yearEl = document.querySelector('[data-ml-field="yearBuilt"]');
-      data.yearBuilt = yearEl.value.trim();
-      if (!data.yearBuilt) bad(yearField);
+      var rawYear = yearEl.value.trim();
+      if (categoryValue === 'sale') {
+        if (!rawYear) bad(yearField);
+      }
+      data.yearBuilt = rawYear ? (rawYear.length >= 4 ? rawYear.substring(0, 4) : rawYear) : '';
 
       data.furnishing = furnishingSelect.getLabel();
-      if (!data.furnishing) bad(document.querySelector('[data-ml-select-mount="furnishing"]'));
+      if (categoryValue === 'sale' && !data.furnishing) {
+        bad(document.querySelector('[data-ml-select-mount="furnishing"]'));
+      }
 
       var qfChecked = toArray(quickFactsGrid.querySelectorAll('input:checked')).map(function (i) {
         var opt = QUICKFACT_OPTIONS.filter(function (o) { return o.id === i.value; })[0];
@@ -1191,7 +1258,7 @@
         var on = b.getAttribute('data-value') === categoryValue;
         b.classList.toggle('is-active', on); b.setAttribute('aria-checked', on ? 'true' : 'false');
       });
-      periodField.hidden = categoryValue === 'sale';
+      updateCategoryFields();
 
       var knownType = PROPERTY_TYPES.filter(function (t) { return t.value === record.typeLabel; })[0];
       if (knownType) propertyTypeSelect.setValue(knownType.value); else propertyTypeSelect.setValue(null, record.typeLabel, true);

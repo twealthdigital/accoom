@@ -112,13 +112,36 @@
 
       setText('[data-pd-location-text]', property.location);
       setText('[data-pd-price]', property.price);
-      setText('[data-pd-beds-tag]', property.beds + ' Beds');
-      setText('[data-pd-baths-tag]', property.baths + ' Baths');
+      setText('[data-pd-beds-tag]', property.beds ? property.beds + ' Beds' : '');
+      setText('[data-pd-baths-tag]', property.baths ? property.baths + ' Baths' : '');
       setText('[data-pd-type-tag]', property.typeLabel);
-      setText('[data-pd-quickfact-beds]', property.beds + ' Bedrooms');
-      setText('[data-pd-quickfact-baths]', property.baths + ' Bathrooms');
       setText('[data-pd-overview-id]', property.id);
       setText('[data-pd-overview-type]', property.typeLabel);
+      setText('[data-pd-overview-furnishing]', property.furnishing || 'N/A');
+
+      var yearRow = document.querySelector('[data-pd-overview-year-row]');
+      if (yearRow) {
+        if (property.category === 'rent' || !property.yearBuilt) {
+          yearRow.style.display = 'none';
+        } else {
+          yearRow.style.display = '';
+          setText('[data-pd-overview-year]', property.yearBuilt);
+        }
+      }
+
+      // Hide any quickfact element with 0 value
+      ['beds', 'baths', 'kitchens', 'livingRooms', 'parking'].forEach(function (key) {
+        var val = property[key];
+        var factEl = document.querySelector('[data-pd-quickfact-' + key + ']');
+        if (factEl) {
+          var container = factEl.closest('.pd-quickfact');
+          if (!val || val === 0 || val === '0') {
+            if (container) container.style.display = 'none';
+          } else {
+            if (container) container.style.display = '';
+          }
+        }
+      });
 
       var agent = property.agent;
       setText('[data-pd-agent-name-text]', agent.name || 'Agent');
