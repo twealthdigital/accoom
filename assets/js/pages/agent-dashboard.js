@@ -166,6 +166,19 @@
       if (k && listingState.tab === 'available') listingState.kind = k[1];
     })();
 
+    // Re-read the listings from storage so Delete / Hold / Make Available
+    // (done by listing-actions.js) show up in every tab without a reload.
+    function syncFolders() {
+      var fresh = Accoom.getStorage('accoom-agent-listings', null);
+      if (!Array.isArray(fresh)) fresh = [];
+      folders = fresh.filter(function (f) { return f.status !== 'deleted'; });
+    }
+
+    document.addEventListener('accoom:listing-action', function () {
+      syncFolders();
+      updateKindCounts();
+    });
+
     function updateListingCounts() {
       Object.keys(STATUS_LABEL).forEach(function (key) {
         var count = folders.filter(function (f) { return f.status === key; }).length;
@@ -175,6 +188,9 @@
     }
 
     function setListingTab(tab) {
+      syncFolders();
+      updateKindCounts();
+      updateListingCounts();
       listingState.tab = tab;
 
       if (listingTabsEl) {

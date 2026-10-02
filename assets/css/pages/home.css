@@ -697,6 +697,13 @@ html.dark-mode .popular-card p { color: rgba(255, 255, 255, 0.4); }
   gap: 16px;
 }
 
+@media (min-width: 576px) {
+  .tip-tag { font-size: 9px; padding: 3px 8px; }
+  .tip-body { padding: 12px; }
+  .tip-body h3 { font-size: 13px; -webkit-line-clamp: 4; line-clamp: 4; }
+  .tip-meta { font-size: 11px; }
+}
+
 @media (min-width: 768px) {
   .listings-header {
     flex-direction: row;
@@ -2482,9 +2489,16 @@ html.dark-mode .why-visual.no-dark .why-photo--light { display: block; }
 
 .suits-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 32%);
+  gap: 16px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: 2px 2px 12px;
+  scroll-snap-type: inline mandatory;
+  scrollbar-width: none;
 }
+.suits-grid::-webkit-scrollbar { display: none; }
 
 .suit-card {
   display: flex;
@@ -2494,7 +2508,7 @@ html.dark-mode .why-visual.no-dark .why-photo--light { display: block; }
   border-radius: 14px;
   background: var(--surface-page-alt);
   border: 1px solid var(--line-page);
-  cursor: pointer;
+  scroll-snap-align: start;
   transition: transform var(--dur-med) var(--ease),
               box-shadow var(--dur-med) var(--ease),
               border-color var(--dur-fast) var(--ease);
@@ -2537,25 +2551,38 @@ html.dark-mode .why-visual.no-dark .why-photo--light { display: block; }
   height: 30px;
   display: grid;
   place-items: center;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
   background: var(--gold-soft);
   color: var(--gold);
+  cursor: pointer;
   transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
+.suit-arrow:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 
 @media (hover: hover) {
-  .suit-card:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14); }
-  .suit-card:hover .suit-media img { transform: scale(1.06); }
-  .suit-card:hover .suit-arrow { background: var(--gold); color: var(--navy-2); }
+  .suit-arrow:hover { background: var(--gold); color: var(--navy-2); }
 }
 
-@media (min-width: 576px) {
-  .suits-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 575px) {
+  .suits-grid { grid-auto-columns: 78%; }
+}
+
+@media (min-width: 576px) and (max-width: 1099px) {
+  .suits-grid { grid-auto-columns: minmax(220px, 32%); }
   .suit-text h3 { font-size: 15px; }
 }
 
 @media (min-width: 1100px) {
-  .suits-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
+  .suits-grid {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    overflow: visible;
+    padding: 0;
+    scroll-snap-type: none;
+  }
   .suit-body { padding: 12px 12px 14px; }
 }
 
@@ -2582,51 +2609,76 @@ html.dark-mode .why-visual.no-dark .why-photo--light { display: block; }
 .tips-cta { max-width: 100%; }
 
 .tips-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 12px;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-end;
+  min-width: 0;
+  gap: 0;
+  padding: 28px clamp(8px, 2vw, 24px) 32px;
+  overflow: visible;
 }
 
 .tip-card {
   display: flex;
+  flex: 1 1 0;
   min-width: 0;
+  max-width: 280px;
+  margin-left: clamp(-44px, -3vw, -8px);
+  flex-direction: column;
   overflow: hidden;
   border-radius: 14px;
-  background: var(--surface-page);
+  background: var(--surface-panel);
   border: 1px solid var(--line-page);
   color: inherit;
+  transform-origin: 50% 100%;
+  transform: translateY(var(--tip-fan-y, 0)) rotate(var(--tip-fan-rot, 0deg));
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  position: relative;
   transition: transform var(--dur-med) var(--ease),
               box-shadow var(--dur-med) var(--ease),
               border-color var(--dur-fast) var(--ease);
 }
+.tip-card:first-child { margin-left: 0; }
+.tip-card:nth-child(1) { --tip-fan-rot: -7deg; --tip-fan-y: 14px; z-index: 1; }
+.tip-card:nth-child(2) { --tip-fan-rot: 0deg;  --tip-fan-y: 0px;  z-index: 2; }
+.tip-card:nth-child(3) { --tip-fan-rot: 7deg;  --tip-fan-y: 14px; z-index: 3; }
 .tip-card:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 
 .tip-media {
   position: relative;
-  flex: 0 0 38%;
-  min-height: 110px;
-  display: grid;
-  place-items: center;
-  color: rgba(255, 255, 255, 0.9);
+  flex: none;
+  min-height: 0;
+  aspect-ratio: 4 / 3;
 }
-.tip-media--a { background: linear-gradient(135deg, #111F35, #2a4a7a); }
-.tip-media--b { background: linear-gradient(135deg, #9D5F16, #DF962E); }
-.tip-media--c { background: linear-gradient(135deg, #0B1220, #1f6f5c); }
+.tip-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 300ms var(--ease);
+}
+html.dark-mode .tip-card { background: var(--surface-page-alt); }
 
 .tip-tag {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  max-width: calc(100% - 16px);
-  padding: 3px 9px;
+  bottom: -9px;
+  left: 12px;
+  z-index: 1;
+  max-width: calc(100% - 12px);
+  padding: 4px 8px;
   border-radius: var(--radius-pill);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   background: #fff;
   color: var(--navy-2);
+}
+html:not(.dark-mode) .tip-tag {
+  background: #1A1A1A;
+  color: var(--white);
 }
 
 .tip-body {
@@ -2636,25 +2688,88 @@ html.dark-mode .why-visual.no-dark .why-photo--light { display: block; }
   flex-direction: column;
   justify-content: center;
   gap: 8px;
-  padding: 14px;
+  padding: 18px 12px 12px;
 }
-.tip-body h3 { margin: 0; font-size: 14px; line-height: 1.35; font-weight: 700; color: var(--on-page); }
-.tip-meta { font-size: 12px; color: var(--on-page-soft); }
+.tip-body h3 {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 700;
+  color: var(--on-page);
+  overflow-wrap: anywhere;
+}
+.tip-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--on-page-soft);
+}
+.tip-meta-reading { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.tip-meta-reading svg { flex: 0 0 auto; }
+.tip-meta-separator { color: var(--gold); }
+
+@media (max-width: 575px) {
+  .tip-card.is-peeked,
+  .tips .tips-grid.tip-anim-ready.is-in-view .tip-card.is-peeked {
+    transform: translateY(-18px) rotate(0deg) scale(1.3, 1.04);
+  }
+
+  .tips-grid { padding-inline: clamp(8px, 2vw, 12px); }
+  .tip-card {
+    flex: 0 0 42%;
+    max-width: none;
+    margin-left: clamp(-46px, -8vw, -24px);
+  }
+  .tip-card:first-child { margin-left: 0; }
+  .tip-body { padding: 18px 12px 14px; }
+  .tip-body h3 { font-size: 12px; -webkit-line-clamp: 2; line-clamp: 2; }
+  .tip-meta { font-size: 9px; }
+}
+
+@media (max-width: 575px) and (hover: none), (max-width: 575px) and (pointer: coarse) {
+  .tip-card:active .tip-body h3 {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+    line-clamp: none;
+  }
+}
 
 @media (hover: hover) {
-  .tip-card:hover { transform: translateY(-6px); border-color: var(--gold); --tip-shadow: 0 18px 38px rgba(0, 0, 0, 0.16); }
-  .tip-card:hover .tip-media svg { transform: scale(1.12) rotate(-6deg); }
+  .tip-card:hover .tip-photo { transform: scale(1.05); }
 }
 
-/* Scroll-in reveal — cards fan out from below like a dealt hand of cards, and
-   SETTLE into the fanned pose below (not flat) — see the --tip-fan-* vars in
-   the ≥768px block. .tip-anim-ready is added by home.js only when JS +
+@media (hover: none), (pointer: coarse) {
+  .tip-card:active .tip-photo { transform: scale(1.05); }
+}
+
+@media (hover: hover) {
+  .tip-card:hover {
+    transform: translateY(-18px) rotate(0deg) scale(1.07, 1.04);
+    z-index: 20;
+    border-color: var(--gold);
+    box-shadow: 0 20px 36px rgba(0, 0, 0, 0.18);
+    transition: transform 180ms var(--ease), box-shadow 180ms var(--ease), border-color 180ms var(--ease);
+  }
+  .tip-card:hover .tip-photo { transform: scale(1.05); }
+}
+
+/* Scroll-in reveal — cards rise into their resting fan pose. .tip-anim-ready
+  is added by home.js only when JS +
    IntersectionObserver are available, so without JS the cards simply sit in
    their resting fan pose already — never stuck hidden. */
 .tips-grid.tip-anim-ready .tip-card {
   opacity: 0;
   transform: translateY(64px) scale(0.92) rotate(var(--tip-rot, 0deg));
-  transition: opacity 0.65s var(--ease), transform 0.65s var(--ease);
+  transition: opacity 0.65s var(--ease), transform 180ms var(--ease);
   transform-origin: 50% 100%;
 }
 .tips-grid.tip-anim-ready .tip-card:nth-child(1) { --tip-rot: -8deg; transition-delay: 0ms; }
@@ -2666,32 +2781,70 @@ html.dark-mode .why-visual.no-dark .why-photo--light { display: block; }
   transform: translateY(var(--tip-fan-y, 0)) scale(1) rotate(var(--tip-fan-rot, 0deg));
 }
 
+.tip-card.is-peeked,
+.tips-grid.tip-anim-ready.is-in-view .tip-card.is-peeked {
+  transform: translateY(-18px) rotate(0deg) scale(1.07, 1.04);
+  z-index: 20;
+  border-color: var(--gold);
+  box-shadow: 0 20px 36px rgba(0, 0, 0, 0.18);
+  transition: transform 180ms var(--ease), box-shadow 180ms var(--ease), border-color 180ms var(--ease);
+}
+.tip-card.is-peeked .tip-photo { transform: scale(1.05); }
+@media (max-width: 575px) {
+  .tip-card.is-peeked .tip-body h3 {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+    line-clamp: none;
+  }
+}
+
+@media (hover: hover) {
+  .tips-grid.tip-anim-ready.is-in-view .tip-card:hover {
+    transform: translateY(-18px) rotate(0deg) scale(1.07, 1.04);
+    z-index: 20;
+    border-color: var(--gold);
+    box-shadow: 0 20px 36px rgba(0, 0, 0, 0.18);
+    transition: transform 180ms var(--ease), box-shadow 180ms var(--ease), border-color 180ms var(--ease);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .tip-card:active,
+  .tips-grid.tip-anim-ready.is-in-view .tip-card:active {
+    transform: translateY(-18px) rotate(0deg) scale(1.07, 1.04);
+    z-index: 20;
+    border-color: var(--gold);
+    box-shadow: 0 20px 36px rgba(0, 0, 0, 0.18);
+    transition: transform 180ms var(--ease), box-shadow 180ms var(--ease), border-color 180ms var(--ease);
+  }
+}
+
+@media (max-width: 575px) {
+  .tips { overflow-x: clip; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tips-grid.tip-anim-ready .tip-card { opacity: 1; transform: translateY(var(--tip-fan-y, 0)) rotate(var(--tip-fan-rot, 0deg)); transition: none; }
 }
 
 @media (min-width: 768px) {
-  /* Whot-style card fan: the 3 cards overlap and sit at a slight angle,
-     like a hand of cards, instead of separate grid boxes.
-     ADJUST THE FAN HERE:
-       --tip-fan-rot  = how far each card tilts (outer cards only; middle stays straight)
-       --tip-fan-y    = how far the outer cards drop below the middle one
-       margin-left    = how much each card overlaps the one before it (bigger negative = more overlap) */
+  /* Give the fan more breathing room as the cards grow. */
   .tips-grid {
     display: flex;
-    flex-wrap: wrap;               /* safety net: drops to one-per-row instead of squeezing if ever too narrow */
+    flex-wrap: nowrap;
     justify-content: center;
     align-items: flex-end;
-    gap: 20px;                     /* only used if flex-wrap above ever kicks in */
-    padding: 24px 20px 0;          /* top: room to lift on hover · sides: room for the tilted outer cards */
-    overflow-x: hidden;            /* clips the tilted outer cards' corners on very tight widths — vertical hover lift is unaffected */
+    gap: 0;
+    padding: 32px 24px;            /* breathing room for the tilted cards and their hover lift */
+    overflow: visible;
   }
 
   .tip-card { flex-direction: column; }
   .tip-card {
-    flex: 1 1 240px;
+    flex: 1 1 0;
     max-width: 280px;
-    margin-left: -44px;
+    margin-left: clamp(-44px, -3vw, -8px);
     transform-origin: 50% 100%;
     transform: translateY(var(--tip-fan-y, 0)) rotate(var(--tip-fan-rot, 0deg));
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
@@ -2703,25 +2856,29 @@ html.dark-mode .why-visual.no-dark .why-photo--light { display: block; }
   .tip-card:nth-child(2) { --tip-fan-rot: 0deg;  --tip-fan-y: 0px;  z-index: 2; }
   .tip-card:nth-child(3) { --tip-fan-rot: 7deg;  --tip-fan-y: 14px; z-index: 3; }
 
-  .tip-media { flex: none; aspect-ratio: 16 / 10; min-height: 0; }
-  .tip-body { justify-content: flex-start; padding: 16px; }
+  .tip-media { flex: none; min-height: 0; }
+  .tip-body { justify-content: flex-start; padding: 18px 16px 14px; }
   .tip-body h3 { font-size: 15px; }
 }
 
-/* Hover: the card straightens up and lifts above its neighbours — only
-   where a real pointer is present, and only once the fan itself exists.
-   Overrides the plain lift rule above for this breakpoint. */
-@media (min-width: 768px) and (hover: hover) {
-  .tip-card:hover {
-    transform: translateY(calc(var(--tip-fan-y, 0) - 16px)) rotate(0deg) scale(1.04);
-    z-index: 10;
-    border-color: var(--gold);
-    --tip-shadow: 0 20px 36px rgba(0, 0, 0, 0.18);
+/* Desktop layout: cards on the left, heading and copy on the right. */
+@media (min-width: 1100px) {
+  .tips-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.45fr);
+    grid-template-areas: "cards heading" "cards copy";
+    column-gap: clamp(40px, 5vw, 88px);
+    row-gap: 16px;
   }
+  .tips-heading { grid-area: heading; align-self: end; }
+  .tips-grid { grid-area: cards; align-self: center; }
+  .tips-copy { grid-area: copy; align-self: start; }
 }
 
-@media (min-width: 1100px) {
-  .tips-inner { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 40px; }
+@media (max-width: 1099px) {
+  .tips-heading,
+  .tips-copy { text-align: center; }
+  .tips-lead { margin-inline: auto; }
+  .tips-cta { margin-inline: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {

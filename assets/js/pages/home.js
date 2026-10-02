@@ -386,9 +386,11 @@ function getById(id) {
     }
     syncPopularCounts();
 
-    // Clicking/activating a card filters "All Property Listings" using
-    // its own title as the search term (identical pattern to the pills above).
-    Accoom.$$('[data-popular-type]').forEach(function (card) {
+    // The arrow buttons filter listings using their card title.
+    Accoom.$$('[data-popular-filter]').forEach(function (button) {
+      var card = button.closest('[data-popular-type]');
+      if (!card) return;
+
       function activate() {
         var titleEl = card.querySelector('h3');
         var query = titleEl ? titleEl.textContent.trim() : '';
@@ -404,10 +406,7 @@ function getById(id) {
           window.scrollTo({ top: Math.max(targetY, 0), behavior: 'smooth' });
         }
       }
-      Accoom.on(card, 'click', activate);
-      Accoom.on(card, 'keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
-      });
+      Accoom.on(button, 'click', activate);
     });
 
     var listingsGrid = document.querySelector('[data-listings-grid]');
@@ -1520,6 +1519,55 @@ var nameEl = card.querySelector('.listing-name');
         });
       }, { threshold: 0.25 });
       io.observe(grid);
+    })();
+
+    (function initTipCardPeek() {
+      var grid = document.querySelector('.tips-grid');
+      if (!grid) return;
+
+      var cards = Array.from(grid.querySelectorAll('.tip-card'));
+
+      function resetPeek() {
+        cards.forEach(function (card) {
+          card.classList.remove('is-peeked');
+          card.setAttribute('aria-pressed', 'false');
+        });
+      }
+
+      function togglePeek(card) {
+        var wasPeeked = card.classList.contains('is-peeked');
+        resetPeek();
+        if (!wasPeeked) {
+          card.classList.add('is-peeked');
+          card.setAttribute('aria-pressed', 'true');
+        }
+      }
+
+      cards.forEach(function (card) {
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-pressed', 'false');
+      });
+
+      Accoom.on(grid, 'click', function (event) {
+        var card = event.target.closest('.tip-card');
+        if (card) togglePeek(card);
+      });
+
+      Accoom.on(grid, 'keydown', function (event) {
+        var card = event.target.closest('.tip-card');
+        if (!card || (event.key !== 'Enter' && event.key !== ' ')) return;
+        event.preventDefault();
+        togglePeek(card);
+      });
+
+      Accoom.on(document, 'click', function (event) {
+        if (!event.target.closest('.tip-card')) resetPeek();
+      });
+
+      Accoom.on(document, 'keydown', function (event) {
+        if (event.key === 'Escape') resetPeek();
+      });
     })();
 
     // Footer year (footer is now an async partial, so wait for it)

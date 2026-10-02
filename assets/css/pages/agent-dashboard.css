@@ -114,16 +114,17 @@ html.dark-mode .ag-dash-sidebar {
 .ag-dash-nav {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 4px;
 }
 
 .ag-dash-nav-link {
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 8px 9px;
-  border-radius: var(--radius-s);
-  font-size: 13px;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-m);
+  font-size: 0.98rem;
+  font-weight: 500;
   color: var(--on-page-soft);
   background: transparent;
   border: none;
@@ -133,7 +134,7 @@ html.dark-mode .ag-dash-sidebar {
   transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
 
-.ag-dash-nav-link svg { flex-shrink: 0; opacity: 0.8; }
+.ag-dash-nav-link svg { flex-shrink: 0; opacity: 0.8; width: 20px; height: 20px; }
 
 .ag-dash-nav-link:hover {
   background: var(--gold-soft);
@@ -143,11 +144,12 @@ html.dark-mode .ag-dash-sidebar {
 .ag-dash-nav-link.is-active {
   background: var(--gold-soft);
   color: var(--gold-dark);
+  font-weight: 600;
 }
 
 .ag-dash-signout {
   margin-top: auto;
-  padding-top: 10px;
+  padding-top: 14px;
   border-top: 1px solid var(--line-page);
   border-radius: 0;
 }
@@ -648,6 +650,8 @@ a.ag-dash-stat:hover {
   html.dark-mode .ag-dash-sidebar.is-open { box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4); }
 
   .ag-dash-signout { margin-top: auto; }
+
+
 
   .ag-dash-main { padding: 18px 18px 50px; }
 }
