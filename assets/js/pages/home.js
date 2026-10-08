@@ -1526,6 +1526,12 @@ var nameEl = card.querySelector('.listing-name');
       if (!grid) return;
 
       var cards = Array.from(grid.querySelectorAll('.tip-card'));
+      var rotationTimer = null;
+      var rotationAnimations = [];
+      var rotationVersion = 0;
+      var isGridVisible = false;
+      var isPaused = false;
+      var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       function resetPeek() {
         cards.forEach(function (card) {
@@ -1534,12 +1540,122 @@ var nameEl = card.querySelector('.listing-name');
         });
       }
 
+      function stopRotation() {
+        window.clearTimeout(rotationTimer);
+        rotationTimer = null;
+        rotationVersion++;
+        rotationAnimations.forEach(function (animation) {
+          animation.onfinish = null;
+          animation.cancel();
+        });
+        rotationAnimations = [];
+        grid.querySelectorAll('.is-cycle-leaving').forEach(function (card) {
+          card.classList.remove('is-cycle-leaving');
+        });
+      }
+
+      function scheduleRotation(delay) {
+        if (reducedMotion || isPaused || !isGridVisible || rotationTimer ||
+            document.hidden || grid.querySelector('.is-peeked') || cards.length < 2) return;
+
+        rotationTimer = window.setTimeout(rotateFrontCard, typeof delay === 'number' ? delay : 2000);
+      }
+
+      function rotateFrontCard() {
+        rotationTimer = null;
+        if (reducedMotion || isPaused || !isGridVisible || document.hidden ||
+            grid.querySelector('.is-peeked')) return;
+
+        var card = grid.firstElementChild;
+        if (!card) return;
+
+        var version = ++rotationVersion;
+        card.classList.add('is-cycle-leaving');
+        var leaveAnimation = card.animate([
+          { transform: window.getComputedStyle(card).transform, opacity: 1 },
+          {
+            transform: 'translateY(' + Math.max(window.innerHeight, card.offsetHeight * 2) + 'px) rotate(14deg) scale(0.78)',
+            opacity: 0
+          }
+        ], {
+          duration: 520,
+          easing: 'cubic-bezier(0.55, 0, 0.9, 0.3)',
+          fill: 'forwards'
+        });
+        rotationAnimations = [leaveAnimation];
+
+        leaveAnimation.onfinish = function () {
+          if (version !== rotationVersion || isPaused || grid.querySelector('.is-peeked')) return;
+
+          leaveAnimation.cancel();
+          card.classList.remove('is-cycle-leaving');
+
+          var before = new Map();
+          Array.from(grid.children).forEach(function (item) {
+            var rect = item.getBoundingClientRect();
+            before.set(item, { left: rect.left, top: rect.top });
+          });
+
+          grid.appendChild(card);
+
+          var moveAnimations = [];
+          Array.from(grid.children).forEach(function (item) {
+            var oldRect = before.get(item);
+            var newRect = item.getBoundingClientRect();
+            var dx = oldRect.left - newRect.left;
+            var dy = oldRect.top - newRect.top;
+            var transform = window.getComputedStyle(item).transform;
+            if (!transform || transform === 'none') transform = 'matrix(1, 0, 0, 1, 0, 0)';
+            var keyframes = [
+              { transform: 'translate(' + dx + 'px, ' + dy + 'px) ' + transform, opacity: item === card ? 0 : 1 },
+              { transform: transform, opacity: 1 }
+            ];
+            moveAnimations.push(item.animate(keyframes, {
+              duration: 560,
+              easing: 'cubic-bezier(0.22, 1, 0.36, 1)'
+            }));
+          });
+
+          rotationAnimations = moveAnimations;
+          window.setTimeout(function () {
+            if (version !== rotationVersion) return;
+            rotationAnimations = [];
+            scheduleRotation(900);
+          }, 580);
+        };
+      }
+
+      if (!reducedMotion && 'IntersectionObserver' in window) {
+        var rotationObserver = new IntersectionObserver(function (entries) {
+          isGridVisible = entries[0].isIntersecting;
+          if (isGridVisible) {
+            scheduleRotation();
+          } else {
+            stopRotation();
+          }
+        }, { threshold: 0.1 });
+        rotationObserver.observe(grid);
+      }
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+          stopRotation();
+        } else {
+          scheduleRotation();
+        }
+      });
+
       function togglePeek(card) {
         var wasPeeked = card.classList.contains('is-peeked');
+        stopRotation();
         resetPeek();
         if (!wasPeeked) {
           card.classList.add('is-peeked');
           card.setAttribute('aria-pressed', 'true');
+          isPaused = true;
+        } else {
+          isPaused = false;
+          scheduleRotation();
         }
       }
 
@@ -1562,11 +1678,21 @@ var nameEl = card.querySelector('.listing-name');
       });
 
       Accoom.on(document, 'click', function (event) {
-        if (!event.target.closest('.tip-card')) resetPeek();
+        if (!event.target.closest('.tip-card') && grid.querySelector('.is-peeked')) {
+          stopRotation();
+          resetPeek();
+          isPaused = false;
+          scheduleRotation();
+        }
       });
 
       Accoom.on(document, 'keydown', function (event) {
-        if (event.key === 'Escape') resetPeek();
+        if (event.key === 'Escape' && grid.querySelector('.is-peeked')) {
+          stopRotation();
+          resetPeek();
+          isPaused = false;
+          scheduleRotation();
+        }
       });
     })();
 

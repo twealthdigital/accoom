@@ -2790,6 +2790,10 @@ html:not(.dark-mode) .tip-tag {
   transition: transform 180ms var(--ease), box-shadow 180ms var(--ease), border-color 180ms var(--ease);
 }
 .tip-card.is-peeked .tip-photo { transform: scale(1.05); }
+.tip-card.is-cycle-leaving {
+  z-index: 30 !important;
+  pointer-events: none;
+}
 @media (max-width: 575px) {
   .tip-card.is-peeked .tip-body h3 {
     display: block;
@@ -2798,6 +2802,48 @@ html:not(.dark-mode) .tip-tag {
     line-clamp: none;
   }
 }
+
+.tips .tip-card {
+  display: block;
+  height: clamp(220px, 22vw, 280px);
+}
+.tips .tip-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  aspect-ratio: auto;
+}
+.tips .tip-media::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08) 20%, rgba(0, 0, 0, 0.2) 48%, rgba(0, 0, 0, 0.86) 100%);
+  content: '';
+  pointer-events: none;
+}
+.tips .tip-photo {
+  position: absolute;
+  inset: 0;
+}
+.tips .tip-tag {
+  top: 12px;
+  bottom: auto;
+  left: 12px;
+  z-index: 2;
+}
+.tips .tip-body {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  justify-content: flex-end;
+  padding: 72px 14px 14px;
+  color: var(--white);
+}
+.tips .tip-body h3 { color: var(--white); }
+.tips .tip-meta { color: rgba(255, 255, 255, 0.84); }
 
 @media (hover: hover) {
   .tips-grid.tip-anim-ready.is-in-view .tip-card:hover {
@@ -2885,4 +2931,70 @@ html:not(.dark-mode) .tip-tag {
   .suit-card, .tip-card, .suit-media img, .hp-link { transition: none; }
   .suit-card:hover, .tip-card:hover { transform: none; }
   .suit-card:hover .suit-media img { transform: none; }
+}
+
+@media (max-width: 575px) {
+  .tips-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+    gap: 0;
+    padding: 12px 8px 24px;
+  }
+
+  .tips-grid .tip-card {
+    width: 90%;
+    height: clamp(220px, 62vw, 270px);
+    margin: 0;
+    transform: none;
+    --tip-fan-y: 0px;
+    --tip-fan-rot: 0deg;
+    --tip-rot: 0deg;
+  }
+  .tips-grid .tip-card:nth-child(1) { z-index: 1; }
+  .tips-grid .tip-card:nth-child(2) {
+    z-index: 2;
+    margin-top: calc(42px - clamp(220px, 62vw, 270px));
+    margin-left: 5%;
+  }
+  .tips-grid .tip-card:nth-child(3) {
+    z-index: 3;
+    margin-top: calc(42px - clamp(220px, 62vw, 270px));
+    margin-left: 10%;
+  }
+
+  .tips-grid.tip-anim-ready .tip-card,
+  .tips-grid.tip-anim-ready.is-in-view .tip-card {
+    opacity: 1;
+    transform: none;
+  }
+
+  .tips .tips-grid .tip-card.is-peeked,
+  .tips .tips-grid.tip-anim-ready.is-in-view .tip-card.is-peeked {
+    position: fixed;
+    inset: 12px;
+    z-index: 20;
+    width: auto;
+    height: auto;
+    max-width: none;
+    margin: 0;
+    transform: none;
+    overflow: hidden;
+    border-color: var(--gold);
+    box-shadow: 0 20px 36px rgba(0, 0, 0, 0.18);
+    transition: transform 180ms var(--ease), box-shadow 180ms var(--ease), border-color 180ms var(--ease);
+  }
+
+  .tips .tips-grid .tip-card.is-peeked .tip-body h3,
+  .tips .tips-grid.tip-anim-ready.is-in-view .tip-card.is-peeked .tip-body h3 {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+  }
+
+  .tips .tips-grid .tip-card.is-peeked .tip-meta,
+  .tips .tips-grid.tip-anim-ready.is-in-view .tip-card.is-peeked .tip-meta {
+    flex-wrap: nowrap;
+  }
 }
