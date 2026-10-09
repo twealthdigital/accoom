@@ -165,10 +165,8 @@
               '<td data-label="Price">' + formatPrice(f.price) + (kind === 'sale' ? '' : ' / ' + escapeHtml(f.period || 'year')) + '</td>' +
               '<td data-label="Status"><span class="ag-dash-table-status ag-dash-table-status--' + escapeHtml(f.status || 'available') + '">' + escapeHtml(status) + '</span></td>' +
               '<td data-label="Listed">' + escapeHtml(f.dateAdded || timeAgo(f.updatedAt) || '—') + '</td>' +
-              '<td class="ag-dash-row-actions" data-label="Actions">' +
-                '<button type="button" class="ag-dash-row-share" aria-label="Share listing ' + escapeHtml(f.name || 'property') + '">' +
-                  '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="10.6" x2="15.4" y2="6.4"></line><line x1="8.6" y1="13.4" x2="15.4" y2="17.6"></line></svg>' +
-                '</button>' +
+              '<td class="ag-dash-row-actions" data-label="">' +
+                '<div class="lax-controls"></div>' +
               '</td>' +
             '</tr>'
           );

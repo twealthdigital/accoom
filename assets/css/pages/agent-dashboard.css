@@ -845,7 +845,7 @@ a.ag-dash-stat:hover {
     justify-content: center;
     gap: 5px;
     padding: 0 0 0 4px !important;
-    border-bottom: 1px solid var(--line-page) !important;
+      border-bottom: none !important;
   }
   .ag-dash-row-actions .lax-controls { position: static; right: auto; bottom: auto; }
   .ag-dash-row-share,
