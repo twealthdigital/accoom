@@ -664,12 +664,13 @@
 
   function menuItemsFor(status) {
     var items = [
-      { action: 'delete', label: 'Delete', icon: 'trash', danger: true },
-      { action: 'hold',            label: 'Hold',           icon: 'pause' },
-      { action: 'mark-sold',       label: 'Mark as Sold',   icon: 'check' },
+      { action: 'share',    label: 'Share',          icon: 'share' },
+      { action: 'delete',   label: 'Delete',         icon: 'trash', danger: true },
+      { action: 'hold',     label: 'Hold',           icon: 'pause' },
+      { action: 'mark-sold',label: 'Mark as Sold',   icon: 'check' },
       { action: 'make-available',  label: 'Make Available', icon: 'check' },
-      { action: 'edit',            label: 'Edit',           icon: 'edit'  },
-      { action: 'view',            label: 'View',           icon: 'eye'   }
+      { action: 'edit',     label: 'Edit',           icon: 'edit'  },
+      { action: 'view',     label: 'View',           icon: 'eye'   }
     ];
     // On Hold tab: show Make Available, hide Hold
     if (status === 'hold') {
@@ -1193,6 +1194,7 @@
     else if (action === 'mark-sold') actionMarkSold(card, btn);
     else if (action === 'edit') actionEdit(card);
     else if (action === 'view') openView(card, btn);
+    else if (action === 'share') openShare(baseProperty(card), btn);
   }
 
   /* ------------------------------------------------------------------------
