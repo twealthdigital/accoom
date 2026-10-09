@@ -1,10 +1,10 @@
 /* ==========================================================================
    ACCOOM — Wallet (frontend mock, backend-ready)
 
-   Single source of truth for the buyer's wallet balance. Every page that
-   shows or changes the balance (header panel, profile stats, property
-   payment modal, payment page) reads/writes through this module instead
-   of touching localStorage or the DOM directly.
+   Single source of truth for the buyer's wallet balance and local
+   transaction activity. Every page that shows or changes the balance
+   reads/writes through this module instead of touching localStorage
+   directly.
 
    Swapping this for a real backend later only means editing the bodies
    of getBalance/credit/debit/setBalance below to call your API instead
@@ -17,6 +17,8 @@ window.Accoom = window.Accoom || {};
   'use strict';
 
   var BALANCE_KEY = 'accoom-wallet-balance';
+  var TRANSACTIONS_KEY = 'accoom-wallet-transactions';
+  var MAX_TRANSACTIONS = 50;
   var UPDATED_EVENT = 'accoom:wallet-updated';
 
   function toSafeAmount(value) {
@@ -33,6 +35,29 @@ window.Accoom = window.Accoom || {};
       // Older browsers without CustomEvent support simply won't get the live update.
     }
   }
+
+  function recordTransaction(type, amount, balance, description, details) {
+    var transactions = Accoom.getStorage(TRANSACTIONS_KEY, []);
+    if (!Array.isArray(transactions)) transactions = [];
+    details = details && typeof details === 'object' ? details : {};
+    transactions.unshift({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+      type: type,
+      amount: amount,
+      balance: balance,
+      description: description || (type === 'credit' ? 'Account credit' : 'Account payment'),
+      category: details.category || (type === 'credit' ? 'credit' : 'payment'),
+      status: details.status || 'completed',
+      propertyId: details.propertyId || null,
+      createdAt: details.createdAt || new Date().toISOString()
+    });
+    Accoom.setStorage(TRANSACTIONS_KEY, transactions.slice(0, MAX_TRANSACTIONS));
+  }
+
+  Accoom.getWalletTransactions = function () {
+    var transactions = Accoom.getStorage(TRANSACTIONS_KEY, []);
+    return Array.isArray(transactions) ? transactions : [];
+  };
 
   /**
    * Current wallet balance in Naira. Defaults to 0 for a brand new/guest session.
@@ -58,11 +83,12 @@ window.Accoom = window.Accoom || {};
    * Add funds (a successful deposit/top-up). Returns the new balance, or
    * null if the amount was invalid.
    */
-  Accoom.creditWallet = function (amount) {
+  Accoom.creditWallet = function (amount, description, details) {
     var addAmount = toSafeAmount(amount);
     if (addAmount === null || addAmount <= 0) return null;
     var next = toSafeAmount(Accoom.getWalletBalance() + addAmount);
     Accoom.setStorage(BALANCE_KEY, next);
+    recordTransaction('credit', addAmount, next, description, details);
     broadcast(next);
     return next;
   };
@@ -71,13 +97,14 @@ window.Accoom = window.Accoom || {};
    * Remove funds (a completed purchase paid from wallet balance). Refuses
    * to go below zero. Returns the new balance, or null if it can't be done.
    */
-  Accoom.debitWallet = function (amount) {
+  Accoom.debitWallet = function (amount, description, details) {
     var takeAmount = toSafeAmount(amount);
     if (takeAmount === null || takeAmount <= 0) return null;
     var current = Accoom.getWalletBalance();
     if (takeAmount > current) return null;
     var next = toSafeAmount(current - takeAmount);
     Accoom.setStorage(BALANCE_KEY, next);
+    recordTransaction('debit', takeAmount, next, description, details);
     broadcast(next);
     return next;
   };

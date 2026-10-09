@@ -1129,6 +1129,17 @@
 
       var id = editingId || ('LST-' + Date.now());
       var existing = list.filter(function (l) { return String(l.id) === String(id); })[0];
+      var createdAt = existing && existing.createdAt;
+      if (!createdAt && existing && existing.dateAdded) {
+        var legacyCreatedAt = new Date(existing.dateAdded);
+        if (!isNaN(legacyCreatedAt.getTime())) {
+          legacyCreatedAt.setHours(0, 0, 0, 0);
+          createdAt = legacyCreatedAt.toISOString();
+        }
+      }
+      var savedAt = new Date().toISOString();
+      var activityHistory = existing && Array.isArray(existing.activityHistory) ? existing.activityHistory.slice() : [];
+      if (!existing) activityHistory.push({ type: 'uploaded', at: savedAt });
 
       var envImageCount = uploads.environment.filter(function (u) { return u.type === 'image'; }).length;
       var envVideoCount = uploads.environment.filter(function (u) { return u.type === 'video'; }).length;
@@ -1141,6 +1152,8 @@
         area: data.area,
         address: data.address,
         status: existing ? existing.status : 'available',
+        createdAt: createdAt || savedAt,
+        activityHistory: activityHistory,
         category: data.category,
         typeLabel: data.typeLabel,
         period: data.period,
@@ -1162,7 +1175,7 @@
         views: existing ? existing.views : '0',
         envImageCount: envImageCount,
         envVideoCount: envVideoCount,
-        updatedAt: new Date().toISOString()
+        updatedAt: savedAt
       });
 
       var idx = list.findIndex ? list.findIndex(function (l) { return String(l.id) === String(id); }) : -1;
@@ -1206,15 +1219,15 @@
               text: editingId
                 ? '\u201C' + data.name + '\u201D was updated successfully.'
                 : '\u201C' + data.name + '\u201D is now live under Available Properties on your dashboard.',
-              link: 'agent-dashboard.html'
+              link: 'my-listings.html'
             });
           }
         } catch (err) { /* a notification problem must never stop a save */ }
         try { sessionStorage.removeItem(DRAFT_KEY); } catch (err) { /* ignore */ }
         setSaving(false);
-        var landing = 'agent-dashboard.html?tab=' + encodeURIComponent(saved.status || 'available') +
+        var landing = 'my-listings.html?tab=' + encodeURIComponent(saved.status || 'available') +
           '&kind=' + (saved.category === 'sale' ? 'sale' : 'rent');
-        toast(editingId ? 'Listing updated.' : 'Listing published.', { link: landing, linkLabel: 'View dashboard' });
+        toast(editingId ? 'Listing updated.' : 'Listing published.', { link: landing, linkLabel: 'View My Listings' });
         window.location.href = landing;
       } catch (err) {
         setSaving(false);

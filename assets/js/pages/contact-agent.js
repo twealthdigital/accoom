@@ -1530,7 +1530,7 @@
         if (paymentCancel) paymentCancel.disabled = true;
 
         window.setTimeout(function () {
-          Accoom.debitWallet(paymentTarget.amount);
+          Accoom.debitWallet(paymentTarget.amount, 'Property payment', { category: 'property-payment', propertyId: paymentTarget.id });
           paymentProcessing = false;
           paymentConfirm.classList.remove('is-loading');
           paymentConfirm.disabled = false;
@@ -1636,7 +1636,7 @@
 
         window.setTimeout(function () {
           propState.paymentStatus = 'declined';
-          Accoom.creditWallet(parsePaymentAmount(targetProperty.price));
+          Accoom.creditWallet(parsePaymentAmount(targetProperty.price), 'Property payment refund', { category: 'refund', propertyId: targetProperty.id });
           upsertPurchaseRecord(conv, targetProperty, 'cancelled');
           if (state.activeId === conv.id && String(conv.property.id) === String(targetProperty.id)) {
             renderPaymentState(conv);

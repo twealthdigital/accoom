@@ -292,9 +292,9 @@
         var walletMovedAmount = 0;
         if (mode === 'deposit') {
           walletMovedAmount = isWalletTopUp ? currentWalletAmount() : depositNeeded;
-          Accoom.creditWallet(walletMovedAmount);
+          Accoom.creditWallet(walletMovedAmount, 'Account deposit', { category: 'deposit' });
         } else if (mode === 'checkout') {
-          Accoom.debitWallet(amount);
+          Accoom.debitWallet(amount, 'Property purchase payment', { category: 'property-payment', propertyId: propertyId });
           if (!isWalletTopUp) markPropertyPaid(propertyId, amount);
         }
 
@@ -409,7 +409,7 @@
                 }
 
                 window.setTimeout(function () {
-                  Accoom.debitWallet(amount);
+                  Accoom.debitWallet(amount, 'Property purchase payment', { category: 'property-payment', propertyId: propertyId });
                   markPropertyPaid(propertyId, amount);
 
                   var backHref = returnPage || ('property.html?id=' + encodeURIComponent(propertyId));

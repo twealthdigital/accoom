@@ -1521,179 +1521,132 @@ var nameEl = card.querySelector('.listing-name');
       io.observe(grid);
     })();
 
-    (function initTipCardPeek() {
+    // Tips slider (small screens only): one card at a time, auto swaps every 5s,
+    // swipe left or right to navigate, press and hold to pause.
+    (function initTipsSlider() {
       var grid = document.querySelector('.tips-grid');
-      if (!grid) return;
-
+      if (!grid || !window.matchMedia) return;
       var cards = Array.from(grid.querySelectorAll('.tip-card'));
-      var rotationTimer = null;
-      var rotationAnimations = [];
-      var rotationVersion = 0;
-      var isGridVisible = false;
-      var isPaused = false;
-      var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (cards.length < 2) return;
 
-      function resetPeek() {
-        cards.forEach(function (card) {
-          card.classList.remove('is-peeked');
-          card.setAttribute('aria-pressed', 'false');
-        });
+      var mq = window.matchMedia('(max-width: 575px)');
+      var DELAY = 5000;
+      var SWAP_MS = 520;
+      var index = 0;
+      var autoTimer = null;
+      var swapTimer = null;
+      var finish = null;
+      var held = false;
+      var startX = 0;
+      var startY = 0;
+      var visible = !('IntersectionObserver' in window);
+
+      function schedule() {
+        window.clearTimeout(autoTimer);
+        autoTimer = null;
+        if (finish || held || !mq.matches || !visible || document.hidden) return;
+        autoTimer = window.setTimeout(function () { go(1); }, DELAY);
       }
 
-      function stopRotation() {
-        window.clearTimeout(rotationTimer);
-        rotationTimer = null;
-        rotationVersion++;
-        rotationAnimations.forEach(function (animation) {
-          animation.onfinish = null;
-          animation.cancel();
-        });
-        rotationAnimations = [];
-        grid.querySelectorAll('.is-cycle-leaving').forEach(function (card) {
-          card.classList.remove('is-cycle-leaving');
-        });
+      function stop() {
+        window.clearTimeout(autoTimer);
+        window.clearTimeout(swapTimer);
+        autoTimer = null;
+        swapTimer = null;
+        if (finish) finish();
       }
 
-      function scheduleRotation(delay) {
-        if (reducedMotion || isPaused || !isGridVisible || rotationTimer ||
-            document.hidden || grid.querySelector('.is-peeked') || cards.length < 2) return;
+      function go(dir) {
+        window.clearTimeout(autoTimer);
+        window.clearTimeout(swapTimer);
+        if (finish) finish();
 
-        rotationTimer = window.setTimeout(rotateFrontCard, typeof delay === 'number' ? delay : 2000);
-      }
+        var cur = cards[index];
+        index = (index + dir + cards.length) % cards.length;
+        var nxt = cards[index];
+        var forward = dir > 0;
 
-      function rotateFrontCard() {
-        rotationTimer = null;
-        if (reducedMotion || isPaused || !isGridVisible || document.hidden ||
-            grid.querySelector('.is-peeked')) return;
+        cur.classList.remove('is-active');
+        cur.classList.add('is-leaving', forward ? 'to-left' : 'to-right');
+        nxt.classList.add('is-entering', forward ? 'from-right' : 'from-left');
 
-        var card = grid.firstElementChild;
-        if (!card) return;
-
-        var version = ++rotationVersion;
-        card.classList.add('is-cycle-leaving');
-        var leaveAnimation = card.animate([
-          { transform: window.getComputedStyle(card).transform, opacity: 1 },
-          {
-            transform: 'translateY(' + Math.max(window.innerHeight, card.offsetHeight * 2) + 'px) rotate(14deg) scale(0.78)',
-            opacity: 0
-          }
-        ], {
-          duration: 520,
-          easing: 'cubic-bezier(0.55, 0, 0.9, 0.3)',
-          fill: 'forwards'
-        });
-        rotationAnimations = [leaveAnimation];
-
-        leaveAnimation.onfinish = function () {
-          if (version !== rotationVersion || isPaused || grid.querySelector('.is-peeked')) return;
-
-          leaveAnimation.cancel();
-          card.classList.remove('is-cycle-leaving');
-
-          var before = new Map();
-          Array.from(grid.children).forEach(function (item) {
-            var rect = item.getBoundingClientRect();
-            before.set(item, { left: rect.left, top: rect.top });
-          });
-
-          grid.appendChild(card);
-
-          var moveAnimations = [];
-          Array.from(grid.children).forEach(function (item) {
-            var oldRect = before.get(item);
-            var newRect = item.getBoundingClientRect();
-            var dx = oldRect.left - newRect.left;
-            var dy = oldRect.top - newRect.top;
-            var transform = window.getComputedStyle(item).transform;
-            if (!transform || transform === 'none') transform = 'matrix(1, 0, 0, 1, 0, 0)';
-            var keyframes = [
-              { transform: 'translate(' + dx + 'px, ' + dy + 'px) ' + transform, opacity: item === card ? 0 : 1 },
-              { transform: transform, opacity: 1 }
-            ];
-            moveAnimations.push(item.animate(keyframes, {
-              duration: 560,
-              easing: 'cubic-bezier(0.22, 1, 0.36, 1)'
-            }));
-          });
-
-          rotationAnimations = moveAnimations;
-          window.setTimeout(function () {
-            if (version !== rotationVersion) return;
-            rotationAnimations = [];
-            scheduleRotation(900);
-          }, 580);
+        finish = function () {
+          cur.classList.remove('is-leaving', 'to-left', 'to-right');
+          nxt.classList.remove('is-entering', 'from-right', 'from-left');
+          nxt.classList.add('is-active');
+          finish = null;
         };
+
+        swapTimer = window.setTimeout(function () {
+          if (finish) finish();
+          schedule();
+        }, SWAP_MS);
       }
 
-      if (!reducedMotion && 'IntersectionObserver' in window) {
-        var rotationObserver = new IntersectionObserver(function (entries) {
-          isGridVisible = entries[0].isIntersecting;
-          if (isGridVisible) {
-            scheduleRotation();
-          } else {
-            stopRotation();
+      function setup() {
+        stop();
+        cards.forEach(function (card) {
+          card.classList.remove('is-active', 'is-leaving', 'is-entering', 'to-left', 'to-right', 'from-left', 'from-right');
+        });
+        if (mq.matches) {
+          // Off-screen cards must not wait for lazy loading before sliding in.
+          grid.querySelectorAll('img').forEach(function (img) {
+            img.loading = 'eager';
+            img.draggable = false;
+          });
+          grid.classList.add('is-slider');
+          cards[index].classList.add('is-active');
+          schedule();
+        } else {
+          grid.classList.remove('is-slider');
+        }
+      }
+
+      // Press and hold pauses auto swap, releasing resumes it. A quick horizontal swipe changes card.
+      grid.addEventListener('pointerdown', function (e) {
+        if (!mq.matches) return;
+        held = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        window.clearTimeout(autoTimer);
+        autoTimer = null;
+      });
+
+      function release(e, cancelled) {
+        if (!held) return;
+        held = false;
+        if (!cancelled && mq.matches) {
+          var dx = e.clientX - startX;
+          var dy = e.clientY - startY;
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+            go(dx < 0 ? 1 : -1);
+            return;
           }
-        }, { threshold: 0.1 });
-        rotationObserver.observe(grid);
+        }
+        schedule();
+      }
+
+      grid.addEventListener('pointerup', function (e) { release(e, false); });
+      grid.addEventListener('pointercancel', function (e) { release(e, true); });
+      grid.addEventListener('contextmenu', function (e) {
+        if (mq.matches) e.preventDefault();
+      });
+
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          visible = entries[0].isIntersecting;
+          if (visible) schedule(); else stop();
+        }, { threshold: 0.1 }).observe(grid);
       }
 
       document.addEventListener('visibilitychange', function () {
-        if (document.hidden) {
-          stopRotation();
-        } else {
-          scheduleRotation();
-        }
+        if (document.hidden) stop(); else schedule();
       });
 
-      function togglePeek(card) {
-        var wasPeeked = card.classList.contains('is-peeked');
-        stopRotation();
-        resetPeek();
-        if (!wasPeeked) {
-          card.classList.add('is-peeked');
-          card.setAttribute('aria-pressed', 'true');
-          isPaused = true;
-        } else {
-          isPaused = false;
-          scheduleRotation();
-        }
-      }
+      if (mq.addEventListener) mq.addEventListener('change', setup);
+      else if (mq.addListener) mq.addListener(setup);
 
-      cards.forEach(function (card) {
-        card.setAttribute('role', 'button');
-        card.setAttribute('tabindex', '0');
-        card.setAttribute('aria-pressed', 'false');
-      });
-
-      Accoom.on(grid, 'click', function (event) {
-        var card = event.target.closest('.tip-card');
-        if (card) togglePeek(card);
-      });
-
-      Accoom.on(grid, 'keydown', function (event) {
-        var card = event.target.closest('.tip-card');
-        if (!card || (event.key !== 'Enter' && event.key !== ' ')) return;
-        event.preventDefault();
-        togglePeek(card);
-      });
-
-      Accoom.on(document, 'click', function (event) {
-        if (!event.target.closest('.tip-card') && grid.querySelector('.is-peeked')) {
-          stopRotation();
-          resetPeek();
-          isPaused = false;
-          scheduleRotation();
-        }
-      });
-
-      Accoom.on(document, 'keydown', function (event) {
-        if (event.key === 'Escape' && grid.querySelector('.is-peeked')) {
-          stopRotation();
-          resetPeek();
-          isPaused = false;
-          scheduleRotation();
-        }
-      });
+      setup();
     })();
 
     // Footer year (footer is now an async partial, so wait for it)

@@ -321,9 +321,13 @@ html.dark-mode .quick-search {
   white-space: nowrap;
   position: relative;
   z-index: 2;
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
-  background: var(--gold);
+  padding: 0;
+  font-weight: 700;
+  color: #111111;
+}
+
+html.dark-mode .popular-searches-label {
+  color: #ffffff;
 }
 
 /* Scrollable wrapper for pills - HIDE SCROLLBAR */
@@ -505,7 +509,7 @@ html.dark-mode .pill:hover {
 
 .popular-searches-label {
     font-size: 12px;
-    padding: 5px 10px;
+    padding: 0;
   }
 
   .popular-searches-scroll {
@@ -2969,32 +2973,92 @@ html:not(.dark-mode) .tip-tag {
     transform: none;
   }
 
-  .tips .tips-grid .tip-card.is-peeked,
-  .tips .tips-grid.tip-anim-ready.is-in-view .tip-card.is-peeked {
-    position: fixed;
-    inset: 12px;
-    z-index: 20;
-    width: auto;
-    height: auto;
-    max-width: none;
-    margin: 0;
-    transform: none;
+  /* Tips slider: one card at a time, slides every 5s, swipe to navigate (class added by home.js) */
+  .tips .tips-grid.is-slider {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
+    padding: 12px 12px 36px;
     overflow: hidden;
-    border-color: var(--gold);
-    box-shadow: 0 20px 36px rgba(0, 0, 0, 0.18);
-    transition: transform 180ms var(--ease), box-shadow 180ms var(--ease), border-color 180ms var(--ease);
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
 
-  .tips .tips-grid .tip-card.is-peeked .tip-body h3,
-  .tips .tips-grid.tip-anim-ready.is-in-view .tip-card.is-peeked .tip-body h3 {
-    display: block;
-    overflow: visible;
-    -webkit-line-clamp: unset;
-    line-clamp: unset;
+  .tips .tips-grid.is-slider .tip-card {
+    grid-area: 1 / 1;
+    width: 100%;
+    margin: 0;
+    visibility: hidden;
+    translate: 110% 0;
+    pointer-events: none;
+    transition: none;
+    transform-origin: 0% 100%;
   }
 
-  .tips .tips-grid .tip-card.is-peeked .tip-meta,
-  .tips .tips-grid.tip-anim-ready.is-in-view .tip-card.is-peeked .tip-meta {
-    flex-wrap: nowrap;
+  .tips .tips-grid.is-slider .tip-card img {
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+  }
+
+  .tips .tips-grid.is-slider .tip-card.is-active {
+    visibility: visible;
+    translate: 0 0;
+  }
+
+  .tips .tips-grid.is-slider .tip-card.is-leaving {
+    visibility: visible;
+    position: relative;
+    z-index: 5;
+    will-change: translate;
+  }
+
+  .tips .tips-grid.is-slider .tip-card.is-leaving.to-left {
+    transform-origin: 0% 100%;
+    animation: tipFallLeft 500ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .tips .tips-grid.is-slider .tip-card.is-leaving.to-right {
+    transform-origin: 100% 100%;
+    animation: tipFallRight 500ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .tips .tips-grid.is-slider .tip-card.is-entering {
+    visibility: visible;
+    will-change: translate;
+  }
+
+  .tips .tips-grid.is-slider .tip-card.is-entering.from-right {
+    animation: tipInRight 500ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  .tips .tips-grid.is-slider .tip-card.is-entering.from-left {
+    animation: tipInLeft 500ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  @keyframes tipFallLeft {
+    from { translate: 0 0; }
+    to   { translate: -120% 0; }
+  }
+
+  @keyframes tipFallRight {
+    from { translate: 0 0; }
+    to   { translate: 120% 0; }
+  }
+
+  @keyframes tipInRight {
+    from { translate: 120% 0; }
+    to   { translate: 0 0; }
+  }
+
+  @keyframes tipInLeft {
+    from { translate: -120% 0; }
+    to   { translate: 0 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tips .tips-grid.is-slider .tip-card.is-leaving { animation: none; visibility: hidden; }
+    .tips .tips-grid.is-slider .tip-card.is-entering { animation: none; translate: 0 0; }
   }
 }

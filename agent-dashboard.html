@@ -140,7 +140,7 @@
             <p class="ag-dash-greeting">Welcome back, <span data-ag-first-name>there</span></p>
             <p class="ag-dash-sub">Here's what's live on ACCOOM under your account.</p>
           </div>
-          <a href="my-listings.html" class="btn ag-dash-list-btn" aria-label="List a product">
+          <a href="addlistings.html" class="btn ag-dash-list-btn" aria-label="Add a property listing">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             <span class="ag-dash-list-btn-label">List a Property</span>
           </a>
@@ -166,69 +166,64 @@
             <span class="ag-dash-stat-number" data-ag-stat="pending">0</span>
             <span class="ag-dash-stat-label">Pending review</span>
           </div>
-          <a href="payment.html?context=wallet&amp;mode=deposit&amp;return=agent-dashboard.html" class="ag-dash-stat ag-dash-stat--wallet">
-            <span class="ag-dash-stat-number" data-ag-stat="wallet">&#8358;0.00</span>
-            <span class="ag-dash-stat-label">Wallet balance</span>
-          </a>
+          <div class="ag-dash-stat">
+            <span class="ag-dash-stat-number" data-ag-stat="sold">0</span>
+            <span class="ag-dash-stat-label">Marked sold</span>
+          </div>
         </div>
 
-        <!-- Listings, categorised by status -->
-        <div class="ag-dash-section">
-          <div class="ag-dash-section-head">
-            <div>
-              <h2>Your Listings</h2>
-              <p>Every property you've submitted, grouped by status.</p>
+        <div class="ag-dash-overview-grid">
+          <section class="ag-dash-section ag-dash-panel ag-dash-earnings">
+            <div class="ag-dash-section-head">
+              <div>
+                <h2>Earnings</h2>
+                <p>Recorded income by local calendar period.</p>
+              </div>
             </div>
-          </div>
+            <div class="ag-dash-earnings-grid">
+              <div class="ag-dash-earnings-metric"><span>Today</span><strong data-ag-earning="today">&#8358;0.00</strong></div>
+              <div class="ag-dash-earnings-metric"><span>This week</span><strong data-ag-earning="week">&#8358;0.00</strong></div>
+              <div class="ag-dash-earnings-metric"><span>This month</span><strong data-ag-earning="month">&#8358;0.00</strong></div>
+              <div class="ag-dash-earnings-metric"><span>Overall</span><strong data-ag-earning="overall">&#8358;0.00</strong></div>
+            </div>
+            <p class="ag-dash-data-note">Totals include completed earnings transactions only.</p>
+          </section>
 
-          <!-- Status tabs — the last three (Delisted / In Dispute / Reported)
-               are agent-only: buyers never see these on the public site. -->
-          <div class="ag-dash-listing-tabs" data-ag-listing-tabs role="tablist">
-            <button type="button" class="ag-dash-listing-tab is-active" data-ag-listing-tab="available" role="tab" aria-selected="true">
-              Available Properties
-              <span class="ag-dash-listing-tab-count" data-ag-listing-count="available">0</span>
-            </button>
-            <button type="button" class="ag-dash-listing-tab" data-ag-listing-tab="in_progress" role="tab" aria-selected="false">
-              In Progress
-              <span class="ag-dash-listing-tab-count" data-ag-listing-count="in_progress">0</span>
-            </button>
-            <button type="button" class="ag-dash-listing-tab" data-ag-listing-tab="sold" role="tab" aria-selected="false">
-              Sold Properties
-              <span class="ag-dash-listing-tab-count" data-ag-listing-count="sold">0</span>
-            </button>
-            <button type="button" class="ag-dash-listing-tab" data-ag-listing-tab="delisted" role="tab" aria-selected="false">
-              Delisted
-              <span class="ag-dash-listing-tab-count" data-ag-listing-count="delisted">0</span>
-            </button>
-            <button type="button" class="ag-dash-listing-tab" data-ag-listing-tab="in_dispute" role="tab" aria-selected="false">
-              In Dispute
-              <span class="ag-dash-listing-tab-count" data-ag-listing-count="in_dispute">0</span>
-            </button>
-            <button type="button" class="ag-dash-listing-tab" data-ag-listing-tab="reported" role="tab" aria-selected="false">
-              Reported
-              <span class="ag-dash-listing-tab-count" data-ag-listing-count="reported">0</span>
-            </button>
-            <button type="button" class="ag-dash-listing-tab" data-ag-listing-tab="hold" role="tab" aria-selected="false">
-              On Hold
-              <span class="ag-dash-listing-tab-count" data-ag-listing-count="hold">0</span>
-            </button>
-          </div>
+          <section class="ag-dash-section ag-dash-panel ag-dash-transactions-panel">
+            <div class="ag-dash-section-head">
+              <div><h2>Transactions</h2><p>Recent recorded account activity.</p></div>
+            </div>
+            <ul class="ag-dash-transactions" data-ag-transactions></ul>
+            <p class="ag-dash-activity-empty" data-ag-transactions-empty hidden>No transactions recorded yet.</p>
+          </section>
 
-          <!-- Under "Available": split by For Rent / For Sale -->
-          <div class="ag-dash-kind-tabs" data-ag-kind-tabs role="tablist" aria-label="For rent or for sale" hidden>
-            <button type="button" class="ag-dash-kind-tab is-active" data-ag-kind="all" role="tab" aria-selected="true">All <span data-ag-kind-count="all">0</span></button>
-            <button type="button" class="ag-dash-kind-tab" data-ag-kind="rent" role="tab" aria-selected="false">For Rent <span data-ag-kind-count="rent">0</span></button>
-            <button type="button" class="ag-dash-kind-tab" data-ag-kind="sale" role="tab" aria-selected="false">For Sale <span data-ag-kind-count="sale">0</span></button>
-          </div>
-          <p class="ag-dash-listing-tabs-note">Delisted, In Dispute, Reported and Hold listings are only visible to you here — they never show up to buyers on ACCOOM.</p>
+          <section class="ag-dash-section ag-dash-panel ag-dash-performance">
+            <div class="ag-dash-section-head">
+              <div>
+                <h2>Performance</h2>
+                <p data-ag-chart-description>Income movement over time.</p>
+              </div>
+              <div class="ag-dash-chart-switch" role="group" aria-label="Choose chart type">
+                <button type="button" class="is-active" data-ag-chart-type="line" aria-pressed="true">Line</button>
+                <button type="button" data-ag-chart-type="bar" aria-pressed="false">Bar</button>
+                <button type="button" data-ag-chart-type="pie" aria-pressed="false">Pie</button>
+              </div>
+            </div>
+            <div class="ag-dash-chart" data-ag-chart aria-label="Performance chart"></div>
+            <p class="ag-dash-data-note" data-ag-chart-note hidden>Illustrative sample data — replace with verified transactions when connected to the backend.</p>
+          </section>
 
-          <div class="ag-dash-folder-grid" data-ag-folders>
-            <!-- listing cards injected by agent-dashboard.js -->
-          </div>
-
-          <p class="ag-dash-folder-empty" data-ag-folders-empty hidden>
-            Nothing here yet.
-          </p>
+          <section class="ag-dash-section ag-dash-panel ag-dash-recent">
+            <div class="ag-dash-section-head">
+              <div>
+                <h2>Recent listing activity</h2>
+                <p>Properties uploaded today.</p>
+              </div>
+              <a class="ag-dash-view-all" href="my-listings.html">View all listings</a>
+            </div>
+            <ul class="ag-dash-activity" data-ag-activity></ul>
+            <p class="ag-dash-activity-empty" data-ag-activity-empty hidden>No listing activity yet.</p>
+          </section>
         </div>
 
 
@@ -253,6 +248,7 @@
   <script src="assets/js/core/partials.js"></script>
   <script src="assets/js/data/properties.js"></script>
   <script src="assets/js/data/notifications.js"></script>
+  <script src="assets/js/data/agent-dashboard.js"></script>
 
   <script src="assets/js/modules/dropdown.js"></script>
   <script src="assets/js/modules/offcanvas.js"></script>
@@ -263,7 +259,5 @@
 
   <script src="assets/js/main.js"></script>
   <script src="assets/js/pages/agent-dashboard.js"></script>
-<script src="assets/js/modules/listing-actions.js"></script>
-<script>Accoom.ListingActions.configure({ editHref: 'my-listings.html' });</script>
 </body>
 </html>

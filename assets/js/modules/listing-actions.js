@@ -6,7 +6,7 @@
      • 3-dot button  -> dropdown: Delete · Hold · Edit · View
          Delete / Hold  -> warning dialog (Proceed / Cancel) with a loading
                            state while the request is in flight
-         Edit           -> placeholder until the My Listings page exists
+         Edit           -> opens the listing form for that property
          View           -> big agent-side property view that opens INSIDE the
                            listings container, in front of the other cards
      • Clicking a card itself does nothing (no navigation).
@@ -19,7 +19,8 @@
    Wiring to a real backend:
      Accoom.ListingActions.configure({
        service: { remove: function (id, info) { return fetch(...) },
-                  hold:   function (id, info) { return fetch(...) } },
+                  hold:   function (id, info) { return fetch(...) },
+                  markSold: function (id, info) { return fetch(...) } },
        resolver: function (info, base) { return fetch(...).then(r => r.json()) }
      });
    Or just listen for the (cancelable) 'accoom:listing-action' event.
@@ -38,8 +39,10 @@
     scope: 'main',              // where listing cards live
     cardSelector: null,         // optional: force card detection
     shareSelector: null,        // optional: force share-button detection
+    controlsContainerSelector: null, // optional: mount the options button inside the card
+    menuPlacement: 'auto',      // auto, below, or mobile-below
     containerSelector: null,    // optional: where the View dialog opens
-    editHref: null,             // optional: e.g. 'my-listings.html' (adds ?id=)
+    editHref: null,             // optional: e.g. 'addlistings.html' (adds ?id=)
     storageKey: 'accoom-agent-listing-state',
     viewTimeout: 10000,         // ms before the View dialog shows "try again"
     resolver: null,             // optional async data source for the View dialog
@@ -576,7 +579,8 @@
     wrap.innerHTML =
       '<button type="button" class="lax-more" aria-haspopup="menu" aria-expanded="false" ' +
       'aria-label="More options for ' + esc(info.name) + '" title="More options">' + icon('dots', 18) + '</button>';
-    card.appendChild(wrap);
+    var controlsContainer = cfg.controlsContainerSelector && card.querySelector(cfg.controlsContainerSelector);
+    (controlsContainer || card).appendChild(wrap);
 
     var btn = wrap.querySelector('.lax-more');
     btn.addEventListener('click', function (e) {
@@ -662,18 +666,20 @@
     var items = [
       { action: 'delete', label: 'Delete', icon: 'trash', danger: true },
       { action: 'hold',            label: 'Hold',           icon: 'pause' },
+      { action: 'mark-sold',       label: 'Mark as Sold',   icon: 'check' },
       { action: 'make-available',  label: 'Make Available', icon: 'check' },
       { action: 'edit',            label: 'Edit',           icon: 'edit'  },
       { action: 'view',            label: 'View',           icon: 'eye'   }
     ];
     // On Hold tab: show Make Available, hide Hold
     if (status === 'hold') {
-      return items.filter(function (i) { return i.action !== 'hold'; });
+      return items.filter(function (i) { return i.action !== 'hold' && i.action !== 'mark-sold'; });
     }
     // Everywhere else: hide Make Available, and also hide Hold if already delisted
     return items.filter(function (i) {
       if (i.action === 'make-available') return false;
       if (i.action === 'hold' && status === 'delisted') return false;
+      if (i.action === 'mark-sold' && status === 'sold') return false;
       return true;
     });
   }
@@ -689,8 +695,23 @@
     var mw = menuEl.offsetWidth;
     var mh = menuEl.offsetHeight;
     var gap = 8;
-    var roomAbove = r.top - gap - 8;
-    var above = roomAbove >= mh || roomAbove > (vh - r.bottom - gap - 8);
+    var roomAbove = Math.max(0, r.top - gap - 8);
+    var roomBelow = Math.max(0, vh - r.bottom - gap - 8);
+    var above;
+    if (cfg.menuPlacement === 'below') above = false;
+    else if (roomBelow >= mh) above = false;
+    else if (roomAbove >= mh) above = true;
+    else above = roomAbove > roomBelow;
+
+    var available = above ? roomAbove : roomBelow;
+    if (available < mh) {
+      menuEl.style.maxHeight = Math.max(40, available) + 'px';
+      menuEl.style.overflowY = 'auto';
+      mh = menuEl.offsetHeight;
+    } else {
+      menuEl.style.maxHeight = '';
+      menuEl.style.overflowY = '';
+    }
     var top = above ? r.top - gap - mh : r.bottom + gap;
     top = Math.max(8, Math.min(top, vh - mh - 8));
     var left = Math.max(8, Math.min(r.right - mw, vw - mw - 8));
@@ -735,7 +756,13 @@
     popLayer(st.layer);
     window.removeEventListener('resize', st.onReposition);
     window.removeEventListener('scroll', st.onReposition, true);
-    if (menuEl) menuEl.classList.remove('is-open');
+    if (menuEl) {
+      menuEl.classList.remove('is-open', 'is-below');
+      menuEl.style.maxHeight = '';
+      menuEl.style.overflowY = '';
+      menuEl.style.top = '';
+      menuEl.style.left = '';
+    }
     if (restoreFocus) st.btn.focus();
   }
 
@@ -969,7 +996,8 @@
 
   var mockService = {
     remove: function () { return delay(700); },
-    hold: function () { return delay(700); }
+    hold: function () { return delay(700); },
+    markSold: function () { return delay(700); }
   };
 
   function service(kind) {
@@ -997,7 +1025,10 @@
       list = list.map(function (f) {
         if (String(f.id) === String(id)) {
           found = true;
-          return Object.assign({}, f, { status: newStatus, updatedAt: new Date().toISOString() });
+          var changedAt = new Date().toISOString();
+          var statusHistory = Array.isArray(f.statusHistory) ? f.statusHistory.slice(-49) : [];
+          if (f.status !== newStatus) statusHistory.push({ status: newStatus, at: changedAt });
+          return Object.assign({}, f, { status: newStatus, updatedAt: changedAt, statusHistory: statusHistory });
         }
         return f;
       });
@@ -1020,8 +1051,8 @@
 
   function afterSuccess(kind, card, info, status) {
     var container = findContainer(card);
-    var action = kind === 'remove' ? 'delete' : kind === 'make-available' ? 'make-available' : 'hold';
-    var newStatus = kind === 'remove' ? 'deleted' : kind === 'make-available' ? 'available' : 'hold';
+    var action = kind === 'remove' ? 'delete' : kind === 'make-available' ? 'make-available' : kind === 'mark-sold' ? 'mark-sold' : 'hold';
+    var newStatus = kind === 'remove' ? 'deleted' : kind === 'make-available' ? 'available' : kind === 'mark-sold' ? 'sold' : 'hold';
 
     persistState(info.id, newStatus, info.name);
 
@@ -1034,11 +1065,12 @@
     } catch (e) { evt = null; }
     var proceed = evt ? document.dispatchEvent(evt) : true;
 
-    if (proceed) {
+    if (proceed && card.parentNode) {
       // tab counters
       adjustTabCount(container, status, -1);
       if (action === 'hold') adjustTabCount(container, 'hold', 1);
       if (action === 'make-available') adjustTabCount(container, 'available', 1);
+      if (action === 'mark-sold') adjustTabCount(container, 'sold', 1);
 
       // animate out, then remove from current tab
       var parent = card.parentElement;
@@ -1055,6 +1087,8 @@
       notify('Listing put on hold', '\u201C' + info.name + '\u201D was moved to your Hold tab.');
     } else if (action === 'make-available') {
       notify('Listing restored', '\u201C' + info.name + '\u201D is back on the Available tab.');
+    } else if (action === 'mark-sold') {
+      notify('Listing marked as sold', '\u201C' + info.name + '\u201D was moved to your Sold Properties tab.');
     }
   }
 
@@ -1133,10 +1167,30 @@
     });
   }
 
+  function actionMarkSold(card, btn) {
+    var info = readCard(card);
+    var status = getStatus(card);
+    openConfirm({
+      returnFocus: btn,
+      tone: 'gold',
+      icon: 'check',
+      title: 'Mark this property as sold?',
+      text: 'The listing will move to your Sold Properties tab and stop appearing as available to buyers.',
+      name: info.name,
+      busyLabel: 'Updating\u2026',
+      onConfirm: function () {
+        return Promise.resolve(service('markSold')(info.id, info)).then(function () {
+          afterSuccess('mark-sold', card, info, status);
+        });
+      }
+    });
+  }
+
   function runAction(action, card, btn) {
     if (action === 'delete') actionDelete(card, btn);
     else if (action === 'hold') actionHold(card, btn);
     else if (action === 'make-available') actionMakeAvailable(card, btn);
+    else if (action === 'mark-sold') actionMarkSold(card, btn);
     else if (action === 'edit') actionEdit(card);
     else if (action === 'view') openView(card, btn);
   }
