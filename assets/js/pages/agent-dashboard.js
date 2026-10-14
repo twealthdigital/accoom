@@ -84,7 +84,74 @@
     var folders = Accoom.getStorage('accoom-agent-listings', null);
     if (!Array.isArray(folders)) folders = [];
     // Strip permanently deleted listings — they should never come back after refresh
-    folders = folders.filter(function (f) { return f.status !== 'deleted'; });
+    folders = folders.filter(function (f) { return f && f.status !== 'deleted'; });
+
+    if (!folders.length) {
+      folders.push({
+        id: 'p-default-1',
+        name: '2 bed room for student',
+        location: 'akungba, Ondo',
+        price: 200000,
+        period: 'year',
+        category: 'rent',
+        status: 'available',
+        cover: 'assets/images/home-properties/selfcon1.png',
+        beds: 2,
+        baths: 1,
+        dateAdded: 'Oct 1, 2026'
+      });
+    }
+
+    var ALL_STATUS_KEYS = ['available', 'in_progress', 'sold', 'delisted', 'in_dispute', 'reported', 'hold'];
+    var baseTemplates = folders.slice();
+
+    ALL_STATUS_KEYS.forEach(function (st) {
+      var count = folders.filter(function (f) { return f.status === st; }).length;
+      var index = 0;
+      while (count < 2) {
+        var base = baseTemplates[index % baseTemplates.length] || baseTemplates[0];
+        folders.push({
+          id: 'demo-' + st + '-' + (count + 1),
+          name: base.name,
+          location: base.location,
+          price: base.price,
+          period: base.period || 'year',
+          category: base.category || 'rent',
+          status: st,
+          cover: base.cover || base.image || 'assets/images/home-properties/selfcon1.png',
+          beds: base.beds || 2,
+          baths: base.baths || 1,
+          dateAdded: base.dateAdded || 'Oct 1, 2026'
+        });
+        count++;
+        index++;
+      }
+    });
+
+    // Ensure at least 2 "for sale" listings are visible under the Available tab
+    var saleCount = folders.filter(function (f) { return f.status === 'available' && f.category === 'sale'; }).length;
+    var base0 = baseTemplates[0] || folders[0];
+    for (var si = saleCount; si < 2; si++) {
+      var saleDemoId = 'demo-sale-' + (si + 1);
+      var alreadyExists = folders.some(function (f) { return String(f.id) === saleDemoId; });
+      if (!alreadyExists) {
+        folders.push({
+          id: saleDemoId,
+          name: base0.name,
+          location: base0.location,
+          price: 4500000,
+          period: 'sale',
+          category: 'sale',
+          status: 'available',
+          cover: base0.cover || base0.image || 'assets/images/home-properties/selfcon1.png',
+          beds: base0.beds || 2,
+          baths: base0.baths || 1,
+          dateAdded: base0.dateAdded || 'Oct 1, 2026'
+        });
+      }
+    }
+
+    Accoom.setStorage('accoom-agent-listings', folders);
 
     var STATUS_LABEL = {
       available: 'Available',

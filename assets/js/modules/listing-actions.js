@@ -663,26 +663,30 @@
   }
 
   function menuItemsFor(status) {
-    var items = [
-      { action: 'share',    label: 'Share',          icon: 'share' },
-      { action: 'delete',   label: 'Delete',         icon: 'trash', danger: true },
-      { action: 'hold',     label: 'Hold',           icon: 'pause' },
-      { action: 'mark-sold',label: 'Mark as Sold',   icon: 'check' },
-      { action: 'make-available',  label: 'Make Available', icon: 'check' },
-      { action: 'edit',     label: 'Edit',           icon: 'edit'  },
-      { action: 'view',     label: 'View',           icon: 'eye'   }
-    ];
-    // On Hold tab: show Make Available, hide Hold
-    if (status === 'hold') {
-      return items.filter(function (i) { return i.action !== 'hold' && i.action !== 'mark-sold'; });
+    var s = (status || '').toLowerCase();
+
+    if (s === 'available') {
+      return [
+        { action: 'share',  label: 'Share',          icon: 'share' },
+        { action: 'delete', label: 'Delete',         icon: 'trash', danger: true },
+        { action: 'hold',   label: 'Hold',           icon: 'pause' },
+        { action: 'edit',   label: 'Edit',           icon: 'edit'  },
+        { action: 'view',   label: 'View',           icon: 'eye'   }
+      ];
     }
-    // Everywhere else: hide Make Available, and also hide Hold if already delisted
-    return items.filter(function (i) {
-      if (i.action === 'make-available') return false;
-      if (i.action === 'hold' && status === 'delisted') return false;
-      if (i.action === 'mark-sold' && status === 'sold') return false;
-      return true;
-    });
+
+    if (s === 'hold') {
+      return [
+        { action: 'delete',         label: 'Delete',         icon: 'trash', danger: true },
+        { action: 'make-available', label: 'Make Available', icon: 'check' },
+        { action: 'view',           label: 'View',           icon: 'eye'   }
+      ];
+    }
+
+    return [
+      { action: 'delete', label: 'Delete', icon: 'trash', danger: true },
+      { action: 'view',   label: 'View',   icon: 'eye'   }
+    ];
   }
 
   function positionMenu() {
@@ -1426,6 +1430,7 @@
     var priceSuffix = periodLabel(p.period);
     var isSale = p.period === 'sale';
     var residential = isResidential(p);
+    var isAvailable = (p.status === 'available');
 
     var tags = [];
     if (p.beds != null) tags.push(p.beds + (p.beds === 1 ? ' Bed' : ' Beds'));
@@ -1441,11 +1446,13 @@
         (tags.length ? '<div class="lax-tags">' + tags.map(function (t) { return '<span class="lax-tag">' + esc(t) + '</span>'; }).join('') + '</div>' : '') +
       '</div>';
 
-    var shareCard =
-      '<div class="lax-card-box lax-share-card lax-o6">' +
-        '<span class="lax-share-card-label">Share Property</span>' +
-        '<button type="button" class="lax-share-btn" data-lax-share-in-view>' + icon('share', 14) + ' Share</button>' +
-      '</div>';
+    // Share card only shows for available listings
+    var shareCard = isAvailable
+      ? '<div class="lax-card-box lax-share-card lax-o6">' +
+          '<span class="lax-share-card-label">Share Property</span>' +
+          '<button type="button" class="lax-share-btn" data-lax-share-in-view>' + icon('share', 14) + ' Share</button>' +
+        '</div>'
+      : '';
 
     var overviewRows = [];
     if (!p.generatedId) overviewRows.push(['Property ID', p.id]);
@@ -1498,8 +1505,8 @@
         }).join('') + '</div></section>'
       : '';
 
-    // Mobile order: gallery, title, about, description, amenities, share, overview.
-    // Desktop: left = gallery, about, amenities; right = title, share, overview, description.
+    // Mobile order: gallery, title, about, description, amenities, share (if available), overview.
+    // Desktop: left = gallery, about, amenities; right = title, share (if available), overview, description.
     return '<div class="lax-view-grid">' +
       '<div class="lax-view-left">' + galleryHtml(p, slides, statusLabel) + aboutBlock + amenityBlock + '</div>' +
       '<div class="lax-view-right">' + titleCard + shareCard + overview + descBlock + '</div>' +

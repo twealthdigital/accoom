@@ -710,8 +710,8 @@ a.ag-dash-stat:hover {
 .ag-dash-table-status--delisted,
 .ag-dash-table-status--reported,
 .ag-dash-table-status--in_dispute { background: rgba(214, 69, 69, 0.12); color: #b23c3c; }
-.ag-dash-row-actions { display: flex; gap: 10px; white-space: nowrap; }
-.ag-dash-row-actions .lax-controls { position: static; }
+td.ag-dash-row-actions { text-align: center; vertical-align: middle; }
+.ag-dash-row-actions .lax-controls { position: static; display: inline-flex; align-items: center; justify-content: center; }
 .ag-dash-row-share { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 0; border: 1px solid var(--line-page); border-radius: 50%; background: transparent; color: var(--on-page-soft); cursor: pointer; }
 .ag-dash-row-share:hover { border-color: var(--gold); color: var(--gold-dark); }
 .ag-dash-pagination {
@@ -812,19 +812,25 @@ a.ag-dash-stat:hover {
 }
 
 @media (max-width: 640px) {
+  .ag-dash-table-wrap {
+    overflow-x: hidden;
+    border-radius: var(--radius-m);
+  }
   .ag-dash-listing-table thead { display: none; }
   .ag-dash-listing-table,
-  .ag-dash-listing-table tbody { display: block; }
+  .ag-dash-listing-table tbody { display: block; width: 100%; }
   .ag-dash-listing-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 34px;
-    gap: 0;
-    padding: 10px 12px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) auto;
+    gap: 4px 8px;
+    padding: 12px;
     border-top: 1px solid var(--line-page);
+    width: 100%;
+    box-sizing: border-box;
   }
   .ag-dash-listing-row:first-child { border-top: 0; }
-  .ag-dash-listing-table td { min-width: 0; padding: 9px 8px; border: 0; }
-  .ag-dash-listing-row td:not(.ag-dash-property-cell)::before {
+  .ag-dash-listing-table td { min-width: 0; padding: 6px 4px; border: 0; box-sizing: border-box; }
+  .ag-dash-listing-row td:not(.ag-dash-property-cell):not(.ag-dash-row-actions)::before {
     display: block;
     margin-bottom: 4px;
     color: var(--on-page-soft);
@@ -832,38 +838,63 @@ a.ag-dash-stat:hover {
     font-size: 0.67rem;
     font-weight: 600;
   }
-  .ag-dash-listing-row .ag-dash-property-cell { grid-column: 1 / -1; padding: 4px 0 10px; }
-  .ag-dash-listing-row td[data-label="Type"],
-  .ag-dash-listing-row td[data-label="Price"],
-  .ag-dash-listing-row td[data-label="Status"],
-  .ag-dash-listing-row td[data-label="Listed"] { border-bottom: 1px solid var(--line-page); }
+  .ag-dash-listing-row .ag-dash-property-cell { grid-column: 1 / -1; grid-row: 1; padding: 2px 0 8px; }
+  .ag-dash-listing-row td[data-label="Type"] {
+    grid-column: 1;
+    grid-row: 2;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line-page);
+  }
+  .ag-dash-listing-row td[data-label="Price"] {
+    grid-column: 2;
+    grid-row: 2;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line-page);
+  }
+  .ag-dash-listing-row td[data-label="Status"] {
+    grid-column: 3;
+    grid-row: 2;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line-page);
+    justify-self: end;
+    text-align: right;
+  }
+  .ag-dash-listing-row td[data-label="Listed"] {
+    grid-column: 1 / span 2;
+    grid-row: 3;
+    padding-top: 10px;
+    border-bottom: none;
+  }
   .ag-dash-row-actions {
     grid-column: 3;
-    grid-row: 2 / span 2;
-    flex-direction: column;
+    grid-row: 3;
+    display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: 5px;
-    padding: 0 0 0 4px !important;
-      border-bottom: none !important;
+    justify-content: flex-end;
+    align-self: center;
+    justify-self: end;
+    padding: 10px 0 0 !important;
+    border-bottom: none !important;
   }
   .ag-dash-row-actions .lax-controls { position: static; right: auto; bottom: auto; }
   .ag-dash-row-share,
-  .ag-dash-row-actions .lax-more { width: 29px; height: 29px; }
-  .ag-dash-row-actions .lax-more svg { width: 15px; height: 15px; }
+  .ag-dash-row-actions .lax-more { width: 32px; height: 32px; }
+  .ag-dash-row-actions .lax-more svg { width: 16px; height: 16px; }
   .ag-dash-pagination { gap: 3px; }
   .ag-dash-pagination button { min-width: 30px; height: 30px; padding: 0 6px; font-size: 0.8rem; }
 }
 
 @media (max-width: 420px) {
   .ag-dash-listing-row {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 32px;
-    padding-right: 9px;
-    padding-left: 9px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) auto;
+    padding-right: 8px;
+    padding-left: 8px;
+    gap: 4px 6px;
   }
-  .ag-dash-listing-table td { padding-right: 6px; padding-left: 6px; }
+  .ag-dash-listing-table td { padding-right: 3px; padding-left: 3px; }
   .ag-dash-property-thumb { width: 42px; height: 38px; flex-basis: 42px; }
   .ag-dash-listing-row .ag-dash-property-cell { gap: 8px; }
   .ag-dash-row-share,
-  .ag-dash-row-actions .lax-more { width: 27px; height: 27px; }
+  .ag-dash-row-actions .lax-more { width: 30px; height: 30px; }
 }
