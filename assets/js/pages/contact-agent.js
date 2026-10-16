@@ -922,7 +922,10 @@
       }
 
       els.propsDropdown.classList.remove('is-hidden');
-      if (els.propsCount) els.propsCount.textContent = allProps.length + ' Properties';
+      if (els.propsCount) {
+        els.propsCount.textContent = allProps.length + ' Properties';
+        els.propsCount.setAttribute('data-short', String(allProps.length));
+      }
       if (els.propsAgentName) els.propsAgentName.textContent = conv.name + '\u2019s Properties';
 
       els.propsList.innerHTML = allProps.map(function (item) {
@@ -1040,13 +1043,19 @@
         els.propApproveBtn.classList.remove('is-loading');
         els.propApproveBtn.classList.toggle('is-hidden', status !== 'review' && status !== 'approved');
         els.propApproveBtn.disabled = status === 'approved';
-        if (els.propApproveLabel) els.propApproveLabel.textContent = status === 'approved' ? 'Payment Approved' : 'Approve Payment';
+        if (els.propApproveLabel) {
+          els.propApproveLabel.textContent = status === 'approved' ? 'Payment Approved' : 'Approve Payment';
+          els.propApproveLabel.setAttribute('data-short', status === 'approved' ? 'Approved' : 'Approve');
+        }
       }
       if (els.propDeclineBtn) {
         els.propDeclineBtn.classList.remove('is-loading');
         els.propDeclineBtn.classList.toggle('is-hidden', status !== 'review' && status !== 'declined');
         els.propDeclineBtn.disabled = status === 'declined';
-        if (els.propDeclineLabel) els.propDeclineLabel.textContent = status === 'declined' ? 'Declined' : 'Decline Payment';
+        if (els.propDeclineLabel) {
+          els.propDeclineLabel.textContent = status === 'declined' ? 'Declined' : 'Decline Payment';
+          els.propDeclineLabel.setAttribute('data-short', status === 'declined' ? 'Declined' : 'Decline');
+        }
       }
       if (status === 'approved' && els.propDeclineBtn) els.propDeclineBtn.classList.add('is-hidden');
       if (status === 'declined' && els.propApproveBtn) els.propApproveBtn.classList.add('is-hidden');
@@ -1082,6 +1091,38 @@
     }
 
     /* ---------------- THREAD RENDER ---------------- */
+    /* ---- Day divider dates (MM/DD/YYYY), always based on the real current date ---- */
+    function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function dayLabelDate(label) {
+      var d = new Date();
+      d.setHours(0, 0, 0, 0);
+      var names = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      var key = String(label).toLowerCase();
+      if (key === 'yesterday') {
+        d.setDate(d.getDate() - 1);
+      } else if (key !== 'today') {
+        var idx = names.indexOf(key);
+        if (idx === -1) return '';
+        d.setDate(d.getDate() - ((d.getDay() - idx + 7) % 7 || 7));
+      }
+      return pad2(d.getMonth() + 1) + '/' + pad2(d.getDate()) + '/' + d.getFullYear();
+    }
+
+    function refreshDayDates() {
+      Array.prototype.forEach.call(document.querySelectorAll('[data-msgs-day]'), function (el) {
+        el.textContent = dayLabelDate(el.getAttribute('data-msgs-day'));
+      });
+    }
+
+    function scheduleDayRefresh() {
+      var now = new Date();
+      var next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
+      window.setTimeout(function () { refreshDayDates(); scheduleDayRefresh(); }, next - now);
+    }
+    scheduleDayRefresh();
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) refreshDayDates(); });
+
     function renderThread(conv) {
       els.thread.innerHTML = '';
       var hasMessages = conv.messages.length > 0;
@@ -1095,7 +1136,9 @@
         if (msg.day !== lastDay) {
           var divider = document.createElement('div');
           divider.className = 'msgs-day-divider';
-          divider.innerHTML = '<span>' + msg.day + '</span>';
+          var dayDate = dayLabelDate(msg.day);
+          divider.innerHTML = '<span>' + msg.day +
+            (dayDate ? '<small class="msgs-day-date" data-msgs-day="' + msg.day + '">' + dayDate + '</small>' : '') + '</span>';
           els.thread.appendChild(divider);
           lastDay = msg.day;
         }

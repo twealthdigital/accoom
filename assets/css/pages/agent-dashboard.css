@@ -898,3 +898,63 @@ td.ag-dash-row-actions { text-align: center; vertical-align: middle; }
   .ag-dash-row-share,
   .ag-dash-row-actions .lax-more { width: 30px; height: 30px; }
 }
+
+/* ===== Premium performance chart (line / bar / donut) ===== */
+.ag-dash-chart { position: relative; min-height: 240px; }
+.ag-dash-chart > svg { display: block; width: 100%; height: auto; overflow: visible; }
+.ag-dash-c-grid { stroke: var(--line-page); stroke-width: 1; stroke-dasharray: 2 6; opacity: 0.75; }
+.ag-dash-c-grid--base { stroke-dasharray: none; opacity: 1; }
+.ag-dash-c-axis { fill: var(--on-page-soft); font-size: 12px; }
+.ag-dash-c-node { stroke: var(--surface-page-alt, #111); stroke-width: 1.6; pointer-events: none; }
+
+/* hover layer */
+.ag-dash-c-hit { outline: none; }
+.ag-dash-c-zone { pointer-events: all; cursor: crosshair; }
+.ag-dash-c-guide { stroke: var(--on-page-soft); stroke-width: 1; stroke-dasharray: 4 4; opacity: 0; transition: opacity 0.15s ease; pointer-events: none; }
+.ag-dash-c-halo, .ag-dash-c-core { opacity: 0; transition: opacity 0.15s ease; pointer-events: none; }
+.ag-dash-c-hit:hover .ag-dash-c-guide,
+.ag-dash-c-hit:focus .ag-dash-c-guide { opacity: 0.6; }
+.ag-dash-c-hit:hover .ag-dash-c-halo,
+.ag-dash-c-hit:hover .ag-dash-c-core,
+.ag-dash-c-hit:focus .ag-dash-c-halo,
+.ag-dash-c-hit:focus .ag-dash-c-core { opacity: 1; }
+.ag-dash-c-zone--bar:hover,
+.ag-dash-c-hit:focus .ag-dash-c-zone--bar { fill: rgba(255, 255, 255, 0.045); }
+.ag-dash-c-bar { transition: filter 0.15s ease; pointer-events: none; }
+.ag-dash-c-hit:hover .ag-dash-c-bar,
+.ag-dash-c-hit:focus .ag-dash-c-bar { filter: brightness(1.2) drop-shadow(0 0 7px currentColor); }
+
+/* tooltip */
+.ag-dash-chart-tooltip {
+  position: absolute; z-index: 3; padding: 8px 13px; border: 1px solid rgba(245, 184, 46, 0.4); border-radius: 10px;
+  background: rgba(18, 16, 12, 0.94); color: #fff; font-size: 0.76rem; font-weight: 600; white-space: nowrap; pointer-events: none;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+
+/* legend under line / bar */
+.ag-dash-c-key { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 20px; margin-top: 12px; color: var(--on-page-soft); font-size: 0.74rem; }
+.ag-dash-c-key span { display: inline-flex; align-items: center; gap: 8px; }
+.ag-dash-c-key i { width: 18px; height: 3px; border-radius: 3px; }
+.ag-dash-c-key .is-up { background: #2fd37a; box-shadow: 0 0 8px rgba(47, 211, 122, 0.6); }
+.ag-dash-c-key .is-down { background: #ff5d5d; box-shadow: 0 0 8px rgba(255, 93, 93, 0.6); }
+.ag-dash-c-key .is-flat { background: #f5b82e; box-shadow: 0 0 8px rgba(245, 184, 46, 0.6); }
+
+/* donut */
+.ag-dash-donut { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 28px clamp(28px, 8vw, 88px); min-height: 240px; }
+.ag-dash-donut > svg { width: 200px; flex: 0 0 200px; height: auto; overflow: visible; }
+.ag-dash-donut-track { fill: none; stroke: var(--line-page); stroke-width: 14; opacity: 0.6; }
+.ag-dash-donut-arc { fill: none; stroke-width: 14; stroke-linecap: round; cursor: crosshair; outline: none; filter: drop-shadow(0 0 5px currentColor); transition: opacity 0.15s ease, stroke-width 0.15s ease; }
+.ag-dash-donut-arc:hover, .ag-dash-donut-arc:focus { stroke-width: 17; }
+.ag-dash-donut > svg:hover .ag-dash-donut-arc:not(:hover) { opacity: 0.4; }
+.ag-dash-donut-total { fill: var(--on-page); font-size: 19px; font-weight: 700; }
+.ag-dash-donut-sub { fill: var(--on-page-soft); font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ag-dash-donut-legend { display: grid; gap: 10px; min-width: min(100%, 280px); margin: 0; padding: 0; list-style: none; }
+.ag-dash-donut-legend li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 11px 14px; border: 1px solid var(--line-page); border-radius: 12px; background: rgba(255, 255, 255, 0.02); color: var(--on-page-soft); font-size: 0.86rem; }
+.ag-dash-donut-legend i { width: 10px; height: 10px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
+.ag-dash-donut-legend small { margin-left: 4px; opacity: 0.8; font-size: 0.72rem; }
+.ag-dash-donut-legend strong { color: var(--on-page); font-size: 0.9rem; }
+
+@media (max-width: 640px) {
+  .ag-dash-c-axis { font-size: 17px; }
+  .ag-dash-donut > svg { width: 170px; flex-basis: 170px; }
+}

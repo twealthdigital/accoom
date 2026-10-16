@@ -2087,3 +2087,150 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
 .msgs-bubble-photos-file {
   cursor: pointer;
 }
+
+/* ===== Contact Agent tweaks ===== */
+
+/* Approve = solid green, Decline = solid red (all screen sizes) */
+.msgs-property-approve-btn {
+  background: #2dbf76;
+  color: #fff;
+  border: 1px solid #2dbf76;
+}
+.msgs-property-decline-btn {
+  background: #e0455f;
+  color: #fff;
+  border: 1px solid #e0455f;
+}
+.msgs-property-approve-btn:hover { background: #2dbf76; filter: brightness(1.1); transform: scale(1.02); }
+.msgs-property-decline-btn:hover { background: #e0455f; filter: brightness(1.1); transform: scale(1.02); }
+.msgs-property-approve-btn:disabled:hover,
+.msgs-property-decline-btn:disabled:hover { filter: none; transform: none; }
+
+/* Same 10px radius as the search bar */
+.msgs-composer input,
+.msgs-composer textarea,
+.msgs-composer textarea[data-msgs-input],
+.msgs-send-btn,
+.msgs-pay-btn,
+.msgs-property-pay-btn,
+.msgs-property-approve-btn,
+.msgs-property-decline-btn { border-radius: 100px; }
+
+.msgs-row--me .msgs-bubble,
+.msgs-row--agent .msgs-bubble { border-radius: 10px; }
+
+/* Day divider: label on top, full date underneath */
+.msgs-day-divider span {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 5px 16px;
+  line-height: 1.25;
+}
+.msgs-day-date { font-size: 0.66rem; font-weight: 500; opacity: 0.8; }
+
+
+
+/* ===== Property card + tabs row: final responsive layout ===== */
+
+/* --- Approve / Decline / Make Payment: always full text, always side by side --- */
+.msgs-property-card {
+  container: msgs-card / inline-size;
+  flex-wrap: wrap;
+}
+.msgs-property-info { flex: 1 1 140px; }
+
+.msgs-property-extra-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.msgs-property-pay-btn,
+.msgs-property-approve-btn,
+.msgs-property-decline-btn {
+  width: auto;
+  height: 34px;
+  padding: 0 16px;
+  gap: 7px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.msgs-property-pay-btn span,
+.msgs-property-approve-btn span,
+.msgs-property-decline-btn span { display: inline; }
+
+/* When the card is narrow, the buttons drop to their own row and share it equally */
+@container msgs-card (max-width: 520px) {
+  .msgs-property-extra-actions { flex: 1 1 100%; }
+  .msgs-property-pay-btn,
+  .msgs-property-approve-btn,
+  .msgs-property-decline-btn { flex: 1 1 0; min-width: 0; }
+}
+/* Very narrow phones: slightly tighter, still full text */
+@container msgs-card (max-width: 330px) {
+  .msgs-property-pay-btn,
+  .msgs-property-approve-btn,
+  .msgs-property-decline-btn { padding: 0 8px; gap: 5px; font-size: 0.72rem; }
+  .msgs-property-approve-btn svg,
+  .msgs-property-decline-btn svg,
+  .msgs-property-pay-btn svg { width: 13px; height: 13px; }
+}
+
+/* --- Properties dropdown: sits beside the status pill, drops straight down --- */
+.msgs-chat-tabs-row { position: relative; gap: 10px; container: msgs-tabs / inline-size; }
+
+.msgs-chat-tabs-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+.msgs-chat-tabs-right .msgs-property-status { margin-bottom: 0; }
+
+.msgs-chat-tabs-row .msgs-props-dropdown { position: static; }
+.msgs-chat-tabs-row .msgs-props-btn { height: 34px; padding: 0 14px; gap: 7px; }
+.msgs-props-btn[aria-expanded="true"] { border-color: var(--gold); color: var(--gold); }
+.msgs-props-btn[aria-expanded="true"] .msgs-props-chevron { transform: rotate(180deg); }
+
+/* anchored to the tabs row, so it can never run off either side of the screen */
+.msgs-chat-tabs-row .msgs-props-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 18px;
+  left: auto;
+  width: min(340px, calc(100% - 36px));
+  min-width: 0;
+  max-width: none;
+  max-height: clamp(180px, calc(100dvh - 420px), 340px) !important;
+  z-index: 100;
+  transform: translateY(-6px);
+  transform-origin: top right;
+}
+.msgs-chat-tabs-row .msgs-props-panel.is-open { transform: translateY(0); }
+
+/* Status badge always shows its full label (overrides the old tablet rule that hid it) */
+.msgs-property-status-label { display: inline; }
+
+/* The properties button adjusts to the space left in the row (not the screen width) */
+@container msgs-tabs (max-width: 440px) {
+  .msgs-chat-tabs { gap: 16px; }
+  .msgs-chat-tabs-right { gap: 6px; }
+  .msgs-chat-tabs-row .msgs-props-btn { padding: 0 10px; gap: 5px; }
+  [data-msgs-props-count] { font-size: 0; }
+  [data-msgs-props-count]::before { content: attr(data-short); font-size: 0.78rem; font-weight: 700; }
+  .msgs-property-status { padding: 7px 10px; }
+}
+/* Very tight rows (320px phones): trim a little more, label still stays */
+@container msgs-tabs (max-width: 300px) {
+  .msgs-chat-tab { font-size: 0.8rem; }
+  .msgs-chat-tabs { gap: 12px; }
+  .msgs-property-status { padding: 7px 10px; font-size: 0.78rem; }
+  .msgs-property-status-icon { display: none; }
+  .msgs-chat-tabs-row .msgs-props-btn { padding: 0 8px; }
+}

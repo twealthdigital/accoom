@@ -622,7 +622,216 @@
     }
 
     var activeChartType = 'line';
+        // ---------- Premium chart helpers: rise = green, fall = red, flat / pending = gold ----------
+    var CHART_COLORS = { up: '#2fd37a', down: '#ff5d5d', flat: '#f5b82e' };
+
+    function chartR(value) { return Math.round(value * 100) / 100; }
+
+    function chartTrend(point, previous) {
+      if (!previous) return 'flat';
+      if (point.status === 'pending' || previous.status === 'pending') return 'flat';
+      if (point.amount > previous.amount) return 'up';
+      if (point.amount < previous.amount) return 'down';
+      return 'flat';
+    }
+
+    function chartMoney(value) {
+      var n = Math.abs(Number(value) || 0);
+      var units = [[1e9, 'B'], [1e6, 'M'], [1e3, 'k']];
+      for (var i = 0; i < units.length; i++) {
+        if (n >= units[i][0]) return '\u20A6' + (n / units[i][0]).toFixed(1).replace(/\.0$/, '') + units[i][1];
+      }
+      return '\u20A6' + Math.round(n);
+    }
+
+    function chartScale(maxValue) {
+      var raw = Math.max(maxValue, 1000) / 4;
+      var pow = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+      var steps = [1, 2, 2.5, 5, 10];
+      var step = pow * 10;
+      for (var i = 0; i < steps.length; i++) {
+        if (steps[i] * pow >= raw) { step = steps[i] * pow; break; }
+      }
+      return { step: step, max: step * 4 };
+    }
+
+    // Monotone cubic tangents: smooth and wavy, never overshoots, flat stays flat.
+    function chartTangents(pts) {
+      var n = pts.length, d = [], m = [], i;
+      for (i = 0; i < n - 1; i++) d[i] = (pts[i + 1].y - pts[i].y) / (pts[i + 1].x - pts[i].x);
+      m[0] = d[0];
+      m[n - 1] = d[n - 2];
+      for (i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+      for (i = 0; i < n - 1; i++) {
+        if (d[i] === 0) { m[i] = 0; m[i + 1] = 0; continue; }
+        var a = m[i] / d[i], b = m[i + 1] / d[i], s = a * a + b * b;
+        if (s > 9) { var t = 3 / Math.sqrt(s); m[i] = t * a * d[i]; m[i + 1] = t * b * d[i]; }
+      }
+      return m;
+    }
+
+    function chartLabelIndexes(count) {
+      var step = Math.max(1, Math.ceil(count / 7)), out = [];
+      for (var i = count - 1; i >= 0; i -= step) out.push(i);
+      return out;
+    }
+
+    function chartBarPath(x, y, w, h) {
+      var r = Math.min(7, w / 2, h);
+      return 'M' + chartR(x) + ' ' + chartR(y + h) + 'V' + chartR(y + r) + 'Q' + chartR(x) + ' ' + chartR(y) + ' ' + chartR(x + r) + ' ' + chartR(y) +
+        'H' + chartR(x + w - r) + 'Q' + chartR(x + w) + ' ' + chartR(y) + ' ' + chartR(x + w) + ' ' + chartR(y + r) + 'V' + chartR(y + h) + 'Z';
+    }
+
     function renderPortfolioChart(type) {
+      var chart = document.querySelector('[data-ag-chart]');
+      if (!chart) return;
+
+      var description = document.querySelector('[data-ag-chart-description]');
+      var series = Accoom.AgentDashboardData.getPerformanceSeries() || [];
+      var chartNote = document.querySelector('[data-ag-chart-note]');
+      if (chartNote) chartNote.hidden = !series.some(function (point) { return point.demo; });
+
+      /* ---------------- DONUT (pie) ---------------- */
+      if (type === 'pie') {
+        if (description) description.textContent = 'Earnings, pending amounts and payments.';
+        var breakdown = Accoom.AgentDashboardData.getTransactionBreakdown();
+        var slices = [
+          { label: 'Earnings', amount: breakdown.earnings || 0, trend: 'up' },
+          { label: 'Pending', amount: breakdown.pending || 0, trend: 'flat' },
+          { label: 'Payments', amount: breakdown.payments || 0, trend: 'down' }
+        ].filter(function (item) { return item.amount > 0; });
+        if (!slices.length) {
+          chart.innerHTML = '<p class="ag-dash-chart-empty">No transaction amounts to show yet.</p>';
+          return;
+        }
+        var total = slices.reduce(function (sum, item) { return sum + item.amount; }, 0);
+        var circ = 2 * Math.PI * 60;
+        var gap = slices.length > 1 ? 20 : 0;
+        var acc = 0;
+        var arcs = slices.map(function (item) {
+          var part = circ * item.amount / total;
+          var len = Math.max(0.01, part - gap);
+          var arc = '<circle class="ag-dash-donut-arc" cx="80" cy="80" r="60" transform="rotate(-90 80 80)" stroke="currentColor" style="color:' +
+            CHART_COLORS[item.trend] + '" stroke-dasharray="' + chartR(len) + ' ' + chartR(circ) + '" stroke-dashoffset="-' + chartR(acc + gap / 2) +
+            '" data-chart-label="' + escapeHtml(item.label) + '" data-chart-amount="' + item.amount + '" tabindex="0" role="img" aria-label="' +
+            escapeHtml(item.label + ': ' + Accoom.formatWalletAmount(item.amount)) + '"></circle>';
+          acc += part;
+          return arc;
+        }).join('');
+        chart.innerHTML = '<div class="ag-dash-donut"><svg viewBox="0 0 160 160" aria-label="Transaction amount breakdown">' +
+          '<circle class="ag-dash-donut-track" cx="80" cy="80" r="60"></circle>' + arcs +
+          '<text class="ag-dash-donut-total" x="80" y="82" text-anchor="middle">' + chartMoney(total) + '</text>' +
+          '<text class="ag-dash-donut-sub" x="80" y="98" text-anchor="middle">Total volume</text></svg>' +
+          '<ul class="ag-dash-donut-legend">' + slices.map(function (item) {
+            var pct = item.amount / total * 100;
+            return '<li><i style="color:' + CHART_COLORS[item.trend] + '"></i><span>' + escapeHtml(item.label) +
+              ' <small>' + (pct < 1 ? '<1%' : Math.round(pct) + '%') + '</small></span><strong>' + Accoom.formatWalletAmount(item.amount) + '</strong></li>';
+          }).join('') + '</ul></div><div class="ag-dash-chart-tooltip" data-ag-chart-tooltip role="status" hidden></div>';
+        return;
+      }
+
+      /* ---------------- LINE + BAR ---------------- */
+      if (description) description.textContent = 'Recorded income movement over time.';
+      var data = series.map(function (point) {
+        return { label: point.label, amount: Math.max(0, Number(point.amount) || 0), status: point.status || 'settled' };
+      });
+      if (!data.length) {
+        chart.innerHTML = '<p class="ag-dash-chart-empty">No income recorded yet.</p>';
+        return;
+      }
+
+      var W = 720, H = 260, L = 58, R = 24, T = 16, B = 40;
+      var base = H - B, plotH = base - T, plotW = W - L - R, inset = 14;
+      var n = data.length;
+      var scale = chartScale(Math.max.apply(Math, data.map(function (d) { return d.amount; })));
+      function yOf(v) { return base - v / scale.max * plotH; }
+
+      var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Income over time">';
+
+      svg += '<defs>';
+      ['up', 'down', 'flat'].forEach(function (k) {
+        svg += '<linearGradient id="agFill-' + k + '" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0" stop-color="' + CHART_COLORS[k] + '" stop-opacity="0.45"/>' +
+          '<stop offset="1" stop-color="' + CHART_COLORS[k] + '" stop-opacity="0.02"/></linearGradient>' +
+          '<linearGradient id="agBar-' + k + '" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0" stop-color="' + CHART_COLORS[k] + '" stop-opacity="1"/>' +
+          '<stop offset="1" stop-color="' + CHART_COLORS[k] + '" stop-opacity="0.28"/></linearGradient>';
+      });
+      svg += '<filter id="agGlow" filterUnits="userSpaceOnUse" x="0" y="0" width="' + W + '" height="' + H + '"><feGaussianBlur stdDeviation="3.5"/></filter></defs>';
+
+      // grid + y axis
+      for (var g = 0; g <= 4; g++) {
+        var gy = chartR(base - g * plotH / 4);
+        svg += '<line class="ag-dash-c-grid' + (g === 0 ? ' ag-dash-c-grid--base' : '') + '" x1="' + L + '" y1="' + gy + '" x2="' + (W - R) + '" y2="' + gy + '"></line>' +
+          '<text class="ag-dash-c-axis" x="' + (L - 10) + '" y="' + (gy + 4) + '" text-anchor="end">' + chartMoney(scale.step * g) + '</text>';
+      }
+
+      var xs;
+      if (type === 'bar') {
+        /* ----- BAR ----- */
+        var slot = plotW / n, bw = Math.min(36, slot * 0.58);
+        xs = function (i) { return L + slot * (i + 0.5); };
+        data.forEach(function (d, i) {
+          var trend = chartTrend(d, data[i - 1]);
+          var h = Math.max(2, base - yOf(d.amount));
+          svg += '<g class="ag-dash-c-hit" data-chart-index="' + i + '" tabindex="0" role="img" aria-label="' +
+            escapeHtml(d.label + ': ' + Accoom.formatWalletAmount(d.amount) + (d.status === 'pending' ? ' (pending)' : '')) + '">' +
+            '<rect class="ag-dash-c-zone ag-dash-c-zone--bar" x="' + chartR(xs(i) - slot / 2) + '" y="' + T + '" width="' + chartR(slot) + '" height="' + plotH + '" rx="8" fill="transparent"></rect>' +
+            '<path class="ag-dash-c-bar" d="' + chartBarPath(xs(i) - bw / 2, base - h, bw, h) + '" fill="url(#agBar-' + trend + ')" style="color:' + CHART_COLORS[trend] + '"></path></g>';
+        });
+      } else {
+        /* ----- LINE ----- */
+        var stepX = n > 1 ? (plotW - inset * 2) / (n - 1) : plotW;
+        xs = function (i) { return n === 1 ? L + plotW / 2 : L + inset + i * stepX; };
+        var pts = data.map(function (d, i) { return { x: xs(i), y: yOf(d.amount), d: d }; });
+        var areas = '', glows = '', lines = '', nodes = '';
+        var incoming = [];
+        if (n > 1) {
+          var tan = chartTangents(pts);
+          for (var i = 0; i < n - 1; i++) {
+            var p = pts[i], q = pts[i + 1], dx = q.x - p.x;
+            var trend = chartTrend(q.d, p.d);
+            incoming[i + 1] = trend;
+            var curve = 'M' + chartR(p.x) + ' ' + chartR(p.y) + 'C' + chartR(p.x + dx / 3) + ' ' + chartR(p.y + tan[i] * dx / 3) + ' ' +
+              chartR(q.x - dx / 3) + ' ' + chartR(q.y - tan[i + 1] * dx / 3) + ' ' + chartR(q.x) + ' ' + chartR(q.y);
+            areas += '<path d="' + curve + 'L' + chartR(q.x) + ' ' + base + 'L' + chartR(p.x) + ' ' + base + 'Z" fill="url(#agFill-' + trend + ')"></path>';
+            glows += '<path d="' + curve + '" stroke="' + CHART_COLORS[trend] + '"></path>';
+            lines += '<path d="' + curve + '" stroke="' + CHART_COLORS[trend] + '"></path>';
+          }
+          incoming[0] = incoming[1];
+        } else {
+          incoming[0] = 'flat';
+        }
+        pts.forEach(function (pt, i) {
+          var color = CHART_COLORS[incoming[i] || 'flat'];
+          nodes += '<circle class="ag-dash-c-node" cx="' + chartR(pt.x) + '" cy="' + chartR(pt.y) + '" r="3.6" fill="' + color + '"></circle>';
+        });
+        svg += areas +
+          '<g fill="none" stroke-width="7" stroke-linecap="round" opacity="0.38" filter="url(#agGlow)">' + glows + '</g>' +
+          '<g fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">' + lines + '</g>' + nodes;
+        pts.forEach(function (pt, i) {
+          var color = CHART_COLORS[incoming[i] || 'flat'];
+          svg += '<g class="ag-dash-c-hit" data-chart-index="' + i + '" tabindex="0" role="img" aria-label="' +
+            escapeHtml(pt.d.label + ': ' + Accoom.formatWalletAmount(pt.d.amount) + (pt.d.status === 'pending' ? ' (pending)' : '')) + '">' +
+            '<line class="ag-dash-c-guide" x1="' + chartR(pt.x) + '" y1="' + T + '" x2="' + chartR(pt.x) + '" y2="' + base + '"></line>' +
+            '<circle class="ag-dash-c-halo" cx="' + chartR(pt.x) + '" cy="' + chartR(pt.y) + '" r="9" fill="' + color + '" fill-opacity="0.22" stroke="' + color + '" stroke-opacity="0.6"></circle>' +
+            '<circle class="ag-dash-c-core" cx="' + chartR(pt.x) + '" cy="' + chartR(pt.y) + '" r="4.8" fill="' + color + '" stroke="#fff" stroke-width="1.5"></circle>' +
+            '<rect class="ag-dash-c-zone" x="' + chartR(pt.x - stepX / 2) + '" y="' + T + '" width="' + chartR(stepX) + '" height="' + plotH + '" fill="transparent"></rect></g>';
+        });
+      }
+
+      // x axis labels
+      chartLabelIndexes(n).forEach(function (i) {
+        svg += '<text class="ag-dash-c-axis" x="' + chartR(xs(i)) + '" y="' + (H - 12) + '" text-anchor="middle">' + escapeHtml(data[i].label) + '</text>';
+      });
+
+      chart.innerHTML = svg + '</svg>' +
+        '<div class="ag-dash-c-key"><span><i class="is-up"></i>Rise</span><span><i class="is-down"></i>Fall</span><span><i class="is-flat"></i>Flat / pending</span></div>' +
+        '<div class="ag-dash-chart-tooltip" data-ag-chart-tooltip role="status" hidden></div>';
+    }
+
+    // Old renderer kept below (unused) so nothing else breaks. You can delete this whole function later.
+    function legacyRenderPortfolioChart(type) {
       var chart = document.querySelector('[data-ag-chart]');
       if (!chart) return;
 
