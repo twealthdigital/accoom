@@ -62,7 +62,7 @@ window.Accoom = window.Accoom || {};
     // wholeWord: must start and end on a word edge in what the person typed.
     var src = entry.wholeWord ? '(^|[^a-z0-9])(' + core + ')(?![a-z0-9])' : '()(' + core + ')';
     var category = KINDS[entry.category] ? entry.category : 'other';
-    return { re: new RegExp(src, 'gi'), ignoreNearDigits: !!entry.ignoreNearDigits, category: category };
+    return { re: new RegExp(src, 'gi'), ignoreNearDigits: !!entry.ignoreNearDigits, category: category, whole: !!entry.wholeWord };
   }
 
   function rules() {
@@ -96,7 +96,7 @@ window.Accoom = window.Accoom || {};
         if (rule.ignoreNearDigits) {
           skip = /\d/.test(nearestNonSpace(text, start - 1, -1)) || /\d/.test(nearestNonSpace(text, end, 1));
         }
-        if (!skip) return { match: m[2], label: KINDS[rule.category].label, kind: rule.category };
+        if (!skip) return { match: m[2], label: KINDS[rule.category].label, kind: rule.category, whole: rule.whole };
         if (rule.re.lastIndex === m.index) rule.re.lastIndex++;
       }
     }

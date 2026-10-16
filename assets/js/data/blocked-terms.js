@@ -67,6 +67,30 @@ window.Accoom = window.Accoom || {};
     T('off platform', 'contact', true), T('outside the app', 'contact', true),
     T('outside accoom', 'contact', true),
 
+    /* ---- The word "contact" in any form, plus reach out / get in touch ---- */
+    T('contact', 'contact'),
+    T('reach out', 'contact'), T('reaches out', 'contact'),
+    T('reached out', 'contact'), T('reaching out', 'contact'),
+    T('reach me', 'contact', true), T('reach you', 'contact', true),
+    T('get in touch', 'contact'), T('getting in touch', 'contact'),
+    T('got in touch', 'contact'), T('in touch', 'contact', true),
+    T('touch base', 'contact', true),
+
+    /* ---- Asking for / sharing a phone number ---- */
+    T('number', 'contact', true), T('numbers', 'contact', true),
+    T('phone', 'contact', true), T('phones', 'contact', true),
+    T('cellphone', 'contact'), T('telephone', 'contact'),
+    T('digits', 'contact', true),
+
+    /* ---- Sound-alike spellings of messaging apps ---- */
+    T('what app', 'social', true), T('whatapp', 'social', true),
+    T('whtsapp', 'social'), T('whtsap', 'social'), T('whatzapp', 'social'),
+    T('watzapp', 'social'), T('wasap', 'social', true), T('wassap', 'social', true),
+    T('w app', 'social', true), T('wa me', 'social', true),
+    T('instagrm', 'social'), T('insta gram', 'social'), T('telegrm', 'social'),
+    T('facebok', 'social'), T('face book', 'social'), T('snap chat', 'social'),
+    T('tik tok', 'social'), T('twiter', 'social'), T('linkdin', 'social'),
+
     /* ---- Payment terms (all payments must happen on ACCOOM) ---- */
     T('paypal', 'payment'), T('cashapp', 'payment'), T('venmo', 'payment'),
     T('zelle', 'payment'), T('moneygram', 'payment'), T('western union', 'payment'),

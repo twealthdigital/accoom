@@ -1094,6 +1094,63 @@
     /* ---- Day divider dates (MM/DD/YYYY), always based on the real current date ---- */
     function pad2(n) { return n < 10 ? '0' + n : '' + n; }
 
+    /* ---- Real day labels, worked out from each message's timestamp ---- */
+    var WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    function startOfDay(d) { var x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+    function dayKey(ts) { var d = new Date(ts); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
+    function dayDiff(ts) {
+      return Math.round((startOfDay(new Date()) - startOfDay(new Date(ts))) / 86400000);
+    }
+    // Today -> Yesterday -> weekday name (2 to 6 days ago) -> full date
+    function dayLabelFromTs(ts) {
+      var diff = dayDiff(ts);
+      if (diff <= 0) return 'Today';
+      if (diff === 1) return 'Yesterday';
+      var d = new Date(ts);
+      if (diff < 7) return WEEKDAYS[d.getDay()];
+      return d.getDate() + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getFullYear();
+    }
+    // Small date beside the label (not needed once the label is already a date)
+    function dayDateFromTs(ts) {
+      if (dayDiff(ts) >= 7) return '';
+      var d = new Date(ts);
+      return pad2(d.getMonth() + 1) + '/' + pad2(d.getDate()) + '/' + d.getFullYear();
+    }
+
+    // Older messages only have words like "Today" / "Monday" / "2 weeks ago".
+    // Turn those into real timestamps once so they age correctly from now on.
+    function parseClock(t) {
+      var m = /(\d+):(\d+)\s*(AM|PM)/i.exec(t || '');
+      if (!m) return [12, 0];
+      var h = parseInt(m[1], 10) % 12;
+      if (/pm/i.test(m[3])) h += 12;
+      return [h, parseInt(m[2], 10)];
+    }
+    function legacyDayToDate(label) {
+      var d = startOfDay(new Date());
+      var k = String(label || '').toLowerCase();
+      if (!k || k === 'today') return d;
+      if (k === 'yesterday') { d.setDate(d.getDate() - 1); return d; }
+      var idx = WEEKDAYS.map(function (n) { return n.toLowerCase(); }).indexOf(k);
+      if (idx !== -1) { d.setDate(d.getDate() - ((d.getDay() - idx + 7) % 7 || 7)); return d; }
+      if (k === 'last week') { d.setDate(d.getDate() - 7); return d; }
+      var wk = /^(\d+)\s+weeks?\s+ago$/.exec(k);
+      if (wk) { d.setDate(d.getDate() - 7 * parseInt(wk[1], 10)); return d; }
+      return d;
+    }
+    function ensureTimestamps() {
+      state.conversations.concat(state.savedConversations).forEach(function (c) {
+        c.messages.forEach(function (m) {
+          if (m.ts) return;
+          var d = legacyDayToDate(m.day);
+          var t = parseClock(m.time);
+          d.setHours(t[0], t[1], 0, 0);
+          m.ts = d.getTime();
+        });
+      });
+    }
+
     function dayLabelDate(label) {
       var d = new Date();
       d.setHours(0, 0, 0, 0);
@@ -1109,10 +1166,15 @@
       return pad2(d.getMonth() + 1) + '/' + pad2(d.getDate()) + '/' + d.getFullYear();
     }
 
+    var renderedDayKey = dayKey(Date.now());
+    // Runs at midnight and when the tab comes back into view: if the date
+    // changed, redraw so "Today" becomes "Yesterday" and so on.
     function refreshDayDates() {
-      Array.prototype.forEach.call(document.querySelectorAll('[data-msgs-day]'), function (el) {
-        el.textContent = dayLabelDate(el.getAttribute('data-msgs-day'));
-      });
+      var nowKey = dayKey(Date.now());
+      if (nowKey === renderedDayKey) return;
+      renderedDayKey = nowKey;
+      var conv = findConv(state.activeId);
+      if (conv) { renderThread(conv); renderSavedThread(conv); }
     }
 
     function scheduleDayRefresh() {
@@ -1133,14 +1195,16 @@
 
       var lastDay = null;
       conv.messages.forEach(function (msg) {
-        if (msg.day !== lastDay) {
+        if (!msg.ts) msg.ts = Date.now();
+        var key = dayKey(msg.ts);
+        if (key !== lastDay) {
           var divider = document.createElement('div');
           divider.className = 'msgs-day-divider';
-          var dayDate = dayLabelDate(msg.day);
-          divider.innerHTML = '<span>' + msg.day +
-            (dayDate ? '<small class="msgs-day-date" data-msgs-day="' + msg.day + '">' + dayDate + '</small>' : '') + '</span>';
+          var dayDate = dayDateFromTs(msg.ts);
+          divider.innerHTML = '<span>' + dayLabelFromTs(msg.ts) +
+            (dayDate ? '<small class="msgs-day-date">' + dayDate + '</small>' : '') + '</span>';
           els.thread.appendChild(divider);
-          lastDay = msg.day;
+          lastDay = key;
         }
         els.thread.appendChild(buildRow(msg, conv));
       });
@@ -1424,6 +1488,189 @@
       Accoom.on(els.replyCancel, 'click', hideReplyPreview);
     }
 
+    /* ---------------- BUYER CHAT GUARD ----------------
+       Same rules as the agent listing form: contact details, links,
+       social apps, payment wording, the word "contact" (and reach out /
+       get in touch), plus foul language. The offending text is removed
+       from the box, a dialog explains why, and more than 5 warnings
+       pauses the chat for 30 seconds. */
+    var CG_PHONE_RE = /(?:\+?\d[\d\-\s().]{6,}\d)/;
+    var CG_EMAIL_RE = /[\w.+-]+@[\w-]+\.[a-z]{2,}/i;
+    var CG_URL_RE = /(https?:\/\/\S+|www\.\S+|\b[a-z0-9-]+\.(?:com|net|org|ng|co|io|me|link|xyz|info)\b\S*)/i;
+    var CG_ICON = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+
+    // What the buyer sees, by type of violation.
+    var CG_COPY = {
+      contact: {
+        title: 'Keep this conversation on ACCOOM',
+        body: 'Asking for or sharing a phone number, or asking an agent to \u201Ccontact\u201D you, \u201Creach out\u201D or \u201Cget in touch\u201D elsewhere, isn\u2019t allowed. Everything about this property should stay in this chat, so you have a record of what was agreed and your payment stays protected.'
+      },
+      details: {
+        title: 'Don\u2019t share personal details here',
+        body: 'Phone numbers, email addresses and links can\u2019t be sent in chat. Staying on ACCOOM keeps your personal details private and keeps you covered if anything goes wrong with a property.'
+      },
+      social: {
+        title: 'Please stay on ACCOOM',
+        body: 'Moving to WhatsApp, Instagram or other apps isn\u2019t allowed. Deals made off ACCOOM aren\u2019t protected, and we can\u2019t step in if something goes wrong.'
+      },
+      payment: {
+        title: 'Pay only through ACCOOM',
+        body: 'Never pay an agent directly. Payments made outside ACCOOM aren\u2019t protected and can\u2019t be refunded. Use the Pay button on the property card so your money is held safely until the agent delivers.'
+      },
+      profanity: {
+        title: 'Please keep it respectful',
+        body: 'Offensive or inappropriate language isn\u2019t allowed on ACCOOM. Keep your messages polite so agents can help you quickly.'
+      },
+      other: {
+        title: 'That message can\u2019t be sent',
+        body: 'This wording isn\u2019t allowed on ACCOOM. Please rephrase your message and keep the conversation about the property.'
+      }
+    };
+
+    function chatScan(text) {
+      if (!text) return null;
+      var m = CG_PHONE_RE.exec(text);
+      if (m && m[0].replace(/\D/g, '').length >= 7) return { match: m[0].trim(), kind: 'details' };
+      m = CG_EMAIL_RE.exec(text);
+      if (m) return { match: m[0], kind: 'details' };
+      m = CG_URL_RE.exec(text);
+      if (m) return { match: m[0], kind: 'details' };
+      if (window.Accoom && Accoom.ContentGuard) return Accoom.ContentGuard.scan(text);
+      return null;
+    }
+
+    var cg = { violations: 0, locked: false, timer: null, queue: [], showing: false, suppress: false, warn: null, lock: null };
+
+    function cgEnsureWarn() {
+      if (cg.warn) return;
+      cg.warn = document.createElement('div');
+      cg.warn.className = 'msgs-guard-overlay';
+      cg.warn.innerHTML =
+        '<div class="msgs-guard-box" role="alertdialog" aria-modal="true" tabindex="-1">' +
+          '<div class="msgs-guard-icon">' + CG_ICON + '</div>' +
+          '<h3 data-cg-title></h3>' +
+          '<p>You wrote:</p>' +
+          '<p class="msgs-guard-quote" data-cg-quote></p>' +
+          '<p data-cg-body></p>' +
+          '<button type="button" class="msgs-guard-dismiss" data-cg-dismiss>Got it</button>' +
+        '</div>';
+      document.body.appendChild(cg.warn);
+    }
+
+    function cgDrain() {
+      if (cg.locked) { cg.queue = []; cg.showing = false; return; }
+      if (!cg.queue.length) { cg.showing = false; document.body.classList.remove('no-scroll'); return; }
+      cg.showing = true;
+      document.body.classList.add('no-scroll');
+      cgEnsureWarn();
+      var info = cg.queue.shift();
+      var copy = CG_COPY[info.kind] || CG_COPY.other;
+      cg.warn.querySelector('[data-cg-title]').textContent = copy.title;
+      cg.warn.querySelector('[data-cg-quote]').textContent = '\u201C' + info.match.trim() + '\u201D';
+      cg.warn.querySelector('[data-cg-body]').textContent = copy.body;
+      cg.warn.classList.add('is-open');
+      var btn = cg.warn.querySelector('[data-cg-dismiss]');
+      function onDismiss() {
+        btn.removeEventListener('click', onDismiss);
+        cg.warn.classList.remove('is-open');
+        window.setTimeout(function () {
+          cgDrain();
+          if (!cg.showing && els.input && !cg.locked) els.input.focus();
+        }, 220);
+      }
+      btn.addEventListener('click', onDismiss);
+      window.requestAnimationFrame(function () { btn.focus(); });
+    }
+
+    function cgStartLock() {
+      cg.locked = true;
+      cg.queue = [];
+      cg.showing = false;
+      if (cg.warn) cg.warn.classList.remove('is-open');
+      if (!cg.lock) {
+        cg.lock = document.createElement('div');
+        cg.lock.className = 'msgs-guard-lock';
+        cg.lock.innerHTML =
+          '<div class="msgs-guard-lock-box">' +
+            '<div class="msgs-guard-lock-icon">' + CG_ICON + '</div>' +
+            '<h2>Chat paused for your protection</h2>' +
+            '<p>Several attempts to share contact details or move this conversation off ACCOOM were blocked. Payments and agreements made outside the platform aren\u2019t protected, and we can\u2019t help if something goes wrong.</p>' +
+            '<p class="msgs-guard-lock-timer"><span data-cg-seconds>30</span>s remaining, then you can continue chatting.</p>' +
+          '</div>';
+        document.body.appendChild(cg.lock);
+      }
+      cg.lock.hidden = false;
+      document.body.classList.add('no-scroll');
+      var until = Date.now() + 30000;
+      var secEl = cg.lock.querySelector('[data-cg-seconds]');
+      window.clearInterval(cg.timer);
+      function tick() {
+        var left = Math.max(0, Math.ceil((until - Date.now()) / 1000));
+        secEl.textContent = left;
+        if (left <= 0) { window.clearInterval(cg.timer); cgFinishLock(); }
+      }
+      tick();
+      cg.timer = window.setInterval(tick, 250);
+    }
+
+    function cgFinishLock() {
+      cg.locked = false;
+      cg.violations = 0;
+      cg.suppress = true;
+      if (els.input) els.input.value = '';
+      cg.suppress = false;
+      var conv = findConv(state.activeId);
+      if (conv) conv.draft = '';
+      if (typeof autoGrowInput === 'function') autoGrowInput();
+      renderList();
+      cg.lock.hidden = true;
+      document.body.classList.remove('no-scroll');
+      if (els.input) els.input.focus();
+    }
+
+    function cgHandle(el, info) {
+      // Wipe the ENTIRE message, not just the offending word, then explain why.
+      cg.suppress = true;
+      el.value = '';
+      cg.suppress = false;
+      var conv = findConv(state.activeId);
+      if (conv) conv.draft = el.value;
+      if (typeof autoGrowInput === 'function') autoGrowInput();
+      cg.violations += 1;
+      if (cg.violations > 5) cgStartLock();
+      else { cg.queue.push(info); if (!cg.showing) cgDrain(); }
+    }
+
+    // Returns true when something was found (and already removed + warned).
+    // While typing, only the finished part of the message is checked: everything
+    // up to the last space or punctuation mark. The word still being typed
+    // ("abo" on the way to "about") is left alone until it is completed.
+    function cgFinishedText(text) {
+      var m = text.match(/^[\s\S]*[\s.,;:!?]/);
+      return m ? m[0] : '';
+    }
+
+    // live = true  -> called while typing (checks finished words only)
+    // live = false/omitted -> called on send (checks the whole message)
+    function cgGuard(el, live) {
+      if (!el || cg.suppress || cg.locked) return false;
+      var text = el.value;
+      var info = chatScan(text);
+      // Still typing the last word? Short or foul words ("abo" on the way to
+      // "about") wait until the word is finished (space or punctuation) or the
+      // message is sent. Everything typed before that last word is checked now.
+      if (info && live && !/[\s.,;:!?]$/.test(text) && (info.kind === 'profanity' || info.whole)) {
+        info = chatScan(text.replace(/\S*$/, ''));
+      }
+      if (!info) return false;
+      cgHandle(el, info); // wipes the whole box, so one hit is enough
+      return true;
+    }
+
+    if (els.input) {
+      Accoom.on(els.input, 'input', function () { cgGuard(els.input, true); });
+    }
+
     /* ---------------- COMPOSER ---------------- */
     if (els.composer) {
       if (els.input) {
@@ -1441,6 +1688,9 @@
         var conv = findConv(state.activeId);
         if (!conv) return;
 
+        if (cg.locked) return;
+        if (cgGuard(els.input)) return; // blocked text was removed + warned
+
         var text = els.input.value.trim();
         if (!text) return;
 
@@ -1448,6 +1698,7 @@
           id: 'u' + Date.now(),
           from: 'me',
           day: 'Today',
+          ts: Date.now(),
           time: formatNow(),
           read: false
         };
@@ -1601,13 +1852,17 @@
       Accoom.on(els.propReviewBtn, 'click', function () {
         var conv = findConv(state.activeId);
         if (!conv) return;
-        // A report flips this property's status to "In Dispute" right
-        // away. A real backend can set/clear conv.disputed independently —
-        // renderPaymentState() will always reflect whatever it's set to.
-        activePropState(conv).disputed = true;
-        renderPaymentState(conv);
-        // TODO: wire to real "request a review" flow using conv.property.id
-        window.location.href = 'review-request.html?property=' + encodeURIComponent(conv.property.id);
+        // Tell the report page who is being reported. The property only goes
+        // "In Dispute" once the report is actually submitted there.
+        Accoom.setStorage('accoom-report-context', {
+          convId: conv.id,
+          agentName: conv.name,
+          avatar: conv.avatar,
+          verified: !!conv.verified,
+          property: conv.property,
+          properties: conv.allProperties || [conv.property]
+        });
+        window.location.href = 'report-agent.html';
       });
     }
 
@@ -1926,6 +2181,8 @@
 
     /* ---------------- INIT ---------------- */
     updateMoveSavedLabel();
+    ensureTimestamps();
+    saveConversations();
     reconcilePaidProperties();
     renderList();
     showChatEmpty();

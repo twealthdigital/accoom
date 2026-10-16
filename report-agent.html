@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Report Agent — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.png" />
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark') document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="preload" href="partials/header.html" as="fetch" crossorigin>
+  <link rel="preload" href="partials/footer.html" as="fetch" crossorigin>
+  <link rel="stylesheet" href="assets/css/pages/report-agent.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="partial-mount" data-partial="partials/header.html"></div>
+
+  <main class="rp-page">
+    <div class="container rp-shell">
+
+      <!-- Back to chat -->
+      <a href="contact-agent.html" class="rp-back" data-rp-back>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Back to chat</span>
+      </a>
+
+      <header class="rp-head">
+        <h1>Report an agent</h1>
+        <p>Tell us what went wrong. Reports are confidential, the agent is never told who reported them, and every report is reviewed by the ACCOOM Trust &amp; Safety team.</p>
+      </header>
+
+      <!-- ===================== FORM ===================== -->
+      <div data-rp-form-wrap>
+
+        <!-- Who is being reported -->
+        <section class="rp-card rp-agent" data-rp-agent-card hidden>
+          <img class="rp-agent-avatar" data-rp-agent-avatar src="assets/images/agent-images/agenticonimg.webp" alt="" />
+          <div class="rp-agent-info">
+            <p class="rp-agent-label">You are reporting</p>
+            <h2 class="rp-agent-name"><span data-rp-agent-name>Agent</span><span class="rp-verified" data-rp-agent-verified hidden>Verified</span></h2>
+            <p class="rp-agent-prop" data-rp-agent-prop></p>
+          </div>
+        </section>
+
+        <form class="rp-form" data-rp-form novalidate>
+
+          <!-- Agent name fallback (only when opened without a chat) -->
+          <section class="rp-card" data-rp-agent-field hidden>
+            <div class="rp-field">
+              <label class="rp-label" for="rp-agent-input">Agent name <span class="rp-req">*</span></label>
+              <input class="rp-input" id="rp-agent-input" type="text" maxlength="80" placeholder="Name of the agent you are reporting" autocomplete="off" />
+              <p class="rp-error" role="alert"></p>
+            </div>
+          </section>
+
+          <!-- STEP 1: CATEGORY -->
+          <section class="rp-card">
+            <div class="rp-step">
+              <span class="rp-step-num">1</span>
+              <div>
+                <h2 class="rp-step-title">What are you reporting?</h2>
+                <p class="rp-step-sub">Choose the category that fits best. You can only pick one.</p>
+              </div>
+            </div>
+            <div class="rp-cats" data-rp-cats role="radiogroup" aria-label="Report category"></div>
+            <p class="rp-error rp-error--cat" data-rp-cat-error role="alert"></p>
+          </section>
+
+          <!-- STEP 2: DETAILS (appears after a category is chosen) -->
+          <div class="rp-details" data-rp-details hidden>
+            <section class="rp-card">
+              <div class="rp-step">
+                <span class="rp-step-num">2</span>
+                <div>
+                  <h2 class="rp-step-title">Tell us what happened</h2>
+                  <p class="rp-step-sub">Category: <b data-rp-chosen>—</b></p>
+                </div>
+              </div>
+
+              <div class="rp-field">
+                <label class="rp-label" for="rp-subject">Short summary <span class="rp-req">*</span></label>
+                <input class="rp-input" id="rp-subject" type="text" maxlength="100" placeholder="e.g. Agent asked me to pay the inspection fee by transfer" autocomplete="off" />
+                <p class="rp-error" role="alert"></p>
+              </div>
+
+              <div class="rp-grid">
+                <div class="rp-field">
+                  <label class="rp-label" for="rp-date">When did it happen? <span class="rp-req">*</span></label>
+                  <input class="rp-input" id="rp-date" type="date" />
+                  <p class="rp-error" role="alert"></p>
+                </div>
+                <div class="rp-field">
+                  <label class="rp-label" for="rp-property">Which property is this about? <span class="rp-req">*</span></label>
+                  <select class="rp-input rp-select" id="rp-property"></select>
+                  <p class="rp-error" role="alert"></p>
+                </div>
+              </div>
+
+              <div class="rp-field">
+                <label class="rp-label" for="rp-desc">Full description <span class="rp-req">*</span></label>
+                <textarea class="rp-input rp-textarea" id="rp-desc" rows="6" maxlength="2000" data-rp-desc></textarea>
+                <div class="rp-meta">
+                  <p class="rp-error" role="alert"></p>
+                  <p class="rp-count" data-rp-count>0 / 2000</p>
+                </div>
+              </div>
+
+              <!-- Shown only for categories that involve money -->
+              <div class="rp-money" data-rp-money hidden>
+                <div class="rp-grid">
+                  <div class="rp-field">
+                    <label class="rp-label" for="rp-amount">Amount involved (₦)</label>
+                    <input class="rp-input" id="rp-amount" type="number" inputmode="numeric" min="0" step="1" placeholder="e.g. 50000" />
+                    <p class="rp-error" role="alert"></p>
+                  </div>
+                  <div class="rp-field">
+                    <span class="rp-label" id="rp-paid-label">Did you already send money outside ACCOOM? <span class="rp-req">*</span></span>
+                    <div class="rp-radios" role="radiogroup" aria-labelledby="rp-paid-label">
+                      <label class="rp-radio"><input type="radio" name="paidOutside" value="yes" /><span>Yes</span></label>
+                      <label class="rp-radio"><input type="radio" name="paidOutside" value="no" /><span>No</span></label>
+                    </div>
+                    <p class="rp-error" role="alert"></p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Evidence -->
+            <section class="rp-card">
+              <h2 class="rp-step-title">Evidence <span class="rp-opt">(recommended)</span></h2>
+              <p class="rp-step-sub">Screenshots of the chat, receipts or transfer slips. Up to 5 files, 10MB each. PNG, JPG or PDF.</p>
+              <div class="rp-drop" data-rp-drop>
+                <input type="file" accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf" multiple hidden data-rp-file />
+                <button type="button" class="rp-drop-btn" data-rp-file-btn>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  <span>Add files</span>
+                </button>
+                <p class="rp-drop-hint">or drag and drop them here</p>
+              </div>
+              <p class="rp-error" data-rp-file-error role="alert"></p>
+              <ul class="rp-files" data-rp-files></ul>
+            </section>
+
+            <!-- Confirm + submit -->
+            <section class="rp-card">
+              <label class="rp-check">
+                <input type="checkbox" data-rp-block />
+                <span>Also block this agent so they can no longer message me.</span>
+              </label>
+              <label class="rp-check">
+                <input type="checkbox" data-rp-confirm />
+                <span>I confirm that this report is true to the best of my knowledge. I understand false reports can lead to action on my account. <span class="rp-req">*</span></span>
+              </label>
+              <p class="rp-error" data-rp-confirm-error role="alert"></p>
+
+              <div class="rp-actions">
+                <a href="contact-agent.html" class="btn btn--ghost rp-cancel" data-rp-back-secondary>Cancel</a>
+                <button type="submit" class="btn btn--primary rp-submit" data-rp-submit>
+                  <span class="rp-submit-label">Report Agent</span>
+                  <span class="rp-spinner" aria-hidden="true"></span>
+                </button>
+              </div>
+            </section>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===================== AFTER SUBMIT ===================== -->
+      <section class="rp-card rp-success" data-rp-success hidden>
+        <div class="rp-success-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+        </div>
+        <h2>Report submitted</h2>
+        <p>Your report about <b data-rp-success-name>this agent</b> is with our Trust &amp; Safety team.</p>
+        <p class="rp-ref">Reference <b data-rp-success-ref>—</b></p>
+        <p class="rp-success-note" data-rp-success-blocked hidden>This agent has been blocked on your account.</p>
+        <div class="rp-success-actions">
+          <button type="button" class="btn btn--primary" data-rp-another>Make another report about <span data-rp-another-name>this agent</span></button>
+          <a href="contact-agent.html" class="btn btn--ghost" data-rp-back-secondary>Back to chat</a>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <div data-partial="partials/footer.html"></div>
+
+  <!-- ===================== CONFIRMATION DIALOG ===================== -->
+  <div class="rp-dialog-overlay" data-rp-dialog aria-hidden="true">
+    <div class="rp-dialog" role="dialog" aria-modal="true" aria-labelledby="rp-dialog-title" tabindex="-1">
+      <button type="button" class="rp-dialog-close" data-rp-dialog-close aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <div class="rp-dialog-icon">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+      </div>
+      <h2 id="rp-dialog-title">Thank you, your report has been received</h2>
+      <p class="rp-dialog-lead">Your report about <b data-rp-dialog-name>this agent</b> has been sent to the ACCOOM Trust &amp; Safety team. Reporting helps keep every buyer and agent on ACCOOM safe.</p>
+      <p class="rp-dialog-ref">Reference number <b data-rp-dialog-ref>RPT-000000</b></p>
+
+      <div class="rp-dialog-block">
+        <h3>What happens next</h3>
+        <ol>
+          <li>Our team reviews your report and any evidence you attached within 24 to 48 hours.</li>
+          <li>If we need more detail, we will message you in your ACCOOM notifications.</li>
+          <li>If the agent broke our rules, we take action, from a warning up to removing their account.</li>
+        </ol>
+      </div>
+
+      <div class="rp-dialog-assure">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        <p>Your report is confidential. The agent will not be told who reported them. Any payment held safely on ACCOOM stays protected while we review. Until then, do not pay or share personal details outside the platform.</p>
+      </div>
+
+      <button type="button" class="btn btn--primary rp-dialog-done" data-rp-dialog-close>Done</button>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/wallet.js"></script>
+  <script src="assets/js/core/skeleton.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/data/notifications.js"></script>
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+  <script src="assets/js/animations/buttons.js"></script>
+  <script src="assets/js/animations/transitions.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/report-agent.js"></script>
+  <script>Accoom.loadPartials();</script>
+</body>
+</html>

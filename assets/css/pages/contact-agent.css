@@ -1667,6 +1667,131 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
   cursor: not-allowed;
 }
 
+/* Buyer chat guard: warning dialog + 30s pause */
+.msgs-guard-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  z-index: 99999;
+  display: block;
+  padding: 20px;
+  box-sizing: border-box;
+  background: rgba(8, 10, 16, 0.6);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 220ms ease, visibility 220ms ease;
+}
+.msgs-guard-overlay.is-open { opacity: 1; visibility: visible; }
+.msgs-guard-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(420px, calc(100vw - 40px));
+  box-sizing: border-box;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--surface-panel);
+  border: 1px solid var(--line-page);
+  color: var(--on-page);
+  text-align: center;
+  transform: translate(-50%, -50%) scale(0.88);
+  opacity: 0;
+  transition: transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 180ms ease;
+}
+.msgs-guard-overlay.is-open .msgs-guard-box { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+.msgs-guard-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(229, 72, 77, 0.14);
+  color: #e5484d;
+}
+.msgs-guard-box h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 700; color: var(--on-page); }
+.msgs-guard-box p { margin: 0 0 10px; font-size: 0.85rem; line-height: 1.55; color: var(--on-page-soft); }
+.msgs-guard-quote {
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(229, 72, 77, 0.12);
+  color: #e5484d !important;
+  font-weight: 600;
+  word-break: break-word;
+}
+.msgs-guard-dismiss {
+  width: 100%;
+  margin-top: 8px;
+  padding: 11px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--gold);
+  color: #14100a;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.msgs-guard-dismiss:hover { filter: brightness(1.08); }
+
+.msgs-guard-lock {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  z-index: 100000;
+  display: block;
+  padding: 20px;
+  background: rgba(6, 7, 11, 0.86);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.msgs-guard-lock[hidden] { display: none; }
+.msgs-guard-lock-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(420px, calc(100vw - 40px));
+  box-sizing: border-box;
+  padding: 28px 24px;
+  border-radius: 18px;
+  background: #14161c;
+  border: 1px solid rgba(223, 150, 46, 0.3);
+  text-align: center;
+  color: #fff;
+}
+.msgs-guard-lock-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(214, 69, 69, 0.18);
+  color: #ef6b6b;
+}
+.msgs-guard-lock-box h2 { margin: 0 0 10px; font-size: 1.15rem; font-weight: 700; }
+.msgs-guard-lock-box p { margin: 0 0 8px; font-size: 0.86rem; line-height: 1.6; color: rgba(255, 255, 255, 0.72); }
+.msgs-guard-lock-timer { font-weight: 700; color: #fff !important; font-size: 0.92rem; }
+.msgs-guard-lock-timer span { color: var(--gold); font-size: 1.1rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .msgs-guard-overlay, .msgs-guard-box { transition: none !important; }
+}
+
 /* Payment decision dialog */
 .msgs-payment-modal-overlay {
   position: fixed;
