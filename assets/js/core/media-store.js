@@ -222,7 +222,7 @@ window.Accoom = window.Accoom || {};
           tx.oncomplete = tx.onerror = tx.onabort = function () { resolve(); };
         });
       }),
-      new Promise(function (resolve) { window.setTimeout(resolve, 2500); })  // never hold a page hostage
+      new Promise(function (resolve) { window.setTimeout(resolve, 800); })  // never hold a page hostage
     ]).then(null, function () { /* carry on without */ }).then(function () { hydrated = true; });
   }
 

@@ -9,6 +9,33 @@ window.Accoom = window.Accoom || {};
 (function (Accoom) {
   'use strict';
 
+  // Header/footer are cached for the browser session. First page of a visit
+  // fetches them; every page after that gets them instantly from the cache.
+  // The cache is refreshed quietly in the background, so the NEXT page always
+  // has the latest version without anything popping in on this one.
+  var CACHE_PREFIX = 'accoom-partial:';
+
+  function cacheGet(url) {
+    try { return window.sessionStorage.getItem(CACHE_PREFIX + url); } catch (e) { return null; }
+  }
+
+  function cacheSet(url, html) {
+    try { window.sessionStorage.setItem(CACHE_PREFIX + url, html); } catch (e) { /* full or blocked: ignore */ }
+  }
+
+  function fetchPartial(url) {
+    return fetch(url).then(function (res) {
+      if (!res.ok) throw new Error('Failed to load partial: ' + url);
+      return res.text();
+    });
+  }
+
+  function inject(el, url, html) {
+    el.innerHTML = html;
+    el.removeAttribute('data-partial');
+    Accoom.dispatch(document, 'partial:loaded', { url: url, el: el });
+  }
+
   /**
    * Load a single partial into a target element
    */
@@ -16,15 +43,18 @@ window.Accoom = window.Accoom || {};
     var url = el.getAttribute('data-partial');
     if (!url) return Promise.resolve();
 
-    return fetch(url)
-      .then(function (res) {
-        if (!res.ok) throw new Error('Failed to load partial: ' + url);
-        return res.text();
-      })
+    var cached = cacheGet(url);
+    if (cached) {
+      inject(el, url, cached);
+      // Refresh the cache for the next page; do not re-render this one.
+      fetchPartial(url).then(function (html) { cacheSet(url, html); }, function () {});
+      return Promise.resolve();
+    }
+
+    return fetchPartial(url)
       .then(function (html) {
-        el.innerHTML = html;
-        el.removeAttribute('data-partial');
-        Accoom.dispatch(document, 'partial:loaded', { url: url, el: el });
+        cacheSet(url, html);
+        inject(el, url, html);
       })
       .catch(function (err) {
         console.warn(err);

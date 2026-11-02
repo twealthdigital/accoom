@@ -10,10 +10,10 @@ window.Accoom = window.Accoom || {};
 (function (Accoom) {
   'use strict';
 
-  // Every skeleton must stay on screen at least this long, so a fast
-  // response doesn't just flash the placeholder for a frame. The fetch
-  // itself is never delayed — only the swap to real content is.
-  var MIN_VISIBLE_MS = 400;
+  // No forced minimum: the moment real content is ready, it replaces the
+  // skeleton. (Flashing is already avoided because a skeleton only appears
+  // after SHOW_DELAY_MS, see below.)
+  var MIN_VISIBLE_MS = 0;
 
   // Tracks when each container's skeleton went up, keyed by the element
   // itself so multiple skeletons on one page each get their own
@@ -101,8 +101,8 @@ window.Accoom = window.Accoom || {};
   //   Accoom.showSkeleton(el, kind, n) -> unchanged, template mode.
   //   Accoom.hideSkeleton(el, fn)      -> unchanged API; also cleans up 'self'
   //                                       mode and ignores stale/superseded calls.
-  //   Accoom.skeletonRegion(elOrSel)   -> show 'self' now, hide after the 2s
-  //                                       minimum (data already rendered).
+  //   Accoom.skeletonRegion(elOrSel)   -> show 'self' now and hide it as soon
+  //                                       as the region's images have loaded.
   // ==========================================================================
   var _showBase = Accoom.showSkeleton;
   var _hideBase = Accoom.hideSkeleton;
@@ -301,7 +301,7 @@ window.Accoom = window.Accoom || {};
     var token = container.__skToken;
 
     // In-place skeletons have nothing to swap, so no fade-out is needed:
-    // wait out the 2s minimum, drop the skeleton classes, done.
+    // drop the skeleton classes straight away, done.
     if (container.__skSelf) {
       var since = (shownAt && shownAt.get(container)) || 0;
       var remaining = since ? Math.max(0, MIN_VISIBLE_MS - (Date.now() - since)) : 0;
@@ -329,7 +329,7 @@ window.Accoom = window.Accoom || {};
   };
 
   // Synchronous, no-wait clear. Use it right before you overwrite a
-  // skeleton'd container yourself, from code that already waited the 2s.
+  // skeleton'd container yourself, from code that is ready to render.
   Accoom.clearSkeleton = function (container) {
     if (!container) return;
     container.__skSelf = false;
@@ -338,7 +338,7 @@ window.Accoom = window.Accoom || {};
   };
 
   // How long a skeleton may wait for images before giving up (failsafe).
-  var ASSET_WAIT_MAX_MS = 8000;
+  var ASSET_WAIT_MAX_MS = 2500;
   // A skeleton only appears if content is still not ready after this long.
   var SHOW_DELAY_MS = 150;
 
@@ -444,80 +444,6 @@ window.Accoom = window.Accoom || {};
 
 
 
-  // Whole-page skeleton. Every page shows a skeleton of everything visible
-  // (header, footer, every section, every image) for the 2s minimum, drawn
-  // from the page's own markup. Sections that run their own loading
-  // lifecycle (the home listings grid) are left out of this pass so they
-  // are not skeletonized twice.
-  var NEVER_ROOT = /overlay|modal|lightbox|toast|dialog|drawer|panel/i;
-  var PAGE_SKIP = { 'home.html': ['all-listings'] };                       // element ids
-  var PAGE_EXTRA = { 'home.html': ['.all-listings .listings-header'] };    // selectors
-  var partialMounts = [];
-
-  document.addEventListener('partial:loaded', function (e) {
-    if (e.detail && e.detail.el) partialMounts.push(e.detail.el);
-  });
-
-  function usableRoot(el) {
-    if (!el || el.nodeType !== 1) return false;
-    if (/^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|LINK|META)$/.test(el.tagName)) return false;
-    if (el.id === 'load-page' || el.__skOn || el.hasAttribute('data-partial')) return false;
-    if (typeof el.className === 'string' && NEVER_ROOT.test(el.className)) return false;
-    if (el.getAttribute('role') === 'dialog') return false;
-    return true;
-  }
-
-  // A wrapper with display:contents has no box of its own, so its children
-  // become the skeleton roots instead.
-  function collectRoots(el, out) {
-    if (!usableRoot(el)) return;
-    if (window.getComputedStyle(el).display === 'contents') {
-      for (var i = 0; i < el.children.length; i++) collectRoots(el.children[i], out);
-      return;
-    }
-    out.push(el);
-  }
-
-  function initPageSkeleton() {
-    return; // replaced by per-element skeletons (see the end of this file)
-    var page = (window.location.pathname.split('/').pop() || 'home.html').toLowerCase();
-    var skip = PAGE_SKIP[page] || [];
-    var roots = [];
-    for (var i = 0; i < document.body.children.length; i++) {
-      var child = document.body.children[i];
-      if (partialMounts.indexOf(child) !== -1 || skip.indexOf(child.id) !== -1) continue;
-      collectRoots(child, roots);
-    }
-    (PAGE_EXTRA[page] || []).forEach(function (sel) {
-      Array.prototype.forEach.call(document.querySelectorAll(sel), function (el) {
-        if (usableRoot(el)) roots.push(el);
-      });
-    });
-    roots.forEach(function (el) { Accoom.skeletonRegion(el); });
-  }
-
-  // Header / footer arrive via fetch, so they get their skeleton the moment
-  // they are in the page (after main.js has finished wiring them up).
-  function initPartialSkeletons() {
-    return; // replaced by per-element skeletons (see the end of this file)
-    var roots = [];
-    partialMounts.forEach(function (mount) {
-      for (var i = 0; i < partialMounts.length; i++) {
-        if (partialMounts[i] !== mount && partialMounts[i].contains(mount)) return;
-      }
-      collectRoots(mount, roots);
-    });
-    roots.forEach(function (el) { Accoom.skeletonRegion(el); });
-  }
-
-  // Run after the page's own Accoom.ready() callbacks, so they have
-  // already rendered the real content the skeleton is drawn from.
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { setTimeout(initPageSkeleton, 0); });
-  } else {
-    setTimeout(initPageSkeleton, 0);
-  }
-  document.addEventListener('partials:ready', function () { setTimeout(initPartialSkeletons, 0); });
 
   // ==========================================================================
   // Per-element loading skeletons (the way big apps do it). Every image, map,
@@ -525,7 +451,7 @@ window.Accoom = window.Accoom || {};
   // loading, and swaps to the real thing the moment that one is ready.
   // Nothing waits on anything else and nothing is timed.
   // ==========================================================================
-  var FRAME_FAILSAFE_MS = 6000;
+  var FRAME_FAILSAFE_MS = 3000;
 
   function noteClass(el) {
     if (el.__skHad === undefined) el.__skHad = el.hasAttribute('class');
