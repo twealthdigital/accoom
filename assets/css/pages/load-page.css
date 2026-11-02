@@ -17,8 +17,8 @@ html.is-loading body {
   align-items: center;
   justify-content: center;
   background: var(--black);
-  transition: opacity 420ms cubic-bezier(0.4, 0, 0.2, 1),
-              visibility 0s linear 420ms;
+  transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0s linear 300ms;
 }
 
 #load-page.is-hidden {
@@ -35,7 +35,7 @@ html.is-loading body {
   padding-inline: 1.5rem;
   opacity: 0;
   transform: translateY(6px) scale(0.98);
-  animation: load-page-in 620ms cubic-bezier(0.4, 0, 0.2, 1) 80ms forwards;
+  animation: load-page-in 400ms cubic-bezier(0.4, 0, 0.2, 1) 40ms forwards;
 }
 
 .load-page__logo {
@@ -61,7 +61,7 @@ html.is-loading body {
   letter-spacing: 0.02em;
   text-align: center;
   opacity: 0;
-  animation: load-page-in 620ms cubic-bezier(0.4, 0, 0.2, 1) 500ms forwards;
+  animation: load-page-in 400ms cubic-bezier(0.4, 0, 0.2, 1) 200ms forwards;
 }
 
 @keyframes load-page-in {

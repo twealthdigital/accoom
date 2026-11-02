@@ -17,9 +17,14 @@
   </script>
 
   <link rel="stylesheet" href="assets/css/main.css" />
-  <link rel="preload" href="partials/header.html" as="fetch" crossorigin>
-  <link rel="preload" href="partials/footer.html" as="fetch" crossorigin>
   <link rel="stylesheet" href="assets/css/pages/load-page.css" />
+
+  <!-- While the splash is showing, quietly fetch what home.html needs,
+       so the page appears instantly when the splash ends. -->
+  <link rel="prefetch" href="home.html" as="document" />
+  <link rel="prefetch" href="assets/css/pages/home.css" as="style" />
+  <link rel="prefetch" href="partials/header.html" as="fetch" crossorigin />
+  <link rel="prefetch" href="partials/footer.html" as="fetch" crossorigin />
 </head>
 <body>
 
@@ -35,11 +40,8 @@
   </div>
 </div>
 
-<script src="assets/js/core/dom.js"></script>
-<script src="assets/js/core/events.js"></script>
-<script src="assets/js/core/storage.js"></script>
-<script src="assets/js/core/wallet.js"></script>
-<script src="assets/js/modules/theme.js"></script>
+<!-- The splash only needs its own script. The shared core/theme scripts
+     were removed here because nothing on this page uses them. -->
 <script src="assets/js/pages/load-page.js"></script>
 
 </body>
