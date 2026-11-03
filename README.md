@@ -38,5 +38,4 @@ See `HANDOFF.md` for the latest performance/guest-state work and what is left.
 - Compress images and videos (WebP/AVIF, correct sizes, lazy-load, `preload="none"` on videos)
 - Real backend/API (replace mock data in `assets/js/data/`)
 - Real auth and a payment gateway (Paystack or Flutterwave)
-- Rename `filter-accomodation.html` to `filter-accommodation.html` and update links
 - Split the very large JS files (`contact-agent.js`, `listing-actions.js`, `home.js`, `my-listings.js`)

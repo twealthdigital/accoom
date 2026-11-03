@@ -20,13 +20,16 @@ Goal: only the PNG images and MP4 videos should be slowing the site down.
 
 14. **Decision: big scripts NOT split (measured).** Gzipped sizes in dist: contact-agent 15 KB, listing-actions 17 KB, my-listings 11 KB, home 11 KB, agent-dashboard 9 KB. Each loads only on its own page (listing-actions only on my-listings), so splitting would save almost nothing and risks breaking load order and the inline `ListingActions.configure(...)` call. Do not split unless a real-browser profile shows script parse time is the bottleneck. Menu scroll/resize listeners in listing-actions are added on open and removed on close (checked, fine).
 
+15. **Guest guard on contact-agent.html** - inline head script sends guests to `auth.html?mode=signup` before paint (JS check kept as backup).
+16. **Role audit done (code read).** Agent pages (addlistings, agent-dashboard, my-listings, agent-details) all block guests, customers and unfinished agents; onboarding and auth redirect by role; profile.html sends agents to the dashboard. saved-properties, purchases, purchase-details, payment, account-settings, notifications, report-agent are signed-in only and open to both roles (left as is: owner's choice).
+17. **Renamed** `filter-accomodation` -> `filter-accommodation` (html, css, js, header links) with a permanent redirect for the old URL in `vercel.json`.
+
 ## NOT DONE yet (suggested next steps, in order)
 - Compress/resize PNGs to WebP/AVIF (37 MB of images; hero PNGs ~1.8 MB each; logos ~0.9 MB). Add `width`/`height`, keep `loading="lazy"` below the fold. Videos: `preload="none"` + poster, compress mp4 (~9 MB).
 - Listing-card videos in `home.js` (~line 460) use `autoplay preload="metadata"` on every card.
 - (Script splitting: decided against, see 14.) Old note: NOTE: `listing-actions.js` is only loaded on my-listings.html and is configured by an inline script right after it, so it was left alone (risky). Page JS files are already loaded only by their own page; real gains need splitting inside the files.
 - (observer narrowed to `<main>`, see 11) re-check in a real browser that my-listings no longer stutters; `skeleton.js` and `media-store.js` still observe `document.documentElement` (attributes + subtree) - next suspects if anything still freezes.
 - Not yet verified in a real browser (no Chrome in the sandbox): run Lighthouse / DevTools Performance on home, property, my-listings as guest AND logged in.
-- Rename `filter-accomodation.html` -> `filter-accommodation.html` (and links).
 
 - Audit remaining pages for wrong-user-type content: only payment/report-agent were found unguarded so far; still check `contact-agent.html`, `onboarding.html` and customer vs agent views in a real browser.
 

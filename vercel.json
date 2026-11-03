@@ -72,5 +72,12 @@
       "source": "/assets/images/:path*.png",
       "destination": "/assets/images/:path*.webp"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/filter-accomodation.html",
+      "destination": "/filter-accommodation.html",
+      "permanent": true
+    }
   ]
 }
