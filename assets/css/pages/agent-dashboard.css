@@ -958,3 +958,16 @@ td.ag-dash-row-actions { text-align: center; vertical-align: middle; }
   .ag-dash-c-axis { font-size: 17px; }
   .ag-dash-donut > svg { width: 170px; flex-basis: 170px; }
 }
+
+
+/* ===== True pie + matching totals (added) ===== */
+.ag-dash-pc-slice { stroke: var(--surface-page-alt, #fff); stroke-width: 2.5; stroke-linejoin: round; cursor: crosshair; outline: none; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.18)); transition: transform 0.18s ease, opacity 0.15s ease; }
+.ag-dash-pc-slice:hover, .ag-dash-pc-slice:focus { transform: translate(var(--px), var(--py)); }
+.ag-dash-donut > svg:hover .ag-dash-pc-slice:not(:hover) { opacity: 0.55; }
+.ag-dash-pc-pct { fill: #fff; font-size: 11px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; pointer-events: none; paint-order: stroke; stroke: rgba(0, 0, 0, 0.28); stroke-width: 2px; }
+.ag-dash-donut-legend li.ag-dash-pc-total { grid-template-columns: 1fr auto; background: transparent; border-style: dashed; }
+.ag-dash-c-totals { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 12px; margin: 12px 0 0; padding: 0; list-style: none; }
+.ag-dash-c-totals li { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid var(--line-page); border-radius: 999px; color: var(--on-page-soft); font-size: 0.78rem; }
+.ag-dash-c-totals i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.ag-dash-c-totals span { color: var(--on-page-soft); }
+.ag-dash-c-totals strong { color: var(--on-page); }

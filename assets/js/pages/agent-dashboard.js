@@ -627,12 +627,26 @@
 
     function chartR(value) { return Math.round(value * 100) / 100; }
 
+    // A pending point is flat (it holds the previous level). The point AFTER it is
+    // compared with that held level, so it correctly turns green / red once it settles.
     function chartTrend(point, previous) {
       if (!previous) return 'flat';
-      if (point.status === 'pending' || previous.status === 'pending') return 'flat';
+      if (point.status === 'pending') return 'flat';
       if (point.amount > previous.amount) return 'up';
       if (point.amount < previous.amount) return 'down';
       return 'flat';
+    }
+
+    // Same three totals under the line, the bar and (as the legend) the pie.
+    function chartTotalsHtml() {
+      var b = Accoom.AgentDashboardData.getTransactionBreakdown();
+      return '<ul class="ag-dash-c-totals">' + [
+        ['Earnings', 'up', b.earnings],
+        ['Pending', 'flat', b.pending],
+        ['Payments', 'down', b.payments]
+      ].map(function (row) {
+        return '<li style="color:' + CHART_COLORS[row[1]] + '"><i></i><span>' + row[0] + '</span><strong>' + Accoom.formatWalletAmount(row[2] || 0) + '</strong></li>';
+      }).join('') + '</ul>';
     }
 
     function chartMoney(value) {
@@ -691,7 +705,7 @@
       var chartNote = document.querySelector('[data-ag-chart-note]');
       if (chartNote) chartNote.hidden = !series.some(function (point) { return point.demo; });
 
-      /* ---------------- DONUT (pie) ---------------- */
+      /* ---------------- PIE (a real pie, no hole) ---------------- */
       if (type === 'pie') {
         if (description) description.textContent = 'Earnings, pending amounts and payments.';
         var breakdown = Accoom.AgentDashboardData.getTransactionBreakdown();
@@ -705,28 +719,43 @@
           return;
         }
         var total = slices.reduce(function (sum, item) { return sum + item.amount; }, 0);
-        var circ = 2 * Math.PI * 60;
-        var gap = slices.length > 1 ? 20 : 0;
-        var acc = 0;
-        var arcs = slices.map(function (item) {
-          var part = circ * item.amount / total;
-          var len = Math.max(0.01, part - gap);
-          var arc = '<circle class="ag-dash-donut-arc" cx="80" cy="80" r="60" transform="rotate(-90 80 80)" stroke="currentColor" style="color:' +
-            CHART_COLORS[item.trend] + '" stroke-dasharray="' + chartR(len) + ' ' + chartR(circ) + '" stroke-dashoffset="-' + chartR(acc + gap / 2) +
-            '" data-chart-label="' + escapeHtml(item.label) + '" data-chart-amount="' + item.amount + '" tabindex="0" role="img" aria-label="' +
-            escapeHtml(item.label + ': ' + Accoom.formatWalletAmount(item.amount)) + '"></circle>';
-          acc += part;
-          return arc;
+        var PC = 80, PR = 74;                 // centre and radius inside the 160 x 160 box
+        var angle = -Math.PI / 2;             // first slice starts at 12 o'clock
+        var defs = '<defs>' + ['up', 'down', 'flat'].map(function (k) {
+          return '<radialGradient id="agPie-' + k + '" cx="50%" cy="50%" r="75%">' +
+            '<stop offset="0" stop-color="' + CHART_COLORS[k] + '" stop-opacity="0.78"/>' +
+            '<stop offset="1" stop-color="' + CHART_COLORS[k] + '" stop-opacity="1"/></radialGradient>';
+        }).join('') + '</defs>';
+        var labels = '';
+        var wedges = slices.map(function (item) {
+          var sweep = 2 * Math.PI * item.amount / total;
+          var a0 = angle, a1 = angle + sweep, mid = (a0 + a1) / 2;
+          angle = a1;
+          var d;
+          if (slices.length === 1) {
+            d = 'M' + (PC - PR) + ' ' + PC + 'A' + PR + ' ' + PR + ' 0 1 1 ' + (PC + PR) + ' ' + PC +
+              'A' + PR + ' ' + PR + ' 0 1 1 ' + (PC - PR) + ' ' + PC + 'Z';
+          } else {
+            d = 'M' + PC + ' ' + PC + 'L' + chartR(PC + PR * Math.cos(a0)) + ' ' + chartR(PC + PR * Math.sin(a0)) +
+              'A' + PR + ' ' + PR + ' 0 ' + (sweep > Math.PI ? 1 : 0) + ' 1 ' + chartR(PC + PR * Math.cos(a1)) + ' ' + chartR(PC + PR * Math.sin(a1)) + 'Z';
+          }
+          var pct = item.amount / total * 100;
+          if (pct >= 8) {
+            labels += '<text class="ag-dash-pc-pct" x="' + chartR(PC + PR * 0.62 * Math.cos(mid)) + '" y="' + chartR(PC + PR * 0.62 * Math.sin(mid)) + '">' + Math.round(pct) + '%</text>';
+          }
+          return '<path class="ag-dash-pc-slice" d="' + d + '" fill="url(#agPie-' + item.trend + ')" style="color:' + CHART_COLORS[item.trend] +
+            ';--px:' + chartR(Math.cos(mid) * 5) + 'px;--py:' + chartR(Math.sin(mid) * 5) + 'px"' +
+            ' data-chart-label="' + escapeHtml(item.label) + '" data-chart-amount="' + item.amount + '" tabindex="0" role="img" aria-label="' +
+            escapeHtml(item.label + ': ' + Accoom.formatWalletAmount(item.amount)) + '"></path>';
         }).join('');
-        chart.innerHTML = '<div class="ag-dash-donut"><svg viewBox="0 0 160 160" aria-label="Transaction amount breakdown">' +
-          '<circle class="ag-dash-donut-track" cx="80" cy="80" r="60"></circle>' + arcs +
-          '<text class="ag-dash-donut-total" x="80" y="82" text-anchor="middle">' + chartMoney(total) + '</text>' +
-          '<text class="ag-dash-donut-sub" x="80" y="98" text-anchor="middle">Total volume</text></svg>' +
+        chart.innerHTML = '<div class="ag-dash-donut"><svg viewBox="0 0 160 160" aria-label="Transaction amount breakdown">' + defs + wedges + labels + '</svg>' +
           '<ul class="ag-dash-donut-legend">' + slices.map(function (item) {
             var pct = item.amount / total * 100;
             return '<li><i style="color:' + CHART_COLORS[item.trend] + '"></i><span>' + escapeHtml(item.label) +
               ' <small>' + (pct < 1 ? '<1%' : Math.round(pct) + '%') + '</small></span><strong>' + Accoom.formatWalletAmount(item.amount) + '</strong></li>';
-          }).join('') + '</ul></div><div class="ag-dash-chart-tooltip" data-ag-chart-tooltip role="status" hidden></div>';
+          }).join('') +
+          '<li class="ag-dash-pc-total"><span>Total volume</span><strong>' + Accoom.formatWalletAmount(total) + '</strong></li></ul></div>' +
+          '<div class="ag-dash-chart-tooltip" data-ag-chart-tooltip role="status" hidden></div>';
         return;
       }
 
@@ -827,6 +856,7 @@
 
       chart.innerHTML = svg + '</svg>' +
         '<div class="ag-dash-c-key"><span><i class="is-up"></i>Rise</span><span><i class="is-down"></i>Fall</span><span><i class="is-flat"></i>Flat / pending</span></div>' +
+        chartTotalsHtml() +
         '<div class="ag-dash-chart-tooltip" data-ag-chart-tooltip role="status" hidden></div>';
     }
 
@@ -943,14 +973,22 @@
         if (!tooltip || !target) return;
         var label = target.getAttribute('data-chart-label') || '';
         var amount = Number(target.getAttribute('data-chart-amount'));
+        var extra = '';
         if (!label && target.hasAttribute('data-chart-index')) {
           var point = Accoom.AgentDashboardData.getPerformanceSeries()[Number(target.getAttribute('data-chart-index'))];
           if (!point) return;
-          label = point.label + (point.status === 'pending' ? ' · Pending' : '');
+          label = point.label;
           amount = point.amount;
+          if (point.status === 'pending') {
+            label += ' · Pending';
+            amount = point.pendingAmount;
+            extra = ' · chart holds ' + Accoom.formatWalletAmount(point.amount);
+          } else if (point.pendingAmount > 0) {
+            extra = ' · +' + Accoom.formatWalletAmount(point.pendingAmount) + ' pending';
+          }
         }
         if (!label || !isFinite(amount)) return;
-        tooltip.textContent = label + ' · ' + Accoom.formatWalletAmount(amount);
+        tooltip.textContent = label + ' · ' + Accoom.formatWalletAmount(amount) + extra;
         tooltip.hidden = false;
         var chartRect = chartEl.getBoundingClientRect();
         var targetRect = target.getBoundingClientRect();

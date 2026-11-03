@@ -3,19 +3,25 @@ window.Accoom = window.Accoom || {};
 (function (Accoom) {
   'use strict';
 
-  var DEMO_SERIES = [
-    { amount: 280000, status: 'settled' },
-    { amount: 345000, status: 'settled' },
-    { amount: 310000, status: 'settled' },
-    { amount: 420000, status: 'settled' },
-    { amount: 390000, status: 'settled' },
-    { amount: 475000, status: 'settled' },
-    { amount: 360000, status: 'settled' },
-    { amount: 520000, status: 'settled' },
-    { amount: 455000, status: 'settled' },
-    { amount: 590000, status: 'settled' },
-    { amount: 490000, status: 'pending' },
-    { amount: 640000, status: 'settled' }
+  // Temporary, removable sample chart data; never written to wallet transactions.
+  // ONE ledger feeds the line, the bar AND the pie, so every number matches.
+  //   earned  = income that has settled. This is what the bars / line plot.
+  //   pending = income still waiting to settle. The chart HOLDS the previous level
+  //             (flat, gold) for that period until the money settles and the line rises or falls.
+  //   paid    = money paid out.
+  var DEMO_LEDGER = [
+    { earned: 280000, paid: 40000 },
+    { earned: 345000, paid: 35000 },
+    { earned: 310000 },
+    { earned: 420000, paid: 60000 },
+    { earned: 390000, paid: 25000 },
+    { earned: 475000, paid: 70000 },
+    { earned: 360000 },
+    { earned: 520000, paid: 80000 },
+    { earned: 455000, paid: 30000 },
+    { earned: 590000, paid: 90000 },
+    { pending: 320000 },
+    { earned: 640000, paid: 100000 }
   ];
 
   function transactions() {
@@ -56,56 +62,86 @@ window.Accoom = window.Accoom || {};
     return totals;
   }
 
-  function getPerformanceSeries(now) {
-    var current = now instanceof Date ? now : new Date();
-    var realEarnings = transactions().filter(function (transaction) {
-      return isEarning(transaction) && transactionDate(transaction);
-    });
-    if (realEarnings.length) {
-      var byDay = {};
-      realEarnings.forEach(function (transaction) {
-        var date = transactionDate(transaction);
-        var key = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
-        byDay[key] = (byDay[key] || 0) + Number(transaction.amount || 0);
-      });
-      return Object.keys(byDay).map(function (key) {
-        var parts = key.split('-');
-        var date = new Date(Number(parts[0]), Number(parts[1]), Number(parts[2]));
-        return {
-          label: date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-          timestamp: date.getTime(),
-          amount: byDay[key],
-          status: 'settled'
-        };
-      }).sort(function (a, b) { return a.timestamp - b.timestamp; }).slice(-12);
-    }
+  function isPendingTx(transaction) {
+    return transaction.status === 'pending' || transaction.verified === false;
+  }
 
-    return DEMO_SERIES.map(function (point, index) {
-      var date = new Date(current.getFullYear(), current.getMonth(), current.getDate());
-      date.setDate(date.getDate() - (DEMO_SERIES.length - index - 1) * 2);
+  // Turns ledger rows into chart points. A pending row never moves the chart:
+  // it keeps the previous level (flat) until the money settles.
+  function toPoints(rows, demo) {
+    var held = 0;
+    var hasPrevious = false;
+    return rows.map(function (row) {
+      var pendingOnly = !(row.earned > 0) && row.pending > 0;
+      var amount = pendingOnly ? (hasPrevious ? held : row.pending) : (row.earned || 0);
+      held = amount;
+      hasPrevious = true;
       return {
-        label: date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-        timestamp: date.getTime(),
-        amount: point.amount,
-        status: point.status,
-        demo: true
+        label: new Date(row.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+        timestamp: row.timestamp,
+        amount: amount,
+        earned: row.earned || 0,
+        pendingAmount: row.pending || 0,
+        status: pendingOnly ? 'pending' : 'settled',
+        demo: !!demo
       };
     });
   }
 
-  function getTransactionBreakdown() {
-    var sums = { earnings: 0, pending: 0, payments: 0 };
-    transactions().forEach(function (transaction) {
-      var amount = Number(transaction.amount);
-      if (!isFinite(amount) || amount <= 0) return;
-      if (transaction.status === 'pending' || transaction.verified === false) sums.pending += amount;
-      else if (isEarning(transaction)) sums.earnings += amount;
-      else if (transaction.type === 'debit') sums.payments += amount;
+  function totalsOf(rows, demo) {
+    var totals = { earnings: 0, pending: 0, payments: 0, demo: !!demo };
+    rows.forEach(function (row) {
+      totals.earnings += row.earned || 0;
+      totals.pending += row.pending || 0;
+      totals.payments += row.paid || 0;
     });
-    if (!sums.earnings && !sums.pending && !sums.payments) {
-      sums = { earnings: 1120000, pending: 260000, payments: 540000, demo: true };
+    return totals;
+  }
+
+  // The single source of truth for all three charts.
+  function getLedger(now) {
+    var current = now instanceof Date ? now : new Date();
+    var real = transactions().filter(function (transaction) {
+      var amount = Number(transaction.amount);
+      return transactionDate(transaction) && isFinite(amount) && amount > 0;
+    });
+
+    if (real.some(isEarning)) {
+      var byDay = {};
+      real.forEach(function (transaction) {
+        var date = transactionDate(transaction);
+        var key = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+        var row = byDay[key] || (byDay[key] = { timestamp: key, earned: 0, pending: 0, paid: 0 });
+        var amount = Number(transaction.amount);
+        if (isEarning(transaction) && isPendingTx(transaction)) row.pending += amount;
+        else if (isEarning(transaction)) row.earned += amount;
+        else if (transaction.type === 'debit') row.paid += amount;
+      });
+      var rows = Object.keys(byDay).map(function (key) { return byDay[key]; })
+        .sort(function (a, b) { return a.timestamp - b.timestamp; });
+      var incomeRows = rows.filter(function (row) { return row.earned > 0 || row.pending > 0; }).slice(-12);
+      var from = incomeRows.length ? incomeRows[0].timestamp : 0;
+      return {
+        points: toPoints(incomeRows, false),
+        totals: totalsOf(rows.filter(function (row) { return row.timestamp >= from; }), false)
+      };
     }
-    return sums;
+
+    var demoRows = DEMO_LEDGER.map(function (row, index) {
+      var date = new Date(current.getFullYear(), current.getMonth(), current.getDate());
+      date.setDate(date.getDate() - (DEMO_LEDGER.length - index - 1) * 2);
+      return { timestamp: date.getTime(), earned: row.earned || 0, pending: row.pending || 0, paid: row.paid || 0 };
+    });
+    return { points: toPoints(demoRows, true), totals: totalsOf(demoRows, true) };
+  }
+
+  function getPerformanceSeries(now) {
+    return getLedger(now).points;
+  }
+
+  // Same ledger as the line/bar, so Earnings here = the sum of the settled bars.
+  function getTransactionBreakdown(now) {
+    return getLedger(now).totals;
   }
 
   Accoom.AgentDashboardData = {
