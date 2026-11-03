@@ -43,8 +43,9 @@
   --radius-s: 6px;
   --radius-m: 10px;
   --radius-pill: 999px;
-  --header-h: 84px;
-  --header-h-mobile: 64px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --header-h: calc(84px + var(--safe-top));
+  --header-h-mobile: calc(64px + var(--safe-top));
 
   /* Motion */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
