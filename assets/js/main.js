@@ -137,10 +137,18 @@ window.Accoom = window.Accoom || {};
           image: (currentProperty.images && currentProperty.images[0]) || ''
         };
         Accoom.setStorage('accoom-active-agent', agent);
-        window.location.href = 'agent-profile.html';
+        window.location.href = 'agent-profile.html' + (window.__apHash || '');
       }
 
       var mainBtn = document.querySelector('[data-pd-view-profile]');
+      var reviewsLink = document.querySelector('[data-pd-reviews-link]');
+      if (reviewsLink && mainBtn) {
+        Accoom.on(reviewsLink, 'click', function (e) {
+          e.preventDefault();
+          window.__apHash = '#reviews';
+          mainBtn.click();
+        });
+      }
       if (mainBtn) {
         Accoom.on(mainBtn, 'click', function (e) {
           e.preventDefault();

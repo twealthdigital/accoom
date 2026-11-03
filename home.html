@@ -284,36 +284,6 @@
             </div>
           </div>
 
-          <div class="filter-group">
-            <h4 class="filter-group-title">Agent Level</h4>
-            <div class="filter-checkbox-list">
-              <label class="filter-checkbox level-al5">
-                <input type="checkbox" value="AL5" />
-                <span class="filter-checkbox-box"></span>
-                <span>AL5</span>
-              </label>
-              <label class="filter-checkbox level-al4">
-                <input type="checkbox" value="AL4" />
-                <span class="filter-checkbox-box"></span>
-                <span>AL4</span>
-              </label>
-              <label class="filter-checkbox level-al3">
-                <input type="checkbox" value="AL3" />
-                <span class="filter-checkbox-box"></span>
-                <span>AL3</span>
-              </label>
-              <label class="filter-checkbox level-al2">
-                <input type="checkbox" value="AL2" />
-                <span class="filter-checkbox-box"></span>
-                <span>AL2</span>
-              </label>
-              <label class="filter-checkbox level-al1">
-                <input type="checkbox" value="AL1" />
-                <span class="filter-checkbox-box"></span>
-                <span>AL1</span>
-              </label>
-            </div>
-          </div>
 
           <div class="filter-group">
             <h4 class="filter-group-title">Bedrooms</h4>
@@ -402,7 +372,7 @@
         if (!grid || !pager) return;
         var w = window.innerWidth;
         var count = w >= 992 ? 8 : (w >= 768 ? 6 : (w >= 576 ? 4 : 2));
-        var card = '<article class="listing-card skeleton-scope" aria-hidden="true"><div class="listing-card-media skeleton-ink"><img class="media-slide is-active skeleton-hide" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt=""></div><div class="listing-card-body"><p class="listing-name skeleton-ink skeleton-round skeleton-fit">3 Bedroom Flat, Surulere, Lagos</p><p class="listing-price skeleton-ink skeleton-round skeleton-fit">\u20A6205,000 <small class="skeleton-ink skeleton-round">/yr</small></p><p class="listing-location skeleton-ink skeleton-round skeleton-fit">Surulere, Lagos</p><div class="listing-meta"><span class="skeleton-ink skeleton-round">2 Bed</span><span class="skeleton-ink skeleton-round">1 Bath</span><span class="listing-share-wrap"><button type="button" class="listing-share skeleton-ink" tabindex="-1"></button></span></div><div class="listing-agent"><div class="listing-agent-id"><span class="listing-agent-avatar"><img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="" class="skeleton-ink skeleton-media"></span><span class="listing-agent-name skeleton-ink skeleton-round">StayWell Agents</span></div><span class="listing-rating skeleton-ink skeleton-round">4.9 (210)</span></div><div class="listing-agent-level-row"><span class="listing-agent-level level-al1 skeleton-ink">AL1</span><button type="button" class="listing-view-btn skeleton-ink" tabindex="-1"><span class="skeleton-ink skeleton-round">View</span></button></div></div></article>';
+        var card = '<article class="listing-card skeleton-scope" aria-hidden="true"><div class="listing-card-media skeleton-ink"><img class="media-slide is-active skeleton-hide" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt=""></div><div class="listing-card-body"><p class="listing-name skeleton-ink skeleton-round skeleton-fit">3 Bedroom Flat, Surulere, Lagos</p><p class="listing-price skeleton-ink skeleton-round skeleton-fit">\u20A6205,000 <small class="skeleton-ink skeleton-round">/yr</small></p><p class="listing-location skeleton-ink skeleton-round skeleton-fit">Surulere, Lagos</p><div class="listing-meta"><span class="skeleton-ink skeleton-round">2 Bed</span><span class="skeleton-ink skeleton-round">1 Bath</span><span class="listing-share-wrap"><button type="button" class="listing-share skeleton-ink" tabindex="-1"></button></span></div><div class="listing-agent"><div class="listing-agent-id"><span class="listing-agent-avatar"><img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="" class="skeleton-ink skeleton-media"></span><span class="listing-agent-name skeleton-ink skeleton-round">StayWell Agents</span></div><span class="listing-rating skeleton-ink skeleton-round">4.9 (210)</span></div><div class="listing-agent-level-row"><button type="button" class="listing-view-btn skeleton-ink" tabindex="-1"><span class="skeleton-ink skeleton-round">View</span></button></div></div></article>';
         var cards = '';
         for (var i = 0; i < count; i++) cards += card;
         grid.innerHTML = cards;
@@ -436,7 +406,7 @@
             </span>
             <div class="why-item-text">
               <h3>Verified Agents</h3>
-              <p>Levels, ratings and reviews.</p>
+              <p>Ratings and reviews.</p>
             </div>
           </li>
           <li class="why-item">

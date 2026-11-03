@@ -438,7 +438,7 @@ var currentPage = 1;
           sessionStorage.removeItem('accoom-filter-state');
           currentFilters.priceMin = Number(savedFilterState.priceMin) || currentFilters.priceMin;
           currentFilters.priceMax = Number(savedFilterState.priceMax) || currentFilters.priceMax;
-          currentFilters.levels = (savedFilterState.agent || []).filter(function (value) { return /^AL\d+$/i.test(value); });
+          currentFilters.levels = [];
           currentFilters.verifiedOnly = (savedFilterState.agent || []).indexOf('verified') !== -1;
           currentFilters.beds = savedFilterState.bedrooms && savedFilterState.bedrooms !== 'any'
             ? [Number(savedFilterState.bedrooms)]
@@ -546,16 +546,12 @@ function cardTemplate(item) {
 '<span class="listing-agent-name">' + item.agent.name +
                   '</span>' +
                 '</div>' +
-'<span class="listing-rating">' +
+'<a href="agent-profile.html#reviews" class="listing-rating" data-agent-reviews>' +
                   '<svg width="12" height="12" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/></svg>' +
                   item.agent.rating + ' (' + item.agent.reviews + ')' +
-                '</span>' +
+                '</a>' +
               '</div>' +
 '<div class="listing-agent-level-row">' +
-                '<span class="listing-agent-level level-' + item.agent.level.toLowerCase() + '">' +
-                  levelDotsTemplate(parseInt(item.agent.level.replace('AL', ''), 10)) +
-                  item.agent.level +
-                '</span>' +
                 '<button type="button" class="listing-view-btn" data-view-listing>' +
                   '<span>View</span>' +
                   '<svg class="listing-view-btn-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>' +
@@ -1234,6 +1230,24 @@ Accoom.delegate(listingsGrid, 'click', '[data-view-listing]', function (e) {
         var url = 'property.html?id=' + encodeURIComponent(id) +
           (nameEl ? '&name=' + encodeURIComponent(nameEl.textContent.trim()) : '');
         window.location.href = url;
+      });
+
+      Accoom.delegate(listingsGrid, 'click', '[data-agent-reviews]', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var card = this.closest('.listing-card');
+        var item = PropertyService.getById(card.getAttribute('data-listing-id'));
+        if (!item) return;
+        var a = item.agent;
+        Accoom.setStorage('accoom-active-agent', {
+          name: a.name,
+          avatar: a.avatar || 'assets/images/agent-images/agenticonimg.webp',
+          verified: !!a.verified,
+          stats: Math.max(1, Math.round((a.reviews || 0) / 10)) + ' Properties \u00B7 ' + (a.reviews || 0) + ' Deals',
+          rating: a.rating + ' (' + a.reviews + ' reviews)',
+          property: { id: item.id, name: item.name, location: item.location, price: item.price, image: item.images[0] }
+        });
+        window.location.href = 'agent-profile.html#reviews';
       });
 
       Accoom.delegate(listingsGrid, 'click', '[data-save-listing]', function (e) {

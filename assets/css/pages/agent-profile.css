@@ -285,6 +285,7 @@ html.dark-mode .ap-header-card {
 
 .ap-about-card,
 .ap-reviews-card {
+  scroll-margin-top: calc(var(--header-h-mobile) + 12px);
   background: var(--surface-page-alt);
   border: 1px solid var(--line-page);
   border-radius: 16px;

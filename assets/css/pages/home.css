@@ -1462,7 +1462,7 @@ html.dark-mode .listing-card {
 .listing-agent-level-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-top: 4px;
 }
 

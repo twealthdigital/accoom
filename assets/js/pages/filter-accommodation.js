@@ -82,7 +82,7 @@
       { key: 'furnishing', title: 'Furnishing', type: 'radio', options: [['any', 'Any'], ['furnished', 'Furnished'], ['semi', 'Semi-furnished'], ['unfurnished', 'Unfurnished']] },
       { key: 'amenities', title: 'Amenities and features', help: 'Select everything important to you.', type: 'checkbox', wide: true, options: [['parking', 'Parking space'], ['power', 'Steady power'], ['water', 'Water supply'], ['security', 'Estate security'], ['fenced', 'Fenced compound'], ['serviced', 'Serviced property'], ['pet', 'Pet friendly'], ['internet', 'Internet ready'], ['bq', 'Boys quarters'], ['balcony', 'Balcony'], ['pool', 'Swimming pool'], ['gym', 'Gym / fitness area']] },
       { key: 'availability', title: 'Availability', type: 'radio', options: [['any', 'Any time'], ['now', 'Available now'], ['soon', 'Available soon']] },
-      { key: 'agent', title: 'Agent preference', type: 'checkbox', options: [['verified', 'Verified agents only']].concat(levels.map(function (level) { return [level, level + ' agents']; })) },
+      { key: 'agent', title: 'Agent preference', type: 'checkbox', options: [['verified', 'Verified agents only']] },
       { key: 'sort', title: 'Sort results by', type: 'select', options: [['newest', 'Newest listings'], ['price-low', 'Lowest price'], ['price-high', 'Highest price'], ['popular', 'Most popular']], placeholder: 'Choose sorting' }
     ];
 

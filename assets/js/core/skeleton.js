@@ -434,7 +434,6 @@ window.Accoom = window.Accoom || {};
             '<span class="listing-rating">4.9 (210)</span>' +
           '</div>' +
           '<div class="listing-agent-level-row">' +
-            '<span class="listing-agent-level level-al1">AL1</span>' +
             '<button type="button" class="listing-view-btn" tabindex="-1"><span>View</span></button>' +
           '</div>' +
         '</div>' +

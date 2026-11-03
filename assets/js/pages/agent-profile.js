@@ -13,6 +13,13 @@
     // ============================================================
     var stored = Accoom.getStorage('accoom-active-agent', null);
 
+    if (location.hash === '#reviews') {
+      setTimeout(function () {
+        var el = document.getElementById('reviews');
+        if (el) el.scrollIntoView();
+      }, 600);
+    }
+
     var agent = {
       name: stored ? stored.name : 'David O.',
       avatar: stored ? stored.avatar : 'assets/images/agent-images/agenticonimg.webp',
