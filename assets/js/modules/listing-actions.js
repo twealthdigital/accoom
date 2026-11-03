@@ -1997,7 +1997,9 @@
       var mo = new MutationObserver(function (records) {
         if (relevantMutation(records)) scheduleEnhance();
       });
-      mo.observe(document.body, { childList: true, subtree: true });
+      // Watch only the page content (cards live in <main>), not the whole body:
+      // header, footer, toasts and menus no longer wake the observer.
+      mo.observe(document.querySelector('main') || document.body, { childList: true, subtree: true });
     }
     document.addEventListener('accoom:listings-rendered', scheduleEnhance);
   }

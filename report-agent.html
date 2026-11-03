@@ -27,6 +27,18 @@
       } catch (e) { document.documentElement.classList.add('is-guest'); }
     })();
   </script>
+  <!-- Signed-in-only page: bounce guests to auth before paint -->
+  <script>
+    (function () {
+      try {
+        var user = JSON.parse(localStorage.getItem('accoom-user'));
+        if (!user) window.location.replace('auth.html');
+      } catch (e) {
+        window.location.replace('auth.html');
+      }
+    })();
+  </script>
+
   <!-- early-partials: paints header/footer immediately (see assets/js/core/partials.js) -->
   <script>
     (function () {
