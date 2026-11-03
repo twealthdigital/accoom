@@ -11,6 +11,8 @@ Goal: only the PNG images and MP4 videos should be slowing the site down.
 4. **Script bundling in `build.mjs`** - each page's consecutive `<script src>` tags are merged into hashed files in `dist/assets/bundles/` (321 requests -> ~35 across 21 pages). Order preserved, inline `<script>` blocks (e.g. `Accoom.loadPartials()`) stay in place and split the bundles, each file is wrapped in try/catch. The build **throws** if any inline script would change. Bundles are cached `immutable` (see `vercel.json`, `_headers`).
 5. Verified with jsdom (source vs dist, guest/customer/agent): same cards rendered, partials all injected, same errors (only jsdom limitations).
 
+10. **Dead header icons after reload (FIXED)** - hamburger, messages and notification icons did nothing on a reload when logged in. Cause: `Accoom.loadPartials()` is an inline script placed BEFORE `main.js`; with header/footer in the session cache every promise was already resolved, so `partials:ready` fired before `main.js` had registered its listener. Fix in `assets/js/core/partials.js`: `loadPartials()` waits for DOMContentLoaded when the document is still loading. Verified with jsdom (cached and uncached, logged in).
+
 ## NOT DONE yet (suggested next steps, in order)
 - Compress/resize PNGs to WebP/AVIF (37 MB of images; hero PNGs ~1.8 MB each; logos ~0.9 MB). Add `width`/`height`, keep `loading="lazy"` below the fold. Videos: `preload="none"` + poster, compress mp4 (~9 MB).
 - Listing-card videos in `home.js` (~line 460) use `autoplay preload="metadata"` on every card.

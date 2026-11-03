@@ -97,6 +97,21 @@ window.Accoom = window.Accoom || {};
   Accoom.loadPartials = function () {
     var MAX_PASSES = 5;
 
+    // The header/footer are already painted by the early script, and this
+    // function is called from an inline <script> that sits BEFORE main.js and
+    // the page scripts. When the partials come from the session cache every
+    // promise is already resolved, so 'partials:ready' used to fire before
+    // main.js had registered its listener: the menu, messages and
+    // notification icons then never got wired up (dead after a reload).
+    // Waiting for DOMContentLoaded guarantees every script has registered.
+    if (document.readyState === 'loading') {
+      return new Promise(function (resolve) {
+        document.addEventListener('DOMContentLoaded', function () {
+          Accoom.loadPartials().then(resolve);
+        }, { once: true });
+      });
+    }
+
     function loadPass(pass) {
       var targets = Accoom.$$('[data-partial]');
       if (!targets.length) return Promise.resolve();
