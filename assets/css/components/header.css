@@ -8,6 +8,7 @@
   top: 0;
   z-index: 220;
   height: var(--header-h);
+  padding-top: var(--safe-top);
   background: var(--surface-header);
   border-bottom: 1px solid var(--line-dark);
   transition: background var(--dur-med) var(--ease),
