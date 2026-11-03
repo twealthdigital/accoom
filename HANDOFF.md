@@ -16,10 +16,12 @@ Goal: only the PNG images and MP4 videos should be slowing the site down.
 11. **listing-actions observer narrowed** - `boot()` in `assets/js/modules/listing-actions.js` now observes `<main>` (falls back to `<body>`) instead of the whole body, so header/footer/toast changes no longer wake it on my-listings.
 12. **Guest guard added** to `payment.html` and `report-agent.html` (they had none; guests could open them by URL). Same inline bounce-to-`auth.html` script the other signed-in-only pages use.
 
+13. **Content Guard lazy-loaded** - `addlistings.html` and `contact-agent.html` no longer load `vendor/obscenity.bundle.js` (51 KB), `blocked-terms.js` and `content-guard.js` before first paint. New `assets/js/modules/content-guard-loader.js` injects them in the same order once the browser is idle (or on the first touch/focus/typing). Callers already check `Accoom.ContentGuard` exists. Verified in jsdom on addlistings (guard loads, blocks \"whatsapp\" wording, passes clean text). contact-agent not verified in jsdom (jsdom crashed on that page) - check in a real browser.
+
 ## NOT DONE yet (suggested next steps, in order)
 - Compress/resize PNGs to WebP/AVIF (37 MB of images; hero PNGs ~1.8 MB each; logos ~0.9 MB). Add `width`/`height`, keep `loading="lazy"` below the fold. Videos: `preload="none"` + poster, compress mp4 (~9 MB).
 - Listing-card videos in `home.js` (~line 460) use `autoplay preload="metadata"` on every card.
-- Split big JS (`contact-agent.js` 94 KB, `listing-actions.js` 90 KB, `home.js`, `my-listings.js`); load listing-actions only when a menu opens.
+- Split big JS (`contact-agent.js` 94 KB, `home.js`, `my-listings.js`, `agent-dashboard.js`). NOTE: `listing-actions.js` is only loaded on my-listings.html and is configured by an inline script right after it, so it was left alone (risky). Page JS files are already loaded only by their own page; real gains need splitting inside the files.
 - (observer narrowed to `<main>`, see 11) re-check in a real browser that my-listings no longer stutters; `skeleton.js` and `media-store.js` still observe `document.documentElement` (attributes + subtree) - next suspects if anything still freezes.
 - Not yet verified in a real browser (no Chrome in the sandbox): run Lighthouse / DevTools Performance on home, property, my-listings as guest AND logged in.
 - Rename `filter-accomodation.html` -> `filter-accommodation.html` (and links).
