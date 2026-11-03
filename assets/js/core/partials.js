@@ -9,6 +9,17 @@ window.Accoom = window.Accoom || {};
 (function (Accoom) {
   'use strict';
 
+  // HOW HEADER/FOOTER LOAD (two stages, so they appear first):
+  //   1. Every page has a tiny inline "early partials" script in its <head>.
+  //      It starts downloading header/footer at once and paints them the moment
+  //      the mount point exists, long before the page's scripts have loaded.
+  //      It marks painted elements with data-early.
+  //   2. This file then finishes the job once the scripts are ready: for
+  //      elements the early script painted, it only removes the data-partial
+  //      attribute and fires 'partial:loaded' (so main.js, skeleton.js etc.
+  //      still wire things up exactly as before). Anything the early script
+  //      did not paint is loaded the normal way below.
+  //
   // Header/footer are cached for the browser session. First page of a visit
   // fetches them; every page after that gets them instantly from the cache.
   // The cache is refreshed quietly in the background, so the NEXT page always
@@ -42,6 +53,21 @@ window.Accoom = window.Accoom || {};
   Accoom.loadPartial = function (el) {
     var url = el.getAttribute('data-partial');
     if (!url) return Promise.resolve();
+
+    // Early script is handling (or has handled) this element.
+    if (el.__early) {
+      return el.__early.then(function () {
+        if (el.hasAttribute('data-early')) {
+          el.removeAttribute('data-early');
+          el.removeAttribute('data-partial');
+          Accoom.dispatch(document, 'partial:loaded', { url: url, el: el });
+          return;
+        }
+        // Early load failed: fall back to the normal path.
+        el.__early = null;
+        return Accoom.loadPartial(el);
+      });
+    }
 
     var cached = cacheGet(url);
     if (cached) {

@@ -4,7 +4,7 @@
    Usage:   npm install   (first time only)
             npm run build
 
-   - Minifies every .js and .css file, except third-party files in vendor/ (same file names, same load order, so
+   - Bundles main.css (its @imports) into one file and minifies every .js and .css file, except third-party files in vendor/ (same file names, same load order, so
      the HTML does not change).
    - Copies .html, partials, images, videos and everything else as they are.
    - Your source files are never modified. Deploy the ./dist folder.
@@ -33,6 +33,15 @@ async function walk(dir, rel = '') {
     if ((ext === '.js' || ext === '.css') && !entry.name.endsWith('.min.js') && !rel.includes('vendor')) {
       const code = await fs.readFile(src, 'utf8');
       if (!code.trim()) { await fs.writeFile(dst, code); continue; }
+      // CSS with @import lines (main.css) is bundled into ONE file, so the
+      // browser needs one request instead of a chain of 16 before it can paint.
+      if (ext === '.css' && /@import\s/.test(code)) {
+        await build({ entryPoints: [src], bundle: true, minify: true, outfile: dst, legalComments: 'none', logLevel: 'error' });
+        const outCode = await fs.readFile(dst, 'utf8');
+        before += Buffer.byteLength(code);
+        saved += Buffer.byteLength(code) - Buffer.byteLength(outCode);
+        continue;
+      }
       const out = await transform(code, {
         loader: ext === '.js' ? 'js' : 'css',
         minify: true,

@@ -9,7 +9,7 @@ npm start
 ```
 
 ## Build for production (optional)
-Makes a minified copy of the site in `dist/` (JS + CSS are ~40% smaller). Source files are never changed.
+Makes a minified copy of the site in `dist/` (JS + CSS ~35% smaller, and `main.css` bundled into one file instead of 16 chained `@import`s). Source files are never changed.
 ```
 npm install
 npm run build
@@ -28,7 +28,9 @@ They add caching (HTML always revalidates, so deploys show up right away) and co
 ## Structure
 - `assets/css/` base, components, utilities, pages
 - `assets/js/` core, modules, pages, data, animations, vendor
-- `partials/` shared header/footer (cached per session by `core/partials.js`)
+- `partials/` shared header/footer. Each page has a small inline "early-partials" script in its `<head>`
+  that paints them right away; `core/partials.js` finishes the wiring once scripts load. Cached per session.
+  If you add a new page, copy that `<script>` block (marked `early-partials`) from any other page's `<head>`.
 
 ## Still to do
 - Compress images and videos (WebP/AVIF, correct sizes, lazy-load, `preload="none"` on videos)

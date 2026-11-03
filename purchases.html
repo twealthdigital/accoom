@@ -29,9 +29,51 @@
     })();
   </script>
 
+  <!-- early-partials: paints header/footer immediately (see assets/js/core/partials.js) -->
+  <script>
+    (function () {
+      try {
+        var PREFIX = 'accoom-partial:', pending = {};
+        var load = function (url) {
+          if (pending[url]) return pending[url];
+          var cached = null;
+          try { cached = window.sessionStorage.getItem(PREFIX + url); } catch (e) {}
+          var net = fetch(url, { priority: 'high' }).then(function (r) {
+            if (!r.ok) throw new Error(url);
+            return r.text();
+          }).then(function (html) {
+            try { window.sessionStorage.setItem(PREFIX + url, html); } catch (e) {}
+            return html;
+          });
+          if (cached) { net.catch(function () {}); pending[url] = Promise.resolve(cached); }
+          else { pending[url] = net; }
+          return pending[url];
+        };
+        var scan = function (root) {
+          var list = root.querySelectorAll('[data-partial]');
+          for (var i = 0; i < list.length; i++) claim(list[i]);
+        };
+        var claim = function (el) {
+          if (el.__early) return;
+          var url = el.getAttribute('data-partial');
+          if (!url) return;
+          el.__early = load(url).then(function (html) {
+            if (el.getAttribute('data-partial') !== url) return;
+            el.innerHTML = html;
+            el.setAttribute('data-early', '1');
+            scan(el);
+          }, function () {});
+        };
+        load('partials/header.html');
+        load('partials/footer.html');
+        var mo = new MutationObserver(function () { scan(document); });
+        mo.observe(document.documentElement, { childList: true, subtree: true });
+        document.addEventListener('DOMContentLoaded', function () { scan(document); mo.disconnect(); });
+      } catch (e) { /* older browser: the normal loader still works */ }
+    })();
+  </script>
+
   <link rel="stylesheet" href="assets/css/main.css" />
-  <link rel="preload" href="partials/header.html" as="fetch" crossorigin>
-  <link rel="preload" href="partials/footer.html" as="fetch" crossorigin>
   <link rel="stylesheet" href="assets/css/pages/profile.css" />
   <link rel="stylesheet" href="assets/css/pages/purchases.css" />
 </head>
