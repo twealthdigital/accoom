@@ -88,14 +88,14 @@
     // Each status must be one of: upcoming, completed, cancelled.
     // ----------------------------------------------------------------
     var MOCK_PURCHASES = [
-      { id: 'ACCOOM-2025-0008', name: '2 Bedroom Apartment', location: 'Lekki Phase 1, Lagos', dates: 'Aug 20 \u2013 Aug 25, 2025', guests: 2, amount: '\u20A6250,000', image: 'assets/images/home-properties/miniflat.png', status: 'upcoming' },
-      { id: 'ACCOOM-2025-0007', name: 'Modern Detached Duplex', location: 'Ikoyi, Lagos', dates: 'Jul 10 \u2013 Jul 15, 2025', guests: 4, amount: '\u20A6450,000', image: 'assets/images/home-properties/hall2.png', status: 'completed' },
-      { id: 'ACCOOM-2025-0006', name: '1 Bedroom Apartment', location: 'Victoria Island, Lagos', dates: 'Jun 25 \u2013 Jun 28, 2025', guests: 1, amount: '\u20A6120,000', image: 'assets/images/home-properties/bedroomflat3.png', status: 'completed' },
-      { id: 'ACCOOM-2025-0005', name: 'Self-Contained Studio', location: 'Yaba, Lagos', dates: 'May 15 \u2013 May 18, 2025', guests: 1, amount: '\u20A680,000', image: 'assets/images/home-properties/selfcon1.png', status: 'cancelled' },
-      { id: 'ACCOOM-2025-0004', name: '3 Bedroom Apartment', location: 'Lekki Phase 1, Lagos', dates: 'Apr 10 \u2013 Apr 15, 2025', guests: 3, amount: '\u20A6350,000', image: 'assets/images/home-properties/miniflat1.png', status: 'completed' },
-      { id: 'ACCOOM-2025-0003', name: 'Mini Flat', location: 'Surulere, Lagos', dates: 'Mar 5 \u2013 Mar 8, 2025', guests: 2, amount: '\u20A6180,000', image: 'assets/images/home-properties/miniflat.png', status: 'completed' },
-      { id: 'ACCOOM-2025-0002', name: '4 Bedroom Detached Duplex', location: 'Ajah, Lagos', dates: 'Feb 12 \u2013 Feb 17, 2025', guests: 5, amount: '\u20A6460,000', image: 'assets/images/home-properties/hall2.png', status: 'completed' },
-      { id: 'ACCOOM-2025-0001', name: 'Self-Contained Studio', location: 'Yaba, Lagos', dates: 'Jan 3 \u2013 Jan 6, 2025', guests: 1, amount: '\u20A675,000', image: 'assets/images/home-properties/selfcon1.png', status: 'completed' }
+      { id: 'ACCOOM-2025-0008', name: '2 Bedroom Apartment', location: 'Lekki Phase 1, Lagos', dates: 'Aug 20 \u2013 Aug 25, 2025', guests: 2, amount: '\u20A6250,000', image: 'assets/images/home-properties/miniflat.webp', status: 'upcoming' },
+      { id: 'ACCOOM-2025-0007', name: 'Modern Detached Duplex', location: 'Ikoyi, Lagos', dates: 'Jul 10 \u2013 Jul 15, 2025', guests: 4, amount: '\u20A6450,000', image: 'assets/images/home-properties/hall2.webp', status: 'completed' },
+      { id: 'ACCOOM-2025-0006', name: '1 Bedroom Apartment', location: 'Victoria Island, Lagos', dates: 'Jun 25 \u2013 Jun 28, 2025', guests: 1, amount: '\u20A6120,000', image: 'assets/images/home-properties/bedroomflat3.webp', status: 'completed' },
+      { id: 'ACCOOM-2025-0005', name: 'Self-Contained Studio', location: 'Yaba, Lagos', dates: 'May 15 \u2013 May 18, 2025', guests: 1, amount: '\u20A680,000', image: 'assets/images/home-properties/selfcon1.webp', status: 'cancelled' },
+      { id: 'ACCOOM-2025-0004', name: '3 Bedroom Apartment', location: 'Lekki Phase 1, Lagos', dates: 'Apr 10 \u2013 Apr 15, 2025', guests: 3, amount: '\u20A6350,000', image: 'assets/images/home-properties/miniflat1.webp', status: 'completed' },
+      { id: 'ACCOOM-2025-0003', name: 'Mini Flat', location: 'Surulere, Lagos', dates: 'Mar 5 \u2013 Mar 8, 2025', guests: 2, amount: '\u20A6180,000', image: 'assets/images/home-properties/miniflat.webp', status: 'completed' },
+      { id: 'ACCOOM-2025-0002', name: '4 Bedroom Detached Duplex', location: 'Ajah, Lagos', dates: 'Feb 12 \u2013 Feb 17, 2025', guests: 5, amount: '\u20A6460,000', image: 'assets/images/home-properties/hall2.webp', status: 'completed' },
+      { id: 'ACCOOM-2025-0001', name: 'Self-Contained Studio', location: 'Yaba, Lagos', dates: 'Jan 3 \u2013 Jan 6, 2025', guests: 1, amount: '\u20A675,000', image: 'assets/images/home-properties/selfcon1.webp', status: 'completed' }
     ];
 
     // Purchases logged from the chat's payment flow (contact-agent.js) —

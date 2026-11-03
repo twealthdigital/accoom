@@ -66,5 +66,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/assets/images/:path*.png",
+      "destination": "/assets/images/:path*.webp"
+    }
   ]
 }

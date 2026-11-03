@@ -170,31 +170,31 @@ var AGENTS = [
       // Each listing owns an `images` array (2 images if it has a video, 3 if it doesn't)
       // plus an optional `video`. Video always plays as the first slide.
       var MEDIA = [
-        { images: ['assets/images/home-properties/selfcon1.png','assets/images/home-properties/selfcon2.png','assets/images/home-properties/selfcon3.png'], video: null },
-        { images: ['assets/images/home-properties/selfcon2.png','assets/images/home-properties/hall2.png'], video: 'assets/videos/home-properties/2bedroomflat.mp4' },
-        { images: ['assets/images/home-properties/selfcon3.png','assets/images/home-properties/selfcon4.png','assets/images/home-properties/selfcon1.png'], video: null },
-        { images: ['assets/images/home-properties/commercialspace.png','assets/images/home-properties/commercialspace2.png','assets/images/home-properties/land1.png'], video: null },
-        { images: ['assets/images/home-properties/land2.png','assets/images/home-properties/land3.png','assets/images/home-properties/land1.png'], video: null },
-        { images: ['assets/images/home-properties/hall3.png','assets/images/home-properties/hall2.png'], video: 'assets/videos/home-properties/selfcon2.mp4' },
-        { images: ['assets/images/home-properties/selfcon2.png','assets/images/home-properties/selfcon3.png','assets/images/home-properties/selfcon4.png'], video: null },
-        { images: ['assets/images/home-properties/miniflat1.png','assets/images/home-properties/singleroom3.png','assets/images/home-properties/bedroomflat3.png'], video: null },
-        { images: ['assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/bedroomflat4.png'], video: 'assets/videos/home-properties/miniflat3.mp4' },
-        { images: ['assets/images/home-properties/commercialspace2.png','assets/images/home-properties/commercialspace.png','assets/images/home-properties/land2.png'], video: null },
-        { images: ['assets/images/home-properties/land3.png','assets/images/home-properties/land1.png','assets/images/home-properties/land2.png'], video: null },
-        { images: ['assets/images/home-properties/hall2.png','assets/images/home-properties/hall3.png','assets/images/home-properties/hall2.png'], video: null },
-        { images: ['assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/bedroomflat4.png','assets/images/home-properties/miniflat1.png'], video: null },
-        { images: ['assets/images/home-properties/bedroomflat4.png','assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/singleroom3.png'], video: null },
-        { images: ['assets/images/home-properties/singleroom3.png','assets/images/home-properties/miniflat1.png'], video: 'assets/videos/home-properties/selfcon3.mp4' },
-        { images: ['assets/images/home-properties/singleroom3.png','assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/bedroomflat4.png'], video: null },
-        { images: ['assets/images/home-properties/land1.png','assets/images/home-properties/land2.png','assets/images/home-properties/land3.png'], video: null },
-        { images: ['assets/images/home-properties/hall3.png','assets/images/home-properties/hall2.png','assets/images/home-properties/hall2.png'], video: null },
-        { images: ['assets/images/home-properties/selfcon4.png','assets/images/home-properties/selfcon1.png','assets/images/home-properties/selfcon2.png'], video: null },
-        { images: ['assets/images/home-properties/selfcon3.png','assets/images/home-properties/selfcon4.png'], video: 'assets/videos/home-properties/selfcon3.mp4' },
-        { images: ['assets/images/home-properties/bedroomflat3.png','assets/images/home-properties/miniflat1.png','assets/images/home-properties/singleroom3.png'], video: null },
-        { images: ['assets/images/home-properties/commercialspace.png','assets/images/home-properties/land1.png','assets/images/home-properties/land2.png'], video: null },
-        { images: ['assets/images/home-properties/land3.png','assets/images/home-properties/commercialspace2.png','assets/images/home-properties/hall2.png'], video: null },
-        { images: ['assets/images/home-properties/hall2.png','assets/images/home-properties/hall3.png','assets/images/home-properties/bedroomflat4.png'], video: null },
-        { images: ['assets/images/home-properties/selfcon2.png','assets/images/home-properties/selfcon1.png','assets/images/home-properties/selfcon3.png'], video: null }
+        { images: ['assets/images/home-properties/selfcon1.webp','assets/images/home-properties/selfcon2.webp','assets/images/home-properties/selfcon3.webp'], video: null },
+        { images: ['assets/images/home-properties/selfcon2.webp','assets/images/home-properties/hall2.webp'], video: 'assets/videos/home-properties/2bedroomflat.mp4' },
+        { images: ['assets/images/home-properties/selfcon3.webp','assets/images/home-properties/selfcon4.webp','assets/images/home-properties/selfcon1.webp'], video: null },
+        { images: ['assets/images/home-properties/commercialspace.webp','assets/images/home-properties/commercialspace2.webp','assets/images/home-properties/land1.webp'], video: null },
+        { images: ['assets/images/home-properties/land2.webp','assets/images/home-properties/land3.webp','assets/images/home-properties/land1.webp'], video: null },
+        { images: ['assets/images/home-properties/hall3.webp','assets/images/home-properties/hall2.webp'], video: 'assets/videos/home-properties/selfcon2.mp4' },
+        { images: ['assets/images/home-properties/selfcon2.webp','assets/images/home-properties/selfcon3.webp','assets/images/home-properties/selfcon4.webp'], video: null },
+        { images: ['assets/images/home-properties/miniflat1.webp','assets/images/home-properties/singleroom3.webp','assets/images/home-properties/bedroomflat3.webp'], video: null },
+        { images: ['assets/images/home-properties/bedroomflat3.webp','assets/images/home-properties/bedroomflat4.webp'], video: 'assets/videos/home-properties/miniflat3.mp4' },
+        { images: ['assets/images/home-properties/commercialspace2.webp','assets/images/home-properties/commercialspace.webp','assets/images/home-properties/land2.webp'], video: null },
+        { images: ['assets/images/home-properties/land3.webp','assets/images/home-properties/land1.webp','assets/images/home-properties/land2.webp'], video: null },
+        { images: ['assets/images/home-properties/hall2.webp','assets/images/home-properties/hall3.webp','assets/images/home-properties/hall2.webp'], video: null },
+        { images: ['assets/images/home-properties/bedroomflat3.webp','assets/images/home-properties/bedroomflat4.webp','assets/images/home-properties/miniflat1.webp'], video: null },
+        { images: ['assets/images/home-properties/bedroomflat4.webp','assets/images/home-properties/bedroomflat3.webp','assets/images/home-properties/singleroom3.webp'], video: null },
+        { images: ['assets/images/home-properties/singleroom3.webp','assets/images/home-properties/miniflat1.webp'], video: 'assets/videos/home-properties/selfcon3.mp4' },
+        { images: ['assets/images/home-properties/singleroom3.webp','assets/images/home-properties/bedroomflat3.webp','assets/images/home-properties/bedroomflat4.webp'], video: null },
+        { images: ['assets/images/home-properties/land1.webp','assets/images/home-properties/land2.webp','assets/images/home-properties/land3.webp'], video: null },
+        { images: ['assets/images/home-properties/hall3.webp','assets/images/home-properties/hall2.webp','assets/images/home-properties/hall2.webp'], video: null },
+        { images: ['assets/images/home-properties/selfcon4.webp','assets/images/home-properties/selfcon1.webp','assets/images/home-properties/selfcon2.webp'], video: null },
+        { images: ['assets/images/home-properties/selfcon3.webp','assets/images/home-properties/selfcon4.webp'], video: 'assets/videos/home-properties/selfcon3.mp4' },
+        { images: ['assets/images/home-properties/bedroomflat3.webp','assets/images/home-properties/miniflat1.webp','assets/images/home-properties/singleroom3.webp'], video: null },
+        { images: ['assets/images/home-properties/commercialspace.webp','assets/images/home-properties/land1.webp','assets/images/home-properties/land2.webp'], video: null },
+        { images: ['assets/images/home-properties/land3.webp','assets/images/home-properties/commercialspace2.webp','assets/images/home-properties/hall2.webp'], video: null },
+        { images: ['assets/images/home-properties/hall2.webp','assets/images/home-properties/hall3.webp','assets/images/home-properties/bedroomflat4.webp'], video: null },
+        { images: ['assets/images/home-properties/selfcon2.webp','assets/images/home-properties/selfcon1.webp','assets/images/home-properties/selfcon3.webp'], video: null }
       ];
 
       // Mock 25-item catalogue for now. In production this array goes away
@@ -457,12 +457,12 @@ var currentPage = 1;
       function mediaSlidesTemplate(item) {
         var html = '';
         if (item.video) {
-          html += '<video class="media-slide is-active" src="' + item.video + '" muted loop autoplay playsinline preload="metadata" poster="' + item.images[0] + '" data-slide="0"></video>';
+          html += '<video class="media-slide is-active" src="' + item.video + '" muted loop playsinline preload="none" poster="' + item.images[0] + '" data-slide="0"></video>';
         }
         item.images.forEach(function (src, idx) {
           var slideIndex = item.video ? idx + 1 : idx;
           var activeClass = (!item.video && idx === 0) ? ' is-active' : '';
-          html += '<img class="media-slide' + activeClass + '" src="' + src + '" alt="' + item.typeLabel + ' in ' + item.location + '" loading="lazy" data-slide="' + slideIndex + '" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.png\';" />';
+          html += '<img class="media-slide' + activeClass + '" src="' + src + '" alt="' + item.typeLabel + ' in ' + item.location + '" loading="lazy" data-slide="' + slideIndex + '" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.webp\';" />';
         });
         return html;
       }
@@ -566,8 +566,30 @@ function cardTemplate(item) {
         );
       }
 
+      // Card videos no longer download on page load: they only start (and
+      // only fetch) when the card is on screen, and pause when it leaves.
+      var cardVideoObserver = null;
+      function watchCardVideos() {
+        var vids = Accoom.$$('video.media-slide', listingsGrid);
+        if (!vids.length) return;
+        if (!('IntersectionObserver' in window)) {
+          vids.forEach(function (v) { if (v.classList.contains('is-active')) v.play().catch(function () {}); });
+          return;
+        }
+        if (cardVideoObserver) cardVideoObserver.disconnect();
+        cardVideoObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            var v = entry.target;
+            if (entry.isIntersecting && v.classList.contains('is-active')) { v.play().catch(function () {}); }
+            else { v.pause(); }
+          });
+        }, { rootMargin: '100px 0px', threshold: 0.25 });
+        vids.forEach(function (v) { cardVideoObserver.observe(v); });
+      }
+
       function renderGrid(items) {
         listingsGrid.innerHTML = items.map(cardTemplate).join('');
+        watchCardVideos();
         listingsGrid.classList.toggle('is-hidden', items.length === 0);
         if (listingsEmpty) listingsEmpty.classList.toggle('is-visible', items.length === 0);
       }

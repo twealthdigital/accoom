@@ -326,14 +326,14 @@
     // upcoming, completed, or cancelled — always matches what's on the
     // My Purchases page instead of a separate hardcoded, status-less list.
     var MOCK_PURCHASES = [
-      { id: 'ACCOOM-2025-0008', name: '2 Bedroom Apartment', price: '\u20A6250,000', image: 'assets/images/home-properties/miniflat.png', status: 'upcoming' },
-      { id: 'ACCOOM-2025-0007', name: 'Modern Detached Duplex', price: '\u20A6450,000', image: 'assets/images/home-properties/hall2.png', status: 'completed' },
-      { id: 'ACCOOM-2025-0006', name: '1 Bedroom Apartment', price: '\u20A6120,000', image: 'assets/images/home-properties/bedroomflat3.png', status: 'completed' },
-      { id: 'ACCOOM-2025-0005', name: 'Self-Contained Studio', price: '\u20A680,000', image: 'assets/images/home-properties/selfcon1.png', status: 'cancelled' },
-      { id: 'ACCOOM-2025-0004', name: '3 Bedroom Apartment', price: '\u20A6350,000', image: 'assets/images/home-properties/miniflat1.png', status: 'completed' },
-      { id: 'ACCOOM-2025-0003', name: 'Mini Flat', price: '\u20A6180,000', image: 'assets/images/home-properties/miniflat.png', status: 'completed' },
-      { id: 'ACCOOM-2025-0002', name: '4 Bedroom Detached Duplex', price: '\u20A6460,000', image: 'assets/images/home-properties/hall2.png', status: 'completed' },
-      { id: 'ACCOOM-2025-0001', name: 'Self-Contained Studio', price: '\u20A675,000', image: 'assets/images/home-properties/selfcon1.png', status: 'completed' }
+      { id: 'ACCOOM-2025-0008', name: '2 Bedroom Apartment', price: '\u20A6250,000', image: 'assets/images/home-properties/miniflat.webp', status: 'upcoming' },
+      { id: 'ACCOOM-2025-0007', name: 'Modern Detached Duplex', price: '\u20A6450,000', image: 'assets/images/home-properties/hall2.webp', status: 'completed' },
+      { id: 'ACCOOM-2025-0006', name: '1 Bedroom Apartment', price: '\u20A6120,000', image: 'assets/images/home-properties/bedroomflat3.webp', status: 'completed' },
+      { id: 'ACCOOM-2025-0005', name: 'Self-Contained Studio', price: '\u20A680,000', image: 'assets/images/home-properties/selfcon1.webp', status: 'cancelled' },
+      { id: 'ACCOOM-2025-0004', name: '3 Bedroom Apartment', price: '\u20A6350,000', image: 'assets/images/home-properties/miniflat1.webp', status: 'completed' },
+      { id: 'ACCOOM-2025-0003', name: 'Mini Flat', price: '\u20A6180,000', image: 'assets/images/home-properties/miniflat.webp', status: 'completed' },
+      { id: 'ACCOOM-2025-0002', name: '4 Bedroom Detached Duplex', price: '\u20A6460,000', image: 'assets/images/home-properties/hall2.webp', status: 'completed' },
+      { id: 'ACCOOM-2025-0001', name: 'Self-Contained Studio', price: '\u20A675,000', image: 'assets/images/home-properties/selfcon1.webp', status: 'completed' }
     ];
 
     if (Array.isArray(DASHBOARD_LOG) && DASHBOARD_LOG.length) {

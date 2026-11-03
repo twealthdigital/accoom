@@ -95,7 +95,7 @@
         period: 'year',
         category: 'rent',
         status: 'available',
-        cover: 'assets/images/home-properties/selfcon1.png',
+        cover: 'assets/images/home-properties/selfcon1.webp',
         beds: 2,
         baths: 1,
         dateAdded: 'Oct 1, 2026'
@@ -118,7 +118,7 @@
           period: base.period || 'year',
           category: base.category || 'rent',
           status: st,
-          cover: base.cover || base.image || 'assets/images/home-properties/selfcon1.png',
+          cover: base.cover || base.image || 'assets/images/home-properties/selfcon1.webp',
           beds: base.beds || 2,
           baths: base.baths || 1,
           dateAdded: base.dateAdded || 'Oct 1, 2026'
@@ -143,7 +143,7 @@
           period: 'sale',
           category: 'sale',
           status: 'available',
-          cover: base0.cover || base0.image || 'assets/images/home-properties/selfcon1.png',
+          cover: base0.cover || base0.image || 'assets/images/home-properties/selfcon1.webp',
           beds: base0.beds || 2,
           baths: base0.baths || 1,
           dateAdded: base0.dateAdded || 'Oct 1, 2026'
@@ -221,7 +221,7 @@
         folderGrid.innerHTML = pageItems.map(function (f) {
           var kind = f.category === 'sale' ? 'sale' : 'rent';
           var status = STATUS_LABEL[f.status] || 'Available';
-          var cover = f.cover || 'assets/images/home-properties/placeholder.png';
+          var cover = f.cover || 'assets/images/home-properties/placeholder.webp';
           return (
             '<tr class="ag-dash-listing-row" data-ag-listing-row data-listing-id="' + escapeHtml(String(f.id || '')) + '" data-name="' + escapeHtml(f.name || 'Untitled property') + '" data-location="' + escapeHtml(f.location || '') + '">' +
               '<td class="ag-dash-property-cell" data-label="Property">' +

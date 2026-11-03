@@ -51,7 +51,7 @@
 
   var NAIRA = '\u20A6';
   var PRICE_RE = /\u20A6\s*([\d,]+(?:\.\d+)?)/;
-  var PLACEHOLDER_IMG = 'assets/images/home-properties/placeholder.png';
+  var PLACEHOLDER_IMG = 'assets/images/home-properties/placeholder.webp';
 
   /* Same placeholder copy the buyer page shows. Replace per-listing by
      returning these fields from cfg.resolver / data-* attributes. */
@@ -1379,7 +1379,7 @@
     pool.concat(GENERIC_POOL).forEach(function (f) {
       if (list.length >= min || seen[f.toLowerCase()]) return;
       seen[f.toLowerCase()] = true;
-      list.push('assets/images/home-properties/' + f + '.png');
+      list.push('assets/images/home-properties/' + f + '.webp');
     });
     return list;
   }
@@ -1417,7 +1417,7 @@
       '<div class="lax-gallery-main is-loading" data-lax-main>' +
         '<span class="lax-gallery-tag">' + esc(statusLabel) + '</span>' +
         '<img data-lax-img alt="' + esc(p.name) + '" />' +
-        '<video data-lax-video muted loop playsinline preload="metadata" style="display:none"></video>' +
+        '<video data-lax-video muted loop playsinline preload="none" style="display:none"></video>' +
         (multi ? '<button type="button" class="lax-gallery-nav lax-gallery-prev" data-lax-prev aria-label="Previous">' + icon('chevL', 18) + '</button>' +
                  '<button type="button" class="lax-gallery-nav lax-gallery-next" data-lax-next aria-label="Next">' + icon('chevR', 18) + '</button>' : '') +
         '<button type="button" class="lax-gallery-viewphotos" data-lax-open-lightbox>' + icon('camera', 14) + ' View Photos</button>' +
@@ -1970,7 +1970,7 @@
   function scheduleEnhance() {
     if (scheduled) return;
     scheduled = true;
-    window.setTimeout(function () { scheduled = false; enhance(); }, 40);
+    window.setTimeout(function () { scheduled = false; enhance(); }, 120);
   }
 
   function relevantMutation(records) {
@@ -1981,6 +1981,10 @@
         if (n.nodeType !== 1) continue;
         if (isOurs(n)) continue;
         if (n.classList && (n.classList.contains('accoom-toast') || n.classList.contains('lax-empty'))) continue;
+        // skeleton placeholders, bare images/videos and icons can never be listing cards
+        var tag = n.tagName;
+        if (tag === 'IMG' || tag === 'VIDEO' || tag === 'SOURCE' || tag === 'SVG' || tag === 'PATH' || tag === 'SPAN' || tag === 'SCRIPT' || tag === 'STYLE') continue;
+        if (typeof n.className === 'string' && /skeleton|shimmer/i.test(n.className)) continue;
         return true;
       }
     }

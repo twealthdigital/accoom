@@ -45,7 +45,7 @@
           name: '2 Bedroom Detached Duplex',
           location: 'Lekki Phase 1, Lagos',
           price: '\u20A6460,000 / year',
-          image: 'assets/images/home-properties/miniflat1.png',
+          image: 'assets/images/home-properties/miniflat1.webp',
           beds: 2,
           baths: 3,
           parking: true,
@@ -79,7 +79,7 @@
           name: '2 Bedroom Apartment',
           location: 'Victoria Island, Lagos',
           price: '\u20A6325,000 / year',
-          image: 'assets/images/home-properties/miniflat.png',
+          image: 'assets/images/home-properties/miniflat.webp',
           beds: 2,
           baths: 2,
           parking: true,
@@ -108,7 +108,7 @@
           name: 'Self-Contained Studio',
           location: 'Ikeja GRA, Lagos',
           price: '\u20A6280,000 / year',
-          image: 'assets/images/home-properties/selfcon1.png'
+          image: 'assets/images/home-properties/selfcon1.webp'
         },
         messages: [
           { id: 'e1', from: 'me', day: 'Yesterday', time: '4:02 PM', read: true,
@@ -130,7 +130,7 @@
           name: '3 Bedroom Terrace',
           location: 'Gwarinpa, Abuja',
           price: '\u20A6900,000 / year',
-          image: 'assets/images/home-properties/hall2.png',
+          image: 'assets/images/home-properties/hall2.webp',
           beds: 3, baths: 3, parking: true, furnished: false,
           description: 'Roomy 3 bedroom terrace in a quiet estate with tarred road access and constant water supply.'
         },
@@ -156,7 +156,7 @@
           name: 'Mini Flat',
           location: 'Yaba, Lagos',
           price: '\u20A6520,000 / year',
-          image: 'assets/images/home-properties/miniflat.png',
+          image: 'assets/images/home-properties/miniflat.webp',
           beds: 1, baths: 1, parking: false, furnished: true,
           description: 'Newly renovated mini flat close to major tech hubs in Yaba, fully furnished and net-ready.'
         },
@@ -180,7 +180,7 @@
           name: '4 Bedroom Semi-Detached',
           location: 'Ikoyi, Lagos',
           price: '\u20A63,200,000 / year',
-          image: 'assets/images/home-properties/bedroomflat3.png',
+          image: 'assets/images/home-properties/bedroomflat3.webp',
           beds: 4, baths: 5, parking: true, furnished: true,
           description: 'Luxury 4 bedroom semi-detached duplex with BQ, generator house, and 24/7 estate security in Ikoyi.'
         },
@@ -204,7 +204,7 @@
           name: 'Self-Contained Room',
           location: 'Uyo, Akwa Ibom',
           price: '\u20A6180,000 / year',
-          image: 'assets/images/home-properties/selfcon1.png',
+          image: 'assets/images/home-properties/selfcon1.webp',
           beds: 1, baths: 1, parking: false, furnished: false,
           description: 'Affordable self-contained room in a residential neighbourhood, walking distance to the market.'
         },
@@ -228,7 +228,7 @@
           name: '2 Bedroom Flat',
           location: 'Port Harcourt, Rivers',
           price: '\u20A6600,000 / year',
-          image: 'assets/images/home-properties/hall2.png',
+          image: 'assets/images/home-properties/hall2.webp',
           beds: 2, baths: 2, parking: true, furnished: false,
           description: 'Well-maintained 2 bedroom flat in a gated compound with borehole water and a caretaker on site.'
         },
@@ -250,7 +250,7 @@
           name: 'Duplex with BQ',
           location: 'Magodo, Lagos',
           price: '\u20A61,800,000 / year',
-          image: 'assets/images/home-properties/bedroomflat3.png',
+          image: 'assets/images/home-properties/bedroomflat3.webp',
           beds: 3, baths: 4, parking: true, furnished: false,
           description: 'Solidly built duplex with a boys quarters, private compound, and good drainage in Magodo Phase 2.'
         },
@@ -274,7 +274,7 @@
           name: 'Serviced Apartment',
           location: 'Wuse 2, Abuja',
           price: '\u20A61,100,000 / year',
-          image: 'assets/images/home-properties/miniflat1.png',
+          image: 'assets/images/home-properties/miniflat1.webp',
           beds: 2, baths: 2, parking: true, furnished: true,
           description: 'Fully serviced 2 bedroom apartment with 24hr power, gym access, and a resident concierge in Wuse 2.'
         },
@@ -891,7 +891,7 @@
                 name: item.name,
                 location: item.location,
                 price: typeof item.price === 'number' ? ('\u20A6' + item.price.toLocaleString('en-NG') + (item.priceLabel ? ' ' + item.priceLabel : '')) : item.price,
-                image: (item.images && item.images[0]) || 'assets/images/home-properties/placeholder.png',
+                image: (item.images && item.images[0]) || 'assets/images/home-properties/placeholder.webp',
                 beds: item.beds,
                 baths: item.baths
               });
@@ -926,7 +926,7 @@
       els.propsList.innerHTML = allProps.map(function (item) {
         var isCurrent = String(item.id) === String(conv.property.id);
         return '<li class="msgs-props-item' + (isCurrent ? ' is-active' : '') + '" data-prop-id="' + item.id + '">' +
-          '<img class="msgs-props-item-img" src="' + (item.image || 'assets/images/home-properties/placeholder.png') + '" alt="" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.png\';" />' +
+          '<img class="msgs-props-item-img" src="' + (item.image || 'assets/images/home-properties/placeholder.webp') + '" alt="" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.webp\';" />' +
           '<div class="msgs-props-item-text">' +
             '<p class="msgs-props-item-name">' + item.name + '</p>' +
             '<p class="msgs-props-item-meta">' +
@@ -960,7 +960,7 @@
     function renderPropertyCard(conv) {
       var p = conv.property;
       if (els.propImg) {
-        els.propImg.src = p.image || 'assets/images/home-properties/placeholder.png';
+        els.propImg.src = p.image || 'assets/images/home-properties/placeholder.webp';
         els.propImg.alt = p.name || 'Property';
       }
       if (els.propName) els.propName.textContent = p.name || 'Property';
@@ -1238,7 +1238,7 @@
       var bubbleInner = '';
       if (msg.photos) {
         bubbleInner = '<div class="msgs-bubble-photos">' +
-          msg.photos.map(function (src) { return '<img src="' + src + '" alt="" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.png\';" />'; }).join('') +
+          msg.photos.map(function (src) { return '<img src="' + src + '" alt="" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.webp\';" />'; }).join('') +
           '<span class="msgs-bubble-photos-count">' + msg.photos.length + ' Photos</span>' +
           '</div>';
       } else {

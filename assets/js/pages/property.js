@@ -49,10 +49,10 @@
       baths: stored ? (stored.baths || 3) : 3,
       typeLabel: stored ? (stored.typeLabel || 'Detached Duplex') : 'Detached Duplex',
       images: (stored && stored.images && stored.images.length) ? stored.images : [
-        'assets/images/home-properties/miniflat1.png',
-        'assets/images/home-properties/miniflat.png',
-        'assets/images/home-properties/placeholder.png',
-        'assets/images/home-properties/miniflat.png'
+        'assets/images/home-properties/miniflat1.webp',
+        'assets/images/home-properties/miniflat.webp',
+        'assets/images/home-properties/placeholder.webp',
+        'assets/images/home-properties/miniflat.webp'
       ],
       video: stored ? stored.video : null,
       extraVideos: (stored && Array.isArray(stored.extraVideos)) ? stored.extraVideos
@@ -201,7 +201,7 @@
             : '';
           return '<button type="button" class="pd-thumb" data-pd-thumb data-index="' + i + '" aria-label="' +
             (slide.type === 'video' ? 'Play video' : 'Photo ' + (i + 1)) + '">' +
-            '<img src="' + poster + '" alt="" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.png\';" />' +
+            '<img src="' + poster + '" alt="" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.webp\';" />' +
             playIcon +
             '</button>';
         }).join('');
@@ -215,6 +215,7 @@
         if (slide.type === 'video') {
           mainImg.style.display = 'none';
           mainVideo.style.display = 'block';
+          if (slide.poster) mainVideo.setAttribute('poster', slide.poster);
           if (mainVideo.getAttribute('src') !== slide.src) mainVideo.setAttribute('src', slide.src);
           mainVideo.play().catch(function () {});
         } else {
@@ -755,7 +756,7 @@
           name: property.name,
           location: property.location || '',
           price: property.price || '',
-          image: (property.images && property.images[0]) || 'assets/images/home-properties/placeholder.png',
+          image: (property.images && property.images[0]) || 'assets/images/home-properties/placeholder.webp',
           beds: property.beds,
           baths: property.baths
         };
@@ -772,7 +773,7 @@
               name: item.name,
               location: item.location,
               price: typeof item.price === 'number' ? ('\u20A6' + item.price.toLocaleString('en-NG') + (item.priceLabel ? ' ' + item.priceLabel : '')) : item.price,
-              image: (item.images && item.images[0]) || 'assets/images/home-properties/placeholder.png',
+              image: (item.images && item.images[0]) || 'assets/images/home-properties/placeholder.webp',
               beds: item.beds,
               baths: item.baths
             };
