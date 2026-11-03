@@ -1321,6 +1321,8 @@ Accoom.delegate(listingsGrid, 'click', '[data-view-listing]', function (e) {
         var avatarEl = card.querySelector('.suggested-agent-avatar');
         var imgEl = card.querySelector('.suggested-property-media img');
 
+        if (!Accoom.isLoggedIn()) { window.location.href = 'auth.html?mode=signup'; return; }
+
         Accoom.setStorage('accoom-contact-request', {
           agentName: (agentNameEl && agentNameEl.childNodes[0]) ? agentNameEl.childNodes[0].nodeValue.trim() : 'Agent',
           agentAvatar: avatarEl ? avatarEl.getAttribute('src') : '',

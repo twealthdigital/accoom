@@ -783,6 +783,8 @@
           agentProps.unshift(thisPropObj);
         }
 
+        if (!Accoom.isLoggedIn()) { window.location.href = 'auth.html?mode=signup'; return; }
+
         Accoom.setStorage('accoom-contact-request', {
           agentName: agent.name || 'David O.',
           agentAvatar: agentAvatar,

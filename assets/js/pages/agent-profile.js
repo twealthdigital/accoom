@@ -284,6 +284,7 @@
 
       Accoom.on(contactBtn, 'click', function (e) {
         e.preventDefault();
+        if (!Accoom.isLoggedIn()) { window.location.href = 'auth.html?mode=signup'; return; }
         Accoom.setStorage('accoom-contact-request', {
           agentName: agent.name,
           agentAvatar: agent.avatar,

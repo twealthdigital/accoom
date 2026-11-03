@@ -290,19 +290,14 @@
 
   Accoom.ready(function () {
 
-    // Guests can't view real conversations — bounce straight to signup,
-    // but allow demo guest sessions if arriving from a listing's Contact Agent.
+    // Guests can't view real conversations — bounce straight to signup.
+    // (The old demo "Guest User" session was removed: it silently turned a
+    // signed-out visitor into a signed-in one site-wide, which made balance,
+    // messages and notifications appear for guests.)
     if (!Accoom.isLoggedIn()) {
-      if (Accoom.getStorage('accoom-contact-request', null)) {
-        Accoom.setStorage('accoom-user', {
-          name: 'Guest User',
-          email: 'guest@accoom.ng',
-          role: 'customer'
-        });
-      } else {
-        window.location.href = 'auth.html?mode=signup';
-        return;
-      }
+      Accoom.removeStorage('accoom-contact-request');
+      window.location.replace('auth.html?mode=signup');
+      return;
     }
 
     var layout = Accoom.$('[data-msgs-layout]');

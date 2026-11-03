@@ -16,6 +16,18 @@
     })();
   </script>
 
+  <!-- auth-state: tags <html> as guest / signed-in BEFORE first paint so account-only
+       parts of the header (balance, messages, notifications, agent CTA) never flash. -->
+  <script>
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('accoom-user')), c = document.documentElement.classList;
+        if (!u) c.add('is-guest');
+        else { c.add('is-auth'); if (u.role === 'agent' && u.agentProfileCompleted) c.add('is-agent-done'); }
+      } catch (e) { document.documentElement.classList.add('is-guest'); }
+    })();
+  </script>
+
   <link rel="stylesheet" href="assets/css/main.css" />
   <link rel="stylesheet" href="assets/css/pages/load-page.css" />
 

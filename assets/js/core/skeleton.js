@@ -521,8 +521,55 @@ window.Accoom = window.Accoom || {};
 
   // CSS background images (hero photos, banners...) have no load event of
   // their own, so preload the same URL and watch that instead.
+  //
+  // PERFORMANCE: this used to call getComputedStyle() on EVERY element of the
+  // page (and again for every partial that loaded) which forces the browser to
+  // recalculate styles for the whole DOM: slow on phones. Now we read the
+  // stylesheets once, collect only the selectors whose rules set a url()
+  // background, and check just the elements that match those selectors.
+  var bgSelectorCache = null;
+  var bgSelectorSheets = -1;
+
+  function backgroundSelector() {
+    var sheets = document.styleSheets;
+    if (bgSelectorCache !== null && bgSelectorSheets === sheets.length) return bgSelectorCache;
+    var probe = document.createDocumentFragment();
+    var seen = {};
+    var list = [];
+
+    function walk(rules) {
+      for (var i = 0; i < rules.length; i++) {
+        var rule = rules[i];
+        if (!rule.selectorText) {                     // @media / @supports / @layer: go inside
+          if (rule.cssRules) walk(rule.cssRules);
+          continue;
+        }
+        var css = rule.cssText || '';
+        if (css.indexOf('url(') === -1 || css.indexOf('background') === -1) continue;
+        var parts = rule.selectorText.split(',');
+        for (var j = 0; j < parts.length; j++) {
+          var sel = parts[j].trim();
+          if (!sel || seen[sel] || sel.indexOf('::') !== -1 || /:(before|after)\b/.test(sel)) continue;
+          try { probe.querySelector(sel); } catch (e) { continue; }   // skip anything the browser rejects
+          seen[sel] = true;
+          list.push(sel);
+        }
+      }
+    }
+
+    for (var s = 0; s < sheets.length; s++) {
+      try { walk(sheets[s].cssRules); } catch (e) { /* cross-origin sheet: nothing we can read */ }
+    }
+    list.push('[style*="url("]');
+    bgSelectorCache = list.join(',');
+    bgSelectorSheets = sheets.length;
+    return bgSelectorCache;
+  }
+
   function scanBackgrounds(root) {
-    var els = root.querySelectorAll('*');
+    if (!root || !root.querySelectorAll) return;
+    var els;
+    try { els = root.querySelectorAll(backgroundSelector()); } catch (e) { return; }
     for (var i = 0; i < els.length; i++) {
       var el = els[i];
       if (el.__skBg || SKIP_TAGS[el.tagName]) continue;
@@ -534,9 +581,9 @@ window.Accoom = window.Accoom || {};
       var probes = [];
       while ((m = re.exec(bg))) {
         if (/^data:/.test(m[2])) continue;
-        var probe = new Image();
-        probe.src = m[2];
-        if (!probe.complete) probes.push(probe);
+        var img = new Image();
+        img.src = m[2];
+        if (!img.complete) probes.push(img);
       }
       if (probes.length) watchBackground(el, probes);
     }

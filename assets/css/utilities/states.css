@@ -28,3 +28,19 @@
   pointer-events: none;
 }
 
+
+/* --------------------------------------------------------------------------
+   Guest / signed-in state, applied from the <html> class set by the tiny
+   "auth-state" script in every page's <head>. Hides account-only UI before
+   first paint so a signed-out visitor never sees it flash (main.js still
+   does the same on partials:ready as a safety net).
+   -------------------------------------------------------------------------- */
+html.is-guest [data-balance-toggle],
+html.is-guest [data-private-balance],
+html.is-guest [data-private-messages],
+html.is-guest [data-private-notifications],
+html.is-guest .notif-dropdown,
+html.is-guest [data-agent-cta],
+html.is-agent-done [data-agent-cta] {
+  display: none !important;
+}
