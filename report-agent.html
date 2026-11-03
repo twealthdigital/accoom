@@ -138,6 +138,7 @@
                 <p class="rp-step-sub">Choose the category that fits best. You can only pick one.</p>
               </div>
             </div>
+            <button type="button" class="rp-write-btn" data-rp-write>Write a report</button>
             <div class="rp-cats" data-rp-cats role="radiogroup" aria-label="Report category"></div>
             <p class="rp-error rp-error--cat" data-rp-cat-error role="alert"></p>
           </section>
@@ -166,8 +167,15 @@
                   <p class="rp-error" role="alert"></p>
                 </div>
                 <div class="rp-field">
-                  <label class="rp-label" for="rp-property">Which property is this about? <span class="rp-req">*</span></label>
-                  <select class="rp-input rp-select" id="rp-property"></select>
+                  <label class="rp-label" for="rp-property">What type of property is this about? <span class="rp-req">*</span></label>
+                  <div class="dropdown select-dropdown rp-dd" data-rp-property-dd>
+                    <button type="button" class="rp-input rp-dd-trigger select-dropdown-trigger dropdown-trigger" aria-haspopup="listbox" aria-expanded="false" data-placeholder="true">
+                      <span data-dropdown-label data-placeholder-text="Select one">Select one</span>
+                      <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <ul class="dropdown-panel select-dropdown-panel" role="listbox" data-dropdown-panel></ul>
+                    <input type="hidden" id="rp-property" />
+                  </div>
                   <p class="rp-error" role="alert"></p>
                 </div>
               </div>

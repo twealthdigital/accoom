@@ -11,6 +11,7 @@
   /* Every category covers the whole platform. money:true shows the amount /
      "paid outside ACCOOM?" fields. */
   var CATEGORIES = [
+
     { id: 'offplatform_deal', title: 'Taking the deal off ACCOOM', desc: 'Asked to continue, agree or close the deal outside the platform.', hint: 'Tell us what they proposed, and where they wanted to move the deal.' },
     { id: 'extra_fees', title: 'Asking for extra fees outside ACCOOM', desc: 'Requested agency, legal, inspection or other fees that are not on the listing.', money: true, hint: 'Which fee did they ask for, how much, and how did they want it paid?' },
     { id: 'direct_payment', title: 'Asking for direct payment', desc: 'Asked you to pay by transfer, cash or crypto instead of paying on ACCOOM.', money: true, hint: 'What payment method did they ask for, and what reason did they give?' },
@@ -105,7 +106,7 @@
     /* ---------- Categories ---------- */
     CATEGORIES.forEach(function (c) {
       var label = document.createElement('label');
-      label.className = 'rp-cat';
+      label.className = 'rp-cat' + (c.custom ? ' rp-cat--write' : '');
       label.innerHTML =
         '<input type="radio" name="category" value="' + c.id + '" />' +
         '<span class="rp-cat-body">' +
@@ -122,12 +123,34 @@
       return null;
     }
 
+    // Click the selected category again to unselect it (step 2 hides again)
+    Accoom.on(els.cats, 'click', function (e) {
+      var t = e.target;
+      if (!t || t.name !== 'category') return;
+      if (state.category && state.category.id === t.value) {
+        t.checked = false;
+        state.category = null;
+        els.details.hidden = true;
+      }
+    });
+
+    // "Write a report" button: picks "Other" and jumps to step 2
+    Accoom.on($('[data-rp-write]'), 'click', function () {
+      var r = els.cats.querySelector('input[value="other"]');
+      if (!r) return;
+      r.checked = true;
+      Accoom.dispatch(r, 'change');
+      window.setTimeout(function () {
+        els.details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    });
+
     Accoom.on(els.cats, 'change', function (e) {
       var cat = getCategory(e.target.value);
       if (!cat) return;
       state.category = cat;
       els.catError.textContent = '';
-      els.chosen.textContent = cat.title;
+      els.chosen.textContent = cat.id === 'other' ? 'Other' : cat.title;
       els.desc.placeholder = cat.hint + ' Include names, dates and anything that was said.';
       els.money.hidden = !cat.money;
       var revealing = els.details.hidden;
@@ -140,26 +163,104 @@
     });
 
     /* ---------- Property select ---------- */
+    var propDD = $('[data-rp-property-dd]');
+    var propTrigger = $('.dropdown-trigger', propDD);
+    var propPanel = $('[data-dropdown-panel]', propDD);
+    var propLabelEl = $('[data-dropdown-label]', propDD);
+    var propCtl = null;
+    var propCustom = document.createElement('input');
+    propCustom.type = 'text';
+    propCustom.id = 'rp-property-custom';
+    propCustom.className = 'rp-input rp-custom-type';
+    propCustom.maxLength = 60;
+    propCustom.placeholder = 'Write the kind of property';
+    propCustom.autocomplete = 'off';
+    propCustom.hidden = true;
+    propDD.insertAdjacentElement('afterend', propCustom);
+    Accoom.on(propCustom, 'input', function () { clearError(propCustom); });
+
+    // Merge the custom text into the main field (Enter, blur or click out)
+    function commitCustom() {
+      var v = propCustom.value.trim();
+      if (els.property.value !== 'custom' || v.length < 2) return;
+      propCustom.hidden = true;
+      propLabelEl.textContent = v;
+    }
+
+    // Split back into 2 fields so it can be edited or changed
+    function splitCustom() {
+      if (els.property.value !== 'custom' || !propCustom.hidden) return;
+      propCustom.hidden = false;
+      propLabelEl.textContent = 'Custom';
+    }
+
+    Accoom.on(propCustom, 'keydown', function (e) {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      commitCustom();
+      propCustom.blur();
+    });
+    Accoom.on(propCustom, 'blur', commitCustom);
+    Accoom.on(document, 'click', function (e) {
+      if (propDD.contains(e.target) || e.target === propCustom) return;
+      commitCustom();
+    });
+    Accoom.on(propTrigger, 'click', splitCustom);
+
+    function syncPropTrigger() {
+      propTrigger.setAttribute('data-placeholder', els.property.value ? 'false' : 'true');
+      var isCustom = els.property.value === 'custom';
+      var wasHidden = propCustom.hidden;
+      propCustom.hidden = !isCustom;
+      if (!isCustom) propCustom.value = '';
+      else if (wasHidden) propCustom.focus();
+    }
+
+    // Click the selected option again to unselect it (must be added BEFORE initDropdown)
+    Accoom.on(propPanel, 'click', function (e) {
+      var li = e.target.closest('[role="option"]');
+      if (!li || !li.classList.contains('is-active')) return;
+      e.stopImmediatePropagation();
+      li.classList.remove('is-active');
+      els.property.value = '';
+      propLabelEl.textContent = propLabelEl.getAttribute('data-placeholder-text');
+      syncPropTrigger();
+      Accoom.dispatch(els.property, 'change');
+      if (propCtl) propCtl.close();
+    });
+
+    propCtl = Accoom.initDropdown(propDD);
+    Accoom.on(propDD, 'dropdown:select', syncPropTrigger);
+
+    // Keep the panel inside the screen: open upward or shrink when there is no room below
+    Accoom.on(propTrigger, 'click', function () {
+      propPanel.classList.remove('is-up');
+      propPanel.style.maxHeight = '';
+      var r = propTrigger.getBoundingClientRect();
+      var below = window.innerHeight - r.bottom - 16;
+      var above = r.top - 16;
+      var need = Math.min(propPanel.scrollHeight + 18, 280);
+      if (below < need && above > below) {
+        propPanel.classList.add('is-up');
+        propPanel.style.maxHeight = Math.max(120, Math.min(280, above - 8)) + 'px';
+      } else {
+        propPanel.style.maxHeight = Math.max(120, Math.min(280, below - 8)) + 'px';
+      }
+    });
     function buildPropertyOptions() {
       var list = [];
       if (ctx.properties && ctx.properties.length) list = ctx.properties;
       else if (ctx.property && ctx.property.id) list = [ctx.property];
-      els.property.innerHTML = '';
-      var first = document.createElement('option');
-      first.value = '';
-      first.textContent = 'Select one';
-      els.property.appendChild(first);
-      list.forEach(function (p) {
-        var o = document.createElement('option');
-        o.value = p.id;
-        o.textContent = p.name + (p.location ? ' — ' + p.location : '');
-        els.property.appendChild(o);
-      });
-      var none = document.createElement('option');
-      none.value = 'none';
-      none.textContent = 'Not about a specific property';
-      els.property.appendChild(none);
-      if (ctx.property && ctx.property.id) els.property.value = ctx.property.id;
+      var items = [
+        { value: 'bedroom-flat', label: 'Bedroom flat' },
+        { value: 'self-con', label: 'Self con' },
+        { value: 'single-room', label: 'Single room' },
+        { value: 'land', label: 'Land' },
+        { value: 'custom', label: 'Custom' },
+        { value: 'none', label: 'None' }
+      ];
+      Accoom.setDropdownOptions(propDD, items, '');
+      syncPropTrigger();
     }
     buildPropertyOptions();
 
@@ -274,7 +375,8 @@
         if (els.subject.value.trim().length < 5) bad(els.subject, 'Add a short summary (at least 5 characters).');
         if (!els.date.value) bad(els.date, 'Choose the date it happened.');
         else if (els.date.value > todayStr()) bad(els.date, 'The date cannot be in the future.');
-        if (!els.property.value) bad(els.property, 'Choose a property, or "Not about a specific property".');
+        if (!els.property.value) bad(els.property, 'Choose the type of property, or None.');
+        else if (els.property.value === 'custom' && propCustom.value.trim().length < 2) bad(propCustom, 'Write what kind of property it is.');
         var len = els.desc.value.trim().length;
         if (len < 30) bad(els.desc, 'Please describe what happened in at least 30 characters (' + len + ' so far).');
         if (state.category.money) {
@@ -314,7 +416,8 @@
         createdAt: Date.now(),
         agentName: name,
         convId: ctx.convId || null,
-        propertyId: propId && propId !== 'none' ? propId : null,
+        propertyId: propId && propId !== 'none' && ctx.property && ctx.property.id ? ctx.property.id : null,
+        propertyType: propId === 'custom' ? propCustom.value.trim() : (propId === 'none' ? null : propDD.querySelector('[data-dropdown-label]').textContent.trim()),
         category: state.category.id,
         categoryTitle: state.category.title,
         subject: els.subject.value.trim(),
@@ -392,6 +495,19 @@
       window.setTimeout(function () {
         if (!agentName) setAgentName(els.agentInput.value.trim());
         var report = saveReport();
+        try {
+          var notifMsg = 'Your report about ' + (agentName || 'this agent') + ' was received. Reference number ' + report.ref + '.';
+          if (Accoom.NotificationService && Accoom.NotificationService.add) {
+            Accoom.NotificationService.add({
+              type: 'accoom',
+              title: 'Report received',
+              text: notifMsg + ' Our Trust &amp; Safety team will review it within 24 to 48 hours.'
+            });
+          }
+          if (Accoom.pushToast) {
+            Accoom.pushToast({ message: notifMsg, link: 'notifications.html', linkLabel: 'View', duration: 10000 });
+          }
+        } catch (err) { /* never block the report */ }
         els.submit.classList.remove('is-loading');
         els.submit.disabled = false;
         openDialog(report);

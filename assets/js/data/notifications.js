@@ -163,10 +163,8 @@ window.Accoom = window.Accoom || {};
     broadcast();
   };
 
-  NotificationService.dismiss = function (id) {
-    writeAll(readAll().filter(function (n) { return n.id !== id; }));
-    broadcast();
-  };
+  // Notifications can no longer be deleted by the user.
+  NotificationService.dismiss = function () {};
 
   Accoom.NOTIFICATIONS_CHANGED_EVENT = CHANGED_EVENT;
 

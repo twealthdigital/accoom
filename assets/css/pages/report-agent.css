@@ -304,3 +304,32 @@ html.dark-mode .rp-input[type="date"] { color-scheme: dark; }
 @media (prefers-reduced-motion: reduce) {
   .rp-dialog-overlay, .rp-dialog, .rp-details:not([hidden]) { transition: none !important; animation: none !important; }
 }
+
+/* Custom property dropdown */
+.rp-dd .rp-dd-trigger { display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; cursor: pointer; }
+.rp-dd .rp-dd-trigger [data-dropdown-label] { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-dd .dropdown-panel { overscroll-behavior: contain; }
+.rp-dd .dropdown-panel.is-up { top: auto; bottom: calc(100% + 8px); transform: translateY(6px); }
+.rp-dd .dropdown-panel.is-up.is-open { transform: translateY(0); }
+
+/* "Write a report" card sits on its own row at the top */
+.rp-cat--write { grid-column: 1 / -1; }
+
+/* Gold "Write a report" button */
+.rp-write-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; margin-bottom: 12px; padding: 13px 18px;
+  border: 0; border-radius: 10px;
+  background: var(--gold); color: #14100a;
+  font: inherit; font-size: 0.95rem; font-weight: 800; cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease), filter var(--dur-fast) var(--ease);
+}
+.rp-write-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+
+/* Property type dropdown, compact options and custom box */
+.rp-dd .dropdown-panel li { padding: 11px 14px; font-weight: 600; }
+.rp-custom-type { margin-top: 10px; }
+.rp-custom-type[hidden] { display: none; }
+
+/* Keep the pop-out notification visible above the confirmation dialog */
+.accoom-toast { z-index: 100000; }
