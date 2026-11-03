@@ -1,0 +1,13 @@
+{
+  "name": "accoom",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Accoom - find accommodation, connect, secure, move in.",
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "npx --yes serve . -l 3000"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}
