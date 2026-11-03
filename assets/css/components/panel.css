@@ -329,19 +329,18 @@ html.dark-mode .side-panel {
   line-height: 1.4;
 }
 
-.panel-help-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 10px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--gold);
-  transition: gap var(--dur-fast) var(--ease);
+.panel-help-cta {
+  display: flex !important;
+  width: 100%;
+  margin-top: 14px;
+  justify-content: center !important;
 }
 
-.panel-help-link:hover {
-  gap: 10px;
+.panel-help .panel-help-cta-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 /* Toggle Row */
@@ -397,8 +396,4 @@ html.dark-mode .panel-location-dropdown .dropdown-panel li.is-active {
 html.dark-mode .panel-help {
   background: var(--surface-page-alt);
   border: 1px solid rgba(255, 255, 255, 0.14);
-}
-
-html.dark-mode .panel-help-link {
-  color: var(--gold);
 }

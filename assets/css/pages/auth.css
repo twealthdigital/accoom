@@ -78,19 +78,19 @@ body.auth-body {
 }
 
 html.dark-mode .auth-visual-top .logo-dark {
-  display: none !important;
+  display: block !important;
 }
 
 html.dark-mode .auth-visual-top .logo-light {
-  display: block !important;
+  display: none !important;
 }
 
 html:not(.dark-mode) .auth-visual-top .logo-dark {
-  display: block !important;
+  display: none !important;
 }
 
 html:not(.dark-mode) .auth-visual-top .logo-light {
-  display: none !important;
+  display: block !important;
 }
 
 .auth-visual-content {
@@ -396,8 +396,10 @@ html:not(.dark-mode) .auth-visual-top .logo-light {
   width: auto;
 }
 
-.auth-loading-logo.logo-dark { display: block; }
-.auth-loading-logo.logo-light { display: none; }
+.auth-loading-logo.logo-dark { display: none; }
+.auth-loading-logo.logo-light { display: block; }
+html.dark-mode .auth-loading-logo.logo-dark { display: block; }
+html.dark-mode .auth-loading-logo.logo-light { display: none; }
 
 .auth-loading-horizon {
   display: block;

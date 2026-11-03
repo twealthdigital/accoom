@@ -40,7 +40,7 @@ window.Accoom = window.Accoom || {};
     var transactions = Accoom.getStorage(TRANSACTIONS_KEY, []);
     if (!Array.isArray(transactions)) transactions = [];
     details = details && typeof details === 'object' ? details : {};
-    transactions.unshift({
+    var transaction = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
       type: type,
       amount: amount,
@@ -50,8 +50,23 @@ window.Accoom = window.Accoom || {};
       status: details.status || 'completed',
       propertyId: details.propertyId || null,
       createdAt: details.createdAt || new Date().toISOString()
+    };
+    [
+      'reference',
+      'payoutStatus',
+      'payoutMethod',
+      'destinationBank',
+      'destinationAccountName',
+      'maskedAccount',
+      'fee',
+      'netAmount',
+      'isDemo'
+    ].forEach(function (key) {
+      if (details[key] !== undefined && details[key] !== null) transaction[key] = details[key];
     });
-    Accoom.setStorage(TRANSACTIONS_KEY, transactions.slice(0, MAX_TRANSACTIONS));
+    transactions.unshift(transaction);
+    if (!Accoom.setStorage(TRANSACTIONS_KEY, transactions.slice(0, MAX_TRANSACTIONS))) return null;
+    return transaction;
   }
 
   Accoom.getWalletTransactions = function () {
@@ -107,6 +122,38 @@ window.Accoom = window.Accoom || {};
     recordTransaction('debit', takeAmount, next, description, details);
     broadcast(next);
     return next;
+  };
+
+  /**
+   * Record a frontend-only payout request in the shared transaction history.
+   * This intentionally does not change the wallet balance or initiate a transfer.
+   */
+  Accoom.recordMockPayoutWithdrawal = function (amount, details) {
+    var safeAmount = toSafeAmount(amount);
+    if (safeAmount === null || safeAmount <= 0) return null;
+    details = details && typeof details === 'object' ? details : {};
+    var transaction = recordTransaction(
+      'debit',
+      safeAmount,
+      Accoom.getWalletBalance(),
+      'Withdrawal request',
+      {
+        category: 'payout-withdrawal',
+        status: details.status || 'pending',
+        createdAt: details.createdAt,
+        reference: details.reference,
+        payoutStatus: details.payoutStatus || details.status || 'pending',
+        payoutMethod: details.payoutMethod,
+        destinationBank: details.destinationBank,
+        destinationAccountName: details.destinationAccountName,
+        maskedAccount: details.maskedAccount,
+        fee: details.fee,
+        netAmount: details.netAmount,
+        isDemo: details.isDemo
+      }
+    );
+    if (transaction) broadcast(Accoom.getWalletBalance());
+    return transaction;
   };
 
   /**

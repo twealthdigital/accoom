@@ -21,7 +21,19 @@ body.onboarding-body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  direction: ltr;
   padding: 20px 24px;
+}
+
+.onboarding-logo {
+  order: 0;
+  margin-right: auto;
+}
+
+.onboarding-theme-toggle {
+  order: 1;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .onboarding-logo img {

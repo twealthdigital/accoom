@@ -103,7 +103,8 @@ window.Accoom = window.Accoom || {};
     var current = now instanceof Date ? now : new Date();
     var real = transactions().filter(function (transaction) {
       var amount = Number(transaction.amount);
-      return transactionDate(transaction) && isFinite(amount) && amount > 0;
+      return transaction.category !== 'payout-withdrawal' &&
+        transactionDate(transaction) && isFinite(amount) && amount > 0;
     });
 
     if (real.some(isEarning)) {

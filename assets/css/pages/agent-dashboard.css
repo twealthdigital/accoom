@@ -688,6 +688,25 @@ a.ag-dash-stat:hover {
 .ag-dash-transaction-amount { white-space: nowrap; font-size: 0.72rem; }
 .ag-dash-transaction-amount.is-credit { color: #26734d; }
 .ag-dash-transaction-amount.is-debit { color: var(--on-page); }
+.ag-dash-tx-details { flex: 0 0 auto; padding: 5px 8px; border: 1px solid var(--line-page); border-radius: 6px; background: transparent; color: var(--gold-dark); font: inherit; font-size: 0.67rem; font-weight: 700; cursor: pointer; }
+.ag-dash-tx-details:hover { background: var(--gold-soft); }
+.ag-dash-tx-status { display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 999px; font-size: 0.62rem; font-weight: 700; }
+.ag-dash-tx-status.is-pending { background: rgba(223, 150, 46, 0.14); color: #9D5F16; }
+.ag-dash-tx-status.is-successful { background: rgba(63, 155, 112, 0.14); color: #26734d; }
+.ag-dash-tx-status.is-failed { background: rgba(217, 79, 79, 0.12); color: #b83b36; }
+html.dark-mode .ag-dash-tx-status.is-pending { color: #f0b858; }
+html.dark-mode .ag-dash-tx-status.is-successful { color: #66c894; }
+html.dark-mode .ag-dash-tx-status.is-failed { color: #f08078; }
+.ag-dash-dialog { width: min(520px, calc(100vw - 28px)); max-height: 88vh; padding: 22px; overflow: auto; border: 1px solid var(--line-page); border-radius: 14px; background: var(--surface-page); color: var(--on-page); box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35); }
+.ag-dash-dialog::backdrop { background: rgba(0, 0, 0, 0.62); backdrop-filter: blur(2px); }
+.ag-dash-dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.ag-dash-dialog-head h2 { color: var(--on-page); font-size: 1.1rem; }
+.ag-dash-dialog-close { display: grid; width: 34px; height: 34px; flex: 0 0 34px; place-items: center; border-radius: 50%; color: var(--on-page-soft); font-size: 1.35rem; cursor: pointer; }
+.ag-dash-dialog-close:hover { background: var(--gold-soft); color: var(--on-page); }
+.ag-dash-transaction-details { display: grid; gap: 0; margin: 0; }
+.ag-dash-transaction-details > div { display: grid; grid-template-columns: minmax(105px, 0.8fr) minmax(0, 1.2fr); gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line-page); }
+.ag-dash-transaction-details dt { color: var(--on-page-soft); font-size: 0.73rem; }
+.ag-dash-transaction-details dd { min-width: 0; margin: 0; overflow-wrap: anywhere; color: var(--on-page); font-size: 0.75rem; font-weight: 600; text-align: right; }
 .ag-dash-activity { margin: 0; padding: 0; list-style: none; }
 .ag-dash-activity-empty { padding: 16px 0; color: var(--on-page-soft); font-size: 0.82rem; }
 

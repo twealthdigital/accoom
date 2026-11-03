@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payouts — Agent Dashboard — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.webp" />
+  <script>
+    (function () {
+      try {
+        if (JSON.parse(localStorage.getItem('accoom-theme')) === 'dark') document.documentElement.classList.add('dark-mode');
+      } catch (e) { document.documentElement.classList.add('dark-mode'); }
+    })();
+  </script>
+  <script>
+    (function () {
+      try {
+        var user = JSON.parse(localStorage.getItem('accoom-user'));
+        if (!user) document.documentElement.classList.add('is-guest');
+        else {
+          document.documentElement.classList.add('is-auth');
+          if (user.role === 'agent' && user.agentProfileCompleted) document.documentElement.classList.add('is-agent-done');
+        }
+      } catch (e) { document.documentElement.classList.add('is-guest'); }
+    })();
+  </script>
+  <script>
+    (function () {
+      try {
+        var user = JSON.parse(localStorage.getItem('accoom-user'));
+        if (!user || !user.email) { window.location.replace('auth.html'); return; }
+        if (!user.role) { window.location.replace('onboarding.html'); return; }
+        if (user.role === 'customer') { window.location.replace('home.html'); return; }
+        if (user.role === 'agent' && !user.agentProfileCompleted) window.location.replace('agent-details.html');
+      } catch (e) { window.location.replace('auth.html'); }
+    })();
+  </script>
+  <script>
+    (function () {
+      try {
+        var PREFIX = 'accoom-partial:', pending = {};
+        var load = function (url) {
+          if (pending[url]) return pending[url];
+          var cached = null;
+          try { cached = window.sessionStorage.getItem(PREFIX + url); } catch (e) {}
+          var net = fetch(url, { priority: 'high' }).then(function (response) {
+            if (!response.ok) throw new Error(url);
+            return response.text();
+          }).then(function (html) {
+            try { window.sessionStorage.setItem(PREFIX + url, html); } catch (e) {}
+            return html;
+          });
+          if (cached) { net.catch(function () {}); pending[url] = Promise.resolve(cached); }
+          else pending[url] = net;
+          return pending[url];
+        };
+        var scan = function (root) {
+          var list = root.querySelectorAll('[data-partial]');
+          for (var i = 0; i < list.length; i++) claim(list[i]);
+        };
+        var claim = function (element) {
+          if (element.__early) return;
+          var url = element.getAttribute('data-partial');
+          if (!url) return;
+          element.__early = load(url).then(function (html) {
+            if (element.getAttribute('data-partial') !== url) return;
+            element.innerHTML = html;
+            element.setAttribute('data-early', '1');
+            scan(element);
+          }, function () {});
+        };
+        load('partials/header.html');
+        load('partials/footer.html');
+        var observer = new MutationObserver(function () { scan(document); });
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+        document.addEventListener('DOMContentLoaded', function () { scan(document); observer.disconnect(); });
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/agent-dashboard.css" />
+  <link rel="stylesheet" href="assets/css/pages/payout.css" />
+</head>
+<body>
+  <div class="partial-mount" data-partial="partials/header.html"></div>
+  <main class="ag-dash-page payout-page">
+    <div class="ag-dash-layout">
+      <div class="ag-dash-backdrop" data-payout-backdrop hidden></div>
+      <aside class="ag-dash-sidebar payout-sidebar" data-payout-sidebar>
+        <div class="ag-dash-identity">
+          <div class="ag-dash-avatar-wrap">
+            <span class="ag-dash-avatar" data-payout-avatar>AG</span>
+            <img class="ag-dash-avatar-img" data-payout-avatar-img alt="" hidden />
+          </div>
+          <div class="ag-dash-identity-text">
+            <p class="ag-dash-name" data-payout-name>Agent</p>
+            <p class="ag-dash-role" data-payout-role>Agent account</p>
+          </div>
+        </div>
+        <nav class="ag-dash-nav" aria-label="Dashboard">
+          <a href="agent-dashboard.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg><span>Overview</span>
+          </a>
+          <a href="my-listings.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg><span>My Listings</span>
+          </a>
+          <a href="payout.html" class="ag-dash-nav-link is-active" aria-current="page">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg><span>Payouts</span>
+          </a>
+          <a href="#" class="ag-dash-nav-link" data-payout-soon><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg><span>My Purchases</span></a>
+          <a href="#" class="ag-dash-nav-link" data-payout-soon><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21 12 16l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z"></path></svg><span>Saved Properties</span></a>
+          <a href="#" class="ag-dash-nav-link" data-payout-soon><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.63a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"></path></svg><span>Account Settings</span></a>
+          <a href="help-support.html" class="ag-dash-nav-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg><span>Help &amp; Support</span></a>
+        </nav>
+        <button type="button" class="ag-dash-nav-link ag-dash-signout" data-payout-signout>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Sign Out</span>
+        </button>
+      </aside>
+
+      <section class="ag-dash-main payout-main">
+        <button type="button" class="ag-dash-mobile-toggle" data-payout-mobile-toggle aria-label="Open dashboard menu" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg><span>Menu</span>
+        </button>
+        <header class="payout-page-head">
+          <div><p class="ag-dash-greeting">Payouts</p><p class="ag-dash-sub">Manage payout accounts and review withdrawal requests.</p></div>
+        </header>
+
+        <section class="payout-overview" aria-labelledby="payout-overview-title">
+          <div class="payout-section-heading"><div><h1 id="payout-overview-title">Payout overview</h1><p>Your available and past withdrawal activity.</p></div><button type="button" class="btn btn--primary payout-overview-cta" data-payout-jump-withdraw>Withdraw Money</button></div>
+          <div class="payout-summary-grid">
+            <article class="payout-summary-card payout-summary-card--primary"><span>Available Balance</span><strong data-payout-summary="availableBalance">₦0.00</strong></article>
+            <article class="payout-summary-card"><span>Total Withdrawn</span><strong data-payout-summary="totalWithdrawn">₦0.00</strong></article>
+            <article class="payout-summary-card"><span>Pending Withdrawals</span><strong data-payout-summary="pendingWithdrawals">₦0.00</strong></article>
+            <article class="payout-summary-card"><span>Total Successful Withdrawals</span><strong data-payout-summary="successfulCount">0</strong><small>completed requests</small></article>
+          </div>
+          <p class="payout-intro">Withdraw your available earnings to your registered bank account. Make sure your bank details are correct before requesting a withdrawal.</p>
+        </section>
+
+        <div class="payout-content-grid">
+          <section class="payout-card payout-methods-card" aria-labelledby="payout-methods-title">
+            <div class="payout-card-heading">
+              <div><h2 id="payout-methods-title">Payout methods</h2><p>Choose where your withdrawals should be sent.</p></div>
+              <button type="button" class="btn btn--primary payout-add-method" data-payout-add-method>Add bank account</button>
+            </div>
+            <div class="payout-account-list" data-payout-account-list></div>
+            <p class="payout-empty" data-payout-accounts-empty hidden>No payout accounts yet. Add a bank account to get started.</p>
+            <p class="payout-request-feedback" data-payout-account-feedback role="status" hidden></p>
+
+            <form class="payout-account-form" data-payout-account-form hidden novalidate>
+              <div class="payout-form-heading"><h3 data-payout-account-form-title>Add a bank account</h3><button type="button" class="payout-text-button" data-payout-account-cancel>Cancel</button></div>
+              <p class="payout-form-notice">Your full account number is not sent to a bank or saved. Only the last four digits are kept.</p>
+              <p class="payout-field-error" data-payout-account-save-error role="alert" hidden></p>
+              <label class="payout-field">
+                <span>Bank name</span>
+                <div class="dropdown payout-bank-select" data-payout-bank-select>
+                  <button type="button" class="input select-dropdown-trigger dropdown-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="payout-bank-label" aria-describedby="payout-bank-name-error" data-placeholder="true">
+                    <span id="payout-bank-label" data-dropdown-label data-placeholder-text="Select your bank">Select your bank</span>
+                    <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <div class="dropdown-panel select-dropdown-panel" data-dropdown-panel>
+                    <div class="select-dropdown-search"><input type="search" data-dropdown-search placeholder="Search banks..." aria-label="Search Nigerian banks" /></div>
+                    <ul data-dropdown-options role="listbox" aria-labelledby="payout-bank-label"></ul>
+                    <p class="select-dropdown-empty" data-dropdown-empty hidden>No banks found.</p>
+                  </div>
+                  <input type="hidden" name="bankName" value="" required />
+                </div>
+                <small id="payout-bank-name-error" class="payout-field-error" data-payout-error="bankName"></small>
+              </label>
+              <label class="payout-field">
+                <span>Account number</span>
+                <input type="text" name="accountNumber" inputmode="numeric" autocomplete="off" maxlength="10" pattern="[0-9]{10}" placeholder="Enter your 10-digit account number" aria-describedby="payout-account-number-hint payout-account-number-error" />
+                <small id="payout-account-number-hint" class="payout-field-hint" data-payout-account-number-hint>Enter 10 digits. The full number is not stored.</small>
+                <small id="payout-account-number-error" class="payout-field-error" data-payout-error="accountNumber"></small>
+              </label>
+              <label class="payout-field">
+                <span>Account name</span>
+                <input type="text" name="accountName" placeholder="Account name will appear after verification." autocomplete="name" required aria-describedby="payout-account-name-hint payout-account-name-error" />
+                <small id="payout-account-name-hint" class="payout-field-hint">Bank verification is unavailable. Enter the account name manually.</small>
+                <small id="payout-account-name-error" class="payout-field-error" data-payout-error="accountName"></small>
+              </label>
+              <button type="submit" class="btn btn--primary">Save payout account</button>
+            </form>
+
+            <div class="payout-privacy-notice">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <p>Your payout information is private and will only be used to manage withdrawals and payments on ACCOOM. Never share your banking PIN, password or OTP with anyone. <a href="/privacy-policy">Read our Privacy Policy</a></p>
+            </div>
+          </section>
+
+          <section class="payout-card payout-withdraw-card" aria-labelledby="payout-withdraw-title">
+            <div class="payout-card-heading"><div><h2 id="payout-withdraw-title">Withdraw money</h2><p>Send a request to one of your saved accounts.</p></div></div>
+            <form data-payout-withdraw-form novalidate>
+              <label class="payout-field">
+                <span>Amount to withdraw</span>
+                <input type="number" name="amount" min="0.01" step="0.01" inputmode="decimal" placeholder="Enter the amount you want to withdraw" aria-describedby="payout-available-hint payout-amount-error" required />
+                <small id="payout-available-hint" class="payout-field-hint">Available balance: <strong data-payout-available-hint>₦0.00</strong></small>
+                <small id="payout-amount-error" class="payout-field-error" data-payout-error="amount"></small>
+              </label>
+              <label class="payout-field">
+                <span>Payout account</span>
+                <div class="dropdown payout-account-select" data-payout-account-select>
+                  <button type="button" class="input select-dropdown-trigger dropdown-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="payout-account-label" aria-describedby="payout-destination-error">
+                    <span id="payout-account-label" data-dropdown-label data-placeholder-text="Select payout account">Select payout account</span>
+                    <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <ul class="dropdown-panel select-dropdown-panel" data-dropdown-panel role="listbox" aria-labelledby="payout-account-label"></ul>
+                  <input type="hidden" name="accountId" value="" />
+                </div>
+                <small id="payout-destination-error" class="payout-field-error" data-payout-error="accountId"></small>
+              </label>
+              <div class="payout-fee-breakdown">
+                <div><span>Estimated withdrawal fee</span><strong data-payout-fee>₦25.00</strong></div>
+                <div><span>Estimated amount you will receive</span><strong data-payout-net>₦0.00</strong></div>
+              </div>
+              <p class="payout-no-account" data-payout-no-account hidden>Add a payout account above before requesting a withdrawal.</p>
+              <button type="submit" class="btn btn--primary payout-withdraw-submit" data-payout-withdraw-submit>Withdraw Money</button>
+              <p class="payout-request-feedback" data-payout-request-feedback role="status" hidden></p>
+            </form>
+          </section>
+        </div>
+
+        <section class="payout-card payout-history-card" aria-labelledby="payout-history-title">
+          <div class="payout-card-heading payout-history-heading">
+            <div><h2 id="payout-history-title" data-payout-history-title>Withdrawal history</h2><p>Track the status of your withdrawal requests.</p></div>
+            <div class="payout-filter-group" role="group" aria-label="Filter withdrawals">
+              <button type="button" class="is-active" data-payout-filter="all" aria-pressed="true">All</button>
+              <button type="button" data-payout-filter="pending" aria-pressed="false">Pending</button>
+              <button type="button" data-payout-filter="successful" aria-pressed="false">Successful</button>
+              <button type="button" data-payout-filter="failed" aria-pressed="false">Failed</button>
+            </div>
+          </div>
+          <div class="payout-transaction-list" data-payout-transaction-list></div>
+          <p class="payout-empty" data-payout-transactions-empty hidden>No withdrawals match this filter.</p>
+        </section>
+
+        <section class="payout-card payout-alternative-card" aria-labelledby="payout-alternative-title">
+          <div class="payout-card-heading"><div><h2 id="payout-alternative-title">Can't find your preferred payout method?</h2><p>Don't see the bank or payment option you want to use? Let us know, and our support team will help you.</p></div></div>
+          <form class="payout-alternative-form" data-payout-alternative-form novalidate>
+            <label class="payout-field">
+              <span>Preferred payout method</span>
+              <input type="text" name="preferredMethod" placeholder="Enter your preferred bank or payment method" required aria-describedby="payout-preferred-error" />
+              <small id="payout-preferred-error" class="payout-field-error" data-payout-error="preferredMethod"></small>
+            </label>
+            <label class="payout-field">
+              <span>Tell us more (optional)</span>
+              <textarea name="requestDetails" rows="3" placeholder="Describe the payout method you would like us to support..."></textarea>
+            </label>
+            <div class="payout-support-row"><a href="help-support.html">Contact Support</a><button type="submit" class="btn btn--primary">Submit Request</button></div>
+            <p class="payout-request-feedback" data-payout-alternative-feedback role="status" hidden></p>
+          </form>
+        </section>
+
+        <dialog class="payout-dialog" data-payout-confirm-dialog aria-labelledby="payout-confirm-title">
+          <div class="payout-dialog-head"><div><p class="payout-dialog-eyebrow">Review request</p><h2 id="payout-confirm-title">Confirm withdrawal</h2></div><button type="button" class="payout-dialog-close" data-payout-confirm-close aria-label="Close confirmation">&times;</button></div>
+          <p class="payout-dialog-note">Confirming records your request. It does not send money or change your available balance.</p>
+          <dl class="payout-confirm-details">
+            <div><dt>Withdrawal amount</dt><dd data-payout-confirm="amount"></dd></div>
+            <div><dt>Withdrawal fee</dt><dd data-payout-confirm="fee"></dd></div>
+            <div><dt>Estimated net amount</dt><dd data-payout-confirm="net"></dd></div>
+            <div><dt>Destination bank</dt><dd data-payout-confirm="bank"></dd></div>
+            <div><dt>Account number</dt><dd data-payout-confirm="account"></dd></div>
+          </dl>
+          <div class="payout-dialog-actions"><button type="button" class="btn btn--ghost" data-payout-cancel-confirm>Go back</button><button type="button" class="btn btn--primary" data-payout-confirm-submit>Confirm withdrawal request</button></div>
+        </dialog>
+
+        <dialog class="payout-dialog" data-payout-details-dialog aria-labelledby="payout-details-title">
+          <div class="payout-dialog-head"><div><p class="payout-dialog-eyebrow">Withdrawal record</p><h2 id="payout-details-title">Transaction details</h2></div><button type="button" class="payout-dialog-close" data-payout-details-close aria-label="Close transaction details">&times;</button></div>
+          <dl class="payout-confirm-details">
+            <div><dt>Transaction reference</dt><dd data-payout-detail="reference"></dd></div>
+            <div><dt>Transaction type</dt><dd data-payout-detail="type"></dd></div>
+            <div><dt>Amount</dt><dd data-payout-detail="amount"></dd></div>
+            <div><dt>Date and time</dt><dd data-payout-detail="date"></dd></div>
+            <div><dt>Destination account</dt><dd data-payout-detail="destination"></dd></div>
+            <div><dt>Current status</dt><dd data-payout-detail="status"></dd></div>
+            <div><dt>Status explanation</dt><dd data-payout-detail="explanation"></dd></div>
+          </dl>
+          <p class="payout-dialog-note">A request marked successful does not confirm a bank transfer.</p>
+        </dialog>
+      </section>
+    </div>
+  </main>
+  <div data-partial="partials/footer.html"></div>
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/wallet.js"></script>
+  <script src="assets/js/data/payouts.js"></script>
+  <script src="assets/js/core/skeleton.js"></script>
+  <script src="assets/js/core/media-store.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/data/notifications.js"></script>
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+  <script>Accoom.loadPartials();</script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/payout.js"></script>
+</body>
+</html>

@@ -665,8 +665,7 @@ html.dark-mode .logo-link .logo-dark {
   line-height: 1;
 }
 
-.desktop-menu-panel .panel-row[href*="chat"],
-.desktop-menu-panel .panel-help-link {
+.desktop-menu-panel .panel-row[href*="chat"] {
   color: var(--gold) !important;
 }
 
@@ -679,10 +678,20 @@ html.dark-mode .logo-link .logo-dark {
   background: var(--line-page);
 }
 
+html.dark-mode .panel-help-cta,
+html.dark-mode .panel-help-cta:hover,
+html.dark-mode .panel-help-cta:visited {
+  color: var(--navy-2) !important;
+}
+
 .desktop-menu-panel .panel-toggle-row {
   color: var(--on-page);
   padding: 10px 14px;
   margin: 4px 0;
+}
+
+.side-panel .panel-toggle-row {
+  margin-bottom: 8px;
 }
 
 .desktop-menu-panel .panel-help {

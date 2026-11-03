@@ -19,6 +19,7 @@
       window.location.href = 'auth.html';
       return;
     }
+    if (Accoom.PayoutService) Accoom.PayoutService.initialize();
 
     var AGENT_TYPE_LABEL = {
       landlord: 'Individual Landlord',
@@ -609,16 +610,87 @@
       if (empty) empty.hidden = true;
       list.innerHTML = transactions.map(function (transaction) {
         var isCredit = transaction.type === 'credit';
+        var isPayout = transaction.category === 'payout-withdrawal';
+        var payoutStatus = isPayout && ['pending', 'successful', 'failed'].indexOf(transaction.payoutStatus) !== -1
+          ? transaction.payoutStatus
+          : '';
+        var statusLabel = payoutStatus
+          ? payoutStatus.charAt(0).toUpperCase() + payoutStatus.slice(1)
+          : '';
+        var statusClass = payoutStatus ? ' is-' + payoutStatus : '';
         var description = (transaction.description || (isCredit ? 'Account credit' : 'Account payment'))
           .replace(/\bwallet\b/gi, 'account');
         return (
           '<li class="ag-dash-transaction">' +
             '<span class="ag-dash-transaction-mark ' + (isCredit ? 'is-credit' : 'is-debit') + '" aria-hidden="true">' + (isCredit ? '+' : '−') + '</span>' +
-            '<span class="ag-dash-transaction-copy"><strong>' + escapeHtml(description) + '</strong><small>' + escapeHtml(localTime(transaction.createdAt)) + ' · ' + escapeHtml(new Date(transaction.createdAt).toLocaleDateString()) + '</small></span>' +
+            '<span class="ag-dash-transaction-copy"><strong>' + escapeHtml(description) + '</strong><small>' +
+              escapeHtml(localTime(transaction.createdAt)) + ' · ' + escapeHtml(new Date(transaction.createdAt).toLocaleDateString()) +
+              (isPayout ? ' · <span class="ag-dash-tx-status' + statusClass + '">' + escapeHtml(statusLabel) + '</span>' : '') +
+            '</small></span>' +
             '<strong class="ag-dash-transaction-amount ' + (isCredit ? 'is-credit' : 'is-debit') + '">' + (isCredit ? '+' : '−') + Accoom.formatWalletAmount(transaction.amount) + '</strong>' +
+            '<button type="button" class="ag-dash-tx-details" data-ag-tx-details="' + escapeHtml(String(transaction.id)) + '">Details</button>' +
           '</li>'
         );
       }).join('');
+    }
+
+    function renderTransactionDetails(transactionId) {
+      var dialog = document.querySelector('[data-ag-transaction-dialog]');
+      var transaction = Accoom.AgentDashboardData.getTransactions().filter(function (item) {
+        return String(item.id) === transactionId;
+      })[0];
+      if (!dialog || !transaction) return;
+
+      var isPayout = transaction.category === 'payout-withdrawal';
+      var payoutStatus = isPayout
+        ? (['pending', 'successful', 'failed'].indexOf(transaction.payoutStatus) !== -1 ? transaction.payoutStatus : 'pending')
+        : transaction.status;
+      var explanations = {
+        pending: 'Your withdrawal request has been received and is awaiting processing.',
+        successful: 'Your withdrawal has been completed successfully.',
+        failed: 'Your withdrawal could not be completed. Please check the transaction details or contact support.'
+      };
+      var date = new Date(transaction.createdAt);
+      var values = {
+        reference: String(transaction.reference || transaction.id).replace(/-DEMO-/g, '-'),
+        type: isPayout ? 'Withdrawal request' : (transaction.type === 'credit' ? 'Account credit' : 'Account payment'),
+        amount: Accoom.formatWalletAmount(transaction.amount),
+        date: isNaN(date.getTime()) ? 'Date unavailable' : date.toLocaleString(),
+        destination: isPayout
+          ? (transaction.destinationBank || transaction.payoutMethod || 'Bank account') + ' · ' + (transaction.maskedAccount || 'Account masked')
+          : 'Not applicable',
+        status: isPayout
+          ? payoutStatus.charAt(0).toUpperCase() + payoutStatus.slice(1)
+          : (transaction.status || 'Recorded'),
+        explanation: isPayout
+          ? (explanations[payoutStatus] || 'This is a preview transaction; no bank transfer has been initiated.')
+          : 'This account activity is recorded in the local preview.'
+      };
+      Object.keys(values).forEach(function (key) {
+        var field = dialog.querySelector('[data-ag-tx-detail="' + key + '"]');
+        if (field) field.textContent = values[key];
+      });
+      var statusField = dialog.querySelector('[data-ag-tx-detail="status"]');
+      if (statusField) {
+        statusField.className = isPayout ? 'ag-dash-tx-status is-' + payoutStatus : '';
+      }
+      dialog.showModal();
+    }
+
+    var transactionList = document.querySelector('[data-ag-transactions]');
+    if (transactionList) {
+      Accoom.delegate(transactionList, 'click', '[data-ag-tx-details]', function () {
+        renderTransactionDetails(this.getAttribute('data-ag-tx-details'));
+      });
+    }
+    var transactionDialog = document.querySelector('[data-ag-transaction-dialog]');
+    if (transactionDialog) {
+      Accoom.on(transactionDialog.querySelector('[data-ag-transaction-close]'), 'click', function () {
+        transactionDialog.close();
+      });
+      Accoom.on(transactionDialog, 'click', function (event) {
+        if (event.target === transactionDialog) transactionDialog.close();
+      });
     }
 
     var activeChartType = 'line';

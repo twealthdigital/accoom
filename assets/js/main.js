@@ -185,9 +185,14 @@ window.Accoom = window.Accoom || {};
 
     // ---- GUEST GATE --------------------------------------------------
     // Nothing account-specific (balance, message/notification previews,
-    // agent chat) may be visible to a signed-out visitor. Any control
-    // that would normally open real data instead routes to signup.
-    if (!Accoom.isLoggedIn()) {
+    // agent chat) may be visible to a signed-out visitor. Property listing
+    // remains an entry point for guests and routes them to signup.
+    var isLoggedIn = Accoom.isLoggedIn();
+    Accoom.$$('[data-agent-signup-cta]').forEach(function (link) {
+      if (isLoggedIn) link.href = 'onboarding.html?upgrade=agent';
+    });
+
+    if (!isLoggedIn) {
       // Balance: hide the trigger entirely, not just the figure.
       Accoom.$$('[data-balance-toggle], [data-private-balance]').forEach(function (btn) {
         btn.classList.add('is-hidden');
@@ -196,13 +201,6 @@ window.Accoom = window.Accoom || {};
       // These controls expose account-only information and actions.
       Accoom.$$('[data-private-messages], [data-private-notifications], .notif-dropdown').forEach(function (control) {
         control.classList.add('is-hidden');
-      });
-
-      // "Become an Agent" is a logged-in-customer upsell — a guest has no
-      // account yet to upgrade, so hide it rather than send them into an
-      // onboarding flow with no account behind it.
-      Accoom.$$('[data-agent-cta]').forEach(function (el) {
-        el.classList.add('is-hidden');
       });
 
       // Guests have no messages or notifications yet — strip every
