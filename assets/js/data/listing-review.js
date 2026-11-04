@@ -245,7 +245,26 @@ window.Accoom = window.Accoom || {};
     });
   }
 
+  // Internal reviewer notes. Stored on the listing, never shown to the agent.
+  function addNote(id, actor, text) {
+    var err = adminOnly(actor); if (err) return err;
+    text = String(text || '').trim();
+    if (!text) return Promise.reject(fail('empty', 'Write a note first.'));
+    return new Promise(function (resolve, reject) {
+      try {
+        var list = readList(), i = find(list, id);
+        if (i === -1) { reject(fail('not_found', 'Listing not found.')); return; }
+        var notes = (list[i].reviewNotes || []).slice(-99);
+        notes.push({ at: nowIso(), by: actor.id || 'admin', text: text.slice(0, 2000) });
+        list[i] = Object.assign({}, list[i], { reviewNotes: notes });
+        writeList(list);
+        audit(actor, 'listing.note', id, {}).then(function () { resolve(list[i]); });
+      } catch (e) { reject(e); }
+    });
+  }
+
   Accoom.ListingReview = {
+    addNote: addNote,
     LABEL: LABEL,
     RULES: RULES,
     get: get,

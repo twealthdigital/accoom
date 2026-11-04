@@ -48,3 +48,12 @@ npm start                        # serves source for quick local checks
 - Dashboard: new "In Review" tab; Make Available is blocked for unapproved listings.
 - No admin screen yet (Stage 3). Until then approve/reject only exist as API calls (`Accoom.ListingReview.approve(id, {role:'admin'})`); "admin" is a demo role, not authentication.
 - `npm test` runs Stage 1, Stage 2 module tests and a real-page test (jsdom, image decoding stubbed).
+
+## Stage 3 - document intelligence + admin review (frontend only, DEMO analysis)
+- New: `data/document-verification.js` (provider abstraction, demo analyzer, cross-document comparison, admin document decisions), `modules/admin-demo.js` (local demo-admin switch), `admin-review.html` + `pages/admin-review.js` + `css/pages/admin-review.css`. Admin page is deliberately NOT linked from any other page (a test enforces it). Open it by address and type `DEMO ADMIN`.
+- Providers: `Accoom.DocVerification.registerProvider(kind, impl)` for `ocr`, `documentAI`, `authenticity`, `external`. Built-ins are DEMO (`kind: 'demo'`). A real service must be `kind: 'remote'`, run on a secure backend, and needs the owner's consent. No API keys in browser code.
+- What is REAL in a report (tagged "Real check"): file opens, PDF page count, file-name hint, same file used on another listing. SIMULATED: type identification, text, extracted values, signature/stamp, missing pages, alterations (sample values; trigger words in a file name raise flags: mismatch-name, mismatch-address, mismatch-cert, blurry, missing-page, altered, nostamp, nosig). NOT PERFORMED: issuer/registry confirmation.
+- Analysis can never set VERIFIED. VERIFIED = administrator decision (`admin_manual`, shown as "not confirmed with the issuer") or a REMOTE external provider that really confirmed (`independent_issuer`).
+- Flow: Pending Review -> (Run analysis) AI Review -> Manual Review -> admin Approve / Request changes / Reject. Approve publishes (status `available`).
+- No authenticity percentage anywhere. Risk level = count of warnings/failures, with an on-screen explanation.
+- Still needs a backend: real OCR/AI, issuer and registry checks, real admin accounts, server-side audit, consent and privacy handling for sending documents to any external service.
