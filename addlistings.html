@@ -107,6 +107,7 @@
   <link rel="stylesheet" href="assets/css/pages/agent-dashboard.css" />
   <link rel="stylesheet" href="assets/css/components/listing-actions.css" />
   <link rel="stylesheet" href="assets/css/pages/my-listings.css" />
+  <link rel="stylesheet" href="assets/css/pages/property-documents.css" />
 </head>
 <body>
 
@@ -419,13 +420,27 @@
           </section>
 
           <!-- ============================================================
+               PROPERTY DOCUMENTATION (Stage 2)
+          ============================================================= -->
+          <section class="ml-card" data-ml-docs-card>
+            <h2 class="ml-card-title">Property Documentation</h2>
+            <p class="ml-card-sub">These documents help ACCOOM review the property and protect everyone involved. Buyers and tenants never see them. Files you choose are saved when you save the listing, so choose them before you leave this page.</p>
+            <div class="du-root" data-ml-docs></div>
+          </section>
+
+          <!-- ============================================================
                SUBMIT
           ============================================================= -->
           <div class="ml-submit-bar">
             <p class="ml-submit-note" data-ml-submit-note>Fill in every required field to save this listing.</p>
-            <button type="submit" class="ml-save-btn" data-ml-save>
-              <span data-ml-save-label>Save listing</span>
-            </button>
+            <div class="ml-submit-actions">
+              <button type="button" class="ml-save-btn ml-save-btn--secondary" data-ml-save-draft>
+                <span>Save as draft</span>
+              </button>
+              <button type="submit" class="ml-save-btn" data-ml-save>
+                <span data-ml-save-label>Submit for review</span>
+              </button>
+            </div>
           </div>
         </form>
       </section>
@@ -473,6 +488,13 @@
   <script src="assets/js/main.js"></script>
   <script src="assets/js/data/agent-dashboard.js"></script>
   <script src="assets/js/pages/agent-dashboard.js"></script>
+  <script src="assets/js/data/schemas.js"></script>
+  <script src="assets/js/core/records.js"></script>
+  <script src="assets/js/core/document-store.js"></script>
+  <script src="assets/js/data/document-requirements.js"></script>
+  <script src="assets/js/data/listing-review.js"></script>
+  <script src="assets/js/modules/document-preview.js"></script>
+  <script src="assets/js/modules/document-upload.js"></script>
   <script src="assets/js/modules/content-guard-loader.js"></script>
   <script src="assets/js/pages/my-listings.js"></script>
 </body>

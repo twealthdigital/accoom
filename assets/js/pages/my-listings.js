@@ -261,14 +261,16 @@
     var descInput = document.getElementById('ml-description');
     var yearField = document.getElementById('ml-year').closest('.ml-field');
 
+    var docsCtrl = null; // Property Documentation (Stage 2), mounted below
+    var currentApproval = null; // approval record of the listing being edited
     var propertyTypeMount = document.querySelector('[data-ml-select-mount="propertyType"]');
-    var propertyTypeSelect = buildSelect('propertyType', { options: PROPERTY_TYPES, placeholder: 'Select property type', allowCustom: true });
+    var propertyTypeSelect = buildSelect('propertyType', { options: PROPERTY_TYPES, placeholder: 'Select property type', allowCustom: true, onChange: function () { if (docsCtrl) docsCtrl.refresh(); } });
     propertyTypeMount.querySelector('.ml-select-trigger').id = 'ml-type-search';
 
     var periodMount = document.querySelector('[data-ml-select-mount="period"]');
     var periodField = document.querySelector('[data-ml-period-field]');
     var periodSelect = buildSelect('period', {
-      options: [{ value: 'year', label: 'Year' }, { value: 'month', label: 'Month' }, { value: 'week', label: 'Week' }],
+      options: [{ value: 'day', label: 'Day' }, { value: 'week', label: 'Week' }, { value: 'month', label: 'Month' }, { value: 'year', label: 'Year' }],
       placeholder: 'Select billing period', search: false
     });
 
@@ -293,6 +295,7 @@
       periodField.hidden = isSale;
       if (yearWrapper) yearWrapper.hidden = !isSale;
       if (furnishingReqBadge) furnishingReqBadge.hidden = !isSale;
+      if (docsCtrl) docsCtrl.refresh();
     }
 
     categoryButtons.forEach(function (btn) {
@@ -308,6 +311,22 @@
       });
     });
     updateCategoryFields();
+
+    /* ======================================================================
+       Property Documentation (Stage 2) — requirements change with rent/sale
+       ====================================================================== */
+    if (Accoom.Records && Accoom.Records.init) Accoom.Records.init();
+    var agentUser = Accoom.getStorage ? Accoom.getStorage('accoom-user', null) : null;
+    var ownerId = (agentUser && (agentUser.id || agentUser.agentId)) || 'local-agent';
+    var docsMount = document.querySelector('[data-ml-docs]');
+    if (docsMount && Accoom.DocumentUpload && Accoom.DocumentStore && Accoom.DocRequirements) {
+      docsCtrl = Accoom.DocumentUpload.mount(docsMount, {
+        ownerId: ownerId,
+        getType: function () { return categoryValue; },
+        getTypeLabel: function () { return propertyTypeSelect.getLabel() || ''; }
+      });
+      propertyTypeMount.addEventListener('change', function () { docsCtrl.refresh(); });
+    }
 
     /* ======================================================================
        Price breakdown
@@ -726,7 +745,8 @@
       var pending = ['images', 'videos', 'environment'].some(function (k) {
         return uploads[k].some(function (u) { return !u.dataUrl; });
       });
-      saveBtn.disabled = pending;
+      saveBtn.disabled = pending || isRejected();
+      if (draftBtn) draftBtn.disabled = pending;
       saveBtn.setAttribute('aria-busy', pending ? 'true' : 'false');
       if (!submitNote) return;
       if (pending) {
@@ -1021,6 +1041,8 @@
        ====================================================================== */
     var saveBtn = document.querySelector('[data-ml-save]');
     var saveLabel = document.querySelector('[data-ml-save-label]');
+    var draftBtn = document.querySelector('[data-ml-save-draft]');
+    var submitMode = true; // false when the agent chose "Save as draft"
     var submitNote = document.querySelector('[data-ml-submit-note]');
 
     function clearAllErrors() {
@@ -1151,7 +1173,7 @@
         state: data.state,
         area: data.area,
         address: data.address,
-        status: existing ? existing.status : 'available',
+        status: existing ? existing.status : 'in_review', // never 'available' until ACCOOM approves
         createdAt: createdAt || savedAt,
         activityHistory: activityHistory,
         category: data.category,
@@ -1175,6 +1197,15 @@
         views: existing ? existing.views : '0',
         envImageCount: envImageCount,
         envVideoCount: envVideoCount,
+        schemaVersion: 2,
+        listingType: data.category,
+        approval: existing
+          ? (existing.approval || { state: 'legacy_unreviewed', updatedAt: savedAt, reason: '', published: false, history: [] })
+          : { state: 'draft', updatedAt: savedAt, reason: '', published: false, history: [] },
+        documentation: Object.assign({ submittedCount: 0, lastSubmittedAt: '' }, existing && existing.documentation, {
+          requirementSet: data.category,
+          answers: docsCtrl ? docsCtrl.getAnswers() : ((existing && existing.documentation && existing.documentation.answers) || {})
+        }),
         updatedAt: savedAt
       });
 
@@ -1208,38 +1239,121 @@
       prepareMedia().then(function () { finishSave(data); });
     }
 
-    function finishSave(data) {
+    function readRecord(id) {
       try {
-        var saved = persistListing(data);
+        var l = JSON.parse(localStorage.getItem('accoom-agent-listings'));
+        return Array.isArray(l) ? l.filter(function (x) { return String(x.id) === String(id); })[0] || null : null;
+      } catch (e) { return null; }
+    }
+    function isRejected() { return !!(currentApproval && currentApproval.state === 'rejected'); }
+    function primaryLabel() {
+      var st = currentApproval && currentApproval.state;
+      if (st === 'approved' || st === 'pending_review' || st === 'ai_review' || st === 'manual_review') return 'Save changes';
+      if (st === 'changes_required') return 'Resubmit for review';
+      return 'Submit for review';
+    }
+    function updateSubmitUi() {
+      var st = currentApproval && currentApproval.state;
+      saveLabel.textContent = primaryLabel();
+      if (draftBtn) draftBtn.hidden = ['approved', 'pending_review', 'ai_review', 'manual_review', 'rejected'].indexOf(st) !== -1;
+      if (isRejected()) {
+        saveBtn.disabled = true;
+        submitNote.textContent = 'This listing was rejected' + (currentApproval.reason ? ': ' + currentApproval.reason : '.') + ' It can no longer be edited.';
+      }
+    }
+    // A listing only goes to ACCOOM review from these states.
+    function canSubmitNow() {
+      var st = currentApproval && currentApproval.state;
+      return !st || st === 'draft' || st === 'changes_required' || st === 'legacy_unreviewed';
+    }
+
+    function stopWithMessage(msg, tone) {
+      setSaving(false);
+      submitNote.textContent = msg;
+      submitNote.style.color = tone === 'ok' ? '' : 'var(--danger, #d64545)';
+      toast(msg);
+    }
+
+    function goToListings(id, message) {
+      try { sessionStorage.removeItem(DRAFT_KEY); } catch (err) { /* ignore */ }
+      var rec = readRecord(id) || {};
+      var landing = 'my-listings.html?tab=' + encodeURIComponent(rec.status || 'in_review') + '&kind=' + (rec.category === 'sale' ? 'sale' : 'rent');
+      toast(message, { link: landing, linkLabel: 'View My Listings' });
+      window.location.href = landing;
+    }
+
+    function finishSave(data) {
+      var isNew = !editingId;
+      var before = editingId ? readRecord(editingId) : null;
+      var saved;
+      try { saved = persistListing(data); }
+      catch (err) { stopWithMessage('Something went wrong saving this listing. Please try again.'); return; }
+      editingId = saved.id; // a retry after a document problem updates this same listing
+      currentApproval = saved.approval;
+
+      var RV = Accoom.ListingReview;
+      var agent = { role: 'agent', id: ownerId };
+      var commit = (docsCtrl && docsCtrl.hasPending()) ? docsCtrl.commit(saved.id) : Promise.resolve({ uploaded: [], failed: [], replacedTypes: [] });
+
+      commit.then(function (res) {
+        if (res.failed.length) {
+          // The listing is saved, but it is NOT submitted while a document failed.
+          docsCtrl.setApproval(saved.approval);
+          stopWithMessage('Listing saved, but ' + res.failed.length + (res.failed.length === 1 ? ' document' : ' documents') + ' could not be saved. See the red messages in Property Documentation, fix them, then try again.');
+          var card = document.querySelector('[data-ml-docs-card]');
+          if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return null;
+        }
+        var chain = Promise.resolve();
+        res.replacedTypes.forEach(function (t) { chain = chain.then(function () { return RV.documentReplaced(saved.id, t, agent); }); });
+        return chain.then(function () {
+          // A changed address, state, area or listing type on an approved listing needs a new review.
+          var now = readRecord(saved.id);
+          var core = before && ['address', 'state', 'area', 'category'].some(function (k) { return before[k] !== now[k]; });
+          if (core && now.approval && now.approval.state === 'approved') {
+            return RV.transition(saved.id, 'pending_review', agent, { reason: 'The address, area, state or listing type changed and must be reviewed again.' });
+          }
+        }).then(function () {
+          return RV.syncDocumentation(saved.id);
+        }).then(function () {
+          var st = (readRecord(saved.id).approval || {}).state;
+          if (submitMode && (!st || st === 'draft' || st === 'changes_required' || st === 'legacy_unreviewed')) {
+            return RV.submitForReview(saved.id, agent).then(function () { return 'submitted'; });
+          }
+          return 'saved';
+        });
+      }).then(function (outcome) {
+        if (!outcome) return;
         try {
-          if (Accoom.NotificationService) {
-            Accoom.NotificationService.add({
-              type: 'accoom',
-              title: editingId ? 'Listing updated' : 'Listing published',
-              text: editingId
-                ? '\u201C' + data.name + '\u201D was updated successfully.'
-                : '\u201C' + data.name + '\u201D is now live under Available Properties on your dashboard.',
-              link: 'my-listings.html'
-            });
+          if (Accoom.NotificationService && outcome === 'saved') {
+            Accoom.NotificationService.add({ type: 'accoom', title: isNew ? 'Draft saved' : 'Listing updated',
+              text: '\u201C' + data.name + '\u201D was saved' + (isNew ? ' as a draft. It is not visible to buyers.' : '.'), link: 'my-listings.html' });
           }
         } catch (err) { /* a notification problem must never stop a save */ }
-        try { sessionStorage.removeItem(DRAFT_KEY); } catch (err) { /* ignore */ }
-        setSaving(false);
-        var landing = 'my-listings.html?tab=' + encodeURIComponent(saved.status || 'available') +
-          '&kind=' + (saved.category === 'sale' ? 'sale' : 'rent');
-        toast(editingId ? 'Listing updated.' : 'Listing published.', { link: landing, linkLabel: 'View My Listings' });
-        window.location.href = landing;
-      } catch (err) {
-        setSaving(false);
-        submitNote.textContent = 'Something went wrong saving this listing. Please try again.';
-        submitNote.style.color = 'var(--danger, #d64545)';
-        toast('Couldn\u2019t save this listing.');
-      }
+        goToListings(saved.id, outcome === 'submitted' ? 'Listing submitted for review.' : (isNew ? 'Draft saved.' : 'Listing updated.'));
+      }).catch(function (err) {
+        if (err && err.code === 'documents_incomplete') {
+          var names = err.report.missing.map(function (m) { return m.label; }).concat(err.report.groupIssues.map(function (g) { return g.label; }));
+          stopWithMessage('Listing saved as a draft, but it was not submitted. Still needed: ' + names.join('; ') + '.');
+        } else {
+          stopWithMessage((err && err.message) || 'Something went wrong. Your listing was saved as a draft.');
+        }
+      });
     }
 
     function setSaving(on) {
       saveBtn.disabled = on;
-      saveLabel.innerHTML = on ? '<span class="ml-save-spinner" aria-hidden="true"></span> Saving\u2026' : (editingId ? 'Save changes' : 'Save listing');
+      saveLabel.innerHTML = on ? '<span class="ml-save-spinner" aria-hidden="true"></span> Saving\u2026' : primaryLabel();
+      if (draftBtn) draftBtn.disabled = on;
+    }
+
+    saveBtn.addEventListener('click', function () { submitMode = true; });
+    if (draftBtn) {
+      draftBtn.addEventListener('click', function () {
+        submitMode = false;
+        if (form.requestSubmit) form.requestSubmit();
+        else form.dispatchEvent(new Event('submit', { cancelable: true }));
+      });
     }
 
     form.addEventListener('submit', function (e) {
@@ -1247,6 +1361,19 @@
       if (isLocked()) return;
       var data = collect();
       if (!data) return;
+      // Submitting for review needs every required document. A draft does not.
+      if (submitMode && canSubmitNow() && docsCtrl) {
+        var ready = docsCtrl.readiness();
+        if (!ready.complete) {
+          var need = ready.missing.map(function (m) { return m.label; }).concat(ready.groupIssues.map(function (g) { return g.label; }));
+          submitNote.textContent = 'Add the required documents first (or choose Save as draft): ' + need.join('; ') + '.';
+          submitNote.style.color = 'var(--danger, #d64545)';
+          var dc = document.querySelector('[data-ml-docs-card]');
+          if (dc) dc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          toast('Some required documents are missing.');
+          return;
+        }
+      }
       setSaving(true);
       window.setTimeout(function () {
         shrinkStep = 0;
@@ -1263,7 +1390,12 @@
       if (!record) { editingId = null; return; }
 
       document.querySelector('[data-ml-title]').textContent = 'Edit listing';
-      saveLabel.textContent = 'Save changes';
+      currentApproval = record.approval || { state: 'legacy_unreviewed' };
+      updateSubmitUi();
+      if (docsCtrl) {
+        docsCtrl.setAnswers((record.documentation && record.documentation.answers) || {});
+        docsCtrl.loadExisting(record.id, currentApproval);
+      }
 
       suppressGuardFlag = true;
       categoryValue = record.category || 'rent';

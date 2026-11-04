@@ -1,0 +1,100 @@
+/* ==========================================================================
+   ACCOOM — Property documentation (Stage 2)
+   Uses the existing tokens (--gold, --line-page, --surface-page-alt ...).
+   Mobile first: one column, large tap targets (min 40px).
+   ========================================================================== */
+
+.du-root { display: flex; flex-direction: column; gap: 12px; }
+.du-accepted { margin: 0; font-size: 0.78rem; color: var(--on-page-soft); }
+
+.du-banner {
+  padding: 10px 12px; border-radius: 10px; font-size: 0.82rem; line-height: 1.45;
+  background: var(--gold-soft); border: 1px solid var(--line-page); color: var(--on-page);
+}
+.du-banner--warn { border-color: #d4a017; }
+.du-banner--bad { border-color: var(--danger, #d64545); }
+
+.du-question { padding: 12px; border: 1px solid var(--line-page); border-radius: 12px; background: var(--surface-page); }
+.du-question-label { margin: 0 0 8px; font-size: 0.84rem; font-weight: 600; color: var(--on-page); }
+.du-radio { display: flex; align-items: center; gap: 10px; min-height: 40px; font-size: 0.85rem; color: var(--on-page); cursor: pointer; }
+.du-radio input { width: 18px; height: 18px; accent-color: var(--gold); flex-shrink: 0; }
+
+.du-group { padding: 10px 12px; border-radius: 10px; font-size: 0.8rem; line-height: 1.45; border: 1px dashed var(--line-page); color: var(--on-page-soft); }
+.du-group--open { border-color: var(--gold); color: var(--on-page); }
+.du-group--ok { border-style: solid; }
+
+.du-item { padding: 14px; border: 1px solid var(--line-page); border-radius: 12px; background: var(--surface-page); display: flex; flex-direction: column; gap: 8px; }
+.du-item-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 6px 10px; }
+.du-item-name { font-size: 0.9rem; font-weight: 600; color: var(--on-page); flex: 1 1 200px; }
+.du-help { margin: 0; font-size: 0.76rem; color: var(--on-page-soft); line-height: 1.45; }
+
+.du-badge { font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.du-badge--required { background: rgba(214, 69, 69, 0.12); color: #b23c3c; }
+.du-badge--applicable { background: var(--gold-soft); color: var(--gold-dark, #9d5f16); }
+.du-badge--optional { background: rgba(120, 120, 120, 0.14); color: var(--on-page-soft); }
+html.dark-mode .du-badge--required { color: #f08a8a; }
+html.dark-mode .du-badge--applicable { color: var(--gold); }
+
+.du-file {
+  display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px;
+  border: 1px solid var(--line-page); background: var(--surface-page-alt); flex-wrap: wrap;
+}
+.du-file--staged { border-style: dashed; }
+.du-file-icon {
+  flex: 0 0 38px; height: 38px; border-radius: 8px; display: grid; place-items: center;
+  font-size: 0.65rem; font-weight: 800; background: var(--gold-soft); color: var(--gold-dark, #9d5f16);
+}
+.du-file-main { display: flex; flex-direction: column; min-width: 0; flex: 1 1 160px; gap: 2px; }
+.du-file-name { font-size: 0.84rem; font-weight: 600; color: var(--on-page); overflow-wrap: anywhere; }
+.du-file-meta { font-size: 0.74rem; color: var(--on-page-soft); }
+.du-file-reason { font-size: 0.74rem; color: #b23c3c; }
+.du-file-actions { display: flex; gap: 4px; margin-left: auto; }
+
+.du-tone--ok { color: #26734d; font-weight: 600; }
+.du-tone--warn { color: #9d5f16; font-weight: 600; }
+.du-tone--bad { color: #b23c3c; font-weight: 600; }
+html.dark-mode .du-tone--ok { color: #66c894; }
+html.dark-mode .du-tone--warn { color: var(--gold); }
+html.dark-mode .du-tone--bad { color: #f08a8a; }
+
+.du-link {
+  min-height: 40px; padding: 0 10px; border: 0; background: transparent; cursor: pointer;
+  font: inherit; font-size: 0.8rem; font-weight: 600; color: var(--gold-dark, #9d5f16);
+}
+html.dark-mode .du-link { color: var(--gold); }
+.du-link--danger { color: #b23c3c; }
+.du-link:hover { text-decoration: underline; }
+
+.du-choose {
+  align-self: flex-start; min-height: 42px; padding: 0 16px; border-radius: 10px; cursor: pointer;
+  border: 1px dashed var(--gold); background: transparent; color: var(--on-page); font: inherit; font-size: 0.84rem; font-weight: 600;
+}
+.du-choose:hover { background: var(--gold-soft); }
+.du-error { margin: 0; font-size: 0.78rem; color: var(--danger, #d64545); }
+.du-summary { margin: 0; font-size: 0.8rem; color: var(--on-page-soft); }
+.du-summary--ok { color: #26734d; }
+html.dark-mode .du-summary--ok { color: #66c894; }
+
+.ml-save-btn--secondary {
+  background: transparent; color: var(--on-page); border: 1px solid var(--line-page); box-shadow: none;
+}
+.ml-save-btn--secondary:hover { background: var(--gold-soft); }
+.ml-submit-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Preview modal */
+.dp-modal { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 12px; }
+.dp-modal[hidden] { display: none; }
+.dp-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); }
+.dp-box {
+  position: relative; width: min(900px, 100%); max-height: 100%; display: flex; flex-direction: column;
+  background: var(--surface-page-alt); border-radius: 14px; overflow: hidden; border: 1px solid var(--line-page);
+}
+.dp-head { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line-page); }
+.dp-title { margin: 0; flex: 1; font-size: 0.92rem; font-weight: 700; color: var(--on-page); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dp-close { width: 40px; height: 40px; border: 0; background: transparent; font-size: 1.6rem; line-height: 1; cursor: pointer; color: var(--on-page); }
+.dp-body { overflow: auto; padding: 10px; -webkit-overflow-scrolling: touch; }
+.dp-frame { width: 100%; height: min(70vh, 640px); border: 0; background: #fff; }
+.dp-img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.dp-fallback, .dp-loading, .dp-error { margin: 8px 0 0; font-size: 0.8rem; color: var(--on-page-soft); }
+.dp-error { color: var(--danger, #d64545); }
+html.dp-open { overflow: hidden; }

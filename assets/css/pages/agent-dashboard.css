@@ -990,3 +990,8 @@ td.ag-dash-row-actions { text-align: center; vertical-align: middle; }
 .ag-dash-c-totals i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 .ag-dash-c-totals span { color: var(--on-page-soft); }
 .ag-dash-c-totals strong { color: var(--on-page); }
+
+/* Review badge shown under a listing status on the dashboard */
+.ag-dash-table-status--in_review { background: rgba(212, 160, 23, 0.16); color: #8a6508; }
+html.dark-mode .ag-dash-table-status--in_review { color: var(--gold); }
+.ag-dash-review-note { display: block; margin-top: 4px; font-size: 0.72rem; color: var(--on-page-soft); max-width: 28ch; }

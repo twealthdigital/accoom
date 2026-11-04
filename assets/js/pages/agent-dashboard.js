@@ -156,12 +156,17 @@
 
     var STATUS_LABEL = {
       available: 'Available',
+      in_review: 'In Review',
       in_progress: 'In Progress',
       sold: 'Sold',
       delisted: 'Delisted',
       in_dispute: 'In Dispute',
       reported: 'Reported',
       hold: 'Hold'
+    };
+    var APPROVAL_LABEL = {
+      draft: 'Draft', pending_review: 'Pending Review', ai_review: 'AI Review', manual_review: 'Manual Review',
+      changes_required: 'Changes Required', rejected: 'Rejected', approved: 'Approved'
     };
     function formatPrice(n) {
       return '₦' + Number(n || 0).toLocaleString('en-NG');
@@ -222,6 +227,13 @@
         folderGrid.innerHTML = pageItems.map(function (f) {
           var kind = f.category === 'sale' ? 'sale' : 'rent';
           var status = STATUS_LABEL[f.status] || 'Available';
+          var reviewNote = '';
+          if (f.status === 'in_review') {
+            // show WHERE the listing is in review, and why changes are needed
+            var ap = f.approval || {};
+            status = APPROVAL_LABEL[ap.state] || 'In Review';
+            if (ap.reason && (ap.state === 'changes_required' || ap.state === 'rejected' || ap.state === 'pending_review')) reviewNote = '<small class="ag-dash-review-note">' + escapeHtml(ap.reason) + '</small>';
+          }
           var cover = f.cover || 'assets/images/home-properties/placeholder.webp';
           return (
             '<tr class="ag-dash-listing-row" data-ag-listing-row data-listing-id="' + escapeHtml(String(f.id || '')) + '" data-name="' + escapeHtml(f.name || 'Untitled property') + '" data-location="' + escapeHtml(f.location || '') + '">' +
@@ -231,7 +243,7 @@
               '</td>' +
               '<td data-label="Type">' + (kind === 'sale' ? 'For sale' : 'For rent') + '</td>' +
               '<td data-label="Price">' + formatPrice(f.price) + (kind === 'sale' ? '' : ' / ' + escapeHtml(f.period || 'year')) + '</td>' +
-              '<td data-label="Status"><span class="ag-dash-table-status ag-dash-table-status--' + escapeHtml(f.status || 'available') + '">' + escapeHtml(status) + '</span></td>' +
+              '<td data-label="Status"><span class="ag-dash-table-status ag-dash-table-status--' + escapeHtml(f.status || 'available') + '">' + escapeHtml(status) + '</span>' + reviewNote + '</td>' +
               '<td data-label="Listed">' + escapeHtml(f.dateAdded || timeAgo(f.updatedAt) || '—') + '</td>' +
               '<td class="ag-dash-row-actions" data-label="">' +
                 '<div class="lax-controls"></div>' +
@@ -286,7 +298,7 @@
       var params = new URLSearchParams(q);
       requestedListingId = params.get('id') || '';
       requestedListingView = params.get('view') === '1';
-      if (t && ['available', 'in_progress', 'sold', 'delisted', 'in_dispute', 'reported', 'hold'].indexOf(t[1]) !== -1) listingState.tab = t[1];
+      if (t && ['available', 'in_review', 'in_progress', 'sold', 'delisted', 'in_dispute', 'reported', 'hold'].indexOf(t[1]) !== -1) listingState.tab = t[1];
       if (k && listingState.tab === 'available') listingState.kind = k[1];
       var requestedListing = folders.filter(function (folder) { return String(folder.id) === requestedListingId; })[0];
       if (requestedListing) {

@@ -23,8 +23,9 @@ window.Accoom = window.Accoom || {};
     billingPeriod: ['day', 'week', 'month', 'year'],
 
     // Lifecycle status of a listing (existing values are kept: available,
-    // in_progress, sold, delisted, in_dispute, reported, hold; "rented" is new).
-    listingStatus: ['available', 'in_progress', 'rented', 'sold', 'delisted',
+    // in_progress, sold, delisted, in_dispute, reported, hold; "rented" and
+    // "in_review" are new. in_review = not yet approved, never public).
+    listingStatus: ['in_review', 'available', 'in_progress', 'rented', 'sold', 'delisted',
       'in_dispute', 'reported', 'hold', 'deleted'],
 
     // Approval state is a SEPARATE axis from the lifecycle status above.

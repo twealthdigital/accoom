@@ -370,6 +370,8 @@
     var priceValue = pm ? parseFloat(pm[1].replace(/,/g, '')) : null;
     var period = /\/\s*(year|yr|annum)/i.test(joined) ? 'year' :
       /\/\s*(month|mo)\b/i.test(joined) ? 'month' :
+      /\/\s*(week|wk)\b/i.test(joined) ? 'week' :
+      /\/\s*(day)\b/i.test(joined) ? 'day' :
       /for sale/i.test(joined) ? 'sale' : '';
 
     // name
@@ -455,6 +457,8 @@
   function periodLabel(period) {
     if (period === 'year') return '/ year';
     if (period === 'month') return '/ month';
+    if (period === 'week') return '/ week';
+    if (period === 'day') return '/ day';
     if (period === 'sale') return 'For Sale';
     return '';
   }
@@ -470,6 +474,7 @@
     if (/\bsold\b/.test(t)) return 'sold';
     if (/progress/.test(t)) return 'in-progress';
     if (/\bhold\b/.test(t)) return 'hold';
+    if (/\breview\b/.test(t)) return 'in_review';
     if (/available/.test(t)) return 'available';
     return null;
   }
@@ -672,6 +677,14 @@
         { action: 'hold',   label: 'Hold',           icon: 'pause' },
         { action: 'edit',   label: 'Edit',           icon: 'edit'  },
         { action: 'view',   label: 'View',           icon: 'eye'   }
+      ];
+    }
+
+    if (s === 'in_review') {
+      return [
+        { action: 'delete', label: 'Delete', icon: 'trash', danger: true },
+        { action: 'edit',   label: 'Edit',   icon: 'edit'  },
+        { action: 'view',   label: 'View',   icon: 'eye'   }
       ];
     }
 
@@ -1153,9 +1166,22 @@
     }
   }
 
+  // A listing that ACCOOM has not approved can never be made available.
+  function reviewBlock(id) {
+    try {
+      var list = JSON.parse(window.localStorage.getItem('accoom-agent-listings'));
+      var rec = Array.isArray(list) ? list.filter(function (l) { return String(l.id) === String(id); })[0] : null;
+      var st = rec && rec.approval && rec.approval.state;
+      if (st && st !== 'approved' && st !== 'legacy_unreviewed') return 'This listing has not been approved by ACCOOM yet, so it cannot be made available.';
+    } catch (e) { /* no record: fall through to the normal flow */ }
+    return '';
+  }
+
   function actionMakeAvailable(card, btn) {
     var info = readCard(card);
     var status = getStatus(card);
+    var blocked = reviewBlock(info.id);
+    if (blocked) { notify('Cannot make available', blocked); return; }
     openConfirm({
       returnFocus: btn,
       tone: 'gold',

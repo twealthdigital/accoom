@@ -40,3 +40,11 @@ Goal: only the PNG images and MP4 videos should be slowing the site down.
 npm install && npm run build     # prints "Bundled scripts on N pages: X -> Y"
 npm start                        # serves source for quick local checks
 ```
+
+## Stage 2 - property documents + listing approval (frontend only)
+- New: `data/document-requirements.js` (rent vs sale sets, "who is listing" question, sale needs at least ONE title document, admin overrides), `data/listing-review.js` (approval state machine + `isPubliclyVisible` / `filterPublic`), `modules/document-upload.js`, `modules/document-preview.js`, `css/pages/property-documents.css`.
+- A listing now has two axes: `status` (lifecycle; new value `in_review`) and `approval.state` (draft, pending_review, ai_review, manual_review, changes_required, approved, rejected, legacy_unreviewed). PUBLIC = `status==='available' && approval.state==='approved' && approval.published`. **Every public page must filter through `Accoom.ListingReview.filterPublic`.** Today no public page reads `accoom-agent-listings` (a test enforces this).
+- Listing form: new "Property Documentation" card, "Save as draft" + "Submit for review" buttons, Day billing period. New listings save as `in_review`, never `available`.
+- Dashboard: new "In Review" tab; Make Available is blocked for unapproved listings.
+- No admin screen yet (Stage 3). Until then approve/reject only exist as API calls (`Accoom.ListingReview.approve(id, {role:'admin'})`); "admin" is a demo role, not authentication.
+- `npm test` runs Stage 1, Stage 2 module tests and a real-page test (jsdom, image decoding stubbed).
