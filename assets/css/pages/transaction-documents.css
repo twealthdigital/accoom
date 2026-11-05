@@ -1,0 +1,30 @@
+/* ACCOOM: Receipts & agreements page (Stage 5). Builds on document-centre.css tokens. */
+.td-page { display: flex; flex-direction: column; gap: 12px; }
+.td-tabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+.td-tabs .dc-tab { flex: 0 0 auto; white-space: nowrap; }
+.td-panel { display: flex; flex-direction: column; gap: 12px; }
+.td-banner { padding: 12px 14px; border-radius: 12px; border: 1px solid #d4a017; background: rgba(212, 160, 23, 0.1); font-size: 0.84rem; line-height: 1.45; }
+.td-banner strong { display: block; margin-bottom: 2px; }
+.td-banner--info { border-color: var(--line-page); background: var(--surface-page-alt); }
+.td-banner ul { margin: 6px 0 0; padding-left: 18px; }
+.td-banner a { color: var(--gold-dark, #9d5f16); font-weight: 600; }
+.td-state { font-size: 0.8rem; font-weight: 600; }
+.td-state--open { color: #b23c3c; }
+.td-state--good { color: #26734d; }
+.td-timeline { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 0.76rem; color: var(--on-page-soft); }
+.td-timeline li { padding-left: 12px; border-left: 2px solid var(--line-page); }
+.td-form { display: flex; flex-direction: column; gap: 4px; padding: 14px; border: 1px solid var(--line-page); border-radius: 12px; background: var(--surface-page-alt); }
+.td-radio { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; min-height: 44px; border: 1px solid var(--line-page); border-radius: 10px; font-size: 0.84rem; line-height: 1.35; cursor: pointer; }
+.td-radio input { margin-top: 2px; accent-color: var(--gold); width: 18px; height: 18px; flex-shrink: 0; }
+.td-radio:has(input:checked) { border-color: var(--gold); background: var(--gold-soft); }
+.td-check { display: flex; gap: 10px; align-items: flex-start; font-size: 0.84rem; line-height: 1.4; margin: 8px 0; }
+.td-check input { margin-top: 2px; accent-color: var(--gold); width: 18px; height: 18px; flex-shrink: 0; }
+.td-textarea { min-height: 140px; padding-top: 10px; resize: vertical; font: inherit; }
+.td-terms { max-height: 280px; overflow: auto; padding: 12px; border: 1px solid var(--line-page); border-radius: 10px; font-size: 0.86rem; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--surface-page); }
+.td-sig-canvas { width: 100%; max-width: 360px; height: 110px; border: 1.5px dashed var(--line-page); border-radius: 10px; background: #fff; touch-action: none; display: block; }
+.td-honest { font-size: 0.78rem; line-height: 1.5; color: var(--on-page-soft); padding: 10px 12px; border-radius: 10px; background: var(--surface-page); border: 1px solid var(--line-page); }
+.td-privacy h3 { margin: 14px 0 4px; font-size: 0.95rem; }
+.td-privacy p, .td-privacy li { font-size: 0.86rem; line-height: 1.55; color: var(--on-page-soft); }
+.td-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.td-table td { padding: 10px 6px; border-bottom: 1px solid var(--line-page); vertical-align: middle; }
+@media (max-width: 560px) { .td-table, .td-table tbody, .td-table tr, .td-table td { display: block; } .td-table tr { padding: 8px 0; border-bottom: 1px solid var(--line-page); } .td-table td { border: 0; padding: 4px 0; } }
