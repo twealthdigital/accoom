@@ -1198,6 +1198,8 @@
         envImageCount: envImageCount,
         envVideoCount: envVideoCount,
         schemaVersion: 2,
+        ownerId: (existing && existing.ownerId) || ownerId,
+        agentName: (existing && existing.agentName) || ((agentUser && (agentUser.fullName || agentUser.name)) || ''),
         listingType: data.category,
         approval: existing
           ? (existing.approval || { state: 'legacy_unreviewed', updatedAt: savedAt, reason: '', published: false, history: [] })

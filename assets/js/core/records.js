@@ -35,7 +35,7 @@ window.Accoom = window.Accoom || {};
     analysisReports: {},
     verifications: {},
     transactions: { uniqueKey: 'idempotencyKey' },
-    actds: { immutable: true },
+    actds: { immutable: true, uniqueKey: 'versionKey' }, // one record per transaction + version
     receipts: { immutable: true },
     agreements: {},
     tenancies: {},

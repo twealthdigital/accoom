@@ -116,6 +116,9 @@ window.Accoom = window.Accoom || {};
         billingPeriod: d.billingPeriod ? pick(d.billingPeriod, ENUM.billingPeriod, '') : '',
         paymentReference: str(d.paymentReference), paymentMethod: str(d.paymentMethod),
         paidAt: str(d.paidAt), actdId: str(d.actdId), receiptId: str(d.receiptId),
+        receiptRef: str(d.receiptRef), provider: str(d.provider), listingName: str(d.listingName),
+        customerName: str(d.customerName), agentName: str(d.agentName), periodCount: num(d.periodCount, 1),
+        startDate: str(d.startDate), expiryDate: str(d.expiryDate),
         tenancyId: str(d.tenancyId), createdAt: d.createdAt || nowIso()
       };
     },
@@ -123,8 +126,10 @@ window.Accoom = window.Accoom || {};
       d = d || {};
       return {
         id: d.id || '', actdNumber: str(d.actdNumber), transactionId: str(d.transactionId),
-        version: num(d.version, 1), supersedes: str(d.supersedes), updateReason: str(d.updateReason),
-        content: d.content || {}, issuedAt: d.issuedAt || nowIso(), pdfRef: str(d.pdfRef)
+        versionKey: str(d.versionKey), version: num(d.version, 1), supersedes: str(d.supersedes), updateReason: str(d.updateReason),
+        content: d.content || {}, seal: str(d.seal), listingId: str(d.listingId), customerId: str(d.customerId), agentId: str(d.agentId),
+        paymentSource: pick(d.paymentSource, ENUM.paymentSource, 'demo'),
+        issuedAt: d.issuedAt || nowIso(), pdfRef: str(d.pdfRef)
       };
     },
     receipt: function (d) {

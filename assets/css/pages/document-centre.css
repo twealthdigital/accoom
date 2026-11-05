@@ -1,0 +1,40 @@
+/* ACCOOM — document centre + ACTD check (Stage 4). Existing tokens, mobile first. */
+.dc-page { max-width: 880px; margin: 0 auto; padding: 18px 14px 56px; color: var(--on-page); display: flex; flex-direction: column; gap: 14px; }
+.dc-title { margin: 0; font-size: 1.4rem; }
+.dc-sub { margin: 0; font-size: 0.88rem; color: var(--on-page-soft); }
+.dc-label { font-size: 0.78rem; font-weight: 600; color: var(--on-page-soft); display: block; margin-top: 8px; }
+.dc-input { width: 100%; min-height: 44px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line-page); background: var(--surface-page); color: var(--on-page); font: inherit; font-size: 0.9rem; }
+.dc-btn { min-height: 44px; padding: 0 18px; border-radius: 10px; border: 1px solid var(--line-page); background: transparent; color: var(--on-page); font: inherit; font-size: 0.86rem; font-weight: 600; cursor: pointer; }
+.dc-btn:hover:not(:disabled) { background: var(--gold-soft); }
+.dc-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.dc-btn--primary { background: var(--gold); border-color: var(--gold); color: #1a1a1a; margin-top: 12px; }
+.dc-btn--sm { min-height: 40px; padding: 0 14px; font-size: 0.8rem; }
+.dc-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.dc-tab { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-page); background: transparent; color: var(--on-page); font: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+.dc-tab[aria-selected="true"] { background: var(--gold); border-color: var(--gold); color: #1a1a1a; }
+.dc-msg { padding: 10px 12px; border-radius: 10px; font-size: 0.84rem; border: 1px solid var(--line-page); background: var(--gold-soft); }
+.dc-msg--bad { border-color: var(--danger, #d64545); }
+.dc-list { display: flex; flex-direction: column; gap: 12px; }
+.dc-empty { padding: 24px 14px; text-align: center; color: var(--on-page-soft); border: 1px dashed var(--line-page); border-radius: 12px; font-size: 0.88rem; }
+.dc-card { padding: 14px; border: 1px solid var(--line-page); border-radius: 12px; background: var(--surface-page); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.dc-card-top { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; justify-content: space-between; }
+.dc-num { font-weight: 800; font-size: 0.95rem; overflow-wrap: anywhere; }
+.dc-prop { font-size: 0.92rem; font-weight: 600; }
+.dc-meta { font-size: 0.78rem; color: var(--on-page-soft); }
+.dc-pill { font-size: 0.68rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: rgba(120,120,120,0.16); }
+.dc-pill--demo { background: rgba(214,69,69,0.14); color: #b23c3c; }
+.dc-pill--ok { background: rgba(38,115,77,0.16); color: #26734d; }
+html.dark-mode .dc-pill--demo { color: #f08a8a; } html.dark-mode .dc-pill--ok { color: #66c894; }
+.dc-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.dc-versions { margin: 4px 0 0; padding: 10px; border-radius: 10px; background: var(--surface-page-alt); display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; }
+.dc-ver { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; justify-content: space-between; }
+.dc-demo { border: 1px solid var(--line-page); border-radius: 12px; padding: 4px 14px; background: var(--surface-page-alt); }
+.dc-demo summary { min-height: 44px; display: flex; align-items: center; font-weight: 700; font-size: 0.86rem; cursor: pointer; }
+.dc-demo-body { padding-bottom: 14px; }
+.dc-note { font-size: 0.8rem; color: var(--on-page-soft); line-height: 1.5; margin: 6px 0; }
+.dc-verify-form { display: flex; flex-direction: column; gap: 2px; max-width: 460px; }
+.dc-result { padding: 14px; border-radius: 12px; border: 1px solid var(--line-page); font-size: 0.9rem; line-height: 1.55; }
+.dc-result:empty { display: none; }
+.dc-result--ok { border-color: #26734d; background: rgba(38,115,77,0.08); }
+.dc-result--bad { border-color: #b23c3c; background: rgba(214,69,69,0.07); }
+.dc-result--warn { border-color: #d4a017; background: rgba(212,160,23,0.1); }

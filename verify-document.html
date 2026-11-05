@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Check an ACTD — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.webp" />
+
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark') document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+
+  <!-- auth-state: tags <html> as guest / signed-in BEFORE first paint so account-only
+       parts of the header (balance, messages, notifications, agent CTA) never flash. -->
+  <script>
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('accoom-user')), c = document.documentElement.classList;
+        if (!u) c.add('is-guest');
+        else { c.add('is-auth'); if (u.role === 'agent' && u.agentProfileCompleted) c.add('is-agent-done'); }
+      } catch (e) { document.documentElement.classList.add('is-guest'); }
+    })();
+  </script>
+
+  <!--
+    SECURITY GATE, Same soft, client-side-only caveat as every other
+    gated page here (see onboarding.html / agent-details.html).
+  -->
+  <script>
+    (function () {
+      try {
+        var user = JSON.parse(localStorage.getItem('accoom-user'));
+        if (!user || !user.email) {
+          window.location.replace('auth.html');
+          return;
+        }
+        if (!user.role) {
+          window.location.replace('onboarding.html');
+          return;
+        }
+        if (user.role === 'customer') {
+          window.location.replace('home.html');
+          return;
+        }
+        if (user.role === 'agent' && !user.agentProfileCompleted) {
+          window.location.replace('agent-details.html');
+          return;
+        }
+      } catch (e) {
+        window.location.replace('auth.html');
+      }
+    })();
+  </script>
+
+  <!-- early-partials: paints header/footer immediately (see assets/js/core/partials.js) -->
+  <script>
+    (function () {
+      try {
+        var PREFIX = 'accoom-partial:', pending = {};
+        var load = function (url) {
+          if (pending[url]) return pending[url];
+          var cached = null;
+          try { cached = window.sessionStorage.getItem(PREFIX + url); } catch (e) {}
+          var net = fetch(url, { priority: 'high' }).then(function (r) {
+            if (!r.ok) throw new Error(url);
+            return r.text();
+          }).then(function (html) {
+            try { window.sessionStorage.setItem(PREFIX + url, html); } catch (e) {}
+            return html;
+          });
+          if (cached) { net.catch(function () {}); pending[url] = Promise.resolve(cached); }
+          else { pending[url] = net; }
+          return pending[url];
+        };
+        var scan = function (root) {
+          var list = root.querySelectorAll('[data-partial]');
+          for (var i = 0; i < list.length; i++) claim(list[i]);
+        };
+        var claim = function (el) {
+          if (el.__early) return;
+          var url = el.getAttribute('data-partial');
+          if (!url) return;
+          el.__early = load(url).then(function (html) {
+            if (el.getAttribute('data-partial') !== url) return;
+            el.innerHTML = html;
+            el.setAttribute('data-early', '1');
+            scan(el);
+          }, function () {});
+        };
+        load('partials/header.html');
+        load('partials/footer.html');
+        var mo = new MutationObserver(function () { scan(document); });
+        mo.observe(document.documentElement, { childList: true, subtree: true });
+        document.addEventListener('DOMContentLoaded', function () { scan(document); mo.disconnect(); });
+      } catch (e) { /* older browser: the normal loader still works */ }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/document-centre.css" />
+</head>
+<body>
+
+  <div class="partial-mount" data-partial="partials/header.html"></div>
+
+  <main class="dc-page">
+    <h1 class="dc-title">Check an ACTD</h1>
+    <p class="dc-sub">Enter the ACTD number printed on the document, or scan its QR code.</p>
+    <form class="dc-verify-form" data-vf-form novalidate>
+      <label class="dc-label" for="vf-ref">ACTD number</label>
+      <input class="dc-input" id="vf-ref" data-vf-ref type="text" placeholder="ACTD-2026-XXXXXXXXXX" autocomplete="off" autocapitalize="characters" />
+      <label class="dc-label" for="vf-ver">Version (optional)</label>
+      <input class="dc-input" id="vf-ver" data-vf-ver type="number" min="1" inputmode="numeric" />
+      <button type="submit" class="dc-btn dc-btn--primary">Check</button>
+    </form>
+    <div class="dc-result" data-vf-result role="status" aria-live="polite"></div>
+    <p class="dc-note"><strong>Important.</strong> ACCOOM does not have a server yet. This check can only look at records stored in <em>this browser</em>, so a document issued on another device will show as &ldquo;not found&rdquo; here even if it is genuine. &ldquo;Not found&rdquo; does not mean a document is fake. Public checking from any device needs a backend.</p>
+    <p class="dc-note">This page never shows names, amounts, addresses or contact details.</p>
+  </main>
+
+  <div class="partial-mount" data-partial="partials/footer.html"></div>
+
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/wallet.js"></script>
+  <script src="assets/js/core/skeleton.js"></script>
+  <script src="assets/js/core/media-store.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/data/notifications.js"></script>
+  <script src="assets/js/data/locations.js"></script>
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script>Accoom.loadPartials && Accoom.loadPartials();</script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/data/schemas.js"></script>
+  <script src="assets/js/core/records.js"></script>
+  <script src="assets/js/data/actd.js"></script>
+  <script src="assets/js/pages/verify-document.js"></script>
+</body>
+</html>
