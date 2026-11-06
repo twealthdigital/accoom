@@ -8,6 +8,6 @@
     if (A.Records && A.Records.init) A.Records.init();
     var me = A.Identity.current();
     if (!me) return;
-    A.Tenancy.backfill(me).then(function () { return A.Tenancy.checkAll(); }).then(function () { return A.Tenancy.deliverInbox(me); }).catch(function () { /* never block the page */ });
+    A.Tenancy.backfill(me).then(function () { return A.Tenancy.checkAll(); }).then(function () { return A.Occupancy ? A.Occupancy.advanceAll() : 0; }).then(function () { return A.Tenancy.deliverInbox(me); }).catch(function () { /* never block the page */ });
   });
 })();

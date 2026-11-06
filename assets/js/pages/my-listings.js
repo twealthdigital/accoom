@@ -269,6 +269,28 @@
 
     var periodMount = document.querySelector('[data-ml-select-mount="period"]');
     var periodField = document.querySelector('[data-ml-period-field]');
+    // Occupancy Extension (rentals only): preset or custom number of days.
+    var oeField = document.querySelector('[data-ml-oe-field]');
+    var oeSelect = document.querySelector('[data-ml-oe]');
+    var oeCustom = document.querySelector('[data-ml-oe-custom]');
+    function readOccupancyDays() {
+      if (!oeSelect) return { ok: true, days: 0 };
+      if (oeSelect.value !== 'custom') return { ok: true, days: Number(oeSelect.value) || 0 };
+      var n = Number(oeCustom.value);
+      return (oeCustom.value !== '' && isFinite(n) && Math.floor(n) === n && n >= 1 && n <= 365) ? { ok: true, days: n } : { ok: false, days: 0 };
+    }
+    function setOccupancyDays(days) {
+      if (!oeSelect) return;
+      var d = Number(days) || 0, preset = [0, 7, 14, 30, 60, 90].indexOf(d) !== -1;
+      oeSelect.value = preset ? String(d) : 'custom';
+      oeCustom.hidden = preset; oeCustom.value = preset ? '' : String(d);
+    }
+    if (oeCustom) oeCustom.addEventListener('input', function () { oeField.classList.remove('has-error'); });
+    if (oeSelect) oeSelect.addEventListener('change', function () {
+      oeCustom.hidden = oeSelect.value !== 'custom';
+      if (!oeCustom.hidden) oeCustom.focus();
+      oeField.classList.remove('has-error');
+    });
     var periodSelect = buildSelect('period', {
       options: [{ value: 'day', label: 'Day' }, { value: 'week', label: 'Week' }, { value: 'month', label: 'Month' }, { value: 'year', label: 'Year' }],
       placeholder: 'Select billing period', search: false
@@ -293,6 +315,7 @@
     function updateCategoryFields() {
       var isSale = categoryValue === 'sale';
       periodField.hidden = isSale;
+      if (oeField) oeField.hidden = isSale;
       if (yearWrapper) yearWrapper.hidden = !isSale;
       if (furnishingReqBadge) furnishingReqBadge.hidden = !isSale;
       if (docsCtrl) docsCtrl.refresh();
@@ -1063,6 +1086,9 @@
       if (categoryValue === 'rent') {
         data.period = periodSelect.getValue();
         if (!data.period) bad(periodField);
+        var oe = readOccupancyDays();
+        if (!oe.ok) bad(oeField);
+        data.occupancyDays = oe.days;
       } else {
         data.period = 'sale';
       }
@@ -1201,6 +1227,9 @@
         ownerId: (existing && existing.ownerId) || ownerId,
         agentName: (existing && existing.agentName) || ((agentUser && (agentUser.fullName || agentUser.name)) || ''),
         listingType: data.category,
+        // Rental-only. A sale listing never carries an Occupancy Extension.
+        occupancyExtension: data.category === 'sale' ? undefined : Object.assign({}, existing && existing.occupancyExtension, {
+          mode: data.occupancyDays > 0 ? ([7, 14, 30, 60, 90].indexOf(data.occupancyDays) !== -1 ? 'days' : 'custom') : 'none', days: data.occupancyDays || 0 }),
         approval: existing
           ? (existing.approval || { state: 'legacy_unreviewed', updatedAt: savedAt, reason: '', published: false, history: [] })
           : { state: 'draft', updatedAt: savedAt, reason: '', published: false, history: [] },
@@ -1410,6 +1439,7 @@
       var knownType = PROPERTY_TYPES.filter(function (t) { return t.value === record.typeLabel; })[0];
       if (knownType) propertyTypeSelect.setValue(knownType.value); else propertyTypeSelect.setValue(null, record.typeLabel, true);
       if (record.period && record.period !== 'sale') periodSelect.setValue(record.period);
+      if (record.occupancyExtension) setOccupancyDays(record.occupancyExtension.days);
       if (record.state) stateSelect.setValue(record.state);
       var knownFurn = FURNISHING_OPTIONS.filter(function (t) { return t.value === record.furnishing; })[0];
       if (knownFurn) furnishingSelect.setValue(knownFurn.value); else if (record.furnishing) furnishingSelect.setValue(null, record.furnishing, true);

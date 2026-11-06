@@ -68,7 +68,7 @@ await test('tenant sees dates, rent, progress bar, reminders and Occupancy Exten
   const t = c.d.querySelector('[data-tn-list]').textContent;
   assert.equal(c.d.querySelectorAll('.tn-card').length, 1); assert.match(t, /Monthly Flat/); assert.match(t, /1 month/); assert.match(t, /\u20A6100,000 per month/);
   const now = Number(sel(c.d, '.tn-bar').getAttribute('aria-valuenow')); assert.ok(now >= 70 && now < 100, 'progress ' + now); assert.match(t, new RegExp(now + '% of this tenancy has passed'));
-  assert.equal(c.d.querySelectorAll('.tn-step').length, 4); assert.match(t, /70%[\s\S]*Reminder sent/); assert.match(t, /30 days after the scheduled expiry date/); assert.match(t, /DEMO/);
+  assert.equal(c.d.querySelector('.tn-steps').querySelectorAll('.tn-step').length, 4, 'the first row is the 70/80/90/100% reminders'); assert.match(t, /70%[\s\S]*Reminder sent/); assert.match(t, /30 days after the scheduled expiry date/); assert.match(t, /DEMO/);
 });
 await test('the 70% reminder was sent once and is not repeated by reloading', async () => {
   const n = JSON.parse(c.w.localStorage.getItem('accoom-rec-notifications')).filter((x) => /^tenancy_(70|80|90|expiry)$/.test(x.category) && x.recipientId === 'cust-1');

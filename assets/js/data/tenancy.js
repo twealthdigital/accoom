@@ -130,7 +130,7 @@ window.Accoom = window.Accoom || {};
       id: 'ten_' + tx.id, propertyId: tx.propertyId, customerId: tx.customerId, agentId: tx.agentId, landlordId: tx.landlordId || '',
       actdId: actd ? actd.id : '', agreementId: '', rentAmount: tx.amounts.unitPrice, billingPeriod: tx.billingPeriod, periodCount: tx.periodCount,
       startDate: tx.startDate, expiryDate: tx.expiryDate, status: 'active', renewalDecision: 'none',
-      occupancyExtension: { mode: days ? 'days' : 'none', days: days }, previousTenancyId: (extra && extra.previousTenancyId) || '',
+      occupancyExtension: (function () { var o = { mode: days ? ([7, 14, 30, 60, 90].indexOf(days) !== -1 ? 'days' : 'custom') : 'none', days: days }; var m = listing && listing.occupancyExtension && listing.occupancyExtension.milestones; if (days && Array.isArray(m) && m.length) o.milestones = m.slice(); return o; })(), previousTenancyId: (extra && extra.previousTenancyId) || '',
       paymentHistory: [{ transactionId: tx.id, kind: (extra && extra.kind) || 'initial', amount: tx.amounts.total, paidAt: tx.paidAt, receiptRef: tx.receiptRef, actdNumber: actd ? actd.actdNumber : '', source: tx.paymentSource }],
       notificationHistory: []
     });
@@ -423,6 +423,8 @@ window.Accoom = window.Accoom || {};
     progress: progress, thresholds: thresholds, thresholdMs: thresholdMs, dayStartMs: dayStartMs,
     ensureForTransaction: ensureForTransaction, backfill: backfill, listFor: listFor, getFor: getFor, chain: chain, canSee: canSee,
     checkOne: checkOne, checkAll: checkAll, decide: decide, sendMessage: sendMessage,
-    offerRenewal: offerRenewal, withdrawOffer: withdrawOffer, renewalFor: renewalFor, payRenewalDemo: payRenewalDemo, deliverInbox: deliverInbox
+    offerRenewal: offerRenewal, withdrawOffer: withdrawOffer, renewalFor: renewalFor, payRenewalDemo: payRenewalDemo, deliverInbox: deliverInbox,
+    // shared with the Occupancy Extension module so both serialise their changes to one tenancy
+    _lock: lock, _notify: notify, _audit: audit, _readListing: readListing
   };
 })(window.Accoom);
