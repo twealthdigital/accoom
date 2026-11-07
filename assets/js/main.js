@@ -162,7 +162,9 @@ window.Accoom = window.Accoom || {};
             verified: !!document.querySelector('[data-pd-agent-name] .pd-agent-verified-badge'),
             stats:    agentStatsEl  ? (agentStatsEl.textContent  || '').trim() : '',
             rating:   agentRatingEl ? (agentRatingEl.textContent || '').trim() : '',
-            level: (Accoom.currentProperty && Accoom.currentProperty.agent) ? Accoom.currentProperty.agent.level : 'AL5'
+            level: (Accoom.currentProperty && Accoom.currentProperty.agent) ? Accoom.currentProperty.agent.level : 'AL5',
+            real: !!(Accoom.currentProperty && Accoom.currentProperty.agentListing),
+            ownerId: (Accoom.currentProperty && Accoom.currentProperty.ownerId) || ''
           });
         });
       }

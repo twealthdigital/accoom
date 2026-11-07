@@ -89,3 +89,12 @@ npm start                        # serves source for quick local checks
 - Same catalogue as before: `PropertyService` (data/properties.js) -> home, Browse filters, search, header search, property page. It also exposes `verified` (listing) and `agent.verified` so the "verified only" filter includes it. Unapproved, draft, rejected or unpublished listings stay private (`filterPublic`).
 - **To switch to real admin review:** set `AUTO_APPROVE.enabled = false`. Admins then approve in `admin-review.html`; `approve(id, admin, { verified: true })` marks a listing verified.
 - Tests that cover the manual workflow (stage2-7 module/page tests) set `enabled = false`; `tests/autoapprove.page.test.mjs` covers the auto flow end to end.
+
+## Real agents show no dummy details (new listings only)
+- Rule: the 25 hardcoded properties/agents (and `David O.` fallbacks) stay as guidelines and will be deleted later. Agents who list through ACCOOM are "real" (`agent.real = true`, `ownerId` set in `data/properties.js`).
+- Home card: real agent shows "No reviews yet" instead of a fake `0 (0)` / rating.
+- Property page (`property.js`): real agent never falls back to the sample agent's 4.8 / 120 reviews / AL5; the sample "Suggested Agents" carousel is removed on real listings; Contact Agent request carries real values (0 reviews, offline, AL1).
+- Agent profile (`agent-profile.js`, `applyRealAgent`): stats = real property count, "No reviews yet", bio / languages only from the agent's own registration (`accoom-user`), specialization + areas derived from their listings, availability row hidden, sample reviews removed, tabs show the agent's real listings (In Progress / Sold show empty messages).
+- `main.js`, `home.js`, `contact-agent.js` pass `real` + `ownerId` into `accoom-active-agent`.
+- Test: `tests/real-agent.page.test.mjs` (in `npm test`).
+- Not verified in a real browser (jsdom only). Level "AL1" is kept for new agents as the starting level.

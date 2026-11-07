@@ -152,7 +152,7 @@ window.Accoom = window.Accoom || {};
         kitchens: rec.kitchens, livingRooms: rec.livingRooms, parking: rec.parking,
         yearBuilt: rec.yearBuilt || '', furnishing: rec.furnishing || '',
         dateAdded: rec.dateAdded || '', views: rec.views == null ? '0' : rec.views,
-        agent: { name: rec.agentName || 'Agent', verified: verified, rating: 0, reviews: 0, online: false, level: 'AL1' }
+        agent: { name: rec.agentName || 'Agent', real: true, ownerId: rec.ownerId || '', verified: verified, rating: 0, reviews: 0, online: false, level: 'AL1' }
       });
     });
     return out;

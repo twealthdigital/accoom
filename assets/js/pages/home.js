@@ -548,7 +548,7 @@ function cardTemplate(item) {
                 '</div>' +
 '<a href="agent-profile.html#reviews" class="listing-rating" data-agent-reviews>' +
                   '<svg width="12" height="12" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/></svg>' +
-                  item.agent.rating + ' (' + item.agent.reviews + ')' +
+                  (item.agent.real ? 'No reviews yet' : item.agent.rating + ' (' + item.agent.reviews + ')') +
                 '</a>' +
               '</div>' +
 '<div class="listing-agent-level-row">' +
@@ -1239,6 +1239,19 @@ Accoom.delegate(listingsGrid, 'click', '[data-view-listing]', function (e) {
         var item = PropertyService.getById(card.getAttribute('data-listing-id'));
         if (!item) return;
         var a = item.agent;
+        if (a.real) {
+          var mineCount = PropertyService.getAll().filter(function (i) { return i.agentListing && String(i.ownerId) === String(a.ownerId); }).length || 1;
+          Accoom.setStorage('accoom-active-agent', {
+            name: a.name, real: true, ownerId: a.ownerId || '',
+            avatar: a.avatar || 'assets/images/agent-images/agenticonimg.webp',
+            verified: !!a.verified,
+            stats: mineCount + (mineCount === 1 ? ' Property' : ' Properties'),
+            rating: 'No reviews yet', level: a.level || 'AL1',
+            property: { id: item.id, name: item.name, location: item.location, price: item.price, image: item.images[0] }
+          });
+          window.location.href = 'agent-profile.html#reviews';
+          return;
+        }
         Accoom.setStorage('accoom-active-agent', {
           name: a.name,
           avatar: a.avatar || 'assets/images/agent-images/agenticonimg.webp',

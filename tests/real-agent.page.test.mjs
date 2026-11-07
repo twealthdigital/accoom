@@ -1,0 +1,85 @@
+// Real agents (new listings) show no dummy rating, reviews, bio, sample cards or suggested agents.
+// (header from home-media test)
+// Agent photos are stored as "idb:<key>" references. The homepage cards must show the real photo,
+// not the raw reference (which made cards blank). Uses the REAL home.html with a seeded media store.
+import http from 'node:http';
+import { readFile } from 'node:fs/promises';
+import { extname, join } from 'node:path';
+import { JSDOM, VirtualConsole } from 'jsdom';
+import { IDBFactory, IDBKeyRange } from 'fake-indexeddb';
+import { webcrypto } from 'node:crypto';
+import assert from 'node:assert/strict';
+
+const ROOT = new URL('..', import.meta.url).pathname;
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' };
+const server = http.createServer(async (req, res) => {
+  try { const p = join(ROOT, decodeURIComponent(req.url.split('?')[0])); const b = await readFile(p); res.writeHead(200, { 'content-type': types[extname(p)] || 'application/octet-stream' }); res.end(b); }
+  catch { res.writeHead(404); res.end('nf'); }
+});
+await new Promise((r) => server.listen(0, '127.0.0.1', r));
+const base = 'http://127.0.0.1:' + server.address().port;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+
+
+const L = { id: 'lst_a', name: 'Akungba Flat', location: 'Akungba, Ondo', area: 'Akungba', state: 'Ondo', category: 'rent', listingType: 'rent', typeLabel: 'Mini Flat', period: 'month',
+  price: 100000, priceValue: 100000, images: ['assets/images/home-properties/miniflat.webp'], agentName: 'Adeola Fortune', ownerId: 'local-agent', schemaVersion: 2, status: 'available',
+  approval: { state: 'approved', published: true, verified: true }, beds: 2, baths: 1, description: [], amenities: [], quickFacts: [], dateAdded: 'Nov 7, 2026', views: '0' };
+const storage = { 'accoom-agent-listings': JSON.stringify([L]),
+  'accoom-user': JSON.stringify({ role: 'agent', fullName: 'Adeola Fortune', about: 'I list homes in Ondo.', languages: ['English', 'Yoruba'], agentProfileCompleted: true }) };
+
+async function open(path) {
+  const vc = new VirtualConsole();
+  const dom = await JSDOM.fromURL(base + '/' + path, { runScripts: 'dangerously', resources: 'usable', pretendToBeVisual: true, virtualConsole: vc,
+    beforeParse(w) {
+      w.indexedDB = new IDBFactory(); w.IDBKeyRange = IDBKeyRange; Object.defineProperty(w, 'crypto', { value: webcrypto, configurable: true });
+      w.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} });
+      w.HTMLMediaElement.prototype.play = () => Promise.resolve(); w.HTMLMediaElement.prototype.pause = () => {};
+      w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = () => {}; w.fetch = () => Promise.reject(new Error('no fetch'));
+      for (const [k, v] of Object.entries(storage)) w.localStorage.setItem(k, v);
+    } });
+  await sleep(3000);
+  return dom.window;
+}
+let p = 0, f = 0;
+async function test(name, fn) { try { await fn(); p++; console.log('  PASS ' + name); } catch (e) { f++; console.log('  FAIL ' + name + '\n       ' + e.message); } }
+const txt = (d, sel) => (d.querySelector(sel) || {}).textContent || '';
+
+console.log('Real agent: property page');
+let w = await open('property.html?id=lst_a'); let d = w.document;
+await test('agent card shows real name, 1 Property, No reviews yet; no sample agents', () => {
+  assert.equal(txt(d, '[data-pd-agent-name-text]').trim(), 'Adeola Fortune');
+  assert.match(txt(d, '[data-pd-agent-stats]'), /^1 Property$/);
+  assert.match(txt(d, '[data-pd-agent-rating]'), /No reviews yet/);
+  assert.equal(d.querySelector('.pd-suggested'), null);
+});
+
+console.log('Real agent: profile page');
+storage['accoom-active-agent'] = JSON.stringify({ name: 'Adeola Fortune', real: true, ownerId: 'local-agent', verified: true, avatar: 'assets/images/agent-images/agenticonimg.webp', level: 'AL1', property: { id: 'lst_a', name: 'Akungba Flat' } });
+w = await open('agent-profile.html');
+d = w.document;
+await test('no dummy stats, rating, reviews, sample cards or sample bio', () => {
+  const page = d.body.textContent;
+  for (const re of [/David O\./, /12 Properties/, /24 Deals/, /4\.8 \(120/, /Akin M\./, /Tolu B\./, /Lekki Phase 1/, /Dedicated to helping you find/, /professional real estate agent with years/]) assert.ok(!re.test(page), 'dummy leaked: ' + re);
+  assert.match(txt(d, '[data-ap-name]'), /Adeola Fortune/);
+  assert.match(txt(d, '[data-ap-stats]'), /^1 Property$/);
+  assert.match(txt(d, '[data-ap-rating]'), /No reviews yet/);
+});
+await test('shows the agent\'s real listing and real details only', () => {
+  assert.equal(d.querySelectorAll('[data-ap-panel="available"] .ap-listing-card').length, 1);
+  assert.equal(d.querySelectorAll('[data-ap-panel="inprogress"] .ap-listing-card, [data-ap-panel="sold"] .ap-listing-card').length, 0);
+  assert.match(d.body.textContent, /I list homes in Ondo\./);
+  assert.match(txt(d, '[data-ap-languages]'), /English, Yoruba/);
+});
+
+console.log('Real agent: homepage card');
+w = await open('home.html'); d = w.document;
+await test('card shows No reviews yet instead of 0 (0)', () => {
+  const card = d.querySelector('[data-listing-id="lst_a"]');
+  assert.ok(card, 'card missing');
+  assert.match(card.textContent, /No reviews yet/);
+  assert.ok(!/0 \(0\)/.test(card.textContent));
+});
+
+console.log('\n' + p + ' passed, ' + f + ' failed');
+server.close(); process.exit(f ? 1 : 0);

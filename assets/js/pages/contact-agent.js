@@ -862,13 +862,18 @@
       if (els.viewProfile) {
         Accoom.on(els.viewProfile, 'click', function (e) {
           e.preventDefault();
+          var realItem = (Accoom.PropertyService && Accoom.PropertyService.getById && conv.property)
+            ? Accoom.PropertyService.getById(conv.property.id) : null;
+          var isReal = !!(realItem && realItem.agentListing);
           Accoom.setStorage('accoom-active-agent', {
             name: conv.name,
             avatar: conv.avatar,
             verified: conv.verified,
             stats: '',
-            rating: '',
-            level: 'AL5',
+            rating: isReal ? 'No reviews yet' : '',
+            level: isReal ? 'AL1' : 'AL5',
+            real: isReal,
+            ownerId: isReal ? (realItem.ownerId || '') : '',
             property: { id: conv.property.id, name: conv.property.name }
           });
           window.location.href = 'agent-profile.html';

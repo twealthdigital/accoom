@@ -38,6 +38,13 @@
     var resolvedAgent = stored && stored.agent
       ? Object.assign({}, defaultAgent, stored.agent)
       : defaultAgent;
+    if (isAgent) {
+      // Real agent: never fall back to the sample agent's rating, reviews or level.
+      resolvedAgent = Object.assign({}, stored.agent || {}, { real: true, ownerId: stored.ownerId || '' });
+      resolvedAgent.name = resolvedAgent.name || 'Agent';
+      resolvedAgent.rating = 0; resolvedAgent.reviews = 0;
+      resolvedAgent.online = false; resolvedAgent.level = resolvedAgent.level || 'AL1';
+    }
     if (!resolvedAgent.avatar) {
       resolvedAgent.avatar = 'assets/images/agent-images/agenticonimg.webp';
     }
@@ -67,8 +74,16 @@
       extraVideos: (stored && Array.isArray(stored.extraVideos)) ? stored.extraVideos
         : ((stored && Array.isArray(stored.videosAll))
           ? stored.videosAll.filter(function (v) { return v && v !== stored.video; }) : []),
-      agent: resolvedAgent
+      agent: resolvedAgent,
+      agentListing: isAgent,
+      ownerId: stored ? (stored.ownerId || '') : ''
     };
+
+    // Suggested Agents are sample tiles: not shown on real agent listings.
+    if (isAgent) {
+      var sugg = document.querySelector('.pd-suggested');
+      if (sugg && sugg.parentNode) sugg.parentNode.removeChild(sugg);
+    }
 
     // Expose to other modules (e.g. main.js's View Profile handler),
     // since `property` above is scoped to this Accoom.ready callback.
@@ -909,13 +924,13 @@
         if (!Accoom.isLoggedIn()) { window.location.href = 'auth.html?mode=signup'; return; }
 
         Accoom.setStorage('accoom-contact-request', {
-          agentName: agent.name || 'David O.',
+          agentName: agent.name || (agent.real ? 'Agent' : 'David O.'),
           agentAvatar: agentAvatar,
           verified: !!agent.verified,
-          online: agent.online !== false,
-          rating: agent.rating || 4.8,
-          reviews: agent.reviews || 120,
-          level: agent.level || 'AL5',
+          online: agent.real ? false : agent.online !== false,
+          rating: agent.real ? 0 : (agent.rating || 4.8),
+          reviews: agent.real ? 0 : (agent.reviews || 120),
+          level: agent.level || (agent.real ? 'AL1' : 'AL5'),
           property: thisPropObj,
           agentProperties: agentProps
         });

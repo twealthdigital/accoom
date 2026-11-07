@@ -71,6 +71,79 @@
     })();
 
     // ============================================================
+    // REAL AGENT (someone who listed through ACCOOM): show only what is
+    // really known. No sample rating, bio, reviews or sample listing cards.
+    // The 25 hardcoded sample agents/properties keep their guideline content.
+    // ============================================================
+    (function applyRealAgent() {
+      if (!stored || !stored.real) return;
+
+      function esc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+      function hideRow(el) { var r = el && (el.closest('.ap-detail-row') || el); if (r) r.style.display = 'none'; }
+      function uniq(a) { return a.filter(function (v, i) { return v && a.indexOf(v) === i; }); }
+
+      var all = (Accoom.PropertyService && Accoom.PropertyService.getAll) ? Accoom.PropertyService.getAll() : [];
+      var mine = all.filter(function (i) { return i.agentListing && String(i.ownerId) === String(stored.ownerId || ''); });
+
+      // Agent's own registration details (only when the signed-in agent is this agent)
+      var me = null;
+      try { me = JSON.parse(window.localStorage.getItem('accoom-user')); } catch (e) { me = null; }
+      var isMe = !!(me && me.role === 'agent' && String(me.id || me.userId || me.agentId || 'local-agent') === String(stored.ownerId || 'local-agent'));
+      var about = isMe && me.about ? String(me.about).trim() : '';
+      var langs = isMe && Array.isArray(me.languages) ? me.languages.filter(Boolean) : [];
+
+      // Header
+      var statsEl = document.querySelector('[data-ap-stats]');
+      if (statsEl) statsEl.textContent = (mine.length || 1) + ((mine.length || 1) === 1 ? ' Property' : ' Properties');
+      var ratingEl = document.querySelector('[data-ap-rating]');
+      if (ratingEl) ratingEl.textContent = 'No reviews yet';
+      var aboutEl = document.querySelector('[data-ap-about]');
+      if (aboutEl) { if (about) aboutEl.textContent = about; else aboutEl.style.display = 'none'; }
+      var titleEl = document.querySelector('[data-ap-about-title]');
+      if (titleEl) titleEl.textContent = 'About ' + agent.name;
+
+      // About card: only rows that have real data
+      var bioEl = document.querySelector('[data-ap-bio]');
+      if (bioEl) { if (about) bioEl.textContent = about; else bioEl.style.display = 'none'; }
+      var spec = document.querySelector('[data-ap-specialization]');
+      var types = uniq(mine.map(function (i) { return i.typeLabel; }));
+      if (spec) { if (types.length) spec.textContent = types.join(', '); else hideRow(spec); }
+      var areasEl = document.querySelector('[data-ap-areas]');
+      var areas = uniq(mine.map(function (i) { return i.area || i.location; }));
+      if (areasEl) { if (areas.length) areasEl.textContent = areas.join(', '); else hideRow(areasEl); }
+      var langEl = document.querySelector('[data-ap-languages]');
+      if (langEl) { if (langs.length) langEl.textContent = langs.join(', '); else hideRow(langEl); }
+      hideRow(document.querySelector('[data-ap-availability]'));
+
+      // Reviews: none yet
+      var list = document.querySelector('.ap-reviews-list');
+      if (list) list.innerHTML = '<p class="ap-bio-text">No reviews yet.</p>';
+
+      // Listings: this agent's real public listings only
+      function card(i) {
+        var price = typeof i.price === 'number' ? '&#8358;' + i.price.toLocaleString('en-NG') : esc(i.price);
+        var suffix = i.priceLabel ? ' <small>' + esc(i.priceLabel) + '</small>' : '';
+        var img = (i.images && i.images[0]) || 'assets/images/home-properties/placeholder.webp';
+        var meta = (i.beds ? '<span>' + i.beds + ' Bed</span>' : '') + (i.baths ? '<span>' + i.baths + ' Bath</span>' : '');
+        return '<article class="listing-card ap-listing-card"><div class="listing-card-media">' +
+          '<img src="' + esc(img) + '" alt="' + esc(i.name) + '" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.webp\';" />' +
+          '<span class="listing-tag ap-status-tag ap-status-tag--available">Available</span>' +
+          '<button type="button" class="ap-card-share-btn" data-ap-card-share aria-label="Share this property"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"></line></svg></button>' +
+          '</div><div class="listing-card-body"><p class="listing-name">' + esc(i.name) + '</p>' +
+          '<p class="listing-price">' + price + suffix + '</p><p class="listing-location">' + esc(i.location) + '</p>' +
+          (meta ? '<div class="listing-meta">' + meta + '</div>' : '') +
+          '<a href="property.html?id=' + encodeURIComponent(i.id) + '&name=' + encodeURIComponent(i.name) + '" class="btn btn--ghost btn--sm ap-card-link">View Property</a></div></article>';
+      }
+      var empty = function (t) { return '<p class="ap-bio-text">' + t + '</p>'; };
+      var panels = { available: mine.length ? '<div class="ap-listing-scroll">' + mine.map(card).join('') + '</div>' : empty('No available properties yet.'),
+                     inprogress: empty('Nothing in progress.'), sold: empty('No sold properties yet.') };
+      Object.keys(panels).forEach(function (k) {
+        var panel = document.querySelector('[data-ap-panel="' + k + '"]');
+        if (panel) panel.innerHTML = panels[k];
+      });
+    })();
+
+    // ============================================================
     // Breadcrumb — Home > [Property Name] > Agent Profile
     // ============================================================
     (function applyBreadcrumb() {
