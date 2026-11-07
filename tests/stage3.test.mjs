@@ -29,6 +29,7 @@ function boot(listings) {
   w.Accoom.NotificationService = { add: (n) => w.notes.push(n) };
   if (listings) w.localStorage.setItem('accoom-agent-listings', JSON.stringify(listings));
   for (const s of SCRIPTS) w.eval(read(s));
+  if (w.Accoom && w.Accoom.ListingReview) w.Accoom.ListingReview.AUTO_APPROVE.enabled = false; // these tests cover the real manual review workflow
   return w;
 }
 const PDF = (t = 'a', name = 'doc.pdf', pages = 1) => new NodeFile([Buffer.from('%PDF-1.4\n' + Array.from({ length: pages }, () => '<< /Type /Page >>\n').join('') + t)], name, { type: 'application/pdf' });

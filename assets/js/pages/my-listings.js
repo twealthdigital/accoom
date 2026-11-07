@@ -1356,7 +1356,8 @@
           var now = readRecord(saved.id);
           var core = before && ['address', 'state', 'area', 'category'].some(function (k) { return before[k] !== now[k]; });
           if (core && now.approval && now.approval.state === 'approved') {
-            return RV.transition(saved.id, 'pending_review', agent, { reason: 'The address, area, state or listing type changed and must be reviewed again.' });
+            return RV.transition(saved.id, 'pending_review', agent, { reason: 'The address, area, state or listing type changed and must be reviewed again.' })
+              .then(function (back) { return RV.autoReviewForTesting(back); });
           }
         }).then(function () {
           return RV.syncDocumentation(saved.id);
@@ -1375,7 +1376,8 @@
               text: '\u201C' + data.name + '\u201D was saved' + (isNew ? ' as a draft. It is not visible to buyers.' : '.'), link: 'my-listings.html' });
           }
         } catch (err) { /* a notification problem must never stop a save */ }
-        goToListings(saved.id, outcome === 'submitted' ? 'Listing submitted for review.' : (isNew ? 'Draft saved.' : 'Listing updated.'));
+        var live = outcome === 'submitted' && RV.isPubliclyVisible(readRecord(saved.id));
+        goToListings(saved.id, outcome === 'submitted' ? (live ? 'Listing approved and live.' : 'Listing submitted for review.') : (isNew ? 'Draft saved.' : 'Listing updated.'));
       }).catch(function (err) {
         if (err && err.code === 'documents_incomplete') {
           var names = err.report.missing.map(function (m) { return m.label; }).concat(err.report.groupIssues.map(function (g) { return g.label; }));

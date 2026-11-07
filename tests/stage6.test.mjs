@@ -29,6 +29,7 @@ function boot() {
   w.Accoom.NotificationService = { add: (n) => w.notes.push(n) };
   w.localStorage.setItem('accoom-agent-listings', JSON.stringify(LISTINGS));
   for (const s of SCRIPTS) w.eval(read(s));
+  if (w.Accoom && w.Accoom.ListingReview) w.Accoom.ListingReview.AUTO_APPROVE.enabled = false; // these tests cover the real manual review workflow
   return w;
 }
 const AGENT = { role: 'agent', id: 'agent-77' }, CUST = { role: 'customer', id: 'cust-1' }, OTHER = { role: 'customer', id: 'cust-2' }, OTHER_AGENT = { role: 'agent', id: 'agent-99' };

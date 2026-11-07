@@ -30,6 +30,17 @@ window.Accoom = window.Accoom || {};
 
   var KEY = 'accoom-agent-listings';
 
+  // --------------------------------------------------------------------------
+  // TESTING ONLY. While enabled, every listing an agent SUCCESSFULLY submits
+  // (documents complete, status pending_review) is immediately approved,
+  // verified and published, so it shows on the homepage, Browse and Search.
+  // It still goes through the normal state machine and audit trail
+  // (pending_review -> manual_review -> approved) using the actor below.
+  // When real admin review is ready: set enabled to false. Nothing else changes;
+  // admins then approve/verify from admin-review.html via approve(..., {verified:true}).
+  // --------------------------------------------------------------------------
+  var AUTO_APPROVE = { enabled: true, actorId: 'auto-approve-testing' };
+
   var LABEL = {
     draft: 'Draft', pending_review: 'Pending Review', ai_review: 'AI Review', manual_review: 'Manual Review',
     changes_required: 'Changes Required', approved: 'Approved', rejected: 'Rejected',
@@ -137,12 +148,14 @@ window.Accoom = window.Accoom || {};
       var next = Object.assign({}, a, {
         state: to, updatedAt: at, history: history,
         reason: (to === 'changes_required' || to === 'rejected' || (to === 'pending_review' && opts.reason)) ? (opts.reason || '') : '',
-        published: false
+        published: false,
+        verified: false          // a listing is verified only by an explicit approval below
       });
       if (to === 'pending_review') next.submittedAt = at;
       if (to === 'approved') {
         next.approvedAt = at; next.approvedBy = actor.id || '';
         next.published = opts.publish !== false;
+        if (opts.verified === true) { next.verified = true; next.verifiedAt = at; next.verifiedBy = actor.id || ''; }
       }
 
       var status = rec.status;
@@ -187,8 +200,22 @@ window.Accoom = window.Accoom || {};
       }
       return transition(id, 'pending_review', actor);
     }).then(function (saved) {
+      return autoReviewForTesting(saved);
+    }).then(function (saved) {
+      if (isPubliclyVisible(saved)) return saved; // auto-approved: the approval notice was already sent
       notify('Listing submitted for review', '\u201C' + saved.name + '\u201D was submitted. ACCOOM will review the documents before it is shown to buyers.');
       return saved;
+    });
+  }
+
+  // TESTING ONLY (see AUTO_APPROVE). Runs the same transitions a reviewer would,
+  // as a clearly labelled automatic actor. Returns the listing unchanged when off.
+  function autoReviewForTesting(saved) {
+    if (!AUTO_APPROVE.enabled) return Promise.resolve(saved);
+    var system = { role: 'system', id: AUTO_APPROVE.actorId };
+    var admin = { role: 'admin', id: AUTO_APPROVE.actorId };
+    return transition(saved.id, 'manual_review', system).then(function () {
+      return approve(saved.id, admin, { verified: true });
     });
   }
 
@@ -201,7 +228,10 @@ window.Accoom = window.Accoom || {};
     var critical = Accoom.DocRequirements.isCritical(rec.listingType || rec.category, docType);
     if (a.state !== 'approved' || !critical) return Promise.resolve({ reviewRequired: false });
     var why = 'The document "' + Accoom.DocRequirements.labelFor(rec.listingType || rec.category, docType) + '" was replaced and must be reviewed again.';
-    return transition(id, 'pending_review', actor || { role: 'system' }, { reason: why }).then(function () {
+    return transition(id, 'pending_review', actor || { role: 'system' }, { reason: why }).then(function (back) {
+      return autoReviewForTesting(back);
+    }).then(function (now) {
+      if (isPubliclyVisible(now)) return { reviewRequired: false };
       notify('Listing back in review', '\u201C' + rec.name + '\u201D is hidden from buyers until the replaced document is reviewed.');
       return { reviewRequired: true, reason: why };
     });
@@ -265,12 +295,14 @@ window.Accoom = window.Accoom || {};
 
   Accoom.ListingReview = {
     addNote: addNote,
+    AUTO_APPROVE: AUTO_APPROVE,
     LABEL: LABEL,
     RULES: RULES,
     get: get,
     canTransition: canTransition,
     transition: transition,
     submitForReview: submitForReview,
+    autoReviewForTesting: autoReviewForTesting,
     documentReplaced: documentReplaced,
     syncDocumentation: syncDocumentation,
     approve: approve,

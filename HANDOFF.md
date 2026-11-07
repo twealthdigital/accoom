@@ -83,3 +83,9 @@ npm start                        # serves source for quick local checks
 - Home card suffix uses the listing's period (/day /wk /mo /yr, or "For Sale"); mock cards keep "/yr".
 - `pricing.js` + `listing-review.js` are loaded on every page that loads `properties.js`.
 - Tests: `tests/pricing.page.test.mjs` (real home + property + document-centre pages).
+
+## Auto-approve for testing (agent listings go live at once)
+- `assets/js/data/listing-review.js` -> `Accoom.ListingReview.AUTO_APPROVE = { enabled: true, actorId: 'auto-approve-testing' }`. After an agent's successful submit (documents complete), `autoReviewForTesting()` runs the normal steps (pending_review -> manual_review -> approved) as a labelled automatic actor, sets `approval.verified = true` (+ `verifiedAt/By`), `published = true`, `status = 'available'`. History and audit show each step.
+- Same catalogue as before: `PropertyService` (data/properties.js) -> home, Browse filters, search, header search, property page. It also exposes `verified` (listing) and `agent.verified` so the "verified only" filter includes it. Unapproved, draft, rejected or unpublished listings stay private (`filterPublic`).
+- **To switch to real admin review:** set `AUTO_APPROVE.enabled = false`. Admins then approve in `admin-review.html`; `approve(id, admin, { verified: true })` marks a listing verified.
+- Tests that cover the manual workflow (stage2-7 module/page tests) set `enabled = false`; `tests/autoapprove.page.test.mjs` covers the auto flow end to end.

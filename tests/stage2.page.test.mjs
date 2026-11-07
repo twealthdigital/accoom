@@ -81,7 +81,7 @@ let navigated = '';
 d.querySelector('[data-ml-save]').click(); await sleep(2500);
 const list = JSON.parse(w.localStorage.getItem('accoom-agent-listings') || '[]');
 const rec = list.find((l) => l.name === 'E2E Mini Flat') || {};
-out.saved = { status: rec.status, approval: rec.approval && rec.approval.state, period: rec.period, listingType: rec.listingType, documents: rec.documents, published: rec.approval && rec.approval.published };
+out.saved = { verified: rec.approval && rec.approval.verified, status: rec.status, approval: rec.approval && rec.approval.state, period: rec.period, listingType: rec.listingType, documents: rec.documents, published: rec.approval && rec.approval.published };
 out.note = d.querySelector('[data-ml-submit-note]').textContent.slice(0, 160);
 // document really stored in IndexedDB?
 const stored = await w.Accoom.DocumentStore.listForListing(rec.id || 'x');
@@ -92,13 +92,13 @@ out.notifications = notes.slice(0, 3);
 const checks = [
   ['Day is offered as a billing period', () => assert.equal(out.rentDocs, true)],
   ['submit without documents is blocked and saves nothing', () => { assert.ok(/Add the required documents first/.test(out.noDocsNote)); assert.equal(out.savedAfterBlock, null); }],
-  ['submit with ownership document saves a private pending_review listing', () => {
-    assert.equal(out.saved.status, 'in_review'); assert.equal(out.saved.approval, 'pending_review');
+  ['submit with ownership document is auto-approved, verified and published (testing flag on)', () => {
+    assert.equal(out.saved.status, 'available'); assert.equal(out.saved.approval, 'approved');
     assert.equal(out.saved.period, 'day'); assert.equal(out.saved.listingType, 'rent');
-    assert.equal(out.saved.published, false); assert.equal(out.publicVisible, false); assert.equal(out.saved.documents, 1);
+    assert.equal(out.saved.published, true); assert.equal(out.saved.verified, true); assert.equal(out.publicVisible, true); assert.equal(out.saved.documents, 1);
   }],
   ['the document is stored in IndexedDB as version 1, not verified', () => assert.equal(JSON.stringify(out.storedDocs), JSON.stringify(['ownership_or_authorization v1 uploaded']))],
-  ['the agent is notified', () => assert.ok(out.notifications.includes('Listing submitted for review'))],
+  ['the agent is notified', () => assert.ok(out.notifications.includes('Listing approved'))],
   ['no unexpected page errors', () => assert.equal(errors.filter((e) => !/Not implemented|navigation|fetch|iframe/i.test(e)).length, 0)]
 ];
 let p = 0, f = 0;

@@ -35,6 +35,7 @@ function boot(opts = {}) {
   w.Accoom.NotificationService = { add: (n) => w.notes.push(n) };
   if (opts.listings) w.localStorage.setItem('accoom-agent-listings', JSON.stringify(opts.listings));
   for (const s of SCRIPTS) w.eval(read(s));
+  w.Accoom.ListingReview.AUTO_APPROVE.enabled = false; // these tests cover the real manual review workflow
   return w;
 }
 

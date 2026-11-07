@@ -133,6 +133,7 @@ await test('request changes with a reason: agent sees it, listing stays private'
 });
 
 await test('after the agent resubmits, the admin can approve and the listing becomes public', async () => {
+  w.Accoom.ListingReview.AUTO_APPROVE.enabled = false; // this test covers the real admin review screen
   await w.Accoom.ListingReview.submitForReview('L1', { role: 'agent', id: 'agent-77' });
   d.querySelector('.adm-q-item') || (d.querySelector('[data-adm-filter]').value = 'action', d.querySelector('[data-adm-filter]').dispatchEvent(new w.Event('change')));
   await sleep(100);

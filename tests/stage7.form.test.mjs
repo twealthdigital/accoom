@@ -97,17 +97,17 @@ out.notifications = notes.slice(0, 3);
 const checks = [
   ['rental documents are shown for a rent listing', () => assert.equal(out.rentDocs, true)],
   ['the first submit (invalid extension, no documents) is blocked and saves nothing', () => assert.equal(out.savedAfterBlock, null)],
-  ['submit with ownership document saves a private pending_review listing', () => {
-    assert.equal(out.saved.status, 'in_review'); assert.equal(out.saved.approval, 'pending_review');
+  ['submit with ownership document is auto-approved and published (testing flag on)', () => {
+    assert.equal(out.saved.status, 'available'); assert.equal(out.saved.approval, 'approved');
     assert.equal(out.saved.period, 'month'); assert.equal(out.saved.listingType, 'rent');
-    assert.equal(out.saved.published, false); assert.equal(out.publicVisible, false);
+    assert.equal(out.saved.published, true); assert.equal(out.publicVisible, true);
   }],
   ['the document is stored in IndexedDB as version 1, not verified', () => assert.equal(JSON.stringify(out.storedDocs), JSON.stringify(['ownership_or_authorization v1 uploaded']))],
-  ['the agent is notified', () => assert.ok(out.notifications.includes('Listing submitted for review'))],
+  ['the agent is notified', () => assert.ok(out.notifications.includes('Listing approved'))],
   ['an invalid custom Occupancy Extension (400 days) blocks saving, shows the field error, and saves nothing', () => { assert.equal(out.invalidBlocked, true); assert.equal(out.invalidSaved, null); }],
   ['correcting the number clears the error', () => assert.equal(out.errorCleared, true)],
   ['the chosen custom Occupancy Extension (45 days) is saved with the rental listing', () => { assert.equal(out.oe.days, 45); assert.equal(out.oe.mode, 'custom'); }],
-  ['the listing is still saved as a private pending-review listing (document flow unchanged)', () => { assert.equal(out.saved.approval, 'pending_review'); assert.equal(out.publicVisible, false); }],
+  ['the listing is saved through the same document flow and is approved (testing flag on)', () => { assert.equal(out.saved.approval, 'approved'); assert.equal(out.publicVisible, true); }],
   ['no unexpected page errors', () => assert.equal(errors.filter((e) => !/Not implemented|navigation|fetch|iframe/i.test(e)).length, 0)]
 ];
 let p = 0, f = 0;

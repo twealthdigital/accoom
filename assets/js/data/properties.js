@@ -119,6 +119,7 @@ window.Accoom = window.Accoom || {};
   function agentItems() {
     var out = [];
     readAgentListings().forEach(function (rec, idx) {
+      var verified = !!(rec.approval && rec.approval.verified);
       var price = Accoom.Pricing.finalPrice(rec);
       if (!price) return;
       var isSale = rec.category === 'sale' || rec.listingType === 'sale';
@@ -139,7 +140,8 @@ window.Accoom = window.Accoom || {};
         location: rec.location || [rec.area, rec.state].filter(Boolean).join(', '),
         beds: Number(rec.beds) || 0,
         baths: Number(rec.baths) || 0,
-        agent: { name: rec.agentName || 'Agent', verified: false, rating: 0, reviews: 0, online: false, level: 'AL1' }
+        verified: verified,
+        agent: { name: rec.agentName || 'Agent', verified: verified, rating: 0, reviews: 0, online: false, level: 'AL1' }
       });
     });
     return out;

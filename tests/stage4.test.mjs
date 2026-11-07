@@ -34,6 +34,7 @@ function boot(listings) {
   w.Accoom.NotificationService = { add: (n) => w.notes.push(n) };
   w.localStorage.setItem('accoom-agent-listings', JSON.stringify(listings || [RENT, SALE]));
   for (const s of SCRIPTS) w.eval(read(s));
+  if (w.Accoom && w.Accoom.ListingReview) w.Accoom.ListingReview.AUTO_APPROVE.enabled = false; // these tests cover the real manual review workflow
   return w;
 }
 const pay = (w, id, over = {}) => w.Accoom.Transactions.recordDemoPayment(Object.assign({ eventId: 'e-' + Math.random(), listingId: id, customerId: 'cust-1', customerName: 'Chinedu Eze' }, over));
