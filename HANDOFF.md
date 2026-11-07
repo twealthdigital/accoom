@@ -75,3 +75,11 @@ npm start                        # serves source for quick local checks
 - Agent-only screens (addlistings form + preview, my-listings edit) still show the four inputs; the preview total is labelled "Price customers see (all fees included)".
 - **Never add fees on top of a final price.** Rent is now charged as the inclusive price per billing period (fees are inside each period's price).
 - `npm test` includes `tests/pricing.test.mjs`.
+
+## Inclusive pricing, part 2 (agent listings in the shared catalogue)
+- Agent listings were NOT reaching the homepage before: every grid reads `Accoom.PropertyService` (data/properties.js), which only held the 25 mock items. It now appends approved + published agent listings (`ListingReview.filterPublic`) with `price = Accoom.Pricing.finalPrice(listing)`, `priceLabel`/`period` from the listing, and NO fee fields (so nothing can add them again). Home, filter-accommodation, about, header search and the property page (getById) all get them from this one place. Mock items are untouched (no invented fees).
+- Agent items sort after mocks by `order` (text ids); 'newest' lists them first.
+- Price filters: the slider end stops (N100,000 / N1,000,000) mean "no limit" in `fetchPage`, so an inclusive price above the slider is not hidden by default.
+- Home card suffix uses the listing's period (/day /wk /mo /yr, or "For Sale"); mock cards keep "/yr".
+- `pricing.js` + `listing-review.js` are loaded on every page that loads `properties.js`.
+- Tests: `tests/pricing.page.test.mjs` (real home + property + document-centre pages).

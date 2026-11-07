@@ -100,6 +100,56 @@ window.Accoom = window.Accoom || {};
     });
   }
 
+
+  // --------------------------------------------------------------------------
+  // Agent-created listings. Only listings ACCOOM has approved and published
+  // (Accoom.ListingReview.filterPublic) ever reach customers. Each one is shown
+  // at its final inclusive price (Accoom.Pricing.finalPrice): accommodation
+  // price + service charge + legal fee + agency fee. The fee fields are NOT
+  // copied onto the catalogue item, so no page can add them a second time.
+  // Mock listings above have no fee fields and are shown exactly as before.
+  // --------------------------------------------------------------------------
+  function readAgentListings() {
+    if (!Accoom.ListingReview || !Accoom.Pricing) return [];
+    var raw;
+    try { raw = JSON.parse(window.localStorage.getItem('accoom-agent-listings')); } catch (e) { return []; }
+    return Accoom.ListingReview.filterPublic(Array.isArray(raw) ? raw : []);
+  }
+
+  function agentItems() {
+    var out = [];
+    readAgentListings().forEach(function (rec, idx) {
+      var price = Accoom.Pricing.finalPrice(rec);
+      if (!price) return;
+      var isSale = rec.category === 'sale' || rec.listingType === 'sale';
+      var period = isSale ? '' : (['day', 'week', 'month', 'year'].indexOf(rec.period) !== -1 ? rec.period : 'year');
+      var images = (rec.images && rec.images.length) ? rec.images : (rec.cover ? [rec.cover] : ['assets/images/home-properties/placeholder.webp']);
+      out.push({
+        id: String(rec.id),
+        order: 1000 + idx,
+        images: images,
+        video: rec.video || null,
+        typeKey: String(rec.typeLabel || 'other').toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        typeLabel: rec.typeLabel || 'Property',
+        name: rec.name || rec.typeLabel || 'Property',
+        price: price,
+        priceLabel: isSale ? 'For Sale' : '/ ' + period,
+        period: period,
+        category: isSale ? 'sale' : 'rent',
+        location: rec.location || [rec.area, rec.state].filter(Boolean).join(', '),
+        beds: Number(rec.beds) || 0,
+        baths: Number(rec.baths) || 0,
+        agent: { name: rec.agentName || 'Agent', verified: false, rating: 0, reviews: 0, online: false, level: 'AL1' }
+      });
+    });
+    return out;
+  }
+
+  // Mock catalogue first (unchanged), then public agent listings.
+  var SLIDER_MIN = 100000, SLIDER_MAX = 1000000; // same range as the homepage price slider (home.js)
+  function all() { return ALL.concat(agentItems()); }
+  function rank(item) { return item.order != null ? item.order : item.id; }
+
   // Typo tolerant matcher. Tries an exact substring first (fast path),
   // then falls back to per word edit distance so a misspelt token like
   // "bouy" still finds "boy". Allowance scales with word length so
@@ -253,13 +303,15 @@ window.Accoom = window.Accoom || {};
   // sortBy: 'nearby' | 'newest' | 'online' | 'verified'
   // filters: { priceMin, priceMax, levels: [], beds: [], verifiedOnly, onlineOnly }
   function fetchPage(page, perPage, sortBy, filters) {
-    var list = ALL.slice();
+    var list = all();
     filters = filters || {};
 
-    if (filters.priceMin != null) {
+    // The homepage slider runs from SLIDER_MIN to SLIDER_MAX; sitting on an end stop means
+    // "no limit" there, so an inclusive price outside the slider range is not hidden by default.
+    if (filters.priceMin != null && filters.priceMin > SLIDER_MIN) {
       list = list.filter(function (item) { return item.price >= filters.priceMin; });
     }
-    if (filters.priceMax != null) {
+    if (filters.priceMax != null && filters.priceMax < SLIDER_MAX) {
       list = list.filter(function (item) { return item.price <= filters.priceMax; });
     }
     if (filters.levels && filters.levels.length) {
@@ -286,9 +338,9 @@ window.Accoom = window.Accoom || {};
     } else if (sortBy === 'verified') {
       list.sort(function (a, b) { return (b.agent.verified ? 1 : 0) - (a.agent.verified ? 1 : 0); });
     } else if (sortBy === 'nearby') {
-      list.sort(function (a, b) { return a.id - b.id; });
+      list.sort(function (a, b) { return rank(a) - rank(b); });
     } else {
-      list.sort(function (a, b) { return b.id - a.id; });
+      list.sort(function (a, b) { return rank(b) - rank(a); });
     }
 
     var start = (page - 1) * perPage;
@@ -298,14 +350,14 @@ window.Accoom = window.Accoom || {};
 
   function getById(id) {
     var found = null;
-    ALL.forEach(function (item) {
+    all().forEach(function (item) {
       if (String(item.id) === String(id)) found = item;
     });
     return found;
   }
 
   function getAll() {
-    return ALL.slice();
+    return all();
   }
 
   function searchList(list, query) {

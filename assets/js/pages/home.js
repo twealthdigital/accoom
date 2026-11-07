@@ -518,7 +518,7 @@ function cardTemplate(item) {
             '</div>' +
             '<div class="listing-card-body">' +
             '<p class="listing-name">' + item.name + '</p>' +
-              '<p class="listing-price">' + formatPrice(item.price) + ' <small>/yr</small></p>' +
+              '<p class="listing-price">' + formatPrice(item.price) + ' <small>' + (item.category === 'sale' ? 'For Sale' : (item.period ? '/' + ({ day: 'day', week: 'wk', month: 'mo', year: 'yr' }[item.period] || 'yr') : '/yr')) + '</small></p>' +
               '<p class="listing-location">' + item.location + '</p>' +
               '<div class="listing-meta">' +
                 '<span>' + item.beds + ' Bed</span><span>' + item.baths + ' Bath</span>' +
