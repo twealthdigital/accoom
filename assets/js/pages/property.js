@@ -42,7 +42,7 @@
       // Real agent: never fall back to the sample agent's rating, reviews or level.
       resolvedAgent = Object.assign({}, stored.agent || {}, { real: true, ownerId: stored.ownerId || '' });
       resolvedAgent.name = resolvedAgent.name || 'Agent';
-      resolvedAgent.rating = 0; resolvedAgent.reviews = 0;
+      resolvedAgent.rating = resolvedAgent.rating || 0; resolvedAgent.reviews = resolvedAgent.reviews || 0;
       resolvedAgent.online = false; resolvedAgent.level = resolvedAgent.level || 'AL1';
     }
     if (!resolvedAgent.avatar) {
@@ -928,8 +928,8 @@
           agentAvatar: agentAvatar,
           verified: !!agent.verified,
           online: agent.real ? false : agent.online !== false,
-          rating: agent.real ? 0 : (agent.rating || 4.8),
-          reviews: agent.real ? 0 : (agent.reviews || 120),
+          rating: agent.real ? (agent.rating || 0) : (agent.rating || 4.8),
+          reviews: agent.real ? (agent.reviews || 0) : (agent.reviews || 120),
           level: agent.level || (agent.real ? 'AL1' : 'AL5'),
           property: thisPropObj,
           agentProperties: agentProps

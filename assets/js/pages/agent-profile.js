@@ -95,8 +95,12 @@
       // Header
       var statsEl = document.querySelector('[data-ap-stats]');
       if (statsEl) statsEl.textContent = (mine.length || 1) + ((mine.length || 1) === 1 ? ' Property' : ' Properties');
+      var RV = Accoom.Reviews;
+      var rkey = RV ? RV.agentKey(stored.ownerId, agent.name) : '';
+      var revs = RV ? RV.forAgent(rkey) : [];
+      var sm = RV ? RV.summary(rkey) : { count: 0, avg: 0 };
       var ratingEl = document.querySelector('[data-ap-rating]');
-      if (ratingEl) ratingEl.textContent = 'No reviews yet';
+      if (ratingEl) ratingEl.textContent = sm.count ? sm.avg + ' (' + sm.count + (sm.count === 1 ? ' review)' : ' reviews)') : 'No reviews yet';
       var aboutEl = document.querySelector('[data-ap-about]');
       if (aboutEl) { if (about) aboutEl.textContent = about; else aboutEl.style.display = 'none'; }
       var titleEl = document.querySelector('[data-ap-about-title]');
@@ -117,16 +121,31 @@
 
       // Reviews: none yet
       var list = document.querySelector('.ap-reviews-list');
-      if (list) list.innerHTML = '<p class="ap-bio-text">No reviews yet.</p>';
+      if (list) {
+        list.innerHTML = revs.length ? revs.map(function (r, i) {
+          return (i ? '<div class="ap-review-divider"></div>' : '') +
+            '<div class="ap-review"><img class="ap-review-avatar" src="assets/images/agent-images/agenticonimg.webp" alt="" />' +
+            '<div class="ap-review-body"><div class="ap-review-top"><span class="ap-review-name">' + RV.esc(r.reviewerName || 'Customer') + '</span>' +
+            '<span class="ap-review-stars">' + RV.stars(r.rating, 11) + '</span><span class="ap-review-time">' + RV.esc(RV.ago(r.createdAt)) + '</span></div>' +
+            (r.text ? '<p class="ap-review-text">' + RV.esc(r.text) + '</p>' : '') + '</div></div>';
+        }).join('') : '<p class="ap-bio-text">No reviews yet.</p>';
+      }
 
-      // Listings: this agent's real public listings only
+      // Listings: this agent's real public listings, with every photo and video (same slider as the home cards)
+      var CHEV_L = '<polyline points="15 18 9 12 15 6"></polyline>', CHEV_R = '<polyline points="9 18 15 12 9 6"></polyline>';
+      function nav(cls, attr, label, pts) { return '<button type="button" class="media-nav ' + cls + '" ' + attr + ' aria-label="' + label + '"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' + pts + '</svg></button>'; }
       function card(i) {
         var price = typeof i.price === 'number' ? '&#8358;' + i.price.toLocaleString('en-NG') : esc(i.price);
         var suffix = i.priceLabel ? ' <small>' + esc(i.priceLabel) + '</small>' : '';
-        var img = (i.images && i.images[0]) || 'assets/images/home-properties/placeholder.webp';
+        var imgs = (i.images && i.images.length) ? i.images : ['assets/images/home-properties/placeholder.webp'];
+        var vids = (i.videosAll && i.videosAll.length) ? i.videosAll : (i.video ? [i.video] : []);
+        var total = imgs.length + vids.length, n = 0, slides = '';
+        vids.forEach(function (v) { slides += '<video class="media-slide' + (n === 0 ? ' is-active' : '') + '" src="' + esc(v) + '" muted loop playsinline preload="none" poster="' + esc(imgs[0]) + '" data-slide="' + (n++) + '"></video>'; });
+        imgs.forEach(function (src) { slides += '<img class="media-slide' + (n === 0 ? ' is-active' : '') + '" src="' + esc(src) + '" alt="' + esc(i.name) + '" loading="lazy" data-slide="' + (n++) + '" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.webp\';" />'; });
+        var dots = ''; for (var d = 0; d < total; d++) dots += '<button type="button" class="media-dot' + (d === 0 ? ' is-active' : '') + '" data-dot="' + d + '" aria-label="View media ' + (d + 1) + '"></button>';
         var meta = (i.beds ? '<span>' + i.beds + ' Bed</span>' : '') + (i.baths ? '<span>' + i.baths + ' Bath</span>' : '');
-        return '<article class="listing-card ap-listing-card"><div class="listing-card-media">' +
-          '<img src="' + esc(img) + '" alt="' + esc(i.name) + '" onerror="this.onerror=null;this.src=\'assets/images/home-properties/placeholder.webp\';" />' +
+        return '<article class="listing-card ap-listing-card"><div class="listing-card-media" data-media>' + slides +
+          (total > 1 ? nav('media-nav-prev', 'data-media-prev', 'Previous', CHEV_L) + nav('media-nav-next', 'data-media-next', 'Next', CHEV_R) + '<div class="media-dots">' + dots + '</div>' : '') +
           '<span class="listing-tag ap-status-tag ap-status-tag--available">Available</span>' +
           '<button type="button" class="ap-card-share-btn" data-ap-card-share aria-label="Share this property"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"></line></svg></button>' +
           '</div><div class="listing-card-body"><p class="listing-name">' + esc(i.name) + '</p>' +
@@ -136,11 +155,32 @@
       }
       var empty = function (t) { return '<p class="ap-bio-text">' + t + '</p>'; };
       var panels = { available: mine.length ? '<div class="ap-listing-scroll">' + mine.map(card).join('') + '</div>' : empty('No available properties yet.'),
-                     inprogress: empty('Nothing in progress.'), sold: empty('No sold properties yet.') };
+                     sold: empty('No sold properties yet.') };
       Object.keys(panels).forEach(function (k) {
         var panel = document.querySelector('[data-ap-panel="' + k + '"]');
         if (panel) panel.innerHTML = panels[k];
       });
+
+      // Slider controls (arrows, dots, swipe)
+      function setActive(mediaEl, index) {
+        Accoom.$$('.media-slide', mediaEl).forEach(function (sl, n) {
+          var on = n === index; sl.classList.toggle('is-active', on);
+          if (sl.tagName === 'VIDEO') { if (on) { sl.play && sl.play().catch(function () {}); } else { sl.pause(); } }
+        });
+        Accoom.$$('.media-dot', mediaEl).forEach(function (dt, n) { dt.classList.toggle('is-active', n === index); });
+      }
+      function step(mediaEl, delta) {
+        var sl = Accoom.$$('.media-slide', mediaEl); if (sl.length < 2) return;
+        var cur = sl.findIndex(function (x) { return x.classList.contains('is-active'); });
+        setActive(mediaEl, (cur + delta + sl.length) % sl.length);
+      }
+      var tabsRoot = document.querySelector('.ap-tab-panels') || document;
+      Accoom.delegate(tabsRoot, 'click', '[data-media-prev]', function (e) { e.preventDefault(); e.stopPropagation(); step(this.closest('[data-media]'), -1); });
+      Accoom.delegate(tabsRoot, 'click', '[data-media-next]', function (e) { e.preventDefault(); e.stopPropagation(); step(this.closest('[data-media]'), 1); });
+      Accoom.delegate(tabsRoot, 'click', '[data-dot]', function (e) { e.preventDefault(); e.stopPropagation(); setActive(this.closest('[data-media]'), parseInt(this.getAttribute('data-dot'), 10)); });
+      var sx = null, sm2 = null;
+      tabsRoot.addEventListener('touchstart', function (e) { var m = e.target.closest && e.target.closest('[data-media]'); sm2 = m; sx = m ? e.touches[0].clientX : null; }, { passive: true });
+      tabsRoot.addEventListener('touchend', function (e) { if (sx == null || !sm2) return; var dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) step(sm2, dx < 0 ? 1 : -1); sx = null; sm2 = null; }, { passive: true });
     })();
 
     // ============================================================

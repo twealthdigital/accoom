@@ -98,3 +98,12 @@ npm start                        # serves source for quick local checks
 - `main.js`, `home.js`, `contact-agent.js` pass `real` + `ownerId` into `accoom-active-agent`.
 - Test: `tests/real-agent.page.test.mjs` (in `npm test`).
 - Not verified in a real browser (jsdom only). Level "AL1" is kept for new agents as the starting level.
+
+## Agent profile polish + customer reviews
+- Profile header: Contact Agent button now sits UNDER the agent's description (`.ap-header-main` wraps `.ap-about` + `.ap-actions`).
+- Profile tabs: **In Progress removed**, only Available + Sold remain. Real agents' Available cards show EVERY photo and video with the same arrows/dots/swipe as the home cards (`videosAll` is now carried on catalogue items in `data/properties.js`).
+- Reviews: new `assets/js/data/reviews.js` (`Accoom.Reviews`, localStorage `accoom-agent-reviews`, one review per customer per property, editing replaces). Loaded before `properties.js` on every page that loads it.
+- Chat (`contact-agent.js`): after the customer approves OR declines a payment, a stars + text dialog opens. If they close it, a "Rate this agent / Write a review" strip stays under the property card (shows "You rated this agent" + Edit after). Only for real agents (sample agents keep fixed ratings).
+- Ratings flow: agent profile shows the average + review list, home card and property page show `avg (count)`, "No reviews yet" when none.
+- Chat property card photo now reads the live catalogue photo (saved conversations held dead blob: addresses).
+- Test: `tests/real-agent.page.test.mjs` extended. Chat page itself not covered (jsdom crashes on contact-agent); check approve/decline -> dialog in a real browser.

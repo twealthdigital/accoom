@@ -23,7 +23,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 
 const L = { id: 'lst_a', name: 'Akungba Flat', location: 'Akungba, Ondo', area: 'Akungba', state: 'Ondo', category: 'rent', listingType: 'rent', typeLabel: 'Mini Flat', period: 'month',
-  price: 100000, priceValue: 100000, images: ['assets/images/home-properties/miniflat.webp'], agentName: 'Adeola Fortune', ownerId: 'local-agent', schemaVersion: 2, status: 'available',
+  price: 100000, priceValue: 100000, images: ['assets/images/home-properties/miniflat.webp','assets/images/home-properties/selfcon1.webp','assets/images/home-properties/selfcon2.webp'], video: 'assets/videos/home-properties/selfcon2.mp4', videosAll: ['assets/videos/home-properties/selfcon2.mp4'], agentName: 'Adeola Fortune', ownerId: 'local-agent', schemaVersion: 2, status: 'available',
   approval: { state: 'approved', published: true, verified: true }, beds: 2, baths: 1, description: [], amenities: [], quickFacts: [], dateAdded: 'Nov 7, 2026', views: '0' };
 const storage = { 'accoom-agent-listings': JSON.stringify([L]),
   'accoom-user': JSON.stringify({ role: 'agent', fullName: 'Adeola Fortune', about: 'I list homes in Ondo.', languages: ['English', 'Yoruba'], agentProfileCompleted: true }) };
@@ -67,11 +67,55 @@ await test('no dummy stats, rating, reviews, sample cards or sample bio', () => 
 });
 await test('shows the agent\'s real listing and real details only', () => {
   assert.equal(d.querySelectorAll('[data-ap-panel="available"] .ap-listing-card').length, 1);
-  assert.equal(d.querySelectorAll('[data-ap-panel="inprogress"] .ap-listing-card, [data-ap-panel="sold"] .ap-listing-card').length, 0);
+  assert.equal(d.querySelector('[data-ap-tab="inprogress"]'), null, 'In Progress tab should be gone');
+  assert.equal(d.querySelectorAll('[data-ap-panel="sold"] .ap-listing-card').length, 0);
   assert.match(d.body.textContent, /I list homes in Ondo\./);
   assert.match(txt(d, '[data-ap-languages]'), /English, Yoruba/);
 });
 
+await test('card carries every photo and video; Contact button sits under the description', () => {
+  assert.equal(d.querySelectorAll('[data-ap-panel="available"] .media-slide').length, 4);
+  assert.equal(d.querySelectorAll('[data-ap-panel="available"] video.media-slide').length, 1);
+  const main = d.querySelector('.ap-header-main');
+  assert.ok(main && main.querySelector('.ap-about') && main.querySelector('[data-ap-contact]'));
+});
+
+console.log('Reviews');
+storage['accoom-agent-reviews'] = JSON.stringify([
+  { id: 'r1', agentKey: 'id:local-agent', agentName: 'Adeola Fortune', propertyId: 'lst_a', reviewerId: 'x', reviewerName: 'Tunde B.', rating: 5, text: 'Honest and quick.', createdAt: new Date().toISOString() },
+  { id: 'r2', agentKey: 'id:local-agent', agentName: 'Adeola Fortune', propertyId: 'lst_a', reviewerId: 'y', reviewerName: 'Ngozi A.', rating: 4, text: '', createdAt: new Date().toISOString() }]);
+w = await open('agent-profile.html'); d = w.document;
+await test('profile shows average rating and written reviews', () => {
+  assert.match(txt(d, '[data-ap-rating]'), /4\.5 \(2 reviews\)/);
+  assert.match(d.querySelector('.ap-reviews-list').textContent, /Honest and quick\./);
+  assert.equal(d.querySelectorAll('.ap-reviews-list .ap-review').length, 2);
+});
+w = await open('home.html'); d = w.document;
+await test('home card shows the real rating after reviews', () => {
+  assert.match(d.querySelector('[data-listing-id="lst_a"]').textContent, /4\.5 \(2\)/);
+});
+await test('Reviews.save keeps one review per customer per property (edit, not duplicate)', () => {
+  const R = w.Accoom.Reviews;
+  const a = R.save({ agentKey: 'id:z', agentName: 'Z', propertyId: 'p1', rating: 3, text: 'ok' });
+  const b = R.save({ agentKey: 'id:z', agentName: 'Z', propertyId: 'p1', rating: 5, text: 'better' });
+  assert.equal(a.id, b.id); assert.equal(R.forAgent('id:z').length, 1); assert.equal(R.summary('id:z').avg, 5);
+  assert.equal(R.save({ agentKey: 'id:z', propertyId: 'p2', rating: 0 }), null);
+});
+
+await test('review dialog: needs stars, then saves rating + text', () => {
+  const R = w.Accoom.Reviews; let saved = null;
+  R.openModal({ agentKey: 'id:q', agentName: 'Q', propertyId: 'p9', propertyName: 'Flat', onSaved: (r) => { saved = r; } });
+  const doc = w.document;
+  doc.querySelector('[data-rv-send]').click();
+  assert.match(doc.querySelector('.rv-err').textContent, /star rating/);
+  doc.querySelector('.rv-star[data-v="4"]').click();
+  doc.querySelector('.rv-text').value = 'Smooth deal';
+  doc.querySelector('[data-rv-send]').click();
+  assert.ok(saved && saved.rating === 4 && saved.text === 'Smooth deal');
+  assert.equal(doc.querySelector('.rv-overlay'), null);
+});
+
+delete storage['accoom-agent-reviews'];
 console.log('Real agent: homepage card');
 w = await open('home.html'); d = w.document;
 await test('card shows No reviews yet instead of 0 (0)', () => {

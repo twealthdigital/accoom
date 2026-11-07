@@ -2359,3 +2359,8 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
   .msgs-property-status-icon { display: none; }
   .msgs-chat-tabs-row .msgs-props-btn { padding: 0 8px; }
 }
+/* Rate-the-agent strip under the property card (after a payment is approved or declined) */
+.msgs-review-strip { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:10px 14px; margin:0 12px 8px; border:1px solid var(--line-page); border-radius:12px; background:var(--gold-soft); font-size:.85rem; font-weight:600; color:var(--on-page); }
+.msgs-review-strip.is-hidden { display:none; }
+.msgs-review-strip-stars { display:inline-flex; gap:2px; vertical-align:middle; margin-left:6px; }
+.msgs-review-strip-btn { padding:7px 14px; border-radius:999px; border:0; background:var(--gold); color:#fff; font-weight:700; font-size:.8rem; cursor:pointer; }

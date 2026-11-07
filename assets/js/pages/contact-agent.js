@@ -965,7 +965,9 @@
     function renderPropertyCard(conv) {
       var p = conv.property;
       if (els.propImg) {
-        els.propImg.src = p.image || 'assets/images/home-properties/placeholder.webp';
+        // Saved conversations can hold a dead blob: address; read the live photo from the catalogue instead.
+        var liveP = (Accoom.PropertyService && Accoom.PropertyService.getById) ? Accoom.PropertyService.getById(p.id) : null;
+        els.propImg.src = (liveP && liveP.images && liveP.images[0]) || p.image || 'assets/images/home-properties/placeholder.webp';
         els.propImg.alt = p.name || 'Property';
       }
       if (els.propName) els.propName.textContent = p.name || 'Property';
@@ -1033,8 +1035,43 @@
       if (els.propStatusLabel) els.propStatusLabel.textContent = PROPERTY_STATUS_LABELS[key];
     }
 
+    // ---- Rate the agent (only agents who listed through ACCOOM; sample agents have fixed ratings) ----
+    function reviewTarget(conv) {
+      var item = (Accoom.PropertyService && Accoom.PropertyService.getById) ? Accoom.PropertyService.getById(conv.property.id) : null;
+      if (!item || !item.agentListing || !Accoom.Reviews) return null;
+      return { agentKey: Accoom.Reviews.agentKey(item.ownerId, item.agent && item.agent.name), agentName: (item.agent && item.agent.name) || conv.name,
+               propertyId: conv.property.id, propertyName: conv.property.name || item.name };
+    }
+    function renderReviewStrip(conv, status) {
+      var strip = Accoom.$('[data-msgs-review-strip]');
+      if (!strip) return;
+      var t = (status === 'approved' || status === 'declined') ? reviewTarget(conv) : null;
+      strip.classList.toggle('is-hidden', !t);
+      if (!t) return;
+      var mineR = Accoom.Reviews.mine(t.agentKey, t.propertyId);
+      var txt = strip.querySelector('[data-msgs-review-text]');
+      var btn = strip.querySelector('[data-msgs-review-open]');
+      txt.innerHTML = mineR ? 'You rated this agent <span class="msgs-review-strip-stars">' + Accoom.Reviews.stars(mineR.rating, 13) + '</span>' : 'Rate this agent';
+      btn.textContent = mineR ? 'Edit review' : 'Write a review';
+    }
+    function openReview(conv, outcome) {
+      var t = reviewTarget(conv);
+      if (!t) return;
+      t.outcome = outcome || '';
+      t.onSaved = function () { renderReviewStrip(conv, activePropState(conv).paymentStatus); };
+      Accoom.Reviews.openModal(t);
+    }
+    (function () {
+      var openBtn = Accoom.$('[data-msgs-review-open]');
+      if (openBtn) Accoom.on(openBtn, 'click', function () {
+        var conv = findConv(state.activeId);
+        if (conv) openReview(conv, activePropState(conv).paymentStatus);
+      });
+    })();
+
     function renderPaymentState(conv) {
       var status = activePropState(conv).paymentStatus || 'idle';
+      renderReviewStrip(conv, status);
 
       renderPropertyStatus(conv);
 
@@ -1916,6 +1953,7 @@
           upsertPurchaseRecord(conv, targetProperty, 'completed');
           if (state.activeId === conv.id && String(conv.property.id) === String(targetProperty.id)) {
             renderPaymentState(conv);
+            openReview(conv, 'approved');
           }
         }, 2000);
       });
@@ -1938,6 +1976,7 @@
           upsertPurchaseRecord(conv, targetProperty, 'cancelled');
           if (state.activeId === conv.id && String(conv.property.id) === String(targetProperty.id)) {
             renderPaymentState(conv);
+            openReview(conv, 'declined');
           }
         }, 2000);
       });

@@ -152,7 +152,11 @@ window.Accoom = window.Accoom || {};
         kitchens: rec.kitchens, livingRooms: rec.livingRooms, parking: rec.parking,
         yearBuilt: rec.yearBuilt || '', furnishing: rec.furnishing || '',
         dateAdded: rec.dateAdded || '', views: rec.views == null ? '0' : rec.views,
-        agent: { name: rec.agentName || 'Agent', real: true, ownerId: rec.ownerId || '', verified: verified, rating: 0, reviews: 0, online: false, level: 'AL1' }
+        videosAll: Array.isArray(rec.videosAll) && rec.videosAll.length ? rec.videosAll : (rec.video ? [rec.video] : []),
+        agent: (function () {
+          var sm = Accoom.Reviews ? Accoom.Reviews.summary(Accoom.Reviews.agentKey(rec.ownerId, rec.agentName)) : { count: 0, avg: 0 };
+          return { name: rec.agentName || 'Agent', real: true, ownerId: rec.ownerId || '', verified: verified, rating: sm.avg, reviews: sm.count, online: false, level: 'AL1' };
+        })()
       });
     });
     return out;
