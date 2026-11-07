@@ -283,10 +283,14 @@
             <h2 class="ml-card-title">Pricing &amp; fees</h2>
             <p class="ml-card-sub">Agency and legal fees are added on top automatically, buyers see the full total before they pay, never a surprise on checkout.</p>
 
-            <div class="ml-row ml-row--3">
+            <div class="ml-row ml-row--4">
               <div class="ml-field">
                 <label class="ml-label" for="ml-price">Price (&#8358;) <span class="ml-req">*</span></label>
                 <input type="text" inputmode="numeric" class="ml-input" id="ml-price" data-ml-field="price" placeholder="e.g. 460,000" autocomplete="off" />
+              </div>
+              <div class="ml-field">
+                <label class="ml-label" for="ml-service-charge">Service charge (&#8358;)</label>
+                <input type="text" inputmode="numeric" class="ml-input" id="ml-service-charge" data-ml-field="serviceCharge" placeholder="e.g. 50,000" autocomplete="off" />
               </div>
               <div class="ml-field">
                 <label class="ml-label" for="ml-agency-fee">Agency fee (&#8358;)</label>
@@ -300,6 +304,7 @@
 
             <div class="ml-price-breakdown" data-ml-price-breakdown>
               <div class="ml-price-row"><span>Listed price</span><span data-ml-price-out>&#8358;0</span></div>
+              <div class="ml-price-row"><span>Service charge</span><span data-ml-service-out>&#8358;0</span></div>
               <div class="ml-price-row"><span data-ml-agency-label>Agency fee</span><span data-ml-agency-out>&#8358;0</span></div>
               <div class="ml-price-row"><span data-ml-legal-label>Legal fee</span><span data-ml-legal-out>&#8358;0</span></div>
               <div class="ml-price-row ml-price-row--total"><span>Total the buyer pays</span><span data-ml-total-out>&#8358;0</span></div>
@@ -338,7 +343,7 @@
               </div>
               <div class="ml-field" data-ml-year-wrapper>
                 <label class="ml-label" for="ml-year">Year built <span class="ml-req">*</span></label>
-                <input type="date" class="ml-input" id="ml-year" data-ml-field="yearBuilt" autocomplete="off" />
+                <input type="text" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" class="ml-input" id="ml-year" data-ml-field="yearBuilt" placeholder="e.g. 2022" autocomplete="off" />
               </div>
             </div>
 

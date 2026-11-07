@@ -129,19 +129,67 @@
         }
       }
 
-      // Hide any quickfact element with 0 value
-      ['beds', 'baths', 'kitchens', 'livingRooms', 'parking'].forEach(function (key) {
-        var val = property[key];
-        var factEl = document.querySelector('[data-pd-quickfact-' + key + ']');
-        if (factEl) {
-          var container = factEl.closest('.pd-quickfact');
-          if (!val || val === 0 || val === '0') {
-            if (container) container.style.display = 'none';
-          } else {
-            if (container) container.style.display = '';
-          }
-        }
+      // Counts (bedrooms, bathrooms, living rooms, kitchens, parking): show the
+      // saved listing value, hide any that are 0. With no saved value the
+      // existing page content is left as it was.
+      var COUNT_LABELS = {
+        beds: ['Bedroom', 'Bedrooms'],
+        baths: ['Bathroom', 'Bathrooms'],
+        livingRooms: ['Living Room', 'Living Rooms'],
+        kitchens: ['Kitchen', 'Kitchens'],
+        parking: ['Parking Space', 'Parking Spaces']
+      };
+      var savedCount = function (key) {
+        if (!stored || stored[key] == null || stored[key] === '') return undefined;
+        var n = parseInt(stored[key], 10);
+        return isNaN(n) ? undefined : n;
+      };
+      Object.keys(COUNT_LABELS).forEach(function (key) {
+        var factEl = document.querySelector('[data-pd-quickfact-' + key.toLowerCase() + ']');
+        if (!factEl) return;
+        var n = savedCount(key);
+        if (n === undefined && (key === 'beds' || key === 'baths')) n = Number(property[key]) || 0;
+        if (n === undefined) return;
+        var container = factEl.closest('.pd-quickfact');
+        if (container) container.style.display = n > 0 ? '' : 'none';
+        if (n > 0) factEl.textContent = n + ' ' + COUNT_LABELS[key][n === 1 ? 0 : 1];
       });
+
+      // Parking Space row in Property Overview
+      var parkingRow = document.querySelector('[data-pd-overview-parking-row]');
+      var parkingN = savedCount('parking');
+      if (parkingRow && parkingN !== undefined) {
+        parkingRow.style.display = parkingN > 0 ? '' : 'none';
+        if (parkingN > 0) setText('[data-pd-overview-parking]', parkingN + (parkingN === 1 ? ' Car' : ' Cars'));
+      }
+
+      // Quick facts: the agent's selected + custom facts replace the sample ones
+      if (stored && Array.isArray(stored.quickFacts) && stored.quickFacts.length) {
+        var qfWrap = document.querySelector('.pd-quickfacts');
+        if (qfWrap) {
+          var QF_ICONS = {
+            check: '<polyline points="20 6 9 17 4 12"></polyline>',
+            shield: '<path d="M12 2l8 3v6c0 5-3.4 9-8 11-4.6-2-8-6-8-11V5l8-3z"></path>',
+            bolt: '<polygon points="13 2 3 14 11 14 10 22 21 10 13 10 13 2"></polygon>',
+            drop: '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path>'
+          };
+          Array.prototype.slice.call(qfWrap.querySelectorAll('.pd-quickfact:not([data-pd-qf-count])')).forEach(function (el) {
+            el.parentNode.removeChild(el);
+          });
+          var seenFacts = {};
+          stored.quickFacts.forEach(function (f) {
+            var text = String((f && typeof f === 'object') ? f.text : f || '').trim();
+            if (!text || seenFacts[text.toLowerCase()]) return;
+            seenFacts[text.toLowerCase()] = true;
+            var iconPath = QF_ICONS[(f && f.icon) || 'check'] || QF_ICONS.check;
+            var chip = document.createElement('div');
+            chip.className = 'pd-quickfact';
+            chip.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + iconPath + '</svg>';
+            chip.appendChild(document.createTextNode(text));
+            qfWrap.appendChild(chip);
+          });
+        }
+      }
 
       var agent = property.agent;
       setText('[data-pd-agent-name-text]', agent.name || 'Agent');
@@ -153,7 +201,8 @@
       setText('[data-pd-agent-rating]', (agent.rating || 0) + ' (' + (agent.reviews || 0) + ' reviews)');
 
       var rent = property.priceValue;
-      var service = Math.round(rent * 0.1);
+      var service = (stored && stored.serviceCharge != null && stored.serviceCharge !== '' && !isNaN(Number(stored.serviceCharge)))
+        ? Number(stored.serviceCharge) : Math.round(rent * 0.1);
       var legal = Math.round(rent * 0.1);
       var agency = (stored && typeof stored.agencyFee === 'number') ? stored.agencyFee : 20000;
       var total = rent + service + legal + agency;

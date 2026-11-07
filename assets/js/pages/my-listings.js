@@ -255,6 +255,7 @@
     var addressInput = document.getElementById('ml-address');
     var priceField = document.getElementById('ml-price').closest('.ml-field');
     var priceInput = document.getElementById('ml-price');
+    var serviceInput = document.getElementById('ml-service-charge');
     var agencyInput = document.getElementById('ml-agency-fee');
     var legalInput = document.getElementById('ml-legal-fee');
     var descField = document.getElementById('ml-description').closest('.ml-field');
@@ -355,6 +356,7 @@
        Price breakdown
        ====================================================================== */
     var priceOut = document.querySelector('[data-ml-price-out]');
+    var serviceOut = document.querySelector('[data-ml-service-out]');
     var agencyOut = document.querySelector('[data-ml-agency-out]');
     var legalOut = document.querySelector('[data-ml-legal-out]');
     var totalOut = document.querySelector('[data-ml-total-out]');
@@ -363,10 +365,12 @@
 
     function recomputePrice() {
       var price = parseNumber(priceInput.value);
+      var serviceCharge = parseNumber(serviceInput.value);
       var agencyFee = parseNumber(agencyInput.value);
       var legalFee = parseNumber(legalInput.value);
-      var total = price + agencyFee + legalFee;
+      var total = price + serviceCharge + agencyFee + legalFee;
       priceOut.textContent = NAIRA + formatNumber(price);
+      serviceOut.textContent = NAIRA + formatNumber(serviceCharge);
       agencyLabelOut.textContent = 'Agency fee';
       legalLabelOut.textContent = 'Legal fee';
       agencyOut.textContent = NAIRA + formatNumber(agencyFee);
@@ -378,7 +382,7 @@
       priceInput.value = digits ? formatNumber(digits) : '';
       recomputePrice();
     });
-    [agencyInput, legalInput].forEach(function (el) {
+    [serviceInput, agencyInput, legalInput].forEach(function (el) {
       el.addEventListener('input', function () {
         var digits = el.value.replace(/[^\d]/g, '');
         el.value = digits ? formatNumber(digits) : '';
@@ -386,6 +390,13 @@
       });
     });
     recomputePrice();
+
+    // Year built is a plain 4-digit year (not a date)
+    var yearInput = document.getElementById('ml-year');
+    yearInput.addEventListener('input', function () {
+      var digits = yearInput.value.replace(/[^\d]/g, '').slice(0, 4);
+      if (yearInput.value !== digits) yearInput.value = digits;
+    });
 
     /* ======================================================================
        Map preview — same "?q=...&output=embed" pattern property.html uses,
@@ -968,7 +979,7 @@
           propertyType: propertyTypeSelect.getValue(), propertyTypeLabel: propertyTypeSelect.getLabel(), propertyTypeCustom: propertyTypeSelect.isCustom(),
           period: periodSelect.getValue(),
           title: titleInput.value, state: stateSelect.getValue(), area: areaInput.value, address: addressInput.value,
-          price: priceInput.value, agencyFee: agencyInput.value, legalFee: legalInput.value,
+          price: priceInput.value, serviceCharge: serviceInput.value, agencyFee: agencyInput.value, legalFee: legalInput.value,
           beds: byField('beds'), baths: byField('baths'), kitchens: byField('kitchens'), livingRooms: byField('livingRooms'),
           parking: byField('parking'), yearBuilt: byField('yearBuilt'),
           furnishing: furnishingSelect.getValue(), furnishingCustom: furnishingSelect.isCustom(),
@@ -1008,10 +1019,10 @@
       if (d.furnishingCustom) furnishingSelect.setValue(null, d.furnishingLabel || d.furnishing, true);
       else if (d.furnishing) furnishingSelect.setValue(d.furnishing);
       titleInput.value = d.title || ''; areaInput.value = d.area || ''; addressInput.value = d.address || '';
-      priceInput.value = d.price || ''; agencyInput.value = d.agencyFee || ''; legalInput.value = d.legalFee || '';
+      priceInput.value = d.price || ''; serviceInput.value = d.serviceCharge || ''; agencyInput.value = d.agencyFee || ''; legalInput.value = d.legalFee || '';
       ['beds', 'baths', 'kitchens', 'livingRooms', 'parking', 'yearBuilt'].forEach(function (name) {
         var el = document.querySelector('[data-ml-field="' + name + '"]');
-        if (el && d[name] != null) el.value = d[name];
+        if (el && d[name] != null) el.value = name === 'yearBuilt' ? String(d[name]).slice(0, 4) : d[name];
       });
       descInput.value = d.description || '';
       (d.quickFactsChecked || []).forEach(function (v) {
@@ -1044,7 +1055,7 @@
       });
       updateCategoryFields();
       [propertyTypeSelect, periodSelect, stateSelect, furnishingSelect].forEach(function (s) { s.setValue(null, '', false); });
-      agencyInput.value = ''; legalInput.value = '';
+      serviceInput.value = ''; agencyInput.value = ''; legalInput.value = '';
       recomputePrice();
       mapFrame.src = ''; mapEl.classList.remove('is-ready');
       customChips.quickFacts = []; customChips.amenities = [];
@@ -1106,9 +1117,10 @@
 
       data.priceValue = parseNumber(priceInput.value);
       if (!data.priceValue) bad(priceField);
+      data.serviceCharge = parseNumber(serviceInput.value);
       data.agencyFee = parseNumber(agencyInput.value);
       data.legalFee = parseNumber(legalInput.value);
-      data.totalPayable = data.priceValue + data.agencyFee + data.legalFee;
+      data.totalPayable = data.priceValue + data.serviceCharge + data.agencyFee + data.legalFee;
       data.price = NAIRA + formatNumber(data.priceValue);
 
       ['beds', 'baths', 'kitchens', 'livingRooms', 'parking'].forEach(function (name) {
@@ -1119,7 +1131,8 @@
       var yearEl = document.querySelector('[data-ml-field="yearBuilt"]');
       var rawYear = yearEl.value.trim();
       if (categoryValue === 'sale') {
-        if (!rawYear) bad(yearField);
+        var yr = parseInt(rawYear, 10);
+        if (!/^\d{4}$/.test(rawYear) || yr < 1800 || yr > new Date().getFullYear() + 5) bad(yearField);
       }
       data.yearBuilt = rawYear ? (rawYear.length >= 4 ? rawYear.substring(0, 4) : rawYear) : '';
 
@@ -1211,6 +1224,7 @@
         videosAll: videos,
         price: data.priceValue,
         priceValue: data.priceValue,
+        serviceCharge: data.serviceCharge,
         agencyFee: data.agencyFee,
         legalFee: data.legalFee,
         totalPayable: data.totalPayable,
@@ -1448,6 +1462,7 @@
       areaInput.value = record.area || '';
       addressInput.value = record.address || '';
       priceInput.value = record.priceValue ? formatNumber(record.priceValue) : '';
+      serviceInput.value = record.serviceCharge ? formatNumber(record.serviceCharge) : '';
       agencyInput.value = record.agencyFee != null ? formatNumber(record.agencyFee)
         : (record.agencyFeePct != null ? formatNumber(Math.round((record.priceValue || 0) * record.agencyFeePct / 100)) : '');
       legalInput.value = record.legalFee != null ? formatNumber(record.legalFee)
@@ -1456,7 +1471,7 @@
         var el = document.querySelector('[data-ml-field="' + name + '"]');
         if (el) el.value = record[name] != null ? record[name] : '';
       });
-      document.querySelector('[data-ml-field="yearBuilt"]').value = record.yearBuilt || '';
+      document.querySelector('[data-ml-field="yearBuilt"]').value = String(record.yearBuilt || '').slice(0, 4);
       descInput.value = (record.description || []).join('\n\n');
 
       (record.quickFacts || []).forEach(function (qf) {
