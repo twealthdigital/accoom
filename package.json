@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node build.mjs",
     "start": "npx --yes serve . -l 3000",
-    "test": "node tests/stage1.test.mjs && node tests/stage2.test.mjs && node tests/stage2.page.test.mjs && node tests/stage3.test.mjs && node tests/stage3.page.test.mjs && node tests/stage4.test.mjs && node tests/stage4.page.test.mjs && node tests/stage5.test.mjs && node tests/stage5.page.test.mjs && node tests/stage6.test.mjs && node tests/stage6.page.test.mjs && node tests/stage7.test.mjs && node tests/stage7.page.test.mjs && node tests/stage7.form.test.mjs"
+    "test": "node tests/stage1.test.mjs && node tests/stage2.test.mjs && node tests/stage2.page.test.mjs && node tests/stage3.test.mjs && node tests/stage3.page.test.mjs && node tests/stage4.test.mjs && node tests/stage4.page.test.mjs && node tests/stage5.test.mjs && node tests/stage5.page.test.mjs && node tests/stage6.test.mjs && node tests/stage6.page.test.mjs && node tests/stage7.test.mjs && node tests/stage7.page.test.mjs && node tests/stage7.form.test.mjs && node tests/pricing.test.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",

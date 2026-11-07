@@ -68,7 +68,7 @@ await test('a demo payment (double-clicked) creates exactly one ACTD card marked
   actdNumber = cards[0].getAttribute('data-actd');
   assert.match(actdNumber, /^ACTD-\d{4}-[A-Z2-9]{10}$/);
   const t = cards[0].textContent;
-  assert.ok(/DEMO/.test(t) && /Lekki Mini Flat/.test(t) && /Rental payment/.test(t) && /1,825,000/.test(t) && /Version 1/.test(t));
+  assert.ok(/DEMO/.test(t) && /Lekki Mini Flat/.test(t) && /Rental payment/.test(t) && /2,100,000/.test(t) && /Version 1/.test(t));
   assert.ok(/ready/.test(cd.querySelector('[data-dc-msg]').textContent));
   const all = await cust.w.Accoom.Records.collection('transactions').all(); assert.equal(all.length, 1);
 });
@@ -153,7 +153,7 @@ await test('an issued ACTD checks out: seal matches, no personal data shown, dem
   const t = v.d.querySelector('[data-vf-result]').textContent;
   assert.ok(t.includes(actdNumber) && /seal matches/i.test(t) && /DEMONSTRATION record/i.test(t));
   assert.ok(/A newer version \(2\) exists/.test(t));
-  assert.ok(!/Chinedu|Lekki|1,825,000|cust-1|agent-77|Ada/.test(t));
+  assert.ok(!/Chinedu|Lekki|2,100,000|cust-1|agent-77|Ada/.test(t));
   assert.ok(/not a digital signature/i.test(t));
   v.dom.window.close();
 });
@@ -171,7 +171,7 @@ await test('a tampered record is reported as changed', async () => {
   const tampered = Object.assign({}, saved);
   const key = Object.keys(saved).find((k) => saved[k].includes(actdNumber) && saved[k].includes('"versionKey"'));
   assert.ok(key, 'found where ACTDs are stored: ' + Object.keys(saved).join());
-  tampered[key] = saved[key].replace('"total":1825000', '"total":1');
+  tampered[key] = saved[key].replace('"total":2100000', '"total":1');
   assert.notEqual(tampered[key], saved[key], 'tamper applied');
   const v = await open('verify-document.html?ref=' + actdNumber + '&v=1', tampered, null);
   const t = v.d.querySelector('[data-vf-result]').textContent; assert.ok(/does NOT match/.test(t), t); v.dom.window.close();

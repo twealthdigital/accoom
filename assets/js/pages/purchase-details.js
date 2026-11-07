@@ -110,8 +110,8 @@
         checkOut: 'Aug 25, 2025',
         bookingDate: 'May 18, 2025 \u00B7 10:30 AM',
         totalAmount: '\u20A6250,000',
-        propertyPrice: '\u20A6240,000',
-        serviceFee: '\u20A610,000',
+        propertyPrice: '\u20A6250,000',
+        serviceFee: 'Included',
         paymentMethod: 'Mastercard **** 4242',
         timeline: [
           { title: 'Purchase Confirmed', desc: 'Your purchase has been confirmed.', date: 'May 18, 2025 \u00B7 10:30 AM', state: 'done' },
@@ -131,8 +131,8 @@
         checkOut: 'Jul 15, 2025',
         bookingDate: 'Jun 2, 2025 \u00B7 9:10 AM',
         totalAmount: '\u20A6450,000',
-        propertyPrice: '\u20A6430,000',
-        serviceFee: '\u20A620,000',
+        propertyPrice: '\u20A6450,000',
+        serviceFee: 'Included',
         paymentMethod: 'Mastercard **** 4242',
         timeline: [
           { title: 'Purchase Confirmed', desc: 'Your Purchase has been confirmed.', date: 'Jun 2, 2025 \u00B7 9:10 AM', state: 'done' },
@@ -152,8 +152,8 @@
         checkOut: 'May 18, 2025',
         bookingDate: 'Apr 20, 2025 \u00B7 4:45 PM',
         totalAmount: '\u20A680,000',
-        propertyPrice: '\u20A675,000',
-        serviceFee: '\u20A65,000',
+        propertyPrice: '\u20A680,000',
+        serviceFee: 'Included',
         paymentMethod: 'Verve **** 1187',
         timeline: [
           { title: 'Purchase Confirmed', desc: 'Your purchase has been confirmed.', date: 'Apr 20, 2025 \u00B7 4:45 PM', state: 'done' },
@@ -202,7 +202,7 @@
           bookingDate: checkIn + ' \u00B7 10:00 AM',
           totalAmount: found.amount,
           propertyPrice: found.amount,
-          serviceFee: '\u20A60',
+          serviceFee: 'Included',
           paymentMethod: 'Card',
           timeline: [
             { title: 'Purchase Confirmed', desc: 'Your purchase has been confirmed.', date: checkIn, state: 'done' }

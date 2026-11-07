@@ -88,18 +88,18 @@ await test('rental demo payment: totals, dates, ACTD v1 linked, marked as demo',
   const w = boot(); const r = await pay(w, 'R1', { periodCount: 12, startDate: '2026-01-31' });
   const t = r.transaction;
   assert.equal(t.status, 'succeeded'); assert.equal(t.paymentSource, 'demo'); assert.equal(t.type, 'rent_payment');
-  assert.equal(t.amounts.price, 1800000); assert.equal(t.amounts.total, 1825000);
+  assert.equal(t.amounts.price, 2100000); assert.equal(t.amounts.total, 2100000);
   assert.equal(t.expiryDate, '2027-01-31'); assert.equal(t.billingPeriod, 'month');
   assert.match(r.actd.actdNumber, /^ACTD-\d{4}-[A-Z2-9]{10}$/);
   assert.equal(r.actd.version, 1); assert.equal(t.actdId, r.actd.id); assert.equal(r.actd.content.demo, true);
   assert.ok(/No real money was moved/.test(r.actd.content.s2.status));
   assert.match(t.receiptRef, /^ACR-\d{4}-/); assert.equal(r.actd.content.s2.receiptRef, t.receiptRef);
 });
-await test('sale demo payment: price + fees, no rental fields, zero fee not listed', async () => {
+await test('sale demo payment: inclusive price, no rental fields, no separate fee lines', async () => {
   const w = boot(); const r = await pay(w, 'S1'); const c = r.actd.content;
   assert.equal(r.transaction.type, 'sale_payment'); assert.equal(r.transaction.amounts.total, 194250000);
   assert.equal(c.s4.startDate, ''); assert.equal(c.s4.expiryDate, ''); assert.equal(c.s4.rentalDuration, ''); assert.equal(c.s4.renewalConditions, '');
-  assert.equal(JSON.stringify(c.s2.lines.map((l) => l.label)), JSON.stringify(['Property price', 'Agency fee']));
+  assert.equal(JSON.stringify(c.s2.lines.map((l) => l.label)), JSON.stringify(['Property price']));
 });
 await test('daily, weekly and yearly rentals use their own period maths', async () => {
   const mk = (id, period, price) => Object.assign({}, RENT, { id, period, price });
@@ -107,7 +107,7 @@ await test('daily, weekly and yearly rentals use their own period maths', async 
   assert.equal((await pay(w, 'D', { periodCount: 3, startDate: '2026-02-27' })).transaction.expiryDate, '2026-03-02');
   assert.equal((await pay(w, 'W', { periodCount: 2, startDate: '2026-12-25' })).transaction.expiryDate, '2027-01-08');
   const y = await pay(w, 'Y', { periodCount: 1, startDate: '2024-02-29' });
-  assert.equal(y.transaction.expiryDate, '2025-02-28'); assert.equal(y.transaction.amounts.price, 1200000);
+  assert.equal(y.transaction.expiryDate, '2025-02-28'); assert.equal(y.transaction.amounts.price, 1225000);
 });
 await test('a repeated event id returns the same transaction and ACTD', async () => {
   const w = boot(); const a = await pay(w, 'R1', { eventId: 'same' }), b = await pay(w, 'R1', { eventId: 'same' });
@@ -197,7 +197,7 @@ await test('verify(): matches for an untouched record and reveals no personal da
   const v = await w.Accoom.ACTD.verify(r.actd.actdNumber, 1);
   assert.equal(v.found, true); assert.equal(v.sealMatches, true); assert.equal(v.isLatest, true); assert.equal(v.demo, true);
   const json = JSON.stringify(v);
-  assert.ok(!/Chinedu|Lekki|Admiralty|150000|1825000|cust-1|agent-77|Ada/.test(json));
+  assert.ok(!/Chinedu|Lekki|Admiralty|150000|2100000|cust-1|agent-77|Ada/.test(json));
   assert.equal((await w.Accoom.ACTD.verify('ACTD-2026-NOPENOPENO')).found, false);
   assert.equal((await w.Accoom.ACTD.verify(r.actd.actdNumber, 9)).found, false);
 });
@@ -304,7 +304,7 @@ await test('PDF contains every section, the statement, the QR URL, the seal and 
   for (const h of ['SECTION 1 - TRANSACTION SUMMARY', 'SECTION 2 - PAYMENT CONFIRMATION', 'SECTION 3 - PROPERTY INFORMATION', 'SECTION 4 - AGREEMENT AND CONFIRMATION', 'SECTION 5 - DOCUMENT DELIVERY', 'SECTION 6 - ACCOOM AUTHENTICATION']) assert.ok(t.includes(h), h);
   assert.ok(all.includes('ACCOOM CERTIFICATE TRANSACTION DOCUMENT (ACTD)') && all.includes(r.actd.actdNumber));
   assert.ok(all.includes('DEMONSTRATION RECORD - NO REAL PAYMENT WAS MADE'));
-  assert.ok(all.includes('NGN 1,825,000') && all.includes('NGN 1,800,000') && all.includes('31 Jan 2027'));
+  assert.ok(all.includes('NGN 2,100,000') && all.includes('NGN 2,100,000') && all.includes('31 Jan 2027'));
   assert.ok(all.includes(r.actd.seal.slice(0, 40)) || t.includes(r.actd.seal));
   const norm = (x) => x.replace(/\s+/g, ' ');
   assert.ok(norm(all).includes(norm(w.Accoom.ACTD.STATEMENT.slice(0, 80))));

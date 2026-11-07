@@ -1298,8 +1298,12 @@
           if (s.typeLabel && !d.type) p.typeLabel = s.typeLabel;
           if (s.location && !d.location) p.location = s.location;
           if (s.priceValue != null && !d.images /* agent-authored, trust it over the DOM-scraped price */) {
-            p.priceValue = s.priceValue;
-            p.price = formatNaira(s.priceValue);
+            // Customer-facing price = accommodation + service charge + legal fee + agency fee.
+            // The agent's base figure stays on the record (basePriceValue) and is never previewed or shared.
+            var finalValue = (window.Accoom && Accoom.Pricing) ? Accoom.Pricing.finalPrice(s) : s.priceValue;
+            p.basePriceValue = s.priceValue;
+            p.priceValue = finalValue || s.priceValue;
+            p.price = formatNaira(p.priceValue);
           }
           if (s.period) p.period = s.period;
           if (s.beds != null) p.beds = s.beds;

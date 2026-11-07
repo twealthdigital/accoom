@@ -64,13 +64,13 @@ await test('receipt content: purpose, parties, breakdown, reference, method, sta
   const w = boot(); const tx = await paid(w, 'R1', { periodCount: 2 });
   const r = await w.Accoom.Records.collection('receipts').get('rcp_' + tx.id), c = r.content;
   assert.equal(c.purpose, 'Rental payment'); assert.equal(c.client.name, 'Chinedu Eze'); assert.equal(c.agent.name, 'Ada Obi'); assert.equal(c.property.name, 'Digital flat');
-  assert.equal(c.total, 325000); assert.equal(c.lines.length, 3); assert.equal(c.payment.reference, tx.paymentReference); assert.ok(c.payment.method);
+  assert.equal(c.total, 350000); assert.equal(c.lines.length, 1); assert.equal(c.payment.reference, tx.paymentReference); assert.ok(c.payment.method);
   assert.equal(c.demo, true); assert.match(c.payment.status, /No real money was moved/); assert.match(c.verifyUrl, /verify-receipt\.html\?ref=ACR-/);
 });
 await test('a sale receipt says "Purchase payment" and only lists fees that apply', async () => {
   const w = boot(); const tx = await paid(w, 'S1');
   const c = (await w.Accoom.Records.collection('receipts').get('rcp_' + tx.id)).content;
-  assert.equal(c.purpose, 'Purchase payment'); assert.equal(c.lines.map((l) => l.label).join('|'), 'Property price|Agency fee'); assert.equal(c.total, 194250000);
+  assert.equal(c.purpose, 'Purchase payment'); assert.equal(c.lines.map((l) => l.label).join('|'), 'Property price'); assert.equal(c.total, 194250000);
 });
 await test('issued receipts cannot be edited (immutable) and the seal detects tampering', async () => {
   const w = boot(); const tx = await paid(w, 'R1');
@@ -310,7 +310,7 @@ await test('receipt PDF contains receipt number, breakdown, delivery wording, de
   const w = boot(); const tx = await paid(w, 'R2'); const r = await w.Accoom.Records.collection('receipts').get('rcp_' + tx.id);
   const out = w.Accoom.ReceiptGenerator.renderReceipt(r), t = pdfText(out);
   assert.equal(text(out.bytes).slice(0, 5), '%PDF-'); assert.ok(text(out.bytes).trimEnd().endsWith('%%EOF'));
-  for (const s of [tx.receiptRef, 'RENTAL PAYMENT', 'DEMONSTRATION RECORD', 'Chinedu Eze', 'Ada Obi', 'NGN 175,000', 'Agency fee', 'ACCOOM has not issued a physical receipt', 'verify-receipt.html', r.seal.slice(0, 16), 'not a digital signature'])
+  for (const s of [tx.receiptRef, 'RENTAL PAYMENT', 'DEMONSTRATION RECORD', 'Chinedu Eze', 'Ada Obi', 'NGN 175,000', 'ACCOOM has not issued a physical receipt', 'verify-receipt.html', r.seal.slice(0, 16), 'not a digital signature'])
     assert.ok(t.includes(s), 'missing: ' + s);
 });
 await test('signing-record PDF states what a signature is and is not', async () => {

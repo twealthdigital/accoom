@@ -43,8 +43,11 @@
       id: (stored && stored.id) || propId || 'ACCOM-24567',
       name: (stored && stored.name) || params.get('name') || '2 Bedroom Detached Duplex',
       location: stored ? stored.location : 'Lekki Phase 1, Lagos, Nigeria',
-      priceValue: stored ? (typeof stored.price === 'number' ? stored.price : parseInt(String(stored.price).replace(/[^\d]/g, ''), 10) || 460000) : 460000,
-      price: stored ? (typeof stored.price === 'number' ? ('\u20A6' + stored.price.toLocaleString('en-NG')) : stored.price) : '\u20A6460,000',
+      // Customers only ever see the inclusive price (accommodation + service charge + legal fee + agency fee).
+      // A record with no fee fields (catalogue, card price) is already inclusive.
+      priceValue: stored ? ((Accoom.Pricing && Accoom.Pricing.finalPrice(stored)) || parseInt(String(stored.price).replace(/[^\d]/g, ''), 10) || 460000) : 460000,
+      price: stored ? ((Accoom.Pricing && Accoom.Pricing.finalPrice(stored)) ? Accoom.Pricing.naira(Accoom.Pricing.finalPrice(stored)) : stored.price) : '\u20A6460,000',
+      period: stored ? (stored.period || '') : '',
       beds: stored ? (stored.beds || 2) : 2,
       baths: stored ? (stored.baths || 3) : 3,
       typeLabel: stored ? (stored.typeLabel || 'Detached Duplex') : 'Detached Duplex',
@@ -200,17 +203,20 @@
       setText('[data-pd-agent-stats]', Math.max(1, Math.round((agent.reviews || 0) / 10)) + ' Properties \u00B7 ' + (agent.reviews || 0) + ' Deals');
       setText('[data-pd-agent-rating]', (agent.rating || 0) + ' (' + (agent.reviews || 0) + ' reviews)');
 
-      var rent = property.priceValue;
-      var service = (stored && stored.serviceCharge != null && stored.serviceCharge !== '' && !isNaN(Number(stored.serviceCharge)))
-        ? Number(stored.serviceCharge) : Math.round(rent * 0.1);
-      var legal = Math.round(rent * 0.1);
-      var agency = (stored && typeof stored.agencyFee === 'number') ? stored.agencyFee : 20000;
-      var total = rent + service + legal + agency;
+      // One inclusive price everywhere. Fees are never added again here and never shown as amounts.
+      var total = property.priceValue;
+      var words = Accoom.Pricing ? Accoom.Pricing.periodWords(property.period) : { per: 'Year', first: 'First Year', slash: 'year' };
       var naira = function (n) { return '\u20A6' + n.toLocaleString('en-NG'); };
-      setText('[data-pd-price-rent]', naira(rent));
-      setText('[data-pd-price-service]', naira(service));
-      setText('[data-pd-price-legal]', naira(legal));
-      setText('[data-pd-price-agency]', naira(agency));
+      var rentLabel = document.querySelector('[data-pd-price-rent]');
+      if (rentLabel && rentLabel.previousElementSibling) rentLabel.previousElementSibling.textContent = 'Rent (Per ' + words.per + ')';
+      var totalLabel = document.querySelector('[data-pd-price-total]');
+      if (totalLabel && totalLabel.previousElementSibling) totalLabel.previousElementSibling.textContent = 'Total (' + words.first + ')';
+      var perEl = document.querySelector('[data-pd-price]');
+      if (perEl && perEl.nextElementSibling && property.period) perEl.nextElementSibling.textContent = ' / ' + words.slash;
+      setText('[data-pd-price-rent]', naira(total));
+      setText('[data-pd-price-service]', 'Included');
+      setText('[data-pd-price-legal]', 'Included');
+      setText('[data-pd-price-agency]', 'Included');
       setText('[data-pd-price-total]', naira(total));
     })();
 

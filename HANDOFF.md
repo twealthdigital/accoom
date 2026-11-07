@@ -68,3 +68,10 @@ npm start                        # serves source for quick local checks
 - Receipt: the ACTD carries a reserved receipt reference (ACR-...). The receipt DOCUMENT itself is Stage 5 and must use `transaction.receiptRef`. Section 5 delivery/acknowledgement and Section 4 signing will be filled by Stage 5 through `ACTD.addendum`. Occupancy Extension (Stage 7) is read from `listing.occupancyExtension.days`; receipt delivery from `listing.receiptDelivery`.
 - PDF uses "NGN" (standard fonts have no Naira sign). Times are shown in WAT (UTC+1).
 - Verified outside the test suite: `qpdf --check`, `pdftotext`, page rasterised and inspected, QR decoded with OpenCV to the exact verification URL (v1 and v2), and the minified `dist` bundle passes the page tests.
+
+## Inclusive pricing (customers never see base price or fee amounts)
+- `assets/js/data/pricing.js` -> `Accoom.Pricing.finalPrice(listing)` = accommodation + service charge + legal fee + agency fee. Fee fields stay on the listing record (agent records / platform maths); a record with no fee fields (catalogue, card price) is already final and is returned unchanged.
+- Customer screens use the final price only: property page (rent row, total, fees shown as "Included"), listing-actions view/share preview, `transactions.js` (payment amount = final price x periods, agencyFee/legalFee in the transaction are 0 so ACTD/receipts no longer print fee lines), purchase-details ("Service Fee: Included"), chat sample text.
+- Agent-only screens (addlistings form + preview, my-listings edit) still show the four inputs; the preview total is labelled "Price customers see (all fees included)".
+- **Never add fees on top of a final price.** Rent is now charged as the inclusive price per billing period (fees are inside each period's price).
+- `npm test` includes `tests/pricing.test.mjs`.

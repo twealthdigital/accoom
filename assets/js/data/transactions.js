@@ -43,6 +43,10 @@ window.Accoom = window.Accoom || {};
     try { var l = JSON.parse(window.localStorage.getItem('accoom-agent-listings')); return (Array.isArray(l) ? l : []).filter(function (x) { return String(x.id) === String(id); })[0] || null; }
     catch (e) { return null; }
   }
+  // Inclusive customer price (js/data/pricing.js); same maths if that file is not loaded.
+  function P() {
+    return Accoom.Pricing || { finalPrice: function (l) { var n = function (v) { v = Number(v); return isFinite(v) && v > 0 ? v : 0; }; var b = n(l.priceValue != null ? l.priceValue : l.price); return b > 0 ? b + n(l.serviceCharge) + n(l.agencyFee) + n(l.legalFee) : 0; } };
+  }
   function money(n) { n = Number(n); return isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : 0; }
 
   // Can this listing be paid for right now?
@@ -53,7 +57,7 @@ window.Accoom = window.Accoom || {};
     if (a && a.state !== 'legacy_unreviewed') {
       if (!(Accoom.ListingReview && Accoom.ListingReview.isPubliclyVisible(l))) return 'This listing has not been approved by ACCOOM, so it cannot be paid for.';
     }
-    if (!money(l.price)) return 'This listing has no price.';
+    if (!money(P().finalPrice(l))) return 'This listing has no price.';
     return '';
   }
 
@@ -71,15 +75,18 @@ window.Accoom = window.Accoom || {};
       if (['day', 'week', 'month', 'year'].indexOf(period) === -1) return Promise.reject(fail('bad_period', 'This rental has no billing period.'));
       try { expiry = Accoom.TenancyDates.expiryDate(start, period, count); } catch (e) { return Promise.reject(fail('bad_date', e.message)); }
     }
-    var price = isRent ? money(l.price) * count : money(l.price);
-    var agency = money(l.agencyFee), legal = money(l.legalFee);
+    // The listing's inclusive price already contains service charge, legal fee and agency fee,
+    // so the fees are never added again here. Individual fees stay on the listing record.
+    var unit = money(P().finalPrice(l));
+    var price = isRent ? unit * count : unit;
+    var agency = 0, legal = 0;
     var tx = Accoom.Schemas.make.transaction({
       idempotencyKey: 'demo:' + eventId,
       type: isRent ? 'rent_payment' : 'sale_payment', status: 'succeeded', paymentSource: 'demo',
       propertyId: String(l.id), listingId: String(l.id), listingName: l.name,
       customerId: String(input.customerId), customerName: String(input.customerName || '').slice(0, 80),
       agentId: String(l.ownerId || 'local-agent'), agentName: String(l.agentName || '').slice(0, 80), landlordId: '',
-      amounts: { unitPrice: money(l.price), price: price, agencyFee: agency, legalFee: legal, other: 0, total: price + agency + legal },
+      amounts: { unitPrice: unit, price: price, agencyFee: agency, legalFee: legal, other: 0, total: price + agency + legal },
       billingPeriod: isRent ? period : '', periodCount: isRent ? count : 1, startDate: isRent ? start : '', expiryDate: expiry,
       paymentReference: 'DEMO-' + code(10), paymentMethod: 'Demonstration payment event', provider: 'ACCOOM demo (no payment gateway connected)',
       paidAt: nowIso(), receiptRef: 'ACR-' + new Date().getUTCFullYear() + '-' + code(10)

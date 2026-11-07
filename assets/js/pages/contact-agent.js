@@ -212,7 +212,7 @@
           { id: 'n1', from: 'me', day: 'Last week', time: '5:45 PM', read: true,
             text: 'Good evening, does the price include agency fees?' },
           { id: 'n2', from: 'agent', day: 'Last week', time: '6:10 PM',
-            text: 'No, agency and legal fees are 10% combined, paid separately.' }
+            text: 'Yes, the price you see already includes agency and legal fees.' }
         ]
       },
       {
