@@ -2359,19 +2359,20 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
   .msgs-property-status-icon { display: none; }
   .msgs-chat-tabs-row .msgs-props-btn { padding: 0 8px; }
 }
-/* Rate-this-seller strip: gold bar under the tabs (shown after a payment is approved or declined) */
-.msgs-review-strip { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px 14px; padding:8px 16px; background:var(--gold); color:#fff; font-weight:700; font-size:.9rem; }
+/* Rate-this-seller: gold title bar, stars on a plain row right under it (shown after a payment is approved or declined) */
+.msgs-review-strip { display:block; padding:0; background:transparent; border-bottom:1px solid var(--line-page); }
 .msgs-review-strip.is-hidden { display:none; }
-.msgs-review-strip-text { line-height:1.3; }
-.msgs-rs-stars { display:flex; align-items:center; gap:2px; }
-.msgs-rs-star { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; padding:0; border:0; background:none; color:#fff; cursor:pointer; opacity:.5; -webkit-tap-highlight-color:transparent; transition:opacity .12s, transform .12s; }
-.msgs-rs-star.is-on { opacity:1; }
+.msgs-review-strip-text { display:block; padding:10px 16px; background:var(--gold); color:#fff; font-weight:700; font-size:.92rem; line-height:1.3; }
+.msgs-rs-stars { display:flex; align-items:center; justify-content:flex-start; gap:4px; padding:8px 12px; background:var(--surface-page, #fff); }
+.msgs-rs-star { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; padding:0; border:0; background:none; color:#d6cfc0; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:color .12s, transform .12s; }
+.msgs-rs-star svg { width:28px; height:28px; }
+.msgs-rs-star.is-on { color:var(--gold); }
 .msgs-rs-star:active { transform:scale(.9); }
 @media (hover:hover) {
-  .msgs-rs-stars:hover .msgs-rs-star { opacity:1; }
-  .msgs-rs-stars .msgs-rs-star:hover ~ .msgs-rs-star { opacity:.5; }
+  .msgs-rs-stars:hover .msgs-rs-star { color:var(--gold); }
+  .msgs-rs-stars .msgs-rs-star:hover ~ .msgs-rs-star { color:#d6cfc0; }
 }
 @media (max-width:480px) {
-  .msgs-review-strip { justify-content:center; text-align:center; padding:8px 10px; }
-  .msgs-rs-star { width:40px; height:40px; }
+  .msgs-review-strip-text { padding:9px 12px; font-size:.88rem; }
+  .msgs-rs-stars { padding:6px 8px; }
 }
