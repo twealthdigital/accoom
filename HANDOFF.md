@@ -109,5 +109,5 @@ npm start                        # serves source for quick local checks
 - Test: `tests/real-agent.page.test.mjs` extended. Chat page itself not covered (jsdom crashes on contact-agent); check approve/decline -> dialog in a real browser.
 
 ## Rate-this-seller bar + CSS cache fix
-- Chat strip: GOLD title bar "Rate this seller" under the tabs, with the 5 tappable stars on a plain white row UNDER it (left-aligned, gold when chosen); originally had stars inside the bar, owner rejected that (`data-msgs-rs-star`). Tapping a star opens the review dialog with that star already selected (`Reviews.openModal({ rating })`). After reviewing it says "You rated this seller" and the stars stay filled; tapping again edits. Pure CSS hover/layout, wraps and centres on phones.
+- Chat "Rate this seller": a SMALL box on the left under the tabs (gold title on top, 5 stars below, fit-content width, rounded border). Owner rejected a full-width bar twice: never make it span the chat. Tapping a star opens the review dialog with that star selected.
 - **Build now versions every stylesheet link (`?v=<hash of all css>`)** in `build.mjs` (`versionCss`). Before, CSS was cached for a day, so visitors saw NEW html with OLD css (the strip appeared unstyled). Do not remove.

@@ -2359,13 +2359,13 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
   .msgs-property-status-icon { display: none; }
   .msgs-chat-tabs-row .msgs-props-btn { padding: 0 8px; }
 }
-/* Rate-this-seller: gold title bar, stars on a plain row right under it (shown after a payment is approved or declined) */
-.msgs-review-strip { display:block; padding:0; background:transparent; border-bottom:1px solid var(--line-page); }
+/* Rate-this-seller: small box on the left (gold title + stars under it), shown after a payment is approved or declined */
+.msgs-review-strip { display:block; width:fit-content; max-width:calc(100% - 24px); margin:10px 12px; padding:0; background:var(--surface-page, #fff); border:1px solid var(--line-page); border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.06); }
 .msgs-review-strip.is-hidden { display:none; }
-.msgs-review-strip-text { display:block; padding:10px 16px; background:var(--gold); color:#fff; font-weight:700; font-size:.92rem; line-height:1.3; }
-.msgs-rs-stars { display:flex; align-items:center; justify-content:flex-start; gap:4px; padding:8px 12px; background:var(--surface-page, #fff); }
-.msgs-rs-star { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; padding:0; border:0; background:none; color:#d6cfc0; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:color .12s, transform .12s; }
-.msgs-rs-star svg { width:28px; height:28px; }
+.msgs-review-strip-text { display:block; padding:8px 14px; background:var(--gold); color:#fff; font-weight:700; font-size:.85rem; line-height:1.3; }
+.msgs-rs-stars { display:flex; align-items:center; justify-content:flex-start; gap:2px; padding:6px 8px; }
+.msgs-rs-star { display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; padding:0; border:0; background:none; color:#d6cfc0; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:color .12s, transform .12s; }
+.msgs-rs-star svg { width:24px; height:24px; }
 .msgs-rs-star.is-on { color:var(--gold); }
 .msgs-rs-star:active { transform:scale(.9); }
 @media (hover:hover) {
@@ -2373,6 +2373,6 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
   .msgs-rs-stars .msgs-rs-star:hover ~ .msgs-rs-star { color:#d6cfc0; }
 }
 @media (max-width:480px) {
-  .msgs-review-strip-text { padding:9px 12px; font-size:.88rem; }
-  .msgs-rs-stars { padding:6px 8px; }
+  .msgs-review-strip { margin:8px 10px; }
+  .msgs-rs-star { width:38px; height:38px; }
 }

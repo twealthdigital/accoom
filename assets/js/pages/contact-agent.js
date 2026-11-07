@@ -1050,7 +1050,7 @@
       if (!t) return;
       var mineR = Accoom.Reviews.mine(t.agentKey, t.propertyId);
       var txt = strip.querySelector('[data-msgs-review-text]');
-      txt.textContent = mineR ? 'You rated this seller \u2014 tap a star to change' : 'Rate this seller';
+      txt.textContent = mineR ? 'You rated this seller' : 'Rate this seller';
       Accoom.$$('[data-msgs-rs-star]', strip).forEach(function (b) {
         b.classList.toggle('is-on', !!mineR && Number(b.getAttribute('data-msgs-rs-star')) <= mineR.rating);
       });
