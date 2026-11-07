@@ -141,6 +141,17 @@ window.Accoom = window.Accoom || {};
         beds: Number(rec.beds) || 0,
         baths: Number(rec.baths) || 0,
         verified: verified,
+        // Everything the agent entered, so the details page shows exactly that (never sample text).
+        agentListing: true,
+        listingType: rec.listingType || rec.category || '',
+        ownerId: rec.ownerId || '',
+        address: rec.address || '', area: rec.area || '', state: rec.state || '',
+        description: rec.description || [],
+        amenities: Array.isArray(rec.amenities) ? rec.amenities : [],
+        quickFacts: Array.isArray(rec.quickFacts) ? rec.quickFacts : [],
+        kitchens: rec.kitchens, livingRooms: rec.livingRooms, parking: rec.parking,
+        yearBuilt: rec.yearBuilt || '', furnishing: rec.furnishing || '',
+        dateAdded: rec.dateAdded || '', views: rec.views == null ? '0' : rec.views,
         agent: { name: rec.agentName || 'Agent', verified: verified, rating: 0, reviews: 0, online: false, level: 'AL1' }
       });
     });

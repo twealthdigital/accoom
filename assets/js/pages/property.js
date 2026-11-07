@@ -23,6 +23,9 @@
       stored = Accoom.PropertyService.getById(propId);
     }
 
+    // A listing an agent created: the page shows ONLY what the agent entered (no sample text).
+    var isAgent = !!(stored && (stored.agentListing || stored.schemaVersion));
+
     var defaultAgent = {
       name: 'David O.',
       avatar: 'assets/images/agent-images/agenticonimg.webp',
@@ -48,8 +51,11 @@
       priceValue: stored ? ((Accoom.Pricing && Accoom.Pricing.finalPrice(stored)) || parseInt(String(stored.price).replace(/[^\d]/g, ''), 10) || 460000) : 460000,
       price: stored ? ((Accoom.Pricing && Accoom.Pricing.finalPrice(stored)) ? Accoom.Pricing.naira(Accoom.Pricing.finalPrice(stored)) : stored.price) : '\u20A6460,000',
       period: stored ? (stored.period || '') : '',
-      beds: stored ? (stored.beds || 2) : 2,
-      baths: stored ? (stored.baths || 3) : 3,
+      beds: stored ? (isAgent ? (Number(stored.beds) || 0) : (stored.beds || 2)) : 2,
+      baths: stored ? (isAgent ? (Number(stored.baths) || 0) : (stored.baths || 3)) : 3,
+      furnishing: stored ? stored.furnishing : '',
+      yearBuilt: stored ? stored.yearBuilt : '',
+      category: stored ? (stored.category || stored.listingType) : '',
       typeLabel: stored ? (stored.typeLabel || 'Detached Duplex') : 'Detached Duplex',
       images: (stored && stored.images && stored.images.length) ? stored.images : [
         'assets/images/home-properties/miniflat1.webp',
@@ -121,10 +127,14 @@
       setText('[data-pd-overview-id]', property.id);
       setText('[data-pd-overview-type]', property.typeLabel);
       setText('[data-pd-overview-furnishing]', property.furnishing || 'N/A');
+      if (isAgent) {
+        var furnRow = document.querySelector('[data-pd-overview-furnishing-row]');
+        if (furnRow) furnRow.style.display = property.furnishing ? '' : 'none';
+      }
 
       var yearRow = document.querySelector('[data-pd-overview-year-row]');
       if (yearRow) {
-        if (property.category === 'rent' || !property.yearBuilt) {
+        if (!property.yearBuilt || (!isAgent && property.category === 'rent')) {
           yearRow.style.display = 'none';
         } else {
           yearRow.style.display = '';
@@ -151,7 +161,7 @@
         var factEl = document.querySelector('[data-pd-quickfact-' + key.toLowerCase() + ']');
         if (!factEl) return;
         var n = savedCount(key);
-        if (n === undefined && (key === 'beds' || key === 'baths')) n = Number(property[key]) || 0;
+        if (n === undefined && (key === 'beds' || key === 'baths' || isAgent)) n = Number(property[key]) || 0;
         if (n === undefined) return;
         var container = factEl.closest('.pd-quickfact');
         if (container) container.style.display = n > 0 ? '' : 'none';
@@ -161,13 +171,14 @@
       // Parking Space row in Property Overview
       var parkingRow = document.querySelector('[data-pd-overview-parking-row]');
       var parkingN = savedCount('parking');
+      if (isAgent && parkingN === undefined) parkingN = 0;
       if (parkingRow && parkingN !== undefined) {
         parkingRow.style.display = parkingN > 0 ? '' : 'none';
         if (parkingN > 0) setText('[data-pd-overview-parking]', parkingN + (parkingN === 1 ? ' Car' : ' Cars'));
       }
 
       // Quick facts: the agent's selected + custom facts replace the sample ones
-      if (stored && Array.isArray(stored.quickFacts) && stored.quickFacts.length) {
+      if (stored && (isAgent || (Array.isArray(stored.quickFacts) && stored.quickFacts.length))) {
         var qfWrap = document.querySelector('.pd-quickfacts');
         if (qfWrap) {
           var QF_ICONS = {
@@ -180,7 +191,7 @@
             el.parentNode.removeChild(el);
           });
           var seenFacts = {};
-          stored.quickFacts.forEach(function (f) {
+          (Array.isArray(stored.quickFacts) ? stored.quickFacts : []).forEach(function (f) {
             var text = String((f && typeof f === 'object') ? f.text : f || '').trim();
             if (!text || seenFacts[text.toLowerCase()]) return;
             seenFacts[text.toLowerCase()] = true;
@@ -194,14 +205,70 @@
         }
       }
 
+      // ---- Content the agent entered: description, amenities, location, dates ----
+      if (isAgent) {
+        var aboutP = document.querySelector('.pd-about-text');
+        if (aboutP && aboutP.parentNode) aboutP.parentNode.removeChild(aboutP); // the agent writes one description; it is shown below
+
+        var paras = Array.isArray(stored.description) ? stored.description
+          : String(stored.description || '').split(/\n{2,}/);
+        paras = paras.map(function (t) { return String(t || '').trim(); }).filter(Boolean);
+        var descBlock = document.querySelector('[data-pd-description-block]');
+        if (descBlock) {
+          Array.prototype.slice.call(descBlock.querySelectorAll('p')).forEach(function (el) { el.parentNode.removeChild(el); });
+          paras.forEach(function (t) { var el = document.createElement('p'); el.textContent = t; descBlock.appendChild(el); });
+          descBlock.style.display = paras.length ? '' : 'none';
+        }
+
+        var amBlock = document.querySelector('[data-pd-amenities-block]');
+        var amGrid = document.querySelector('[data-pd-amenities-grid]');
+        if (amBlock && amGrid) {
+          var tick = amGrid.querySelector('.pd-amenity svg');
+          var tickHtml = tick ? tick.outerHTML : '';
+          var seen = {};
+          var items = (Array.isArray(stored.amenities) ? stored.amenities : []).map(function (a) {
+            return String((a && typeof a === 'object') ? (a.text || a.label || '') : a || '').trim();
+          }).filter(function (t) { var k = t.toLowerCase(); if (!t || seen[k]) return false; seen[k] = true; return true; });
+          amGrid.innerHTML = '';
+          items.forEach(function (t) {
+            var chip = document.createElement('span'); chip.className = 'pd-amenity'; chip.innerHTML = tickHtml;
+            chip.appendChild(document.createTextNode(t)); amGrid.appendChild(chip);
+          });
+          amBlock.style.display = items.length ? '' : 'none';
+        }
+
+        var dateRow = document.querySelector('[data-pd-overview-date-row]');
+        if (dateRow) { dateRow.style.display = stored.dateAdded ? '' : 'none'; setText('[data-pd-overview-date]', stored.dateAdded || ''); }
+        setText('[data-pd-overview-views]', String(stored.views == null ? '0' : stored.views));
+      }
+
+      // Location: the map and address follow the listing (address + area/state), never the sample address.
+      if (stored && (stored.location || stored.address)) {
+        var where = [stored.address, stored.location || [stored.area, stored.state].filter(Boolean).join(', ')].filter(Boolean).join(', ');
+        var frame = document.querySelector('[data-pd-map-iframe]');
+        if (frame) frame.setAttribute('src', 'https://www.google.com/maps?q=' + encodeURIComponent(where) + '&output=embed');
+        var addrEl = document.querySelector('[data-pd-map-address]');
+        if (addrEl && addrEl.lastChild) addrEl.lastChild.textContent = ' ' + where + ' ';
+        var mapLink = document.querySelector('[data-pd-map-link]');
+        if (mapLink) mapLink.setAttribute('href', 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(where));
+      }
+
       var agent = property.agent;
       setText('[data-pd-agent-name-text]', agent.name || 'Agent');
       var avatarEl = document.querySelector('[data-pd-agent-avatar]');
       if (avatarEl && agent.avatar) avatarEl.setAttribute('src', agent.avatar);
       var badge = document.querySelector('[data-pd-agent-name] .pd-agent-verified-badge');
       if (badge) badge.classList.toggle('is-hidden', !agent.verified);
-      setText('[data-pd-agent-stats]', Math.max(1, Math.round((agent.reviews || 0) / 10)) + ' Properties \u00B7 ' + (agent.reviews || 0) + ' Deals');
-      setText('[data-pd-agent-rating]', (agent.rating || 0) + ' (' + (agent.reviews || 0) + ' reviews)');
+      if (isAgent) {
+        var mine = (Accoom.PropertyService && Accoom.PropertyService.getAll ? Accoom.PropertyService.getAll() : []).filter(function (i) {
+          return i.agentListing && String(i.ownerId) === String(stored.ownerId || '');
+        }).length || 1;
+        setText('[data-pd-agent-stats]', mine + (mine === 1 ? ' Property' : ' Properties'));
+        setText('[data-pd-agent-rating]', agent.reviews ? agent.rating + ' (' + agent.reviews + ' reviews)' : 'No reviews yet');
+      } else {
+        setText('[data-pd-agent-stats]', Math.max(1, Math.round((agent.reviews || 0) / 10)) + ' Properties \u00B7 ' + (agent.reviews || 0) + ' Deals');
+        setText('[data-pd-agent-rating]', (agent.rating || 0) + ' (' + (agent.reviews || 0) + ' reviews)');
+      }
 
       // One inclusive price everywhere. Fees are never added again here and never shown as amounts.
       var total = property.priceValue;
