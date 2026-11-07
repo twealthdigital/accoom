@@ -11,6 +11,16 @@
     // AGENT DATA — set by the page that linked here (View Profile),
     // falling back to a default so this page also works stand-alone.
     // ============================================================
+    // Opened from a link (e.g. the "You rated a seller" notification): the link names the seller.
+    (function agentFromLink() {
+      var qs = new URLSearchParams(location.search);
+      if (!qs.get('name')) return;
+      Accoom.setStorage('accoom-active-agent', {
+        name: qs.get('name'), avatar: qs.get('avatar') || 'assets/images/agent-images/agenticonimg.webp',
+        verified: qs.get('verified') === '1', stats: '', rating: 'No reviews yet', level: 'AL1', real: true,
+        ownerId: qs.get('owner') || '', property: { id: qs.get('pid') || '', name: qs.get('pname') || '' }
+      });
+    })();
     var stored = Accoom.getStorage('accoom-active-agent', null);
 
     if (location.hash === '#reviews') {

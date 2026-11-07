@@ -112,7 +112,9 @@ await test('review dialog: needs stars, then saves rating + text', () => {
   doc.querySelector('.rv-text').value = 'Smooth deal';
   doc.querySelector('[data-rv-send]').click();
   assert.ok(saved && saved.rating === 4 && saved.text === 'Smooth deal');
-  assert.equal(doc.querySelector('.rv-overlay'), null);
+  assert.ok(doc.querySelector('.rv-modal.is-success .rv-check'), 'shows the animated success tick');
+  assert.match(doc.querySelector('.rv-modal.is-success').textContent, /will be updated/);
+  doc.querySelector('.rv-overlay').remove();
 });
 
 await test('review dialog opens with the star the customer tapped already selected', () => {

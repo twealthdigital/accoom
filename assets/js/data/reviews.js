@@ -105,7 +105,18 @@ window.Accoom = window.Accoom || {};
       '.rv-text{width:100%;min-height:96px;resize:vertical;border:1px solid var(--line-page,#ddd);border-radius:10px;padding:10px;font:inherit;font-size:.9rem;background:transparent;color:inherit;box-sizing:border-box}' +
       '.rv-err{color:#d33;font-size:.8rem;min-height:1.1em;margin:6px 0 0}.rv-actions{display:flex;gap:10px;margin-top:12px}' +
       '.rv-btn{flex:1;padding:11px;border-radius:10px;border:1px solid var(--line-page,#ddd);background:transparent;color:inherit;font-weight:600;cursor:pointer}' +
-      '.rv-btn--primary{background:var(--gold,#d9922b);border-color:var(--gold,#d9922b);color:#fff}';
+      '.rv-btn--primary{background:var(--gold,#d9922b);border-color:var(--gold,#d9922b);color:#fff}' +
+      '.rv-overlay{transition:background .5s ease}.rv-overlay.is-fading{background:rgba(0,0,0,0)}' +
+      '.rv-modal.is-success{text-align:center;padding:30px 22px 26px;animation:rv-pop .35s cubic-bezier(.2,.9,.3,1.2)}' +
+      '.rv-modal.is-success h3{margin:6px 0 8px;font-size:1.2rem}.rv-modal.is-success p{margin:0;line-height:1.5}' +
+      '.rv-check{display:block;margin:0 auto 6px}' +
+      '.rv-check-circle{stroke:var(--gold,#d9922b);stroke-width:3;stroke-dasharray:151;stroke-dashoffset:151;animation:rv-draw .6s ease forwards}' +
+      '.rv-check-mark{stroke:var(--gold,#d9922b);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40;animation:rv-draw .4s .45s ease forwards}' +
+      '@keyframes rv-draw{to{stroke-dashoffset:0}}' +
+      '@keyframes rv-pop{from{transform:scale(.92);opacity:.6}to{transform:scale(1);opacity:1}}' +
+      '.rv-modal.is-dropping{animation:rv-drop .65s cubic-bezier(.5,0,.9,.4) forwards}' +
+      '@keyframes rv-drop{0%{transform:translateY(0)}20%{transform:translateY(-16px)}100%{transform:translateY(110vh);opacity:0}}' +
+      '@media (prefers-reduced-motion:reduce){.rv-modal.is-success,.rv-modal.is-dropping{animation:none}.rv-check-circle,.rv-check-mark{animation:none;stroke-dashoffset:0}.rv-overlay{transition:none}}';
     document.head.appendChild(st);
   }
 
@@ -130,7 +141,27 @@ window.Accoom = window.Accoom || {};
       b.innerHTML = STAR.replace(/\{s\}/g, 30); starsEl.appendChild(b);
     }
     function paint() { [].forEach.call(starsEl.children, function (b) { b.classList.toggle('is-on', Number(b.getAttribute('data-v')) <= rating); }); }
-    function close() { document.removeEventListener('keydown', onKey); if (ov.parentNode) ov.parentNode.removeChild(ov); }
+    var dropTimer = null;
+    function close() {
+      window.clearTimeout(dropTimer);
+      document.removeEventListener('keydown', onKey);
+      if (ov.parentNode) ov.parentNode.removeChild(ov);
+    }
+    // After saving: animated tick and a short message, then the dialog drops away (with a small bounce) back to the chat.
+    function showSuccess(rec) {
+      if (o.onSaved) o.onSaved(rec);
+      var modal = ov.querySelector('.rv-modal');
+      modal.setAttribute('aria-label', 'Review submitted');
+      modal.className = 'rv-modal is-success';
+      modal.innerHTML = '<div role="status">' +
+        '<svg class="rv-check" viewBox="0 0 52 52" width="76" height="76" aria-hidden="true"><circle class="rv-check-circle" cx="26" cy="26" r="24" fill="none"></circle><path class="rv-check-mark" fill="none" d="M15 27l8 8 15-17"></path></svg>' +
+        '<h3>Review submitted</h3>' +
+        '<p>Your review will be updated on ' + esc(o.agentName ? o.agentName + '\u2019s' : 'the seller\u2019s') + ' profile shortly. Thank you for sharing your experience.</p></div>';
+      dropTimer = window.setTimeout(function () {
+        modal.classList.add('is-dropping'); ov.classList.add('is-fading');
+        dropTimer = window.setTimeout(close, 650);
+      }, 2200);
+    }
     function onKey(e) { if (e.key === 'Escape') close(); }
     starsEl.addEventListener('click', function (e) { var b = e.target.closest('.rv-star'); if (!b) return; rating = Number(b.getAttribute('data-v')); err.textContent = ''; paint(); });
     ov.addEventListener('click', function (e) {
@@ -139,7 +170,7 @@ window.Accoom = window.Accoom || {};
         if (!rating) { err.textContent = 'Please choose a star rating.'; return; }
         var rec = save({ agentKey: o.agentKey, agentName: o.agentName, propertyId: o.propertyId, propertyName: o.propertyName, rating: rating, text: ta.value, outcome: o.outcome });
         if (!rec) { err.textContent = 'Could not save your review. Please try again.'; return; }
-        close(); if (o.onSaved) o.onSaved(rec);
+        showSuccess(rec);
       }
     });
     document.addEventListener('keydown', onKey);

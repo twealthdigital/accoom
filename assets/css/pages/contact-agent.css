@@ -2362,6 +2362,11 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
 /* Rate-this-seller: small box on the left (gold title + stars under it), shown after a payment is approved or declined */
 .msgs-review-strip { display:block; width:fit-content; max-width:calc(100% - 24px); margin:10px 12px; padding:0; background:var(--surface-page, #fff); border:1px solid var(--line-page); border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.06); }
 .msgs-review-strip.is-hidden { display:none; }
+.msgs-review-strip { position:relative; }
+.msgs-review-strip-close { display:none; position:absolute; top:5px; right:6px; width:24px; height:24px; padding:0; border:0; border-radius:50%; background:rgba(255,255,255,.22); color:#fff; align-items:center; justify-content:center; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:background .15s; }
+.msgs-review-strip-close:hover { background:rgba(255,255,255,.4); }
+.msgs-review-strip.is-rated .msgs-review-strip-close { display:inline-flex; }
+.msgs-review-strip.is-rated .msgs-review-strip-text { padding-right:40px; }
 .msgs-review-strip-text { display:block; padding:8px 14px; background:var(--gold); color:#fff; font-weight:700; font-size:.85rem; line-height:1.3; }
 .msgs-rs-stars { display:flex; align-items:center; justify-content:flex-start; gap:2px; padding:6px 8px; }
 .msgs-rs-star { display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; padding:0; border:0; background:none; color:#d6cfc0; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:color .12s, transform .12s; }

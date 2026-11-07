@@ -1039,8 +1039,34 @@
     function reviewTarget(conv) {
       var item = (Accoom.PropertyService && Accoom.PropertyService.getById) ? Accoom.PropertyService.getById(conv.property.id) : null;
       if (!item || !item.agentListing || !Accoom.Reviews) return null;
-      return { agentKey: Accoom.Reviews.agentKey(item.ownerId, item.agent && item.agent.name), agentName: (item.agent && item.agent.name) || conv.name,
+      return { agentKey: Accoom.Reviews.agentKey(item.ownerId, item.agent && item.agent.name), ownerId: item.ownerId || '', avatar: conv.avatar || '', verified: !!conv.verified, agentName: (item.agent && item.agent.name) || conv.name,
                propertyId: conv.property.id, propertyName: conv.property.name || item.name };
+    }
+    var STRIP_CLOSED_KEY = 'accoom-review-strip-closed';
+    function reviewKey(t) { return t.agentKey + '|' + t.propertyId; }
+    function closedStrips() {
+      try { var a = JSON.parse(window.localStorage.getItem(STRIP_CLOSED_KEY)); return Array.isArray(a) ? a : []; } catch (e) { return []; }
+    }
+    function setStripClosed(key, closed) {
+      var list = closedStrips().filter(function (k) { return k !== key; });
+      if (closed) list.push(key);
+      try { window.localStorage.setItem(STRIP_CLOSED_KEY, JSON.stringify(list)); } catch (e) { /* ignore */ }
+    }
+    // Notification: "You rated a seller", linking to that seller's profile reviews.
+    function notifyRated(t, rec) {
+      if (!Accoom.NotificationService || !Accoom.NotificationService.add || !rec) return;
+      var q = ['owner=' + encodeURIComponent(t.ownerId || ''), 'name=' + encodeURIComponent(t.agentName || ''),
+        'pid=' + encodeURIComponent(t.propertyId || ''), 'pname=' + encodeURIComponent(t.propertyName || ''),
+        'verified=' + (t.verified ? '1' : '0')];
+      if (t.avatar && String(t.avatar).indexOf('data:') !== 0) q.push('avatar=' + encodeURIComponent(t.avatar));
+      var n = Number(rec.rating) || 0;
+      try {
+        Accoom.NotificationService.add({
+          type: 'accoom', title: 'You rated a seller',
+          text: 'You gave ' + (t.agentName || 'the seller') + ' ' + n + (n === 1 ? ' star' : ' stars') + (t.propertyName ? ' for ' + t.propertyName : '') + '. Tap to see your rating on their profile.',
+          link: 'agent-profile.html?' + q.join('&') + '#reviews'
+        });
+      } catch (e) { /* a notification problem must never stop a review */ }
     }
     function renderReviewStrip(conv, status) {
       var strip = Accoom.$('[data-msgs-review-strip]');
@@ -1049,6 +1075,10 @@
       strip.classList.toggle('is-hidden', !t);
       if (!t) return;
       var mineR = Accoom.Reviews.mine(t.agentKey, t.propertyId);
+      // "You rated this seller" can be closed; it stays closed until the customer rates again.
+      strip.setAttribute('data-msgs-review-key', reviewKey(t));
+      strip.classList.toggle('is-rated', !!mineR);
+      if (mineR && closedStrips().indexOf(reviewKey(t)) !== -1) { strip.classList.add('is-hidden'); return; }
       var txt = strip.querySelector('[data-msgs-review-text]');
       txt.textContent = mineR ? 'You rated this seller' : 'Rate this seller';
       Accoom.$$('[data-msgs-rs-star]', strip).forEach(function (b) {
@@ -1060,10 +1090,21 @@
       if (!t) return;
       t.outcome = outcome || '';
       t.rating = stars || 0;
-      t.onSaved = function () { renderReviewStrip(conv, activePropState(conv).paymentStatus); };
+      t.onSaved = function (rec) {
+        setStripClosed(reviewKey(t), false);
+        renderReviewStrip(conv, activePropState(conv).paymentStatus);
+        notifyRated(t, rec);
+      };
       Accoom.Reviews.openModal(t);
     }
     (function () {
+      var closeBtn = Accoom.$('[data-msgs-review-close]');
+      if (closeBtn) Accoom.on(closeBtn, 'click', function () {
+        var strip = Accoom.$('[data-msgs-review-strip]');
+        if (!strip) return;
+        setStripClosed(strip.getAttribute('data-msgs-review-key') || '', true);
+        strip.classList.add('is-hidden');
+      });
       var starsBox = Accoom.$('[data-msgs-rs-stars]');
       if (starsBox) Accoom.on(starsBox, 'click', function (e) {
         var b = e.target.closest('[data-msgs-rs-star]');
