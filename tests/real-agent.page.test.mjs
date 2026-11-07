@@ -115,6 +115,13 @@ await test('review dialog: needs stars, then saves rating + text', () => {
   assert.equal(doc.querySelector('.rv-overlay'), null);
 });
 
+await test('review dialog opens with the star the customer tapped already selected', () => {
+  w.Accoom.Reviews.openModal({ agentKey: 'id:q2', agentName: 'Q2', propertyId: 'p10', rating: 3 });
+  const on = [...w.document.querySelectorAll('.rv-star.is-on')].length;
+  w.document.querySelector('[data-rv-later]').click();
+  assert.equal(on, 3);
+});
+
 delete storage['accoom-agent-reviews'];
 console.log('Real agent: homepage card');
 w = await open('home.html'); d = w.document;

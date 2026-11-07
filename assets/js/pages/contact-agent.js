@@ -1050,22 +1050,26 @@
       if (!t) return;
       var mineR = Accoom.Reviews.mine(t.agentKey, t.propertyId);
       var txt = strip.querySelector('[data-msgs-review-text]');
-      var btn = strip.querySelector('[data-msgs-review-open]');
-      txt.innerHTML = mineR ? 'You rated this agent <span class="msgs-review-strip-stars">' + Accoom.Reviews.stars(mineR.rating, 13) + '</span>' : 'Rate this agent';
-      btn.textContent = mineR ? 'Edit review' : 'Write a review';
+      txt.textContent = mineR ? 'You rated this seller \u2014 tap a star to change' : 'Rate this seller';
+      Accoom.$$('[data-msgs-rs-star]', strip).forEach(function (b) {
+        b.classList.toggle('is-on', !!mineR && Number(b.getAttribute('data-msgs-rs-star')) <= mineR.rating);
+      });
     }
-    function openReview(conv, outcome) {
+    function openReview(conv, outcome, stars) {
       var t = reviewTarget(conv);
       if (!t) return;
       t.outcome = outcome || '';
+      t.rating = stars || 0;
       t.onSaved = function () { renderReviewStrip(conv, activePropState(conv).paymentStatus); };
       Accoom.Reviews.openModal(t);
     }
     (function () {
-      var openBtn = Accoom.$('[data-msgs-review-open]');
-      if (openBtn) Accoom.on(openBtn, 'click', function () {
+      var starsBox = Accoom.$('[data-msgs-rs-stars]');
+      if (starsBox) Accoom.on(starsBox, 'click', function (e) {
+        var b = e.target.closest('[data-msgs-rs-star]');
+        if (!b) return;
         var conv = findConv(state.activeId);
-        if (conv) openReview(conv, activePropState(conv).paymentStatus);
+        if (conv) openReview(conv, activePropState(conv).paymentStatus, Number(b.getAttribute('data-msgs-rs-star')));
       });
     })();
 

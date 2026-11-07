@@ -2359,8 +2359,19 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
   .msgs-property-status-icon { display: none; }
   .msgs-chat-tabs-row .msgs-props-btn { padding: 0 8px; }
 }
-/* Rate-the-agent strip under the property card (after a payment is approved or declined) */
-.msgs-review-strip { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:10px 14px; margin:0 12px 8px; border:1px solid var(--line-page); border-radius:12px; background:var(--gold-soft); font-size:.85rem; font-weight:600; color:var(--on-page); }
+/* Rate-this-seller strip: gold bar under the tabs (shown after a payment is approved or declined) */
+.msgs-review-strip { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px 14px; padding:8px 16px; background:var(--gold); color:#fff; font-weight:700; font-size:.9rem; }
 .msgs-review-strip.is-hidden { display:none; }
-.msgs-review-strip-stars { display:inline-flex; gap:2px; vertical-align:middle; margin-left:6px; }
-.msgs-review-strip-btn { padding:7px 14px; border-radius:999px; border:0; background:var(--gold); color:#fff; font-weight:700; font-size:.8rem; cursor:pointer; }
+.msgs-review-strip-text { line-height:1.3; }
+.msgs-rs-stars { display:flex; align-items:center; gap:2px; }
+.msgs-rs-star { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; padding:0; border:0; background:none; color:#fff; cursor:pointer; opacity:.5; -webkit-tap-highlight-color:transparent; transition:opacity .12s, transform .12s; }
+.msgs-rs-star.is-on { opacity:1; }
+.msgs-rs-star:active { transform:scale(.9); }
+@media (hover:hover) {
+  .msgs-rs-stars:hover .msgs-rs-star { opacity:1; }
+  .msgs-rs-stars .msgs-rs-star:hover ~ .msgs-rs-star { opacity:.5; }
+}
+@media (max-width:480px) {
+  .msgs-review-strip { justify-content:center; text-align:center; padding:8px 10px; }
+  .msgs-rs-star { width:40px; height:40px; }
+}

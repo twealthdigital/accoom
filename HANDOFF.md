@@ -107,3 +107,7 @@ npm start                        # serves source for quick local checks
 - Ratings flow: agent profile shows the average + review list, home card and property page show `avg (count)`, "No reviews yet" when none.
 - Chat property card photo now reads the live catalogue photo (saved conversations held dead blob: addresses).
 - Test: `tests/real-agent.page.test.mjs` extended. Chat page itself not covered (jsdom crashes on contact-agent); check approve/decline -> dialog in a real browser.
+
+## Rate-this-seller bar + CSS cache fix
+- Chat strip is now a full-width GOLD bar under the tabs: "Rate this seller" + 5 tappable stars (`data-msgs-rs-star`). Tapping a star opens the review dialog with that star already selected (`Reviews.openModal({ rating })`). After reviewing it says "You rated this seller" and the stars stay filled; tapping again edits. Pure CSS hover/layout, wraps and centres on phones.
+- **Build now versions every stylesheet link (`?v=<hash of all css>`)** in `build.mjs` (`versionCss`). Before, CSS was cached for a day, so visitors saw NEW html with OLD css (the strip appeared unstyled). Do not remove.

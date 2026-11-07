@@ -135,5 +135,30 @@ await fs.rm(OUT, { recursive: true, force: true });
 await fs.mkdir(OUT, { recursive: true });
 await walk(ROOT);
 await bundleAllPages();
+
+// Stylesheet cache-busting: CSS is cached by browsers for a day, so a returning visitor could get NEW html
+// with OLD css (unstyled new elements). Add ?v=<hash of all css> to every local stylesheet link.
+async function versionCss() {
+  const files = [];
+  async function list(dir) {
+    for (const e of await fs.readdir(dir, { withFileTypes: true })) {
+      const f = path.join(dir, e.name);
+      if (e.isDirectory()) await list(f); else if (e.name.endsWith('.css')) files.push(f);
+    }
+  }
+  await list(path.join(OUT, 'assets', 'css'));
+  files.sort();
+  const h = createHash('sha1');
+  for (const f of files) h.update(await fs.readFile(f));
+  const v = h.digest('hex').slice(0, 10);
+  for (const entry of await fs.readdir(OUT, { withFileTypes: true })) {
+    if (!entry.isFile() || !entry.name.endsWith('.html')) continue;
+    const file = path.join(OUT, entry.name);
+    const html = await fs.readFile(file, 'utf8');
+    const out = html.replace(/(<link\b[^>]*\bhref=")((?!https?:|\/\/)[^"?#]*\.css)(")/g, `$1$2?v=${v}$3`);
+    if (out !== html) await fs.writeFile(file, out);
+  }
+}
+await versionCss();
 console.log(`Bundled scripts on ${bundledPages} pages: ${requestsBefore} script requests -> ${requestsAfter}`);
 console.log(`Built ./dist  (JS+CSS: ${(before / 1024).toFixed(0)} KB -> ${((before - saved) / 1024).toFixed(0)} KB, saved ${(saved / 1024).toFixed(0)} KB)`);

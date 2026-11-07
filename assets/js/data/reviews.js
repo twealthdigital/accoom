@@ -112,11 +112,11 @@ window.Accoom = window.Accoom || {};
   function openModal(o) {
     addStyles();
     var existing = mine(o.agentKey, o.propertyId);
-    var rating = existing ? existing.rating : 0;
+    var rating = o.rating || (existing ? existing.rating : 0);
     var ov = document.createElement('div');
     ov.className = 'rv-overlay';
-    ov.innerHTML = '<div class="rv-modal" role="dialog" aria-modal="true" aria-label="Rate this agent">' +
-      '<h3>Rate ' + esc(o.agentName || 'this agent') + '</h3>' +
+    ov.innerHTML = '<div class="rv-modal" role="dialog" aria-modal="true" aria-label="Rate this seller">' +
+      '<h3>Rate ' + esc(o.agentName || 'this seller') + '</h3>' +
       '<p>' + esc(o.propertyName ? 'About ' + o.propertyName : 'Tell others about your experience') + '</p>' +
       '<div class="rv-stars" role="radiogroup" aria-label="Stars"></div>' +
       '<textarea class="rv-text" maxlength="600" placeholder="Write your review (optional)"></textarea>' +
