@@ -229,8 +229,19 @@ window.Accoom = window.Accoom || {};
         var gated = e.target.closest('.msg-trigger, .panel-row--messages, a[href="contact-agent.html"]');
         if (!gated) return;
         e.preventDefault();
-        window.location.href = 'auth.html?mode=signup';
+        // After signing up or in, carry the person to the chat they were opening (or back here for the messages icon).
+        var anchor = e.target.closest('a[href]');
+        var dest = anchor ? anchor.getAttribute('href') : 'contact-agent.html';
+        window.location.href = 'auth.html?mode=signup&next=' + encodeURIComponent(dest);
       });
+      // Header and menu "Log in" / "Sign up" links: remember the page the person was on.
+      Accoom.on(document, 'click', function (e) {
+        var a = e.target.closest('a[href^="auth.html"]');
+        if (!a || /[?&]next=/.test(a.getAttribute('href'))) return;
+        var here = (location.pathname.split('/').pop() || 'home.html') + location.search + location.hash;
+        if (/^(auth|onboarding)\.html/i.test(here)) return;
+        a.setAttribute('href', a.getAttribute('href') + (a.getAttribute('href').indexOf('?') > -1 ? '&' : '?') + 'next=' + encodeURIComponent(here));
+      }, true);
     } else if (
       Accoom.getStorage('accoom-user', {}).role === 'agent' &&
       Accoom.getStorage('accoom-user', {}).agentProfileCompleted
@@ -450,9 +461,9 @@ window.Accoom = window.Accoom || {};
       Accoom.on(dropdownEl, 'dropdown:select', function (e) {
         var value = e.detail && e.detail.value;
         if (value === 'signup') {
-          window.location.href = 'auth.html?mode=signup';
+          window.location.href = 'auth.html?mode=signup&next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash);
         } else if (value === 'signin') {
-          window.location.href = 'auth.html';
+          window.location.href = 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash);
         } else if (value === 'profile') {
           var acctUser = Accoom.getStorage('accoom-user', null);
           window.location.href = (acctUser && acctUser.role === 'agent') ? 'agent-dashboard.html' : 'profile.html';

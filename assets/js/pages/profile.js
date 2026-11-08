@@ -19,7 +19,7 @@
     // (and agents) before paint, this just covers it if storage changed
     // mid-session, e.g. another tab just finished the agent upgrade.
     if (!user) {
-      window.location.href = 'auth.html';
+      window.location.href = 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash);
       return;
     }
     if (user.role === 'agent') {

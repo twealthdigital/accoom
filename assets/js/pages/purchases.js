@@ -19,7 +19,7 @@
     // Belt-and-braces: the inline <head> script already bounces guests
     // before paint, this just covers it if storage changed mid-session.
     if (!user) {
-      window.location.href = 'auth.html';
+      window.location.href = 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash);
       return;
     }
 

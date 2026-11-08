@@ -135,11 +135,42 @@
     // localStorage version does, so every "leave this page" moment needs
     // a visible in-between state rather than an instant redirect.
     function goAfterDelay(message, url, delayMs) {
+      // Success dialog: animated tick, what just happened, and "Redirecting..." while we head to where they were going.
       if (loadingTextEl) loadingTextEl.textContent = message;
       if (loadingOverlay) loadingOverlay.hidden = false;
       setTimeout(function () {
         window.location.replace(url);
-      }, delayMs || 3000);
+      }, delayMs || 1700);
+    }
+
+    // Where the person was going before the auth page (?next=...). Kept in storage too so a reload,
+    // a dropped connection, or the signup > onboarding hop never loses it.
+    function safeNext(v) {
+      if (!v) return null;
+      v = String(v).trim();
+      if (/^[a-z][a-z0-9+.\-]*:|^\/\/|\\/i.test(v)) return null;
+      v = v.replace(/^(\.?\/)+/, '');
+      var base = v.split(/[?#]/)[0];
+      if (!/^[a-z0-9_\-\/]+\.html$/i.test(base)) return null;
+      if (/^(auth|onboarding)\.html$/i.test(base)) return null;
+      return v;
+    }
+    var RETURN_KEY = 'accoom-return-to';
+    (function rememberReturn() {
+      var q = new URLSearchParams(window.location.search);
+      var next = safeNext(q.get('next'));
+      if (!next && document.referrer) {
+        try {
+          var ref = new URL(document.referrer);
+          if (ref.origin === window.location.origin) next = safeNext(ref.pathname.split('/').pop() + ref.search + ref.hash);
+        } catch (e) { /* ignore */ }
+      }
+      try {
+        if (next) window.localStorage.setItem(RETURN_KEY, next);
+      } catch (e) { /* ignore */ }
+    })();
+    function returnTo() {
+      try { return safeNext(window.localStorage.getItem(RETURN_KEY)); } catch (e) { return null; }
     }
 
     function showLoginError(message) {
@@ -157,12 +188,14 @@
     // Send a signed-in user to the right place: unfinished onboarding first,
     // then their role's home. Centralised so login and signup agree.
     function routeAfterAuth(user) {
+      var back = returnTo();
+      var msg = 'Signed in successfully';
       if (!user.role) {
-        goAfterDelay('Signing you in…', 'onboarding.html');
+        goAfterDelay(msg, 'onboarding.html');
       } else if (user.role === 'agent') {
-        goAfterDelay('Signing you in…', 'agent-details.html');
+        goAfterDelay(msg, (back && user.agentProfileCompleted) ? back : 'agent-details.html');
       } else {
-        goAfterDelay('Signing you in…', 'home.html');
+        goAfterDelay(msg, back || 'home.html');
       }
     }
 
@@ -188,7 +221,7 @@
             createdAt: new Date().toISOString()
           });
           // New accounts always go through onboarding — there is no role yet.
-          goAfterDelay('Creating your account…', 'onboarding.html');
+          goAfterDelay('Account created successfully', 'onboarding.html');
           return;
         }
 

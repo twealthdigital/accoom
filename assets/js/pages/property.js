@@ -917,7 +917,6 @@
           agentProps.unshift(thisPropObj);
         }
 
-        if (!Accoom.isLoggedIn()) { window.location.href = 'auth.html?mode=signup'; return; }
 
         Accoom.setStorage('accoom-contact-request', {
           agentName: agent.name || (agent.real ? 'Agent' : 'David O.'),
@@ -931,7 +930,7 @@
           agentProperties: agentProps
         });
 
-        window.location.href = 'contact-agent.html';
+        window.location.href = Accoom.isLoggedIn() ? 'contact-agent.html' : 'auth.html?mode=signup&next=contact-agent.html';
       });
     })();
 

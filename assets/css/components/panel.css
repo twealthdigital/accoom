@@ -99,6 +99,13 @@ html.dark-mode .side-panel {
   padding: 0 20px calc(56px + env(safe-area-inset-bottom, 0px));
 }
 
+/* The global .is-open utility forces display:block, which broke this flex column when the menu opened,
+   so the scroll area grew past the screen and the Dark Mode switch could not be reached. */
+.side-panel.is-open { display: flex !important; }
+
+/* Children keep their natural height so the panel scrolls (down to the Dark Mode switch) instead of squashing them. */
+.panel-scroll > * { flex-shrink: 0; }
+
 /* Navigation */
 .panel-nav {
   display: flex;

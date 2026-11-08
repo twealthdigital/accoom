@@ -296,7 +296,7 @@
     // messages and notifications appear for guests.)
     if (!Accoom.isLoggedIn()) {
       Accoom.removeStorage('accoom-contact-request');
-      window.location.replace('auth.html?mode=signup');
+      window.location.replace( 'auth.html?mode=signup&next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash));
       return;
     }
 

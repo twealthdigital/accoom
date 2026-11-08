@@ -1370,7 +1370,6 @@ Accoom.delegate(listingsGrid, 'click', '[data-view-listing]', function (e) {
         var avatarEl = card.querySelector('.suggested-agent-avatar');
         var imgEl = card.querySelector('.suggested-property-media img');
 
-        if (!Accoom.isLoggedIn()) { window.location.href = 'auth.html?mode=signup'; return; }
 
         Accoom.setStorage('accoom-contact-request', {
           agentName: (agentNameEl && agentNameEl.childNodes[0]) ? agentNameEl.childNodes[0].nodeValue.trim() : 'Agent',
@@ -1385,7 +1384,7 @@ Accoom.delegate(listingsGrid, 'click', '[data-view-listing]', function (e) {
           }
         });
 
-        window.location.href = 'contact-agent.html';
+        window.location.href = Accoom.isLoggedIn() ? 'contact-agent.html' : 'auth.html?mode=signup&next=contact-agent.html';
       });
     })();
 

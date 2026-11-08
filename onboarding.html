@@ -45,7 +45,7 @@
         var isAgentUpgrade = /[?&]upgrade=agent\b/.test(window.location.search);
 
         if (!user || !user.email) {
-          window.location.replace('auth.html');
+          window.location.replace( 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash));
           return;
         }
         // Deliberately clicked "Become an Agent" — always show the
@@ -64,7 +64,7 @@
           return;
         }
       } catch (e) {
-        window.location.replace('auth.html');
+        window.location.replace( 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash));
       }
     })();
   </script>

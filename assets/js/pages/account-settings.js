@@ -20,7 +20,7 @@
     // SWAP FOR BACKEND: replace with GET /api/account/me
     var user = Accoom.getStorage('accoom-user', null);
     if (!user) {
-      window.location.href = 'auth.html';
+      window.location.href = 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash);
       return;
     }
 

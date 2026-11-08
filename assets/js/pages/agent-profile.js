@@ -414,7 +414,6 @@
 
       Accoom.on(contactBtn, 'click', function (e) {
         e.preventDefault();
-        if (!Accoom.isLoggedIn()) { window.location.href = 'auth.html?mode=signup'; return; }
         Accoom.setStorage('accoom-contact-request', {
           agentName: agent.name,
           agentAvatar: agent.avatar,
@@ -427,7 +426,7 @@
             image: agent.property.image || ''
           }
         });
-        window.location.href = 'contact-agent.html';
+        window.location.href = Accoom.isLoggedIn() ? 'contact-agent.html' : 'auth.html?mode=signup&next=contact-agent.html';
       });
     })();
 

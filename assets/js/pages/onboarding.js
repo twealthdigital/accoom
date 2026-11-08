@@ -27,7 +27,7 @@
     // synchronously before paint. This re-check covers the case where this
     // script runs after localStorage changed (e.g. another tab logged out).
     if (!user || !user.email) {
-      window.location.replace('auth.html');
+      window.location.replace( 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash));
       return;
     }
     // isAgentUpgrade must win over the role check below — otherwise
@@ -139,7 +139,12 @@
       // in browser history — pressing "back" from home/agent-details can't
       // land the user back in the middle of onboarding.
       setTimeout(function () {
-        window.location.replace(state.role === 'agent' ? 'agent-details.html' : 'home.html');
+        var back = null;
+        try {
+          back = window.localStorage.getItem('accoom-return-to');
+          if (!back || /^[a-z][a-z0-9+.\-]*:|^\/\/|\\/i.test(back) || !/^[a-z0-9_\-\/]+\.html([?#]|$)/i.test(back) || /^(auth|onboarding)\.html/i.test(back)) back = null;
+        } catch (e) { back = null; }
+        window.location.replace(state.role === 'agent' ? 'agent-details.html' : (back || 'home.html'));
       }, 900);
     }
 

@@ -32,9 +32,9 @@
     (function () {
       try {
         var user = JSON.parse(localStorage.getItem('accoom-user'));
-        if (!user) window.location.replace('auth.html');
+        if (!user) window.location.replace( 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash));
       } catch (e) {
-        window.location.replace('auth.html');
+        window.location.replace( 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash));
       }
     })();
   </script>

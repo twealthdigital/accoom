@@ -41,10 +41,19 @@
     (function () {
       try {
         var user = JSON.parse(localStorage.getItem('accoom-user'));
+        // Already signed in (e.g. a reload mid-redirect): go where they were heading, not just home.
+        var safe = function (v) {
+          if (!v) return null; v = String(v).trim();
+          if (/^[a-z][a-z0-9+.\-]*:|^\/\/|\\/i.test(v)) return null;
+          v = v.replace(/^(\.?\/)+/, ''); var base = v.split(/[?#]/)[0];
+          if (!/^[a-z0-9_\-\/]+\.html$/i.test(base) || /^(auth|onboarding)\.html$/i.test(base)) return null;
+          return v;
+        };
+        var back = safe(new URLSearchParams(location.search).get('next')) || safe(localStorage.getItem('accoom-return-to'));
         if (user && user.email && user.role === 'agent') {
-          window.location.replace('agent-details.html');
+          window.location.replace((back && user.agentProfileCompleted) ? back : 'agent-details.html');
         } else if (user && user.email && user.role === 'customer') {
-          window.location.replace('home.html');
+          window.location.replace(back || 'home.html');
         }
       } catch (e) { /* malformed record — fall through to normal auth screen */ }
     })();
@@ -60,11 +69,10 @@
     <!-- Shown briefly before leaving this page after signup/login — a
          placeholder for real API latency once a backend is wired up. -->
     <div class="auth-loading-overlay" data-auth-loading hidden>
-      <div class="auth-loading-mark">
-        <img src="assets/images/accoom-logo.webp" alt="ACCOOM" class="auth-loading-logo logo-dark" />
-        <img src="assets/images/accoom-white-logo.webp" alt="ACCOOM" class="auth-loading-logo logo-light" />
-        <span class="auth-loading-horizon" aria-hidden="true"></span>
-        <p class="auth-loading-text" data-auth-loading-text>Signing you in…</p>
+      <div class="auth-loading-mark" role="status" aria-live="polite">
+        <svg class="auth-success-check" viewBox="0 0 52 52" width="84" height="84" aria-hidden="true"><circle class="auth-success-circle" cx="26" cy="26" r="24" fill="none"></circle><path class="auth-success-tick" fill="none" d="M15 27l8 8 15-17"></path></svg>
+        <p class="auth-success-title" data-auth-loading-text>Signed in successfully</p>
+        <p class="auth-loading-text">Redirecting…</p>
       </div>
     </div>
 

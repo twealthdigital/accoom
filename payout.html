@@ -28,11 +28,11 @@
     (function () {
       try {
         var user = JSON.parse(localStorage.getItem('accoom-user'));
-        if (!user || !user.email) { window.location.replace('auth.html'); return; }
+        if (!user || !user.email) { window.location.replace( 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash)); return; }
         if (!user.role) { window.location.replace('onboarding.html'); return; }
         if (user.role === 'customer') { window.location.replace('home.html'); return; }
         if (user.role === 'agent' && !user.agentProfileCompleted) window.location.replace('agent-details.html');
-      } catch (e) { window.location.replace('auth.html'); }
+      } catch (e) { window.location.replace( 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash)); }
     })();
   </script>
   <script>

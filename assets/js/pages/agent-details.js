@@ -22,7 +22,7 @@
     var user = Accoom.getStorage('accoom-user', null);
 
     if (!user || !user.email) {
-      window.location.replace('auth.html');
+      window.location.replace( 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash));
       return;
     }
     if (!user.role) {
