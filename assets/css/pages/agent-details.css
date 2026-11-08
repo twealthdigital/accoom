@@ -4,32 +4,32 @@
    form on the left, a live-updating "Profile Preview" card on the right.
    ========================================================================== */
 
-.ad-page {
+.agd-page {
   background: var(--surface-page);
   min-height: 100dvh;
 }
 
 /* ---- Hero banner ---- */
-.ad-hero {
+.agd-hero {
   position: relative;
   overflow: visible;
   padding: 56px 0 100px;
 }
 
-.ad-hero-bg {
+.agd-hero-bg {
   position: absolute;
   inset: 0;
   overflow: hidden;
 }
 
-.ad-hero-bg-track {
+.agd-hero-bg-track {
   display: flex;
   width: 500%;
   height: 100%;
   animation: adHeroSwipe 20s infinite ease-in-out;
 }
 
-.ad-hero-bg-track img {
+.agd-hero-bg-track img {
   width: 20%;
   height: 100%;
   object-fit: cover;
@@ -44,18 +44,18 @@
   80%, 100% { transform: translateX(-80%); }
 }
 
-.ad-hero-overlay {
+.agd-hero-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(90deg, rgba(0, 0, 0, 0.94) 0%, rgba(0, 0, 0, 0.75) 55%, rgba(0, 0, 0, 0.4) 100%);
 }
 
-.ad-hero-inner {
+.agd-hero-inner {
   position: relative;
   z-index: 1;
 }
 
-.ad-eyebrow {
+.agd-eyebrow {
   display: inline-block;
   font-size: 12px;
   font-weight: 700;
@@ -65,25 +65,25 @@
   margin-bottom: 10px;
 }
 
-.ad-hero-title {
+.agd-hero-title {
   font-size: clamp(28px, 4vw, 40px);
   font-weight: 800;
   line-height: 1.15;
   color: var(--white);
 }
 
-.ad-hero-title-accent {
+.agd-hero-title-accent {
   color: var(--gold);
 }
 
-.ad-hero-sub {
+.agd-hero-sub {
   margin-top: 14px;
   color: #C7CDD6;
   max-width: 520px;
 }
 
 /* ---- Hero avatar (the real profile-photo uploader) ---- */
-.ad-hero-avatar {
+.agd-hero-avatar {
   position: absolute;
   left: 0;
   bottom: -150px;
@@ -92,7 +92,7 @@
   text-align: center;
 }
 
-.ad-hero-avatar-photo {
+.agd-hero-avatar-photo {
   position: relative;
   width: 118px;
   height: 118px;
@@ -109,7 +109,7 @@
   box-sizing: border-box;
 }
 
-.ad-hero-avatar-photo img {
+.agd-hero-avatar-photo img {
   width: 100% !important;
   height: 100% !important;
   border-radius: 50%;
@@ -117,7 +117,7 @@
   display: block;
 }
 
-.ad-hero-avatar-badge {
+.agd-hero-avatar-badge {
   position: absolute;
   right: 5px;
   bottom: 30px;
@@ -134,11 +134,11 @@
   transition: transform 0.15s ease;
 }
 
-.ad-hero-avatar-badge:hover {
+.agd-hero-avatar-badge:hover {
   transform: scale(1.08);
 }
 
-.ad-hero-avatar-hint {
+.agd-hero-avatar-hint {
   display: block;
   margin-bottom: 10px;
   font-size: 12px;
@@ -146,7 +146,7 @@
   color: var(--on-page);
 }
 @media (max-width: 640px) {
-  .ad-hero-avatar {
+  .agd-hero-avatar {
     position: relative;
     left: auto;
     bottom: -26px;
@@ -155,7 +155,7 @@
 }
 
 /* ---- Layout: form + preview sidebar ---- */
-.ad-layout {
+.agd-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   width: 100%;
@@ -165,37 +165,37 @@
 }
 
 @media (max-width: 900px) {
-  .ad-layout {
+  .agd-layout {
     grid-template-columns: 1fr;
     padding: 0 0 72px;
   }
 }
 
 /* ---- Form sections ---- */
-.ad-form {
+.agd-form {
   background: var(--surface-panel-alt);
   border: 1px solid var(--line-page);
   border-radius: var(--radius-m);
   padding: 8px 28px 28px;
 }
 
-.ad-section {
+.agd-section {
   padding: 24px 0;
   border-bottom: 1px solid var(--line-page);
 }
 
-.ad-section:last-of-type {
+.agd-section:last-of-type {
   border-bottom: none;
 }
 
-.ad-section-head {
+.agd-section-head {
   display: flex;
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 20px;
 }
 
-.ad-section-icon {
+.agd-section-icon {
   flex-shrink: 0;
   width: 36px;
   height: 36px;
@@ -207,66 +207,66 @@
   color: var(--gold);
 }
 
-.ad-section-title {
+.agd-section-title {
   font-size: 16px;
   font-weight: 700;
   color: var(--on-page);
 }
 
-.ad-section-desc {
+.agd-section-desc {
   margin-top: 2px;
   font-size: 13px;
   color: var(--on-page-soft);
 }
 
-.ad-field {
+.agd-field {
   margin-bottom: 18px;
 }
 
-.ad-field:last-child {
+.agd-field:last-child {
   margin-bottom: 0;
 }
 
-.ad-field-row {
+.agd-field-row {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
   margin-bottom: 18px;
 }
 
-.ad-field-row:last-child {
+.agd-field-row:last-child {
   margin-bottom: 0;
 }
 
-.ad-field-row .ad-field {
+.agd-field-row .agd-field {
   flex: 1 1 auto;
   min-width: min(max-content, 100%);
   margin-bottom: 0;
 }
 
-.ad-field-row--3 .ad-field {
+.agd-field-row--3 .agd-field {
   min-width: min(max-content, 100%);
 }
 
-.ad-field-row--3 .ad-field--wide {
+.agd-field-row--3 .agd-field--wide {
   flex: 1.6 1 auto;
 }
 
 @media (max-width: 640px) {
-  .ad-field-row--3 {
+  .agd-field-row--3 {
     flex-direction: column;
   }
 
-  .ad-field-row--3 .ad-field {
+  .agd-field-row--3 .agd-field {
     width: 100%;
   }
 
-  .ad-field-row--3 .ad-field--wide {
+  .agd-field-row--3 .agd-field--wide {
     order: -1;
   }
 }
 
-.ad-field label {
+.agd-field label {
   display: block;
   font-size: 13px;
   font-weight: 600;
@@ -275,35 +275,35 @@
   white-space: nowrap;
 }
 
-.ad-required {
+.agd-required {
   color: var(--gold);
 }
 
-.ad-optional {
+.agd-optional {
   font-weight: 400;
   color: var(--on-page-soft);
 }
 
-.ad-hint {
+.agd-hint {
   display: block;
   margin-top: 6px;
   font-size: 11.5px;
   color: var(--on-page-soft);
 }
 
-.ad-textarea {
+.agd-textarea {
   resize: vertical;
   min-height: 90px;
   font-family: inherit;
 }
 
-.ad-multiselect {
+.agd-multiselect {
   height: auto;
   min-height: 108px;
 }
 
 /* Photo upload control */
-.ad-upload {
+.agd-upload {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -321,23 +321,23 @@
   transition: border-color var(--dur-fast) var(--ease);
 }
 
-.ad-upload:hover {
+.agd-upload:hover {
   border-color: var(--gold);
   color: var(--on-page);
 }
 
-.ad-upload small {
+.agd-upload small {
   font-weight: 400;
   color: var(--on-page-soft);
 }
 
-.ad-error {
+.agd-error {
   color: var(--danger, #e5484d);
   font-size: 13px;
   margin: 20px 0 0;
 }
 
-.ad-confirm {
+.agd-confirm {
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -347,16 +347,16 @@
   cursor: pointer;
 }
 
-.ad-confirm input {
+.agd-confirm input {
   margin-top: 2px;
   accent-color: var(--gold);
 }
 
-.ad-actions {
+.agd-actions {
   margin-top: 20px;
 }
 
-.ad-submit {
+.agd-submit {
   width: 100%;
   display: flex;
   align-items: center;
@@ -365,7 +365,7 @@
 }
 
 /* ---- Preview sidebar ---- */
-.ad-preview {
+.agd-preview {
   position: sticky;
   top: calc(var(--header-h) + 24px);
   background: var(--surface-panel-alt);
@@ -375,7 +375,7 @@
   text-align: center;
 }
 
-.ad-preview-avatar {
+.agd-preview-avatar {
   position: relative;
   width: 76px;
   height: 76px;
@@ -384,7 +384,7 @@
   overflow: visible;
 }
 
-.ad-preview-avatar-photo {
+.agd-preview-avatar-photo {
   width: 100%;
   height: 100%;
   border-radius: 50%;
@@ -398,7 +398,7 @@
   box-sizing: border-box;
 }
 
-.ad-preview-avatar-photo img {
+.agd-preview-avatar-photo img {
   width: 100% !important;
   height: 100% !important;
   border-radius: 50%;
@@ -406,7 +406,7 @@
   display: block;
 }
 
-.ad-preview-avatar-badge {
+.agd-preview-avatar-badge {
   position: absolute;
   right: -2px;
   bottom: -2px;
@@ -430,20 +430,20 @@
   display: none !important;
 }
 
-.ad-preview-title {
+.agd-preview-title {
   font-size: 15px;
   font-weight: 700;
   color: var(--on-page);
 }
 
-.ad-preview-sub {
+.agd-preview-sub {
   margin-top: 2px;
   font-size: 12px;
   color: var(--on-page-soft);
   margin-bottom: 18px;
 }
 
-.ad-preview-list {
+.agd-preview-list {
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -451,33 +451,33 @@
   margin-bottom: 18px;
 }
 
-.ad-preview-list li {
+.agd-preview-list li {
   display: flex;
   align-items: flex-start;
   gap: 10px;
 }
 
-.ad-preview-list svg {
+.agd-preview-list svg {
   flex-shrink: 0;
   margin-top: 2px;
   color: var(--gold);
 }
 
-.ad-preview-list strong {
+.agd-preview-list strong {
   display: block;
   font-size: 12.5px;
   font-weight: 700;
   color: var(--on-page);
 }
 
-.ad-preview-list span {
+.agd-preview-list span {
   display: block;
   font-size: 12px;
   color: var(--on-page-soft);
   word-break: break-word;
 }
 
-.ad-preview-callout {
+.agd-preview-callout {
   display: flex;
   gap: 10px;
   text-align: left;
@@ -487,13 +487,13 @@
   background: var(--gold-soft);
 }
 
-.ad-preview-callout svg {
+.agd-preview-callout svg {
   flex-shrink: 0;
   color: var(--gold);
   margin-top: 2px;
 }
 
-.ad-preview-callout strong {
+.agd-preview-callout strong {
   display: block;
   font-size: 12.5px;
   font-weight: 700;
@@ -501,7 +501,7 @@
   margin-bottom: 3px;
 }
 
-.ad-preview-callout p {
+.agd-preview-callout p {
   font-size: 12px;
   color: var(--on-page-soft);
   line-height: 1.4;
@@ -509,13 +509,13 @@
 
 
 /* ---- In-form photo upload (moved out of the hero) ---- */
-.ad-photo-section {
+.agd-photo-section {
   display: flex;
   align-items: center;
   gap: 18px;
 }
 
-.ad-photo-frame {
+.agd-photo-frame {
   position: relative;
   flex-shrink: 0;
   width: 72px;
@@ -531,7 +531,7 @@
   box-sizing: border-box;
 }
 
-.ad-photo-frame img {
+.agd-photo-frame img {
   width: 100% !important;
   height: 100% !important;
   border-radius: 50%;
@@ -539,37 +539,37 @@
   display: block;
 }
 
-.ad-photo-title {
+.agd-photo-title {
   font-weight: 600;
   color: var(--on-page);
   margin: 0 0 2px;
 }
 
-.ad-photo-upload-btn {
+.agd-photo-upload-btn {
   margin-top: 8px;
   padding: 8px 16px;
   font-size: 13px;
 }
 
 /* ---- NIN field ---- */
-.ad-nin-row {
+.agd-nin-row {
   display: flex;
   gap: 8px;
 }
 
-.ad-nin-row .input {
+.agd-nin-row .input {
   flex: 1;
 }
 
-.ad-nin-verify {
+.agd-nin-verify {
   flex-shrink: 0;
   padding: 0 16px;
 }
 
-.ad-hint--error {
+.agd-hint--error {
   color: var(--danger, #e5484d);
 }
 
-.ad-hint--success {
+.agd-hint--success {
   color: var(--success, #2f9e44);
 }

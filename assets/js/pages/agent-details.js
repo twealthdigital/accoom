@@ -17,7 +17,7 @@
   'use strict';
 
   Accoom.ready(function () {
-    Accoom.initHeroAnimations({ selector: '.ad-hero', offset: 50 });
+    Accoom.initHeroAnimations({ selector: '.agd-hero', offset: 50 });
 
     var user = Accoom.getStorage('accoom-user', null);
 
@@ -42,7 +42,7 @@
 
     // ---- State dropdown: populated from locations.js data, not hardcoded HTML.
     // Country is fixed to Nigeria (plain input in the HTML, not a dropdown).
-    var stateRoot = document.getElementById('ad-state');
+    var stateRoot = document.getElementById('agd-state');
 
     function loadStatesFor(country, selected) {
       if (!stateRoot) return;
@@ -52,7 +52,7 @@
     // Languages field: a custom multi-select .dropdown, driven by
     // Accoom.getLanguages(country, state) — common languages first,
     // state-specific ones appended once a state is known.
-    var languagesRoot = document.getElementById('ad-languages');
+    var languagesRoot = document.getElementById('agd-languages');
 
     function loadLanguagesFor(country, state, selectedList) {
       if (!languagesRoot) return;
@@ -71,7 +71,7 @@
     }
 
     // ---- Init the custom searchable dropdowns ----
-    ['ad-contact-method', 'ad-business-type', 'ad-experience', 'ad-state', 'ad-languages'].forEach(function (id) {
+    ['agd-contact-method', 'agd-business-type', 'agd-experience', 'agd-state', 'agd-languages'].forEach(function (id) {
       var root = document.getElementById(id);
       if (root) Accoom.initDropdown(root);
     });
@@ -212,8 +212,8 @@
     function setNinStatus(message, isError) {
       if (!ninStatus) return;
       ninStatus.textContent = message;
-      ninStatus.classList.toggle('ad-hint--error', !!isError);
-      ninStatus.classList.toggle('ad-hint--success', !isError && !!message);
+      ninStatus.classList.toggle('agd-hint--error', !!isError);
+      ninStatus.classList.toggle('agd-hint--success', !isError && !!message);
     }
 
     if (ninInput) {
