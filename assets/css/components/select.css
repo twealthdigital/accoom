@@ -1,0 +1,94 @@
+/* ==========================================================================
+   ACCOOM — Custom select (replaces native <select>, see modules/select.js)
+   ========================================================================== */
+.acx-native {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.acx-select { position: relative; width: 100%; }
+.acx-select--auto { width: auto; display: inline-block; min-width: 150px; }
+
+.acx-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 14px;
+  border: 1px solid var(--line-page);
+  border-radius: 9px;
+  background: var(--surface-page);
+  color: var(--on-page);
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.acx-trigger:focus-visible { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+.acx-trigger[aria-expanded="true"] { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+.acx-trigger:disabled { opacity: 0.55; cursor: not-allowed; }
+.acx-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.acx-label.is-placeholder { color: var(--on-page-soft); }
+.acx-trigger svg { flex-shrink: 0; color: var(--on-page-soft); transition: transform 160ms ease; }
+.acx-trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.acx-panel {
+  position: fixed;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 140ms ease, transform 140ms ease, visibility 140ms ease;
+}
+html.dark-mode .acx-panel { box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5); }
+.acx-select.is-open .acx-panel { opacity: 1; visibility: visible; transform: none; }
+.acx-search-wrap { padding: 8px; border-bottom: 1px solid var(--line-page); flex-shrink: 0; }
+.acx-search {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line-page);
+  border-radius: 8px;
+  background: var(--surface-page);
+  color: var(--on-page);
+  font: inherit;
+  font-size: 0.85rem;
+}
+.acx-search:focus { outline: none; border-color: var(--gold); }
+.acx-list { overflow-y: auto; padding: 6px; }
+.acx-option {
+  display: block;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--on-page);
+  font: inherit;
+  font-size: 0.87rem;
+  text-align: left;
+  cursor: pointer;
+}
+.acx-option:hover, .acx-option.is-focused { background: var(--gold-soft); }
+.acx-option.is-selected { color: var(--gold-dark, #9d5f16); font-weight: 700; }
+html.dark-mode .acx-option.is-selected { color: var(--gold); }
+.acx-option:disabled { opacity: 0.45; cursor: not-allowed; }
+.acx-empty { padding: 14px 10px; text-align: center; font-size: 0.82rem; color: var(--on-page-soft); }
+@media (prefers-reduced-motion: reduce) { .acx-panel, .acx-trigger, .acx-trigger svg { transition: none; } }
+
+.has-error .acx-trigger, .ml-field.has-error .acx-trigger { border-color: var(--danger, #d64545); }
