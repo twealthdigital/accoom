@@ -81,19 +81,37 @@ window.Accoom = window.Accoom || {};
 
   /* ------------------------------------------------ listings: server -> here */
   function pullListings() {
-    return Sync.api('GET', '/api/ping', undefined, 1500).then(function (ping) {
+    return Sync.api('GET', '/api/ping', undefined, 4000).then(function (ping) {
       instance = ping.instance || '';
       Sync.available = true;
-      return Sync.api('GET', '/api/listings', undefined, 4000);
+      return Sync.api('GET', '/api/listings', undefined, 6000);
     }).then(function (r) {
       var json = JSON.stringify(Array.isArray(r.listings) ? r.listings : []);
       try { if (window.localStorage.getItem(REMOTE_KEY) !== json) window.localStorage.setItem(REMOTE_KEY, json); } catch (e) { /* full */ }
+      return true;
     }).catch(function () {
       if (Sync.available === null) Sync.available = false;
+      return false;
     });
   }
 
   Sync.ready = pullListings();
+
+  // The server may be started after the page was opened, or answer slowly the first time:
+  // keep asking until it is there, then send this agent's listings.
+  Sync.ready.then(function (ok) {
+    if (ok) return;
+    var tries = 0;
+    var timer = window.setInterval(function () {
+      if (++tries > 60) { window.clearInterval(timer); return; }
+      pullListings().then(function (up) {
+        if (!up) return;
+        window.clearInterval(timer);
+        Sync.available = true;
+        if (Sync.isAgent()) schedulePush();
+      });
+    }, 5000);
+  });
 
   // Page scripts start after the first pull, so the catalogue is complete on first paint.
   var nativeReady = Accoom.ready;
@@ -127,31 +145,54 @@ window.Accoom = window.Accoom || {};
       .then(function (p) { return blob.type + ':' + blob.size + ':' + p.join('-'); });
   }
 
-  function upload(value) {
-    if (typeof value !== 'string') return Promise.resolve(value);
+  var done = {};   // blob:/idb: address -> uploaded address (finished uploads only)
+  var busy = 0, waiting = [];
+
+  // At most 3 files travel at once, so a big video never blocks the photos behind it.
+  function slot(job) {
+    return new Promise(function (resolve) {
+      function run() { busy++; job().then(finish, finish); function finish(v) { busy--; resolve(v); if (waiting.length) waiting.shift()(); } }
+      if (busy < 3) run(); else waiting.push(run);
+    });
+  }
+
+  function startUpload(value) {
+    if (memo[value]) return;
     var isIdb = value.indexOf('idb:') === 0;
-    if (!isIdb && value.indexOf('blob:') !== 0 && value.indexOf('data:') !== 0) return Promise.resolve(value);   // already a normal address
-    if (memo[value]) return memo[value];
+    memo[value] = slot(function () {
+      var getBlob = (isIdb && Accoom.MediaStore)
+        ? Accoom.MediaStore.get(value.slice(4))
+        : fetch(value).then(function (r) { return r.blob(); });
+      return getBlob.then(function (blob) {
+        return fingerprint(blob).then(function (fp) {
+          var map = mediaMap();
+          if (map.files[fp]) return map.files[fp];
+          return fetch('/api/media?type=' + encodeURIComponent(blob.type || ''), { method: 'POST', body: blob })
+            .then(function (res) { if (!res.ok) throw new Error('upload failed'); return res.json(); })
+            .then(function (r) {
+              var fresh = mediaMap();
+              fresh.files[fp] = r.url;
+              try { window.localStorage.setItem(MEDIA_KEY, JSON.stringify(fresh)); } catch (e) { /* full */ }
+              return r.url;
+            });
+        });
+      }).then(function (url) {
+        done[value] = url;
+        schedulePush();            // the listing is sent again, now with this file
+        return url;
+      }, function () { delete memo[value]; return null; });
+    });
+  }
 
-    var getBlob = (isIdb && Accoom.MediaStore)
-      ? Accoom.MediaStore.get(value.slice(4))
-      : fetch(value).then(function (r) { return r.blob(); });
-
-    memo[value] = getBlob.then(function (blob) {
-      return fingerprint(blob).then(function (fp) {
-        var map = mediaMap();
-        if (map.files[fp]) return map.files[fp];
-        return fetch('/api/media?type=' + encodeURIComponent(blob.type || ''), { method: 'POST', body: blob })
-          .then(function (res) { if (!res.ok) throw new Error('upload failed'); return res.json(); })
-          .then(function (r) {
-            var fresh = mediaMap();
-            fresh.files[fp] = r.url;
-            try { window.localStorage.setItem(MEDIA_KEY, JSON.stringify(fresh)); } catch (e) { /* full */ }
-            return r.url;
-          });
-      });
-    }).catch(function () { delete memo[value]; return null; });
-    return memo[value];
+  // The listing itself never waits for its files: it goes to the server at once with the files that are
+  // already there, and again each time another file has arrived.
+  function upload(value) {
+    if (typeof value !== 'string') return value;
+    var isIdb = value.indexOf('idb:') === 0;
+    if (!isIdb && value.indexOf('blob:') !== 0 && value.indexOf('data:') !== 0) return value;   // already a normal address
+    if (done[value]) return done[value];
+    startUpload(value);
+    return '';
   }
 
   // What customers get: final inclusive price only, no fee fields, no review history.
@@ -171,20 +212,14 @@ window.Accoom = window.Accoom || {};
   }
 
   function withUploadedMedia(copy) {
-    var jobs = [];
     ['cover', 'video'].forEach(function (f) {
-      if (typeof copy[f] === 'string') jobs.push(upload(copy[f]).then(function (u) { copy[f] = u || ''; }));
+      if (typeof copy[f] === 'string') copy[f] = upload(copy[f]);
     });
     ['images', 'videosAll', 'extraVideos'].forEach(function (f) {
       if (!Array.isArray(copy[f])) return;
-      copy[f].forEach(function (v, i) { jobs.push(upload(v).then(function (u) { copy[f][i] = u || ''; })); });
+      copy[f] = copy[f].map(upload).filter(Boolean);
     });
-    return Promise.all(jobs).then(function () {
-      ['images', 'videosAll', 'extraVideos'].forEach(function (f) {
-        if (Array.isArray(copy[f])) copy[f] = copy[f].filter(Boolean);
-      });
-      return copy;
-    });
+    return copy;
   }
 
   var pushTimer = null, pushing = false, pushAgain = false;
@@ -200,8 +235,8 @@ window.Accoom = window.Accoom || {};
     try { raw = JSON.parse(window.localStorage.getItem(LISTINGS_KEY)); } catch (e) { raw = null; }
     var mine = Accoom.ListingReview.filterPublic(Array.isArray(raw) ? raw : []);
 
-    return Promise.all(mine.map(function (rec) { return withUploadedMedia(publicCopy(rec)); }))
-      .then(function (items) { return Sync.api('PUT', '/api/listings/' + encodeURIComponent(key), { listings: items }, 20000); })
+    var items = mine.map(function (rec) { return withUploadedMedia(publicCopy(rec)); });
+    return Sync.api('PUT', '/api/listings/' + encodeURIComponent(key), { listings: items }, 20000)
       .catch(function () { /* server away: the next change tries again */ })
       .then(function () {
         pushing = false;

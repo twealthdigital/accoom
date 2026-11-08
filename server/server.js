@@ -101,6 +101,23 @@ function cleanName(v, max = 80) {
 function cleanText(v) { return String(v == null ? '' : v).replace(/\r\n/g, '\n').trim().slice(0, 4000); }
 function cleanId(v) { return String(v == null ? '' : v).replace(/[^A-Za-z0-9_.:-]/g, '').slice(0, 120); }
 
+function log(kind, text) {
+  const t = new Date().toLocaleTimeString();
+  console.log('  [' + t + '] ' + kind + ': ' + text);
+}
+
+// http://localhost:3000/_status : what the server holds right now.
+function statusPage() {
+  const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const agents = Object.keys(db.listings).map((k) => '<h3>Agent ' + esc(k) + '</h3><ul>' +
+    db.listings[k].map((l) => '<li>' + esc(l.name || l.id) + ' - ' + esc(l.location || '') + ' - N' + esc(l.price) + ' - ' + ((l.images || []).length) + ' photo(s)</li>').join('') + '</ul>').join('');
+  const chats = Object.values(db.conversations).map((c) => '<li>' + esc(c.customerName) + ' &harr; ' + esc(c.agentName) + ' about ' + esc(c.propertyName) + ' (' + c.messages.length + ' messages)</li>').join('');
+  return '<!doctype html><meta charset="utf-8"><title>ACCOOM server</title><body style="font:15px system-ui;max-width:720px;margin:2rem auto;padding:0 1rem">' +
+    '<h2>ACCOOM test server</h2><p>Listings shared by agents: <b>' + Object.values(db.listings).reduce((n, l) => n + l.length, 0) + '</b>. Chats: <b>' + Object.keys(db.conversations).length + '</b>.</p>' +
+    (agents || '<p>No agent has shared a listing yet. An agent must be logged in on THIS address, with a submitted (approved) listing, and open any page.</p>') +
+    '<h3>Chats</h3><ul>' + (chats || '<li>none yet</li>') + '</ul></body>';
+}
+
 /* ---------------------------------------------------------------------- API */
 async function handleApi(req, res, url) {
   const p = url.pathname;
@@ -123,6 +140,7 @@ async function handleApi(req, res, url) {
     const list = Array.isArray(body.listings) ? body.listings.filter((l) => l && l.id != null) : [];
     if (list.length) db.listings[m[1]] = list; else delete db.listings[m[1]];
     saveSoon();
+    log('listings', 'agent ' + m[1] + ' now shares ' + list.length + ' listing(s)' + (list.length ? ': ' + list.map((l) => l.name || l.id).join(', ') : ''));
     return sendJson(res, 200, { ok: true, count: list.length });
   }
 
@@ -145,6 +163,7 @@ async function handleApi(req, res, url) {
       const name = hash.digest('hex') + ext;
       fs.rename(tmp, path.join(UPLOADS, name), (err) => {
         if (err) { fs.unlink(tmp, () => {}); return sendJson(res, 500, { error: 'Could not save' }); }
+        log('media', name + ' (' + Math.round(size / 1024) + ' KB)');
         sendJson(res, 200, { url: '/uploads/' + name });
       });
     });
@@ -199,6 +218,7 @@ async function handleApi(req, res, url) {
     if (!conv.messages.some((x) => x.id === mid)) {
       const ts = Number(msg.ts) > 0 ? Math.min(Number(msg.ts), Date.now() + 60000) : Date.now();
       conv.messages.push({ id: mid, from: side, text, ts });
+      log('chat', (side === 'agent' ? conv.agentName : conv.customerName) + ' -> ' + (side === 'agent' ? conv.customerName : conv.agentName) + ' about "' + conv.propertyName + '"');
       conv.messages.sort((a, b) => a.ts - b.ts);
       const other = side === 'agent' ? 'customer' : 'agent';
       conv.unread[other] = (conv.unread[other] || 0) + 1;
@@ -283,6 +303,7 @@ const server = http.createServer((req, res) => {
     return;
   }
   if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405); return res.end(); }
+  if (url.pathname === '/_status') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }); return res.end(statusPage()); }
   serveStatic(req, res, url);
 });
 server.requestTimeout = 0;   // big video uploads
@@ -293,6 +314,7 @@ server.listen(PORT, '0.0.0.0', () => {
   Object.values(os.networkInterfaces()).flat().filter((i) => i && i.family === 'IPv4' && !i.internal).forEach((i) => {
     console.log('  On your Wi-Fi:    http://' + i.address + ':' + PORT + '   (phones / other computers)');
   });
-  console.log('\n  Data is saved in server/data/ - delete that folder to start fresh.');
+  console.log('\n  See what the server holds:  http://localhost:' + PORT + '/_status');
+  console.log('  Data is saved in server/data/ - delete that folder to start fresh.');
   console.log('  Use ONE address per browser (localhost and the Wi-Fi address keep separate logins).\n');
 });
