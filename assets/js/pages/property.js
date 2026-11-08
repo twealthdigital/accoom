@@ -295,10 +295,6 @@
       if (totalLabel && totalLabel.previousElementSibling) totalLabel.previousElementSibling.textContent = 'Total (' + words.first + ')';
       var perEl = document.querySelector('[data-pd-price]');
       if (perEl && perEl.nextElementSibling && property.period) perEl.nextElementSibling.textContent = ' / ' + words.slash;
-      setText('[data-pd-price-rent]', naira(total));
-      setText('[data-pd-price-service]', 'Included');
-      setText('[data-pd-price-legal]', 'Included');
-      setText('[data-pd-price-agency]', 'Included');
       setText('[data-pd-price-total]', naira(total));
     })();
 

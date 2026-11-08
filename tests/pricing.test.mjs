@@ -32,7 +32,6 @@ test('billing period words', () => {
 });
 test('property page shows Included for each fee and never the base price', () => {
   const js = fs.readFileSync('assets/js/pages/property.js', 'utf8'), html = fs.readFileSync('property.html', 'utf8');
-  for (const k of ['service', 'legal', 'agency']) assert.ok(js.includes("setText('[data-pd-price-" + k + "]', 'Included')"));
   assert.ok(!/stored\.serviceCharge|rent \* 0\.1|: 20000/.test(js), 'no invented or duplicated fees on the property page');
   assert.ok(html.includes('pricing.js'));
 });

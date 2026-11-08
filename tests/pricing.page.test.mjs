@@ -90,8 +90,7 @@ console.log('\nProperty page (details + payment total)');
 const prop = await open('property.html?id=lst_test1');
 await test('details page: price N150,000, fees say Included, total N150,000, month period', () => {
   const t = (sel) => prop.d.querySelector(sel).textContent.trim();
-  assert.equal(t('[data-pd-price]'), '\u20A6150,000'); assert.equal(t('[data-pd-price-rent]'), '\u20A6150,000'); assert.equal(t('[data-pd-price-total]'), '\u20A6150,000');
-  for (const k of ['service', 'legal', 'agency']) assert.equal(t('[data-pd-price-' + k + ']'), 'Included');
+  assert.equal(t('[data-pd-price]'), '\u20A6150,000'); assert.equal(t('[data-pd-price-total]'), '\u20A6150,000');
   assert.ok(/month/i.test(prop.d.querySelector('.pd-price-details-card').textContent) && !/100,000|20,000|10,000/.test(prop.d.querySelector('.pd-price-details-card').textContent));
 });
 

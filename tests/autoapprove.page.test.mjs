@@ -129,7 +129,6 @@ await test('details page opens the right listing at the inclusive price', () => 
   const t = (sel) => prop.d.querySelector(sel).textContent.trim();
   assert.ok(/Fresh Agent Flat/.test(prop.d.body.textContent));
   assert.equal(t('[data-pd-price]'), '\u20A6150,000'); assert.equal(t('[data-pd-price-total]'), '\u20A6150,000');
-  for (const k of ['service', 'legal', 'agency']) assert.equal(t('[data-pd-price-' + k + ']'), 'Included');
 });
 const hidden = await open('property.html?id=lst_pending');
 await test('an unapproved listing id does not open as a public property', () => {
