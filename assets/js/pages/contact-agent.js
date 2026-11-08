@@ -353,6 +353,7 @@
       lightboxPrev: Accoom.$('[data-msgs-lightbox-prev]'),
       lightboxNext: Accoom.$('[data-msgs-lightbox-next]'),
       lightboxClose: Accoom.$('[data-msgs-lightbox-close]'),
+      threadWrap: Accoom.$('[data-msgs-thread-wrap]'),
       thread: Accoom.$('[data-msgs-thread]'),
       savedThread: Accoom.$('[data-msgs-saved-thread]'),
       threadEmpty: Accoom.$('[data-msgs-thread-empty]'),
@@ -1291,7 +1292,7 @@
         els.thread.appendChild(buildRow(msg, conv));
       });
 
-      els.thread.scrollTop = els.thread.scrollHeight;
+      scrollChatToEnd();
     }
 
     function renderSavedThread(conv) {
@@ -1367,7 +1368,7 @@
 
       var actionBtn = row.querySelector('[data-row-action]');
       var panel = row.querySelector('[data-row-menu-panel]');
-      var scrollHost = isSavedView ? els.savedThread : els.thread;
+      var scrollHost = els.threadWrap || (isSavedView ? els.savedThread : els.thread);
 
       if (msg.attachments && msg.attachments.length) {
         row.querySelectorAll('[data-sent-attach-index]').forEach(function (node) {
@@ -1791,6 +1792,7 @@
         
         conv.messages.push(msg);
         els.input.value = '';
+        autoGrowInput(); // back to the one line size after sending
         conv.draft = '';
         hideReplyPreview();
         
@@ -1798,7 +1800,7 @@
         renderList();
         saveConversations();
         
-        if (els.thread) els.thread.scrollTop = els.thread.scrollHeight;
+        scrollChatToEnd();
 
         // Simulate the agent reading + replying, like the reference chat.
         setTimeout(function () {
@@ -2125,6 +2127,42 @@
       els.input.style.height = prevHeight;
       return inputSingleLineHeight;
     }
+
+    function scrollChatToEnd() {
+      var host = els.threadWrap || els.thread;
+      if (host) host.scrollTop = host.scrollHeight;
+    }
+
+    // Keep the composer glued to the keyboard on phones: lock page scroll while a chat is open and,
+    // when the keyboard is up, fit the chat to the visible area so the input sits right above it.
+    (function keyboardFit() {
+      var vv = window.visualViewport;
+      var root = document.documentElement;
+      function sync() {
+        var layoutEl = Accoom.$('.msgs-layout') || layout;
+        if (!layoutEl) return;
+        var mobileChat = window.innerWidth <= 860 && layoutEl.getAttribute('data-view') === 'chat';
+        root.classList.toggle('msgs-chat-open', mobileChat);
+        var kb = !!(mobileChat && vv && (window.innerHeight - vv.height) > 120);
+        layoutEl.classList.toggle('is-kb', kb);
+        if (kb) {
+          layoutEl.style.setProperty('--vv-h', Math.round(vv.height) + 'px');
+          layoutEl.style.setProperty('--vv-top', Math.round(vv.offsetTop) + 'px');
+          if (window.scrollY) window.scrollTo(0, 0);
+          if (document.activeElement === els.input) scrollChatToEnd();
+        } else {
+          layoutEl.style.removeProperty('--vv-h');
+          layoutEl.style.removeProperty('--vv-top');
+        }
+      }
+      if (vv) { vv.addEventListener('resize', sync); vv.addEventListener('scroll', sync); }
+      window.addEventListener('resize', sync);
+      window.addEventListener('orientationchange', sync);
+      if (els.input) { els.input.addEventListener('focus', function () { window.setTimeout(sync, 150); }); els.input.addEventListener('blur', function () { window.setTimeout(sync, 150); }); }
+      var layoutObs = Accoom.$('.msgs-layout') || layout;
+      if (layoutObs && window.MutationObserver) new MutationObserver(sync).observe(layoutObs, { attributes: true, attributeFilter: ['data-view'] });
+      sync();
+    })();
 
     function autoGrowInput() {
       if (!els.input) return;

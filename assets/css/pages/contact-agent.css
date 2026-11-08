@@ -827,12 +827,16 @@ html.dark-mode .msgs-props-item.is-active {
   display: flex;
   flex-direction: column;
   position: relative;
+  /* One scroller for the whole chat body: Messages/Saved bar, rate strip and messages scroll together,
+     so only the property card (with Approve/Decline) stays pinned above. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .msgs-thread {
-  flex: 1;
+  flex: 1 0 auto;
   min-height: 0;
-  overflow-y: auto;
+  overflow: visible;
   padding: 18px;
   display: flex;
   flex-direction: column;
@@ -2380,4 +2384,18 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
 @media (max-width:480px) {
   .msgs-review-strip { margin:8px 10px; }
   .msgs-rs-star { width:38px; height:38px; }
+}
+
+
+/* Chat body scrollbar (the wrapper scrolls now, not each thread) */
+.msgs-thread-wrap { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--on-page-soft) 35%, transparent) transparent; }
+.msgs-thread-wrap::-webkit-scrollbar { width: 4px; }
+.msgs-thread-wrap::-webkit-scrollbar-track { background: transparent; }
+.msgs-thread-wrap::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--on-page-soft) 35%, transparent); border-radius: 10px; }
+
+/* Phone chat: the page never scrolls behind the chat, and while the keyboard is open the chat fits the
+   visible area exactly so the composer sits right on top of the keyboard. */
+@media (max-width: 860px) {
+  html.msgs-chat-open, html.msgs-chat-open body { overflow: hidden; overscroll-behavior: none; }
+  .msgs-layout.is-kb { position: fixed; left: 0; right: 0; top: var(--vv-top, 0px); height: var(--vv-h, 100dvh); z-index: 1000; border-radius: 0; margin: 0; }
 }
