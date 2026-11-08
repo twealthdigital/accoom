@@ -113,7 +113,16 @@ window.Accoom = window.Accoom || {};
     if (!Accoom.ListingReview || !Accoom.Pricing) return [];
     var raw;
     try { raw = JSON.parse(window.localStorage.getItem('accoom-agent-listings')); } catch (e) { return []; }
-    return Accoom.ListingReview.filterPublic(Array.isArray(raw) ? raw : []);
+    var own = Accoom.ListingReview.filterPublic(Array.isArray(raw) ? raw : []);
+
+    // Public listings of other agents, shared through the test server (core/sync.js).
+    // This browser's own copy wins when the same listing is in both.
+    var remote;
+    try { remote = JSON.parse(window.localStorage.getItem('accoom-remote-listings')); } catch (e) { remote = null; }
+    if (!Array.isArray(remote) || !remote.length) return own;
+    var have = {};
+    own.forEach(function (l) { have[String(l.id)] = true; });
+    return own.concat(Accoom.ListingReview.filterPublic(remote).filter(function (l) { return !have[String(l.id)]; }));
   }
 
   function agentItems() {
@@ -145,6 +154,7 @@ window.Accoom = window.Accoom || {};
         agentListing: true,
         listingType: rec.listingType || rec.category || '',
         ownerId: rec.ownerId || '',
+        agentKey: rec.agentKey || '',
         address: rec.address || '', area: rec.area || '', state: rec.state || '',
         description: rec.description || [],
         amenities: Array.isArray(rec.amenities) ? rec.amenities : [],
@@ -155,7 +165,7 @@ window.Accoom = window.Accoom || {};
         videosAll: Array.isArray(rec.videosAll) && rec.videosAll.length ? rec.videosAll : (rec.video ? [rec.video] : []),
         agent: (function () {
           var sm = Accoom.Reviews ? Accoom.Reviews.summary(Accoom.Reviews.agentKey(rec.ownerId, rec.agentName)) : { count: 0, avg: 0 };
-          return { name: rec.agentName || 'Agent', real: true, ownerId: rec.ownerId || '', verified: verified, rating: sm.avg, reviews: sm.count, online: false, level: 'AL1' };
+          return { name: rec.agentName || 'Agent', real: true, ownerId: rec.ownerId || '', agentKey: rec.agentKey || '', verified: verified, rating: sm.avg, reviews: sm.count, online: false, level: 'AL1' };
         })()
       });
     });

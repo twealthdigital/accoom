@@ -5,6 +5,12 @@
    dropdown reads the same record). A "Contact Agent" click on another page
    leaves an 'accoom-contact-request' behind; this page turns it into (or
    reopens) the conversation with that agent.
+
+   Real agents (listings uploaded through ACCOOM) are reached through the test
+   server (core/sync.js): the customer's message lands in that agent's inbox on
+   this same page, and the agent's reply comes back. The agent sees the same
+   screen with their customers in the list. Conversations with the sample
+   (hardcoded) agents stay in this browser only.
    ========================================================================== */
 
 (function (Accoom) {
@@ -47,8 +53,25 @@
       send: Accoom.$('[data-msgs-send]')
     };
 
+    var Sync = Accoom.Sync || null;
+    var me = Sync ? Sync.userKey() : '';
+    var myName = Sync ? Sync.userName() : '';
+    var isAgent = !!(Sync && Sync.isAgent());
+    var POLL_MS = 3000;
+
     var conversations = load();
     var activeId = null;
+
+    if (isAgent) {
+      var emptyTitle = els.listEmpty.querySelector('span');
+      if (emptyTitle) emptyTitle.textContent = 'Customers who contact you about your listings will show up here.';
+      var chatEmptyText = els.chatEmpty.querySelector('p');
+      if (chatEmptyText) chatEmptyText.textContent = 'Choose a chat on the left to reply to a customer.';
+      els.input.setAttribute('placeholder', 'Type a reply...');
+    }
+
+    function serverUp() { return !!(Sync && Sync.available); }
+    function clean(v) { return String(v == null ? '' : v).replace(/[<>&"'`]/g, '').trim(); }
 
     /* ---------------- storage ---------------- */
     function load() {
@@ -167,8 +190,8 @@
       els.avatar.src = conv.avatar || AVATAR;
       els.avatar.alt = conv.name || '';
       els.name.textContent = conv.name || 'Agent';
-      els.status.textContent = conv.online ? 'Online' : 'Offline';
-      els.status.classList.toggle('is-online', !!conv.online);
+      els.status.textContent = conv.subtitle || (conv.online ? 'Online' : 'Offline');
+      els.status.classList.toggle('is-online', !conv.subtitle && !!conv.online);
     }
 
     function showEmpty() {
@@ -187,6 +210,7 @@
       if (conv.unread) {
         conv.unread = 0;
         save();
+        markRead(conv);
       }
 
       els.chatEmpty.hidden = true;
@@ -210,15 +234,17 @@
       if (!conv || !text) return;
 
       var now = new Date();
-      conv.messages.push({
-        id: 'm-' + now.getTime(),
+      var sent = {
+        id: 'm-' + now.getTime() + '-' + Math.random().toString(36).slice(2, 6),
         from: 'me',
         ts: now.getTime(),
         day: 'Today',
         time: timeLabel(now),
         read: false,
         text: text
-      });
+      };
+      if (conv.remote) sent.pending = true;   // until the server has it
+      conv.messages.push(sent);
 
       // Latest conversation goes to the top of the list.
       conversations = [conv].concat(conversations.filter(function (c) { return c.id !== conv.id; }));
@@ -229,6 +255,7 @@
       renderThread(conv);
       renderList();
       els.input.focus();
+      if (conv.remote) postMessage(conv, sent);
     }
 
     Accoom.on(els.composer, 'submit', function (e) {
@@ -246,6 +273,115 @@
     });
 
     Accoom.on(els.input, 'input', resizeInput);
+
+    /* ---------------- shared with the test server ---------------- */
+    // A conversation with a real agent (remote) lives on the server. This browser keeps a copy
+    // in 'accoom-conversations' (the header dropdown reads it) seen from MY side:
+    // my messages are from 'me', the other person's are not.
+    function remoteView(rc) {
+      var side = rc.agentKey === me ? 'agent' : 'customer';
+      var other = side === 'agent' ? rc.customerName : rc.agentName;
+      var old = find(rc.id);
+      var msgs = rc.messages.map(function (m) {
+        var d = new Date(m.ts);
+        return { id: m.id, from: m.from === side ? 'me' : 'other', ts: m.ts, day: 'Today', time: timeLabel(d), read: true, text: m.text };
+      });
+      var known = {};
+      msgs.forEach(function (m) { known[m.id] = true; });
+      if (old) {
+        old.messages.forEach(function (m) { if (m.pending && !known[m.id]) msgs.push(m); });
+        msgs.sort(function (a, b) { return a.ts - b.ts; });
+      }
+      return {
+        id: rc.id, remote: true, side: side,
+        name: clean(other) || (side === 'agent' ? 'Customer' : 'Agent'),
+        role: side === 'agent' ? 'Customer' : 'Real Estate Agent',
+        avatar: (old && old.avatar) || AVATAR,
+        online: false,
+        verified: old ? !!old.verified : false,
+        muted: old ? !!old.muted : false,
+        subtitle: clean(rc.propertyName),
+        agentKey: rc.agentKey, customerKey: rc.customerKey,
+        property: (old && old.property && String(old.property.id) === String(rc.propertyId)) ? old.property : { id: rc.propertyId, name: clean(rc.propertyName) },
+        unread: (rc.unread && rc.unread[side]) || 0,
+        messages: msgs
+      };
+    }
+
+    function postMessage(conv, msg) {
+      if (!serverUp()) return Promise.resolve();
+      var mine = conv.side === 'agent';
+      return Sync.api('POST', '/api/conversations/' + encodeURIComponent(conv.id) + '/messages', {
+        senderKey: me,
+        message: { id: msg.id, text: msg.text, ts: msg.ts },
+        meta: {
+          propertyId: conv.property && conv.property.id,
+          propertyName: (conv.property && conv.property.name) || '',
+          agentKey: conv.agentKey, agentName: mine ? myName : conv.name,
+          customerKey: conv.customerKey, customerName: mine ? conv.name : myName
+        }
+      }).then(function () {
+        msg.pending = false;
+        save();
+      }, function () { /* stays pending, retried on the next sync */ });
+    }
+
+    function markRead(conv) {
+      if (!conv.remote || !serverUp()) return;
+      Sync.api('POST', '/api/conversations/' + encodeURIComponent(conv.id) + '/read', { key: me }).catch(function () {});
+    }
+
+    var syncing = false;
+    var openedFromPage = false;   // set below when a Contact Agent / ?open= link chose the chat
+    function syncDown() {
+      if (!me || !serverUp() || syncing) return;
+      syncing = true;
+
+      // Messages that could not be sent yet.
+      conversations.forEach(function (c) {
+        if (!c.remote) return;
+        c.messages.forEach(function (m) { if (m.pending) postMessage(c, m); });
+      });
+
+      Sync.api('GET', '/api/conversations?key=' + encodeURIComponent(me)).then(function (r) {
+        var before = JSON.stringify(conversations);
+        var current = activeId ? find(activeId) : null;
+        var openCount = current ? current.messages.length : 0;
+
+        (r.conversations || []).forEach(function (rc) {
+          var next = remoteView(rc);
+          if (next.id === activeId && next.unread) {            // I am looking at it right now
+            next.unread = 0;
+            Sync.api('POST', '/api/conversations/' + encodeURIComponent(next.id) + '/read', { key: me }).catch(function () {});
+          }
+          var idx = -1;
+          for (var i = 0; i < conversations.length; i++) { if (conversations[i].id === next.id) { idx = i; break; } }
+          if (idx === -1) conversations.push(next); else conversations[idx] = next;
+        });
+
+        // Newest activity first.
+        conversations.sort(function (a, b) {
+          var la = lastMessage(a), lb = lastMessage(b);
+          return (lb ? lb.ts || 0 : 0) - (la ? la.ts || 0 : 0);
+        });
+
+        if (JSON.stringify(conversations) === before) return;
+        save();
+        // Desktop: first time the server's chats arrive, don't leave the chat panel blank.
+        if (!activeId && !openedFromPage && window.innerWidth > MOBILE_MAX && conversations.length) {
+          open(conversations[0].id);
+          return;
+        }
+        var now = activeId ? find(activeId) : null;
+        if (now && now.messages.length !== openCount) renderThread(now);
+        if (now) renderHeader(now);
+        renderList();
+      }).catch(function (e) { if (window.console) console.warn("ACCOOM chat sync: " + (e && e.stack ? e.stack : e)); }).then(function () { syncing = false; });
+    }
+
+    window.setInterval(function () { if (!document.hidden) syncDown(); }, POLL_MS);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) syncDown(); });
+    window.addEventListener('focus', syncDown);
 
     /* ---------------- navigation ---------------- */
     Accoom.delegate(els.list, 'click', '.msgs-list-item', function () {
@@ -277,7 +413,24 @@
       var prop = request.property;
       var agentName = request.agentName || 'Agent';
 
+      // A real agent (listing uploaded through ACCOOM) is reached through the server.
+      var item = (Accoom.PropertyService && Accoom.PropertyService.getById) ? Accoom.PropertyService.getById(prop.id) : null;
+      var agentKey = item && item.agentListing && item.agentKey ? String(item.agentKey) : '';
+      if (agentKey && me && agentKey !== me && serverUp()) {
+        var rid = 'c-' + String(prop.id).replace(/[^A-Za-z0-9_.:-]/g, '') + '-' + me;
+        var found = find(rid);
+        if (found) { found.property = prop; return found; }
+        var made = {
+          id: rid, remote: true, side: 'customer', name: clean(agentName) || 'Agent', role: 'Real Estate Agent',
+          avatar: request.agentAvatar || AVATAR, online: false, verified: !!request.verified, muted: false,
+          subtitle: clean(prop.name), agentKey: agentKey, customerKey: me, property: prop, messages: []
+        };
+        conversations.unshift(made);
+        return made;
+      }
+
       var existing = conversations.filter(function (c) {
+        if (c.remote) return false;
         return (c.property && String(c.property.id) === String(prop.id)) ||
                (c.name && c.name.toLowerCase() === agentName.toLowerCase());
       })[0];
@@ -311,6 +464,7 @@
 
     renderList();
     showEmpty();
+    openedFromPage = !!((request && request.property && request.property.id) || openProp);
 
     if (request && request.property && request.property.id) {
       var conv = conversationFromRequest(request);
@@ -319,15 +473,18 @@
       open(conv.id);
       els.input.focus();
     } else if (openProp) {
-      var target = conversations.filter(function (c) {
+      var sameProp = conversations.filter(function (c) {
         return c.property && String(c.property.id) === String(openProp);
-      })[0];
+      });
+      var target = sameProp.filter(function (c) { return c.unread; })[0] || sameProp[0];
       if (target) open(target.id);
       window.history.replaceState({}, '', window.location.pathname);
     } else if (window.innerWidth > MOBILE_MAX && conversations.length) {
       // Desktop: don't leave the chat panel blank.
       open(conversations[0].id);
     }
+
+    syncDown();
   });
 
 })(window.Accoom);

@@ -20,7 +20,7 @@ import { createHash } from 'node:crypto';
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'dist');
-const SKIP = new Set(['node_modules', 'dist', '.git', '.vscode', 'package.json', 'package-lock.json', 'build.mjs', 'README.md', '.gitignore']);
+const SKIP = new Set(['node_modules', 'dist', '.git', '.vscode', 'package.json', 'package-lock.json', 'build.mjs', 'README.md', '.gitignore', 'server']);
 
 let saved = 0, before = 0;
 

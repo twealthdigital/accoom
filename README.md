@@ -8,6 +8,12 @@ Open the folder in VS Code and use **Live Server** on `index.html`, or:
 npm start
 ```
 
+## Test with several browsers (laptop = database)
+```
+npm run dev
+```
+Opens the site at `http://localhost:3000` and prints a Wi-Fi address for phones. The same server keeps the agents' public listings (+ photos/videos) and the customer <-> agent chats in `server/data/`, so an agent in one browser and a customer in another can talk. Use one address per browser (localhost and the Wi-Fi address keep separate logins). Testing only: no real accounts. Without it (Live Server / Vercel) the site works as before, chats with real agents just stay in one browser.
+
 ## Build for production (optional)
 Makes a minified copy of the site in `dist/` (JS + CSS ~35% smaller, `main.css` bundled into one file instead of 16 chained `@import`s, and each page's ~17 script files merged into 2 hashed bundles). Source files are never changed.
 ```
