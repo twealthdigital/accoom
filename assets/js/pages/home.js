@@ -1354,7 +1354,7 @@ Accoom.delegate(listingsGrid, 'click', '[data-view-listing]', function (e) {
       });
 
       // "Contact Agent" — each card carries its own agent + property info,
-      // so send that exact pair into contact-agent.html instead of always
+      // so send that exact pair into messages.html instead of always
       // landing on whatever fixed conversation used to open by default.
       Accoom.delegate(track, 'click', '.suggested-property-actions .btn--primary', function (e) {
         e.preventDefault();
@@ -1384,7 +1384,7 @@ Accoom.delegate(listingsGrid, 'click', '[data-view-listing]', function (e) {
           }
         });
 
-        window.location.href = Accoom.isLoggedIn() ? 'contact-agent.html' : 'auth.html?mode=signup&next=contact-agent.html';
+        window.location.href = Accoom.isLoggedIn() ? 'messages.html' : 'auth.html?mode=signup&next=messages.html';
       });
     })();
 

@@ -433,7 +433,7 @@ await test('dashboard has an In Review tab and make-available is blocked for una
 });
 
 await test('no public page reads agent listings without the review guard', () => {
-  for (const f of ['home', 'filter-accommodation', 'property', 'saved-properties', 'contact-agent', 'agent-profile', 'agent-details']) {
+  for (const f of ['home', 'filter-accommodation', 'property', 'saved-properties', 'messages', 'agent-profile', 'agent-details']) {
     const s = read('assets/js/pages/' + f + '.js');
     if (s.includes('accoom-agent-listings')) assert.ok(s.includes('ListingReview'), f + '.js reads listings without ListingReview');
   }

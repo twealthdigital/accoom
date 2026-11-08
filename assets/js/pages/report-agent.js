@@ -100,7 +100,7 @@
     }
 
     // Back to chat: reopen the exact conversation when we know it.
-    var backHref = 'contact-agent.html' + (ctx.property && ctx.property.id ? '?open=' + encodeURIComponent(ctx.property.id) : '');
+    var backHref = 'messages.html' + (ctx.property && ctx.property.id ? '?open=' + encodeURIComponent(ctx.property.id) : '');
     Array.prototype.forEach.call(document.querySelectorAll('[data-rp-back], [data-rp-back-secondary]'), function (a) { a.setAttribute('href', backHref); });
 
     /* ---------- Categories ---------- */

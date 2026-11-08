@@ -47,7 +47,7 @@
     // opens this property's agent chat later (whether the buyer got here
     // via the property page's "Make Payment" card or the chat's own Pay
     // button) can pick it up and flip that property to "awaiting
-    // agent review" — see contact-agent.js's reconcilePaidProperties().
+    // agent review" — see messages.js's reconcilePaidProperties().
     // Also fires a toast right here and registers a real notification
     // (shows in the header dropdown + notifications.html), so the buyer
     // knows the payment went through even if they never click through.
@@ -106,7 +106,7 @@
           type: 'order',
           title: 'Payment received',
           text: message + ' Tap to open your chat with the agent.',
-          link: 'contact-agent.html?open=' + encodeURIComponent(id)
+          link: 'messages.html?open=' + encodeURIComponent(id)
         });
       }
     }
@@ -141,10 +141,10 @@
         back.href = returnPage || 'profile.html';
         if (backLabel) backLabel.textContent = 'Back to profile';
       } else {
-        back.href = returnPage === 'contact-agent.html'
-          ? 'contact-agent.html?open=' + encodeURIComponent(propertyId)
+        back.href = returnPage === 'messages.html'
+          ? 'messages.html?open=' + encodeURIComponent(propertyId)
           : 'property.html?id=' + encodeURIComponent(propertyId);
-        if (backLabel && returnPage === 'contact-agent.html') backLabel.textContent = 'Back to chat';
+        if (backLabel && returnPage === 'messages.html') backLabel.textContent = 'Back to chat';
       }
     }
 
@@ -357,8 +357,8 @@
 
             var cancelBtn = document.createElement('a');
             cancelBtn.className  = 'btn btn--ghost';
-            cancelBtn.href       = returnPage === 'contact-agent.html'
-              ? 'contact-agent.html?open=' + encodeURIComponent(propertyId)
+            cancelBtn.href       = returnPage === 'messages.html'
+              ? 'messages.html?open=' + encodeURIComponent(propertyId)
               : ('property.html?id=' + encodeURIComponent(propertyId));
             cancelBtn.textContent = 'Cancel';
 
@@ -464,9 +464,9 @@
               : 'Your card payment request has been recorded. You can review your purchases from your account.';
           }
           if (successAction) {
-            if (returnPage === 'contact-agent.html') {
+            if (returnPage === 'messages.html') {
               successAction.textContent = 'Back to chat';
-              successAction.href = 'contact-agent.html?paid=' + encodeURIComponent(propertyId);
+              successAction.href = 'messages.html?paid=' + encodeURIComponent(propertyId);
               // Land the buyer straight in the agent chat — no need to
               // press "Contact Agent" or click this button themselves.
               window.setTimeout(function () {

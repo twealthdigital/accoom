@@ -98,7 +98,7 @@
       { id: 'ACCOOM-2025-0001', name: 'Self-Contained Studio', location: 'Yaba, Lagos', dates: 'Jan 3 \u2013 Jan 6, 2025', guests: 1, amount: '\u20A675,000', image: 'assets/images/home-properties/selfcon1.webp', status: 'completed' }
     ];
 
-    // Purchases logged from the chat's payment flow (contact-agent.js) —
+    // Purchases logged from the chat's payment flow (messages.js) —
     // merge them ahead of the mock rows so a fresh approve/decline shows
     // up at the top of "All" right away.
     var LOGGED_PURCHASES = Accoom.getStorage('accoom-purchases-log', []);

@@ -226,12 +226,12 @@ window.Accoom = window.Accoom || {};
       // triggers, a message-panel row, or any "Contact/Message Agent"
       // link anywhere on the page — sends guests to signup instead.
       Accoom.on(document, 'click', function (e) {
-        var gated = e.target.closest('.msg-trigger, .panel-row--messages, a[href="contact-agent.html"]');
+        var gated = e.target.closest('.msg-trigger, .panel-row--messages, a[href="messages.html"]');
         if (!gated) return;
         e.preventDefault();
         // After signing up or in, carry the person to the chat they were opening (or back here for the messages icon).
         var anchor = e.target.closest('a[href]');
-        var dest = anchor ? anchor.getAttribute('href') : 'contact-agent.html';
+        var dest = anchor ? anchor.getAttribute('href') : 'messages.html';
         window.location.href = 'auth.html?mode=signup&next=' + encodeURIComponent(dest);
       });
       // Header and menu "Log in" / "Sign up" links: remember the page the person was on.
@@ -665,7 +665,7 @@ window.Accoom = window.Accoom || {};
 
     // Messages dropdown + unread badge (site-wide).
     // Renders straight from the same 'accoom-conversations' record
-    // contact-agent.js reads/writes, so the dropdown is never a second,
+    // messages.js reads/writes, so the dropdown is never a second,
     // separately-hardcoded copy of the chat data.
     Accoom.$$('.msg-dropdown').forEach(function (msgDropdown) {
       Accoom.initDropdown(msgDropdown);
@@ -722,7 +722,7 @@ window.Accoom = window.Accoom || {};
           item.className = 'notif-item' + (conv.unread ? ' is-unread' : '');
           item.setAttribute('data-msg-item', '');
           item.innerHTML =
-            '<a href="contact-agent.html?open=' + encodeURIComponent(conv.property.id) + '" class="notif-item-main">' +
+            '<a href="messages.html?open=' + encodeURIComponent(conv.property.id) + '" class="notif-item-main">' +
               '<span class="notif-item-icon notif-item-icon--message">' +
                 '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' +
               '</span>' +

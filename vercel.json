@@ -78,6 +78,11 @@
       "source": "/filter-accomodation.html",
       "destination": "/filter-accommodation.html",
       "permanent": true
+    },
+    {
+      "source": "/contact-agent.html",
+      "destination": "/messages.html",
+      "permanent": true
     }
   ]
 }

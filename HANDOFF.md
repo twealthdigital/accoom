@@ -111,3 +111,11 @@ npm start                        # serves source for quick local checks
 ## Rate-this-seller bar + CSS cache fix
 - Chat "Rate this seller": a SMALL box on the left under the tabs (gold title on top, 5 stars below, fit-content width, rounded border). Owner rejected a full-width bar twice: never make it span the chat. Tapping a star opens the review dialog with that star selected.
 - **Build now versions every stylesheet link (`?v=<hash of all css>`)** in `build.mjs` (`versionCss`). Before, CSS was cached for a day, so visitors saw NEW html with OLD css (the strip appeared unstyled). Do not remove.
+
+
+## Messages page (step 1: chat only)
+- `contact-agent.html/.js/.css` was cut out. The chat now lives on its own page: `messages.html` + `assets/css/pages/messages.css` + `assets/js/pages/messages.js`. Old URL redirects to it (`vercel.json`). The old files are in git history (commit before this one) if any removed feature needs to be brought back.
+- Every "Contact Agent" / "View all messages" / report-agent / payment link now points to `messages.html`.
+- Step 1 has ONLY: conversation list, chat view (header, day dividers, bubbles with time), composer (Enter sends on desktop, send button on mobile), mobile back button. Data key `accoom-conversations` is unchanged, so the header messages dropdown still works. `accoom-contact-request` opens or creates the conversation for that agent; `?open=<propertyId>` reopens one.
+- No dummy conversations are seeded any more: the list is empty until someone contacts an agent.
+- NOT in yet (to add step by step, as the owner asks): property card, payment/approve/decline, offers, report, block, mute, search, tabs, saved messages, reply, photos/files, ratings strip.
