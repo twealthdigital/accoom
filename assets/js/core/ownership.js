@@ -205,7 +205,38 @@ window.Accoom = window.Accoom || {};
      ------------------------------------------------------------------ */
   function canInitiatePayment(subject) { return check(subject).isOther; }
 
+  /* ------------------------------------------------------------------
+     Stage 5B - payment UI on property pages (listing view)
+     canSeePaymentUI(subject)  false for guests, for the agent's own listing,
+                               and for an agent viewing a listing whose owner
+                               cannot be established ('unknown'). True for an
+                               agent on someone else's listing and for customers
+                               (customers own nothing, so a missing owner on the
+                               record cannot make them pay themselves: their
+                               existing experience is kept).
+     gatePayment(els, subject) hides + disables those controls when it is false,
+                               restores them when it is true again.
+     ------------------------------------------------------------------ */
+  function canSeePaymentUI(subject) {
+    var c = check(subject);
+    if (c.isGuest || c.isOwn) return false;
+    if (c.isUnknown) { var v = viewer(); return !!(v && v.role !== 'agent'); }
+    return true;
+  }
+
+  function gatePayment(target, subject) {
+    var blocked = !canSeePaymentUI(subject);
+    var list = [];
+    if (typeof target === 'string') list = Array.prototype.slice.call(document.querySelectorAll(target));
+    else if (target && target.nodeType === 1) list = [target];
+    else if (target && target.length) list = Array.prototype.slice.call(target);
+    list.forEach(function (el) { setBlocked(el, blocked); });
+    return blocked;
+  }
+
   Accoom.Ownership = {
+    canSeePaymentUI: canSeePaymentUI,
+    gatePayment: gatePayment,
     canInitiatePayment: canInitiatePayment,
     canInitiatePaymentForListingId: function (id) { return checkListingId(id).isOther; },
     check: check,

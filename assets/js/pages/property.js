@@ -741,9 +741,9 @@
     })();
 
     // ============================================================
-    // Permissions Stage 5A: an agent viewing their OWN listing sees no payment UI.
-    // Uses the central Accoom.Ownership check (state 'own' only), so other agents'
-    // listings, customers, guests and unknown owners are untouched. Hides the whole
+    // Permissions Stage 5A/5B: no payment UI on an agent's OWN listing, for guests, or for an
+    // agent on a listing with no provable owner. Uses Accoom.Ownership.canSeePaymentUI; agents on
+    // other agents' listings and customers keep the existing payment UI. Hides the whole
     // Price Details card (Total + Make Payment), closes the payment dialog, and a
     // capture-phase click guard stops the existing handler if the button is revealed
     // by editing the page. Re-runs when the account changes in another tab or the page
@@ -757,17 +757,17 @@
         var b = document.querySelector('[data-pd-payment]');
         return (b && b.closest('.pd-price-details-card')) || document.querySelector('.pd-price-details-card');
       }
-      function isOwnListing() { return o.check(stored || property).isOwn; }
+      function paymentBlocked() { return !o.canSeePaymentUI(stored || property); }
 
       function apply() {
-        var own = isOwnListing();
+        var own = paymentBlocked();
         property.ownership = o.check(stored || property);
         var els = [];
         var card = payCard();
         if (card) els.push(card);
         var pay = document.querySelector('[data-pd-payment]');
         if (pay) els.push(pay);
-        o.gateContact(els, stored || property);
+        o.gatePayment(els, stored || property);
         if (own) {
           var modal = document.querySelector('[data-pay-modal]');
           if (modal) modal.classList.remove('is-open');
@@ -777,7 +777,7 @@
       // Second line of defence: runs before the payment button's own handler.
       document.addEventListener('click', function (e) {
         var t = e.target && e.target.closest ? e.target.closest('[data-pd-payment], [data-pay-confirm]') : null;
-        if (t && isOwnListing()) { e.preventDefault(); e.stopImmediatePropagation(); }
+        if (t && paymentBlocked()) { e.preventDefault(); e.stopImmediatePropagation(); }
       }, true);
 
       apply();
