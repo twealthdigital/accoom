@@ -2401,13 +2401,17 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
 }
 
 /* ---- Agent view (messages.html): same screen, customer-only parts hidden ---- */
-.is-agent-chat .msgs-property-extra-actions,
-.is-agent-chat .msgs-pay-menu,
 .is-agent-chat [data-msgs-view-profile],
 .is-agent-chat [data-msgs-property-review-btn],
 .is-agent-chat [data-msgs-block],
 .is-agent-chat [data-msgs-props-dropdown],
-.is-agent-chat [data-msgs-review-strip],
-.is-agent-chat [data-msgs-property-status],
 .is-agent-chat [data-msgs-blocked-bar] { display: none !important; }
+
+/* Payment parts (Pay Now, Make Payment / Approve / Decline, property status, rate strip) are hidden in an agent
+   chat UNLESS the agent started it (the sender, who pays). The script adds .is-agent-payer for exactly that chat
+   (Permissions Stage 4); the receiving agent never gets the class. */
+.is-agent-chat:not(.is-agent-payer) .msgs-property-extra-actions,
+.is-agent-chat:not(.is-agent-payer) .msgs-pay-menu,
+.is-agent-chat:not(.is-agent-payer) [data-msgs-review-strip],
+.is-agent-chat:not(.is-agent-payer) [data-msgs-property-status] { display: none !important; }
 

@@ -192,7 +192,22 @@ window.Accoom = window.Accoom || {};
     window.addEventListener('pageshow', function (e) { if (e && e.persisted) fn(); });
   }
 
+  /* ------------------------------------------------------------------
+     Stage 4 - payment permission (central rule, reused by later stages)
+     canInitiatePayment(subject)  true only when somebody is signed in and the
+                                  listing is provably SOMEONE ELSE'S ('other').
+                                  False for guests, the owner's own listing
+                                  ('own') and listings whose owner cannot be
+                                  established ('unknown'): a payment prompt must
+                                  never appear on those.
+     This says who MAY pay. Who initiated the contact (the sender) is decided
+     by the chat screen (conv.outgoing); the receiving agent never pays.
+     ------------------------------------------------------------------ */
+  function canInitiatePayment(subject) { return check(subject).isOther; }
+
   Accoom.Ownership = {
+    canInitiatePayment: canInitiatePayment,
+    canInitiatePaymentForListingId: function (id) { return checkListingId(id).isOther; },
     check: check,
     checkListingId: checkListingId,
     isOwn: function (subject) { return check(subject).isOwn; },

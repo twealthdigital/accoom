@@ -1130,6 +1130,17 @@
     })();
 
     function renderPaymentState(conv) {
+      // Permissions Stage 4: the payment feature belongs to the sender only (see canPayInChat).
+      var payer = canPayInChat(conv);
+      document.body.classList.toggle('is-agent-payer', agentView && payer);
+      if (!payer) {
+        [els.propPayBtn, els.propApproveBtn, els.propDeclineBtn].forEach(function (b) {
+          if (b) { b.classList.add('is-hidden'); b.disabled = true; }
+        });
+        if (els.payBtn) els.payBtn.disabled = true;
+        return;
+      }
+      if (els.payBtn) els.payBtn.disabled = false;
       var status = activePropState(conv).paymentStatus || 'idle';
       renderReviewStrip(conv, status);
 
@@ -1900,7 +1911,7 @@
 
     function goToCheckout() {
       var conv = findConv(state.activeId);
-      if (!conv) return;
+      if (!conv || !canPayInChat(conv)) return;   // second line of defence behind the hidden buttons
       openPaymentModal(conv);
     }
 
@@ -1916,6 +1927,8 @@
     });
     Accoom.on(paymentConfirm, 'click', function () {
       if (!paymentTarget) return;
+      var targetConv = findConv(paymentTarget.convId);
+      if (!targetConv || !canPayInChat(targetConv)) { closePaymentModal(); return; }   // not this person's payment
 
       if (paymentTarget.mode === 'checkout') {
         var payingConv = findConv(paymentTarget.convId);
@@ -1935,6 +1948,7 @@
           if (payingConv) {
             getPropState(payingConv, paymentTarget.id).paymentStatus = 'review';
             upsertPurchaseRecord(payingConv, paymentTarget.property, 'upcoming');
+            saveConversations();   // the status was only kept in memory before: closing the page lost it
             if (state.activeId === payingConv.id && String(payingConv.property.id) === String(paymentTarget.id)) {
               renderPaymentState(payingConv);
             }
@@ -1996,7 +2010,11 @@
         guests: property.beds || 1,
         amount: property.price,
         image: property.image,
-        status: status
+        status: status,
+        // Permissions Stage 4: who paid, in which chat, to whom (the initiating user, never the recipient)
+        payerKey: me || (Accoom.Sync ? Accoom.Sync.userKey() : ''),
+        convId: conv.remoteId || conv.id,
+        recipientKey: conv.agentKey || ''
       });
       Accoom.setStorage('accoom-purchases-log', log);
     }
@@ -2004,7 +2022,7 @@
     if (els.propApproveBtn) {
       Accoom.on(els.propApproveBtn, 'click', function () {
         var conv = findConv(state.activeId);
-        if (!conv) return;
+        if (!conv || !canPayInChat(conv)) return;
         var targetProperty = conv.property;
         var propState = getPropState(conv, targetProperty.id);
         if (propState.paymentStatus !== 'review') return;
@@ -2015,6 +2033,7 @@
         window.setTimeout(function () {
           propState.paymentStatus = 'approved';
           upsertPurchaseRecord(conv, targetProperty, 'completed');
+          saveConversations();
           if (state.activeId === conv.id && String(conv.property.id) === String(targetProperty.id)) {
             renderPaymentState(conv);
             openReview(conv, 'approved');
@@ -2026,7 +2045,7 @@
     if (els.propDeclineBtn) {
       Accoom.on(els.propDeclineBtn, 'click', function () {
         var conv = findConv(state.activeId);
-        if (!conv) return;
+        if (!conv || !canPayInChat(conv)) return;
         var targetProperty = conv.property;
         var propState = getPropState(conv, targetProperty.id);
         if (propState.paymentStatus !== 'review') return;
@@ -2038,6 +2057,7 @@
           propState.paymentStatus = 'declined';
           Accoom.creditWallet(parsePaymentAmount(targetProperty.price), 'Property payment refund', { category: 'refund', propertyId: targetProperty.id });
           upsertPurchaseRecord(conv, targetProperty, 'cancelled');
+          saveConversations();
           if (state.activeId === conv.id && String(conv.property.id) === String(targetProperty.id)) {
             renderPaymentState(conv);
             openReview(conv, 'declined');
@@ -2283,10 +2303,11 @@
       if (els.blockedBar) els.blockedBar.classList.toggle('is-hidden', !blocked);
       if (blocked) hideReplyPreview();
 
-      if (els.payBtn) els.payBtn.disabled = blocked;
-      if (els.propPayBtn) els.propPayBtn.disabled = blocked;
-      if (els.propApproveBtn) els.propApproveBtn.disabled = blocked || activePropState(conv).paymentStatus === 'approved';
-      if (els.propDeclineBtn) els.propDeclineBtn.disabled = blocked || activePropState(conv).paymentStatus === 'declined';
+      var noPay = blocked || !canPayInChat(conv);   // Permissions Stage 4: a receiving agent's buttons stay disabled
+      if (els.payBtn) els.payBtn.disabled = noPay;
+      if (els.propPayBtn) els.propPayBtn.disabled = noPay;
+      if (els.propApproveBtn) els.propApproveBtn.disabled = noPay || activePropState(conv).paymentStatus === 'approved';
+      if (els.propDeclineBtn) els.propDeclineBtn.disabled = noPay || activePropState(conv).paymentStatus === 'declined';
       if (els.propReviewBtn) {
         els.propReviewBtn.style.pointerEvents = blocked ? 'none' : '';
         els.propReviewBtn.style.opacity = blocked ? '0.45' : '';
@@ -2299,6 +2320,7 @@
       if (!Object.keys(paidMap).length) return;
       var changed = false;
       state.conversations.forEach(function (conv) {
+        if (!canPayInChat(conv)) return;   // never marks a receiving agent's (or self) chat as paid
         var ids = [conv.property && conv.property.id]
           .concat((conv.allProperties || []).map(function (p) { return p.id; }))
           .filter(Boolean);
@@ -2332,7 +2354,7 @@
     // straight into the Approve/Decline state.
     var justPaidId = new URLSearchParams(window.location.search).get('paid');
     var justPaidConv = justPaidId ? state.conversations.filter(function (c) {
-      return String(c.property.id) === String(justPaidId);
+      return String(c.property.id) === String(justPaidId) && canPayInChat(c);   // ?paid= cannot mark a chat the person may not pay in
     })[0] : null;
 
     // Coming back from payment.html's "Back to chat" / "Cancel" link
@@ -2363,15 +2385,31 @@
     //   incoming  (conv.outgoing falsy): I am conv.agentKey, the other side is conv.customerKey (a customer OR an agent)
     //   outgoing  (conv.outgoing):       I started it, I am conv.customerKey and the recipient is conv.agentKey
     function isSelfConversation(conv) {
-      if (!conv || !me) return false;
+      var meKey = me || (Accoom.Sync ? Accoom.Sync.userKey() : '');   // `me` is assigned later than some early callers
+      if (!conv || !meKey) return false;
       if (conv.agentKey && conv.customerKey && String(conv.agentKey) === String(conv.customerKey)) return true;
-      if (agentView && !conv.outgoing) return !!(conv.customerKey && String(conv.customerKey) === String(me));
+      if (agentView && !conv.outgoing) return !!(conv.customerKey && String(conv.customerKey) === String(meKey));
       // Starting side (customer, or an agent writing to another agent): the recipient must not be me,
       // and the listing must not be my own.
-      if (conv.agentKey && String(conv.agentKey) === String(me)) return true;
+      if (conv.agentKey && String(conv.agentKey) === String(meKey)) return true;
       var O = Accoom.Ownership;
       if (O && conv.property && conv.property.id && O.isOwnListingId(conv.property.id)) return true;
       return false;
+    }
+
+    // Permissions Stage 4: who may see and use the payment feature in a chat.
+    //   customer screen   unchanged (the customer always starts the contact and pays)
+    //   agent screen      ONLY in a chat the agent started (conv.outgoing) about ANOTHER agent's listing.
+    //                     The agent who RECEIVED the chat never pays: no button, no modal, no ?paid= return,
+    //                     no reconcile, even if the page is edited.
+    // Never in a self chat. Reuses the central rule Accoom.Ownership.canInitiatePayment.
+    function canPayInChat(conv) {
+      if (!conv || !conv.property) return false;
+      if (isSelfConversation(conv)) return false;
+      if (!agentView) return true;
+      if (!conv.outgoing) return false;
+      var O = Accoom.Ownership;
+      return !!(O && O.canInitiatePaymentForListingId(conv.property.id));
     }
 
     function markRealAgent(conv, prop) {
