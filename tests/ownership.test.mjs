@@ -54,6 +54,12 @@ test('account id fields match (id / userId / agentId)', () => {
   assert.equal(boot({ role: 'agent', email: 'q@x.com', id: 'ag-77' }).Ownership.check({ ownerId: 'ag-77', agentListing: true }).state, 'own');
   assert.equal(boot({ role: 'agent', email: 'q@x.com', agentId: 'ag-78' }).Ownership.check({ ownerId: 'ag-78', agentListing: true }).state, 'own');
 });
+test('synced agentKey overrides a stale local-agent owner marker', () => {
+  const O = boot(A).Ownership;
+  assert.equal(O.check({ agentListing: true, ownerId: 'local-agent', agentKey: keyB }).state, 'other');
+  assert.equal(O.check({ agentListing: true, ownerId: 'local-agent', agentKey: keyA }).state, 'own');
+  assert.equal(O.check({ agentListing: true, ownerId: 'local-agent', agent: { ownerId: 'local-agent', agentKey: keyB } }).state, 'other');
+});
 test('sample (hardcoded) listing with no owner -> other, not own', () => {
   const r = boot(A).Ownership.check({ id: 1, name: 'Sample', agent: { name: 'David O.' } });
   assert.equal(r.state, 'other'); assert.equal(r.isOwn, false);
@@ -61,6 +67,24 @@ test('sample (hardcoded) listing with no owner -> other, not own', () => {
 test('real listing with missing ownerId -> unknown (fails safe, not own)', () => {
   const r = boot(A).Ownership.check({ agentListing: true, ownerId: '' });
   assert.equal(r.state, 'unknown'); assert.equal(r.isOwn, false);
+});
+test('agents cannot contact a real listing or profile whose owner is unverified', () => {
+  const O = boot(A, [
+    { id: 'a1', agentListing: true, ownerId: keyA },
+    { id: 'b1', agentListing: true, ownerId: keyB },
+    { id: 'unknown', agentListing: true, ownerId: '' }
+  ]).Ownership;
+  assert.equal(O.canContact({ real: true }), false);
+  assert.equal(O.canContactListingId('unknown'), false);
+  assert.equal(O.canContactListingId('not-found'), false);
+  assert.equal(O.canContactListingId('a1'), false);
+  assert.equal(O.canContactListingId('b1'), true);
+});
+test('customers and guests retain contact routing for unknown listings', () => {
+  const customer = boot({ role: 'customer', email: 'c@x.com' }, []).Ownership;
+  const guest = boot(null, []).Ownership;
+  assert.equal(customer.canContactListingId('not-found'), true);
+  assert.equal(guest.canContactListingId('not-found'), true);
 });
 test('missing / odd inputs never throw and are never own', () => {
   const O = boot(A).Ownership;

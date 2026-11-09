@@ -757,18 +757,25 @@
         var b = document.querySelector('[data-pd-payment]');
         return (b && b.closest('.pd-price-details-card')) || document.querySelector('.pd-price-details-card');
       }
-      function paymentBlocked() { return !o.canSeePaymentUI(stored || property); }
+      function paymentBlocked() {
+        if (!o.canSeePaymentUI(stored || property)) return true;
+        var v = o.viewer();
+        return !!(v && v.role === 'agent' && !o.canInitiatePaymentForListingId(property.id));
+      }
 
       function apply() {
-        var own = paymentBlocked();
-        property.ownership = o.check(stored || property);
+        var denied = paymentBlocked();
+        var listingCheck = o.checkListingId(property.id);
+        var v = o.viewer();
+        var agentListingUnverified = !!(v && v.role === 'agent' && !listingCheck.isOther && !listingCheck.isOwn);
+        property.ownership = listingCheck.state === 'unknown' ? listingCheck : o.check(stored || property);
         var els = [];
         var card = payCard();
         if (card) els.push(card);
         var pay = document.querySelector('[data-pd-payment]');
         if (pay) els.push(pay);
-        o.gatePayment(els, stored || property);
-        if (own) {
+        o.gatePayment(els, agentListingUnverified ? { real: true } : (stored || property));
+        if (denied) {
           var modal = document.querySelector('[data-pay-modal]');
           if (modal) modal.classList.remove('is-open');
         }
@@ -932,6 +939,9 @@
         property.ownership = o.check(stored || property);
         var scope = document.querySelector('.pd-agent-actions');
         o.gateContact(scope ? scope.querySelectorAll(o.CONTACT_SELECTOR + ', a[href*="contact-agent.html"]') : [], stored || property);
+        if (scope && !o.canContactListingId(property.id)) {
+          o.gateContact(scope.querySelectorAll(o.CONTACT_SELECTOR + ', a[href*="contact-agent.html"]'), { real: true });
+        }
       }
       gatePropertyContact();
       if (Accoom.Ownership) Accoom.Ownership.onChange(gatePropertyContact);
@@ -939,7 +949,8 @@
       Accoom.on(contactBtn, 'click', function (e) {
         e.preventDefault();
         // Second line of defence: the button may have been revealed by editing the page.
-        if (Accoom.Ownership && !Accoom.Ownership.canContact(stored || property)) return;
+        if (Accoom.Ownership && (!Accoom.Ownership.canContact(stored || property) ||
+            !Accoom.Ownership.canContactListingId(property.id))) return;
         var agent = property.agent || {};
         var agentAvatarEl = document.querySelector('[data-pd-agent-avatar]');
         var agentAvatar = (agentAvatarEl && agentAvatarEl.getAttribute('src')) || agent.avatar || 'assets/images/agent-images/agenticonimg.webp';

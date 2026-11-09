@@ -3,12 +3,13 @@ import { spawn } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { JSDOM, VirtualConsole } from 'jsdom';
 import { IDBFactory, IDBKeyRange } from 'fake-indexeddb';
 import { webcrypto } from 'node:crypto';
 import assert from 'node:assert/strict';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const PORT = 3400 + Math.floor(Math.random() * 250);
 const base = 'http://127.0.0.1:' + PORT;
 const dataDir = await mkdtemp(join(tmpdir(), 'accoom-e2e-'));
@@ -26,17 +27,26 @@ const LISTING = { id: 'lst_e2e', name: 'Akungba Flat', location: 'Akungba, Ondo'
 const windows = [];
 async function browser(path, storage) {
   const vc = new VirtualConsole();
+  vc.on('jsdomError', (error) => console.error(path + ': ' + error.message));
   const dom = await JSDOM.fromURL(base + '/' + path, { runScripts: 'dangerously', resources: 'usable', pretendToBeVisual: true, virtualConsole: vc,
     beforeParse(w) {
       w.indexedDB = new IDBFactory(); w.IDBKeyRange = IDBKeyRange; Object.defineProperty(w, 'crypto', { value: webcrypto, configurable: true });
       w.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} });
       w.HTMLMediaElement.prototype.play = () => Promise.resolve(); w.HTMLMediaElement.prototype.pause = () => {};
       w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = () => {};
-      w.fetch = (u, o) => fetch(new URL(u, base), o);      // jsdom has no fetch
+      w.fetch = (u, o) => { const options = Object.assign({}, o); delete options.signal; return fetch(new URL(u, base), options); }; // jsdom has no fetch
       for (const [k, v] of Object.entries(storage)) w.localStorage.setItem(k, v);
     } });
   windows.push(dom.window);
-  await sleep(2500);
+  if (path.indexOf('property.html') === 0) {
+    const deadline = Date.now() + 10000;
+    while (!dom.window.Accoom || !dom.window.Accoom.currentProperty) {
+      if (Date.now() >= deadline) throw new Error('Property page did not initialize: ' + path);
+      await sleep(50);
+    }
+  } else {
+    await sleep(2500);
+  }
   return dom.window;
 }
 let p = 0, f = 0;
@@ -117,6 +127,13 @@ await test('7. agent on a real listing with no owner info: state unknown, paymen
   click(u, '[data-pd-payment]'); assert.ok(!dialogOpen(u));
 });
 u.close();
+let missing = await browser('property.html?id=not-in-catalogue', agentB);
+await test('7b. an agent cannot contact or start payment for an unlisted property id', () => {
+  assert.ok(cardHidden(missing), 'payment card was exposed for an unverified URL id');
+  assert.ok(hidden(missing, '[data-pd-contact-agent]'), 'contact action was exposed for an unverified URL id');
+  click(missing, '[data-pd-payment]'); assert.ok(!dialogOpen(missing));
+});
+missing.close();
 
 console.log('Customers (existing experience)');
 let c = await browser('property.html?id=lst_e2e', customer);

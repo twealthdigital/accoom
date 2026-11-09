@@ -3,12 +3,13 @@ import { spawn } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { JSDOM, VirtualConsole } from 'jsdom';
 import { IDBFactory, IDBKeyRange } from 'fake-indexeddb';
 import { webcrypto } from 'node:crypto';
 import assert from 'node:assert/strict';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const PORT = 3950 + Math.floor(Math.random() * 250);
 const base = 'http://127.0.0.1:' + PORT;
 const dataDir = await mkdtemp(join(tmpdir(), 'accoom-e2e-'));
@@ -34,7 +35,7 @@ async function browser(path, storage) {
       w.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} });
       w.HTMLMediaElement.prototype.play = () => Promise.resolve(); w.HTMLMediaElement.prototype.pause = () => {};
       w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = () => {};
-      w.fetch = (u, o) => fetch(new URL(u, base), o);
+      w.fetch = (u, o) => { const options = Object.assign({}, o); delete options.signal; return fetch(new URL(u, base), options); };
       for (const [k, v] of Object.entries(storage)) w.localStorage.setItem(k, v);
     } });
   windows.push(dom.window);
@@ -98,6 +99,21 @@ await test('A clicks Make Payment: the payment dialog opens for the listing pric
   assert.ok(modalOpen(a), 'modal closed');
   assert.match(a.document.querySelector('[data-msgs-payment-amount]').textContent, /120,000/);
   assert.equal(a.document.querySelector('[data-msgs-payment-confirm]').textContent, 'Proceed');
+});
+await test('account switching to the listing owner during processing prevents the debit', async () => {
+  const balance = a.Accoom.getWalletBalance();
+  clickEv(a, a.document.querySelector('[data-msgs-payment-confirm]'));
+  a.localStorage.setItem('accoom-user', agentB['accoom-user']);
+  await sleep(3300);
+  assert.equal(a.Accoom.getWalletBalance(), balance);
+  assert.equal(log(a).length, 0);
+  assert.ok(!modalOpen(a));
+  assert.ok(!convs(a)[0].propertyState || !convs(a)[0].propertyState.lst_b ||
+    convs(a)[0].propertyState.lst_b.paymentStatus === 'idle');
+
+  a.localStorage.setItem('accoom-user', agentA['accoom-user']);
+  clickEv(a, a.document.querySelector('[data-msgs-property-pay-btn]'));
+  assert.ok(modalOpen(a), 'legitimate payer could not retry after restoring their account');
 });
 await test('A proceeds: payment goes to review, tied to A (payer), this chat and B (recipient)', async () => {
   clickEv(a, a.document.querySelector('[data-msgs-payment-confirm]'));

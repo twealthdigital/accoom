@@ -1364,7 +1364,7 @@ Accoom.delegate(listingsGrid, 'click', '[data-view-listing]', function (e) {
         var propNameEl = card.querySelector('[data-id]');
         if (!propNameEl) return;
         // Permissions Stage 2: never open a chat with yourself, even from a card.
-        if (Accoom.Ownership && Accoom.Ownership.isOwnListingId(propNameEl.getAttribute('data-id'))) return;
+        if (Accoom.Ownership && !Accoom.Ownership.canContactListingId(propNameEl.getAttribute('data-id'))) return;
 
         var agentNameEl = card.querySelector('.suggested-agent-name');
         var priceEl = card.querySelector('.suggested-property-price');

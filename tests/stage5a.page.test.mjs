@@ -3,12 +3,13 @@ import { spawn } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { JSDOM, VirtualConsole } from 'jsdom';
 import { IDBFactory, IDBKeyRange } from 'fake-indexeddb';
 import { webcrypto } from 'node:crypto';
 import assert from 'node:assert/strict';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const PORT = 3400 + Math.floor(Math.random() * 250);
 const base = 'http://127.0.0.1:' + PORT;
 const dataDir = await mkdtemp(join(tmpdir(), 'accoom-e2e-'));
@@ -32,7 +33,7 @@ async function browser(path, storage) {
       w.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} });
       w.HTMLMediaElement.prototype.play = () => Promise.resolve(); w.HTMLMediaElement.prototype.pause = () => {};
       w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = () => {};
-      w.fetch = (u, o) => fetch(new URL(u, base), o);      // jsdom has no fetch
+      w.fetch = (u, o) => { const options = Object.assign({}, o); delete options.signal; return fetch(new URL(u, base), options); }; // jsdom has no fetch
       for (const [k, v] of Object.entries(storage)) w.localStorage.setItem(k, v);
     } });
   windows.push(dom.window);

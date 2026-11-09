@@ -382,6 +382,9 @@
     var storedConvs = Accoom.getStorage('accoom-conversations', null);
     // The same screen serves two people: a customer (contact-agent.html) and an agent answering them (messages.html).
     var agentView = !!(Accoom.Sync && Accoom.Sync.isAgent());
+    var paymentViewer = Accoom.Ownership && Accoom.Ownership.viewer
+      ? JSON.stringify(Accoom.Ownership.viewer())
+      : '';
     if (agentView) {
       document.body.classList.add('is-agent-chat');
       var elInput = document.querySelector('[data-msgs-input]'); if (elInput) elInput.setAttribute('placeholder', 'Type a reply...');
@@ -1932,24 +1935,30 @@
 
       if (paymentTarget.mode === 'checkout') {
         var payingConv = findConv(paymentTarget.convId);
+        var target = paymentTarget;
         paymentProcessing = true;
         paymentConfirm.classList.add('is-loading');
         paymentConfirm.disabled = true;
         if (paymentCancel) paymentCancel.disabled = true;
 
         window.setTimeout(function () {
-          Accoom.debitWallet(paymentTarget.amount, 'Property payment', { category: 'property-payment', propertyId: paymentTarget.id });
           paymentProcessing = false;
           paymentConfirm.classList.remove('is-loading');
           paymentConfirm.disabled = false;
           if (paymentCancel) paymentCancel.disabled = false;
+          if (!payingConv || !canContinuePayment(payingConv)) {
+            paymentTarget = null;
+            closePaymentModal();
+            return;
+          }
+          Accoom.debitWallet(target.amount, 'Property payment', { category: 'property-payment', propertyId: target.id });
           closePaymentModal();
 
           if (payingConv) {
-            getPropState(payingConv, paymentTarget.id).paymentStatus = 'review';
-            upsertPurchaseRecord(payingConv, paymentTarget.property, 'upcoming');
+            getPropState(payingConv, target.id).paymentStatus = 'review';
+            upsertPurchaseRecord(payingConv, target.property, 'upcoming');
             saveConversations();   // the status was only kept in memory before: closing the page lost it
-            if (state.activeId === payingConv.id && String(payingConv.property.id) === String(paymentTarget.id)) {
+            if (state.activeId === payingConv.id && String(payingConv.property.id) === String(target.id)) {
               renderPaymentState(payingConv);
             }
           }
@@ -2391,6 +2400,8 @@
       if (agentView && !conv.outgoing) return !!(conv.customerKey && String(conv.customerKey) === String(meKey));
       // Starting side (customer, or an agent writing to another agent): the recipient must not be me,
       // and the listing must not be my own.
+      if (agentView && conv.outgoing && conv.property && conv.property.id &&
+          Accoom.Ownership && !Accoom.Ownership.canContactListingId(conv.property.id)) return true;
       if (conv.agentKey && String(conv.agentKey) === String(meKey)) return true;
       var O = Accoom.Ownership;
       if (O && conv.property && conv.property.id && O.isOwnListingId(conv.property.id)) return true;
@@ -2410,6 +2421,13 @@
       if (!conv.outgoing) return false;
       var O = Accoom.Ownership;
       return !!(O && O.canInitiatePaymentForListingId(conv.property.id));
+    }
+
+    function canContinuePayment(conv) {
+      var O = Accoom.Ownership;
+      var currentViewer = O && O.viewer ? O.viewer() : null;
+      return !!(paymentViewer && currentViewer &&
+        JSON.stringify(currentViewer) === paymentViewer && canPayInChat(conv));
     }
 
     function markRealAgent(conv, prop) {
@@ -2582,7 +2600,7 @@
     // (covers links, stale storage and edited pages, not just the hidden buttons).
     if (contactRequest && Accoom.Ownership &&
         (!Accoom.Ownership.contactRequestOk(contactRequest) ||
-         (contactRequest.property && contactRequest.property.id && Accoom.Ownership.isOwnListingId(contactRequest.property.id)))) {
+         (contactRequest.property && contactRequest.property.id && !Accoom.Ownership.canContactListingId(contactRequest.property.id)))) {
       Accoom.removeStorage('accoom-contact-request');
       contactRequest = null;
     }

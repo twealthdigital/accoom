@@ -71,8 +71,12 @@ window.Accoom = window.Accoom || {};
     var out = [];
     function add(v) { v = clean(v); if (v && out.indexOf(v) === -1) out.push(v); }
     if (!subject || typeof subject !== 'object') return out;
-    add(subject.ownerId); add(subject.agentKey);
-    if (subject.agent && typeof subject.agent === 'object') { add(subject.agent.ownerId); add(subject.agent.agentKey); }
+    var nestedAgent = subject.agent && typeof subject.agent === 'object' ? subject.agent : null;
+    // Synced agent keys are authoritative; ownerId may still be the legacy "local-agent" marker.
+    add(subject.agentKey || (nestedAgent && nestedAgent.agentKey));
+    if (out.length) return out;
+    add(subject.ownerId);
+    if (nestedAgent) add(nestedAgent.ownerId);
     return out;
   }
 
@@ -129,26 +133,38 @@ window.Accoom = window.Accoom || {};
 
   /* ------------------------------------------------------------------
      Stage 2 - self-contact prevention
-     canContact(subject)    false only when the listing/profile is the
-                            signed-in agent's own. (Guests are sent to
-                            sign-up by the existing flow; unknown owner is
-                            allowed here because it cannot be proved own -
-                            the server must still refuse it.)
+     canContact(subject)    false for the signed-in agent's own listing or
+                            profile, and for an agent when the owner cannot
+                            be verified. Customers and guests retain their
+                            existing routing behavior.
      contactRequestOk(req)  false when a stored "accoom-contact-request"
                             (or any {ownerId, agentKey, agent} object) names
                             the signed-in agent as the person to contact.
      gateContact(els, subj) hides (and disables) contact / message / chat
                             controls on the signed-in agent's own listing or
-                            profile, and shows them again when it is not.
+                            profile, or when an agent's target is unknown,
+                            and shows them again when allowed.
      onChange(fn)           re-run a gate when the account changes in another
                             tab or the page is restored from the back/forward
                             cache, so no stale "own" state survives.
      ------------------------------------------------------------------ */
-  function canContact(subject) { return !check(subject).isOwn; }
+  function canContact(subject) {
+    var c = check(subject);
+    var v = viewer();
+    return !c.isOwn && !(v && v.role === 'agent' && c.isUnknown);
+  }
+
+  function canContactListingId(id) {
+    var c = checkListingId(id);
+    var v = viewer();
+    return !c.isOwn && !(v && v.role === 'agent' && c.isUnknown);
+  }
 
   function contactRequestOk(req) {
     if (!req || typeof req !== 'object') return true;
-    return !check(req).isOwn;
+    var v = viewer();
+    if (!canContact(req)) return false;
+    return !(v && v.role === 'agent' && req.property && req.property.id && !canContactListingId(req.property.id));
   }
 
   function setBlocked(el, blocked) {
@@ -269,6 +285,7 @@ window.Accoom = window.Accoom || {};
     gatePayment: gatePayment,
     canInitiatePayment: canInitiatePayment,
     canInitiatePaymentForListingId: function (id) { return checkListingId(id).isOther; },
+    canContactListingId: canContactListingId,
     check: check,
     checkListingId: checkListingId,
     isOwn: function (subject) { return check(subject).isOwn; },

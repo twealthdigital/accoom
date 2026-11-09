@@ -418,13 +418,17 @@
         if (!o) return;
         var scope = document.querySelector('.ap-actions') || document;
         o.gateContact(scope.querySelectorAll(o.CONTACT_SELECTOR + ', a[href*="contact-agent.html"]'), stored || agent);
+        if (agent.property.id && !o.canContactListingId(agent.property.id)) {
+          o.gateContact(scope.querySelectorAll(o.CONTACT_SELECTOR + ', a[href*="contact-agent.html"]'), { real: true });
+        }
       }
       gateProfileContact();
       if (Accoom.Ownership) Accoom.Ownership.onChange(gateProfileContact);
 
       Accoom.on(contactBtn, 'click', function (e) {
         e.preventDefault();
-        if (Accoom.Ownership && !Accoom.Ownership.canContact(stored || agent)) return;
+        if (Accoom.Ownership && (!Accoom.Ownership.canContact(stored || agent) ||
+            (agent.property.id && !Accoom.Ownership.canContactListingId(agent.property.id)))) return;
         Accoom.setStorage('accoom-contact-request', {
           ownerId: (stored && stored.ownerId) || '',
           agentKey: (stored && stored.agentKey) || '',
@@ -447,5 +451,4 @@
   });
 
 })(window.Accoom);
-
 

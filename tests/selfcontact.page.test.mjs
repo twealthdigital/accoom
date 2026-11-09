@@ -3,16 +3,17 @@ import { spawn } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { JSDOM, VirtualConsole } from 'jsdom';
 import { IDBFactory, IDBKeyRange } from 'fake-indexeddb';
 import { webcrypto } from 'node:crypto';
 import assert from 'node:assert/strict';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const PORT = 3400 + Math.floor(Math.random() * 250);
 const base = 'http://127.0.0.1:' + PORT;
 const dataDir = await mkdtemp(join(tmpdir(), 'accoom-e2e-'));
-const srv = spawn(process.execPath, ['server/server.js'], { cwd: ROOT, env: { ...process.env, PORT: String(PORT), ACCOOM_DATA: dataDir }, stdio: 'ignore' });
+const srv = spawn(process.execPath, ['server/server.js'], { cwd: ROOT, env: { ...process.env, PORT: String(PORT), ACCOOM_DATA: dataDir }, stdio: 'inherit' });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 for (let i = 0; i < 40; i++) { try { if ((await fetch(base + '/api/ping')).ok) break; } catch { /* starting */ } await sleep(100); }
 
@@ -32,7 +33,7 @@ async function browser(path, storage) {
       w.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} });
       w.HTMLMediaElement.prototype.play = () => Promise.resolve(); w.HTMLMediaElement.prototype.pause = () => {};
       w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = () => {};
-      w.fetch = (u, o) => fetch(new URL(u, base), o);      // jsdom has no fetch
+      w.fetch = (u, o) => { const options = Object.assign({}, o); delete options.signal; return fetch(new URL(u, base), options); }; // jsdom has no fetch
       for (const [k, v] of Object.entries(storage)) w.localStorage.setItem(k, v);
     } });
   windows.push(dom.window);
@@ -109,6 +110,14 @@ await test('4. agent B on A\'s profile: can initiate contact', () => {
   assert.equal(req.ownerId, keyA);
 });
 b.close();
+const unknownProfile = { name: 'Unknown Agent', real: true, ownerId: '', property: { id: 'not-in-catalogue', name: 'Unknown listing' } };
+a = await browser('agent-profile.html', { ...agentA, 'accoom-active-agent': JSON.stringify(unknownProfile) });
+await test('4b. an agent cannot start contact from a profile with unverified ownership', () => {
+  assert.ok(blocked(a, '[data-ap-contact]'));
+  a.document.querySelector('[data-ap-contact]').dispatchEvent(new a.MouseEvent('click', { bubbles: true, cancelable: true }));
+  assert.equal(a.localStorage.getItem('accoom-contact-request'), null);
+});
+a.close();
 
 console.log('Alternative paths');
 const selfRequest = { ownerId: keyA, agentName: 'Adeola Fortune', property: { id: 'lst_e2e', name: 'Akungba Flat', image: '' }, agentProperties: [] };
@@ -119,11 +128,15 @@ const sneaky = { agentName: 'Adeola Fortune', property: { id: 'lst_e2e', name: '
 a = await browser('messages.html', { ...agentA, 'accoom-contact-request': JSON.stringify(sneaky) });
 await test('8b. self request with no owner fields is caught through the listing id', () => assert.equal(a.localStorage.getItem('accoom-contact-request'), null));
 a.close();
-await test('8c. no conversation exists on the server after all that', async () => assert.equal((await j('/api/conversations?key=' + keyA)).conversations.length, 0));
+const unknownRequest = { agentName: 'Unknown Agent', ownerId: 'someone-else', property: { id: 'not-in-catalogue', name: 'Unknown listing' } };
+a = await browser('messages.html', { ...agentA, 'accoom-contact-request': JSON.stringify(unknownRequest) });
+await test('8c. agent contact request for an unlisted id is rejected even with a forged owner id', () => assert.equal(a.localStorage.getItem('accoom-contact-request'), null));
+a.close();
+await test('8d. no conversation exists on the server after all that', async () => assert.equal((await j('/api/conversations?key=' + keyA)).conversations.length, 0));
 
 console.log('Server refuses self-chat');
 const post = (id, body) => fetch(base + '/api/conversations/' + id + '/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-await test('8d. same agentKey and customerKey -> 400, nothing stored', async () => {
+await test('8e. same agentKey and customerKey -> 400, nothing stored', async () => {
   const r = await post('c-self', { senderKey: keyA, message: { id: 'm1', text: 'hi me' }, meta: { agentKey: keyA, customerKey: keyA, propertyId: 'lst_e2e' } });
   assert.equal(r.status, 400);
   assert.equal((await j('/api/conversations?key=' + keyA)).conversations.length, 0);
