@@ -513,3 +513,7 @@ body > .payment-success-overlay.is-open {
 }
 
 
+
+/* Stage 5C: hold the card back while an agent's listing ownership is checked */
+.payment-checking [data-payment-card] { visibility: hidden; }
+.payment-blocked-action { margin-top: 24px; display: inline-flex; }

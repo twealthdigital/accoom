@@ -234,7 +234,37 @@ window.Accoom = window.Accoom || {};
     return blocked;
   }
 
+  /* ------------------------------------------------------------------
+     Stage 5C - payment.html opened directly (URL, bookmark, history)
+     canAccessPaymentPage(propertyId) -> { allowed, reason }
+       guest                      blocked  ('guest')
+       no property id (wallet     allowed  ('no-property')
+         top-up)
+       customer                   allowed  ('customer'): customers own
+                                  nothing, so their experience is unchanged
+       agent, someone else's      allowed  ('other-listing')
+         listing
+       agent, own listing         blocked  ('own-listing')
+       agent, owner cannot be     blocked  ('unverifiable'): listing missing
+         established              from the catalogue, real listing with no
+                                  owner, or the viewer's id is unknown
+     Any property id on the URL counts as a property payment, whatever
+     mode / context says, so "?context=wallet&id=<own listing>" gets no
+     way round it. Frontend only: a backend must repeat the same check.
+     ------------------------------------------------------------------ */
+  function canAccessPaymentPage(propertyId) {
+    var v = viewer();
+    if (!v) return { allowed: false, reason: 'guest' };
+    var id = clean(propertyId);
+    if (!id) return { allowed: true, reason: 'no-property' };
+    if (v.role !== 'agent') return { allowed: true, reason: 'customer' };
+    var c = checkListingId(id);
+    if (c.isOther) return { allowed: true, reason: 'other-listing' };
+    return { allowed: false, reason: c.isOwn ? 'own-listing' : 'unverifiable' };
+  }
+
   Accoom.Ownership = {
+    canAccessPaymentPage: canAccessPaymentPage,
     canSeePaymentUI: canSeePaymentUI,
     gatePayment: gatePayment,
     canInitiatePayment: canInitiatePayment,

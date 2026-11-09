@@ -39,6 +39,17 @@
     })();
   </script>
 
+  <!-- An agent opening a property payment: keep the card hidden until payment.js
+       has checked listing ownership (own / unverifiable listings never see it). -->
+  <script>
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('accoom-user')), q = new URLSearchParams(location.search);
+        if (u && u.role === 'agent' && (q.get('id') || q.get('property'))) document.documentElement.classList.add('payment-checking');
+      } catch (e) {}
+    })();
+  </script>
+
   <!-- early-partials: paints header/footer immediately (see assets/js/core/partials.js) -->
   <script>
     (function () {

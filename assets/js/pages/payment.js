@@ -39,6 +39,85 @@
     var submitButton = document.querySelector('[data-payment-submit]');
     var selectedMethod = 'card';
 
+    // ------------------------------------------------------------
+    // Stage 5C: who may open this page for this listing. Agents never pay
+    // for their own listing, guests and agents whose ownership cannot be
+    // established are blocked, customers are unchanged. Fails closed when
+    // the ownership module is missing.
+    // ------------------------------------------------------------
+    function accessNow() {
+      return (Accoom.Ownership && Accoom.Ownership.canAccessPaymentPage)
+        ? Accoom.Ownership.canAccessPaymentPage(propertyId)
+        : { allowed: false, reason: 'unverifiable' };
+    }
+
+    function showBlocked(reason) {
+      document.documentElement.classList.remove('payment-checking');
+      if (success) {
+        success.classList.remove('is-open', 'is-processing');
+        success.setAttribute('aria-hidden', 'true');
+      }
+      document.body.classList.remove('no-scroll');
+      var card = document.querySelector('[data-payment-card]');
+      if (!card) return;
+      var texts = {
+        'own-listing': ['Payment unavailable', 'You cannot pay for your own listing', 'Payments on a listing are made by other people. Listings you manage cannot be paid for from your own account.'],
+        'unverifiable': ['Payment unavailable', 'We could not confirm this listing', 'We cannot confirm who owns this listing, so payment is not available. Open the listing from its property page and try again.'],
+        'guest': ['Sign in required', 'Please sign in to continue', 'You need to be signed in to make a payment.']
+      };
+      var t = texts[reason] || texts.unverifiable;
+      while (card.firstChild) card.removeChild(card.firstChild);   // the form is gone, nothing can be submitted
+      card.setAttribute('data-payment-blocked', reason);
+      var head = document.createElement('div'); head.className = 'payment-card-heading';
+      var box = document.createElement('div');
+      var eyebrow = document.createElement('p'); eyebrow.className = 'payment-eyebrow'; eyebrow.textContent = t[0];
+      var h1 = document.createElement('h1'); h1.textContent = t[1];
+      var copy = document.createElement('p'); copy.className = 'payment-subtitle'; copy.textContent = t[2];
+      box.appendChild(eyebrow); box.appendChild(h1); box.appendChild(copy);
+      head.appendChild(box); card.appendChild(head);
+      var link = document.createElement('a');
+      link.className = 'btn btn--primary payment-blocked-action';
+      link.href = reason === 'guest' ? 'auth.html' : (propertyId ? 'property.html?id=' + encodeURIComponent(propertyId) : 'home.html');
+      link.textContent = reason === 'guest' ? 'Sign in' : 'Back to property';
+      card.appendChild(link);
+      if (back) back.href = link.href;
+    }
+
+    var access = accessNow();
+    var accessKey = access.allowed + ':' + access.reason;
+
+    // Account changed in another tab (or page restored from the back/forward
+    // cache): re-check. A payment already processing is stopped by the check
+    // made just before money moves (stillAllowed).
+    if (Accoom.Ownership && Accoom.Ownership.onChange) {
+      Accoom.Ownership.onChange(function () {
+        var now = accessNow();
+        if (now.allowed + ':' + now.reason === accessKey) return;
+        if (success && success.classList.contains('is-open')) return;
+        if (now.reason === 'guest') {
+          window.location.replace('auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash));
+          return;
+        }
+        window.location.reload();
+      });
+    }
+
+    function stillAllowed() {
+      var now = accessNow();
+      if (now.allowed) return true;
+      showBlocked(now.reason);
+      return false;
+    }
+
+    if (!access.allowed) {
+      showBlocked(access.reason);
+      if (access.reason === 'guest') {
+        window.location.replace('auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash));
+      }
+      return;
+    }
+    document.documentElement.classList.remove('payment-checking');
+
     function currentWalletAmount() {
       return Number(walletAmountInput && walletAmountInput.value) || 0;
     }
@@ -284,6 +363,7 @@
       }
 
       window.setTimeout(function () {
+        if (!stillAllowed()) return;   // account changed while processing: move nothing
         success.classList.remove('is-processing');
 
         // Move the money in the mock wallet. In a real backend this happens
@@ -409,6 +489,7 @@
                 }
 
                 window.setTimeout(function () {
+                  if (!stillAllowed()) return;   // account changed meanwhile: debit nothing
                   Accoom.debitWallet(amount, 'Property purchase payment', { category: 'property-payment', propertyId: propertyId });
                   markPropertyPaid(propertyId, amount);
 
