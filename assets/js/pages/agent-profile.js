@@ -406,7 +406,7 @@
 
     // ============================================================
     // CONTACT AGENT — carry this exact agent + property into
-    // messages.html instead of leaving it a dead link.
+    // contact-agent.html instead of leaving it a dead link.
     // ============================================================
     (function initContact() {
       var contactBtn = document.querySelector('[data-ap-contact]');
@@ -426,7 +426,7 @@
             image: agent.property.image || ''
           }
         });
-        window.location.href = Accoom.isLoggedIn() ? 'messages.html' : 'auth.html?mode=signup&next=messages.html';
+        window.location.href = Accoom.isLoggedIn() ? 'contact-agent.html' : 'auth.html?mode=signup&next=contact-agent.html';
       });
     })();
 

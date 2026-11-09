@@ -733,7 +733,7 @@
           + '?id=' + encodeURIComponent(property.id)
           + '&amount=' + encodeURIComponent(state.payable.value)
           + '&mode=' + (state.hasFunds ? 'checkout' : 'deposit')
-          + '&return=messages.html';
+          + '&return=contact-agent.html';
         window.location.href = url;
       });
     })();
@@ -875,7 +875,7 @@
     // ============================================================
     (function initContactAgent() {
       var contactBtn = document.querySelector('[data-pd-contact-agent]') ||
-                       document.querySelector('.pd-agent-actions a[href*="messages.html"]');
+                       document.querySelector('.pd-agent-actions a[href*="contact-agent.html"]');
       if (!contactBtn) return;
 
       Accoom.on(contactBtn, 'click', function (e) {
@@ -930,7 +930,7 @@
           agentProperties: agentProps
         });
 
-        window.location.href = Accoom.isLoggedIn() ? 'messages.html' : 'auth.html?mode=signup&next=messages.html';
+        window.location.href = Accoom.isLoggedIn() ? 'contact-agent.html' : 'auth.html?mode=signup&next=contact-agent.html';
       });
     })();
 

@@ -10,7 +10,7 @@ import { webcrypto } from 'node:crypto';
 import assert from 'node:assert/strict';
 
 const ROOT = new URL('..', import.meta.url).pathname;
-const PORT = 3400 + Math.floor(Math.random() * 400);
+const PORT = 3400 + Math.floor(Math.random() * 250);
 const base = 'http://127.0.0.1:' + PORT;
 const dataDir = await mkdtemp(join(tmpdir(), 'accoom-e2e-'));
 const srv = spawn(process.execPath, ['server/server.js'], { cwd: ROOT, env: { ...process.env, PORT: String(PORT), ACCOOM_DATA: dataDir }, stdio: 'ignore' });
@@ -83,7 +83,7 @@ const item = customer.Accoom.PropertyService.getById('lst_e2e');
 const request = { agentName: 'Adeola Fortune', agentAvatar: 'assets/images/agent-images/agenticonimg.webp', verified: true, online: false, level: 'AL1',
   property: { id: 'lst_e2e', name: 'Akungba Flat', image: 'assets/images/home-properties/miniflat.webp', beds: 2, baths: 1 }, agentProperties: [] };
 customer.close();
-customer = await browser('messages.html', { ...customerStore, 'accoom-contact-request': JSON.stringify(request) });
+customer = await browser('contact-agent.html', { ...customerStore, 'accoom-contact-request': JSON.stringify(request) });
 await test('customer opens a chat with the real agent and sends a message', async () => {
   const d = customer.document;
   assert.ok(!d.querySelector('[data-msgs-chat]').hidden, 'chat not open');

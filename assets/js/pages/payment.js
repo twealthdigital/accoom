@@ -106,7 +106,7 @@
           type: 'order',
           title: 'Payment received',
           text: message + ' Tap to open your chat with the agent.',
-          link: 'messages.html?open=' + encodeURIComponent(id)
+          link: 'contact-agent.html?open=' + encodeURIComponent(id)
         });
       }
     }
@@ -141,10 +141,10 @@
         back.href = returnPage || 'profile.html';
         if (backLabel) backLabel.textContent = 'Back to profile';
       } else {
-        back.href = returnPage === 'messages.html'
-          ? 'messages.html?open=' + encodeURIComponent(propertyId)
+        back.href = returnPage === 'contact-agent.html'
+          ? 'contact-agent.html?open=' + encodeURIComponent(propertyId)
           : 'property.html?id=' + encodeURIComponent(propertyId);
-        if (backLabel && returnPage === 'messages.html') backLabel.textContent = 'Back to chat';
+        if (backLabel && returnPage === 'contact-agent.html') backLabel.textContent = 'Back to chat';
       }
     }
 
@@ -357,8 +357,8 @@
 
             var cancelBtn = document.createElement('a');
             cancelBtn.className  = 'btn btn--ghost';
-            cancelBtn.href       = returnPage === 'messages.html'
-              ? 'messages.html?open=' + encodeURIComponent(propertyId)
+            cancelBtn.href       = returnPage === 'contact-agent.html'
+              ? 'contact-agent.html?open=' + encodeURIComponent(propertyId)
               : ('property.html?id=' + encodeURIComponent(propertyId));
             cancelBtn.textContent = 'Cancel';
 
@@ -464,9 +464,9 @@
               : 'Your card payment request has been recorded. You can review your purchases from your account.';
           }
           if (successAction) {
-            if (returnPage === 'messages.html') {
+            if (returnPage === 'contact-agent.html') {
               successAction.textContent = 'Back to chat';
-              successAction.href = 'messages.html?paid=' + encodeURIComponent(propertyId);
+              successAction.href = 'contact-agent.html?paid=' + encodeURIComponent(propertyId);
               // Land the buyer straight in the agent chat — no need to
               // press "Contact Agent" or click this button themselves.
               window.setTimeout(function () {

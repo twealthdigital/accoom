@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Contact Agent — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.webp" />
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark') document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+
+  <!-- auth-state: tags <html> as guest / signed-in BEFORE first paint so account-only
+       parts of the header (balance, messages, notifications, agent CTA) never flash. -->
+  <script>
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('accoom-user')), c = document.documentElement.classList;
+        if (!u) c.add('is-guest');
+        else { c.add('is-auth'); if (u.role === 'agent' && u.agentProfileCompleted) c.add('is-agent-done'); }
+      } catch (e) { document.documentElement.classList.add('is-guest'); }
+    })();
+  </script>
+
+  <!-- Signed-in-only page: bounce guests to signup before paint (messages.js also checks) -->
+  <script>
+    (function () {
+      try {
+        var user = JSON.parse(localStorage.getItem('accoom-user'));
+        if (!user) window.location.replace( 'auth.html?mode=signup&next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash));
+      } catch (e) {
+        window.location.replace( 'auth.html?mode=signup&next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash));
+      }
+    })();
+  </script>
+
+  <!-- early-partials: paints header/footer immediately (see assets/js/core/partials.js) -->
+  <script>
+    (function () {
+      try {
+        var PREFIX = 'accoom-partial:', pending = {};
+        var load = function (url) {
+          if (pending[url]) return pending[url];
+          var cached = null;
+          try { cached = window.sessionStorage.getItem(PREFIX + url); } catch (e) {}
+          var net = fetch(url, { priority: 'high' }).then(function (r) {
+            if (!r.ok) throw new Error(url);
+            return r.text();
+          }).then(function (html) {
+            try { window.sessionStorage.setItem(PREFIX + url, html); } catch (e) {}
+            return html;
+          });
+          if (cached) { net.catch(function () {}); pending[url] = Promise.resolve(cached); }
+          else { pending[url] = net; }
+          return pending[url];
+        };
+        var scan = function (root) {
+          var list = root.querySelectorAll('[data-partial]');
+          for (var i = 0; i < list.length; i++) claim(list[i]);
+        };
+        var claim = function (el) {
+          if (el.__early) return;
+          var url = el.getAttribute('data-partial');
+          if (!url) return;
+          el.__early = load(url).then(function (html) {
+            if (el.getAttribute('data-partial') !== url) return;
+            el.innerHTML = html;
+            el.setAttribute('data-early', '1');
+            scan(el);
+          }, function () {});
+        };
+        load('partials/header.html');
+        load('partials/footer.html');
+        var mo = new MutationObserver(function () { scan(document); });
+        mo.observe(document.documentElement, { childList: true, subtree: true });
+        document.addEventListener('DOMContentLoaded', function () { scan(document); mo.disconnect(); });
+      } catch (e) { /* older browser: the normal loader still works */ }
+    })();
+  </script>
+
+<link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/messages.css" />
+</head>
+<body>
+
+  <div class="partial-mount" data-partial="partials/header.html"></div>
+
+  <!-- =========================================================
+       MESSAGES (chat only: conversation list + chat view)
+  ========================================================= -->
+  <main class="msgs-page">
+    <div class="container msgs-shell">
+      <div class="msgs-layout" data-msgs-layout>
+
+        <!-- ============ CONVERSATION LIST ============ -->
+        <aside class="msgs-list-panel">
+          <div class="msgs-list-header">
+            <h1>Messages</h1>
+          </div>
+
+          <ul class="msgs-list" data-msgs-list></ul>
+
+          <div class="msgs-empty" data-msgs-list-empty hidden>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <p>No messages yet</p>
+            <span>Conversations with agents will show up here.</span>
+          </div>
+        </aside>
+
+        <!-- ============ CHAT VIEW ============ -->
+        <section class="msgs-chat-panel">
+
+          <div class="msgs-chat-empty" data-msgs-chat-empty>
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <h3>Select a conversation</h3>
+            <p>Choose a chat on the left to start messaging an agent.</p>
+          </div>
+
+          <div class="msgs-chat" data-msgs-chat hidden>
+
+            <div class="msgs-chat-header">
+              <button type="button" class="msgs-back-btn" data-msgs-back aria-label="Back to messages">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+              <img class="msgs-chat-avatar" data-msgs-chat-avatar src="" alt="" />
+              <div class="msgs-chat-who">
+                <p class="msgs-chat-name" data-msgs-chat-name></p>
+                <p class="msgs-chat-status" data-msgs-chat-status></p>
+              </div>
+            </div>
+
+            <div class="msgs-thread" data-msgs-thread></div>
+
+            <form class="msgs-composer" data-msgs-composer>
+              <textarea placeholder="Type a message..." data-msgs-input autocomplete="off" rows="1"></textarea>
+              <button type="submit" class="msgs-send-btn" aria-label="Send message" data-msgs-send>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+            </form>
+
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       SCRIPTS
+  ========================================================= -->
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+<script src="assets/js/core/storage.js"></script>
+<script src="assets/js/core/wallet.js"></script>
+<script src="assets/js/core/skeleton.js"></script>
+<script src="assets/js/core/media-store.js"></script>
+<script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/pricing.js"></script>
+  <script src="assets/js/data/listing-review.js"></script>
+  <script src="assets/js/data/reviews.js"></script>
+  <script src="assets/js/core/sync.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/data/notifications.js"></script>
+
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+
+  <script src="assets/js/animations/buttons.js"></script>
+  <script src="assets/js/animations/transitions.js"></script>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/messages.js"></script>
+
+  <script>Accoom.loadPartials();</script>
+
+</body>
+</html>

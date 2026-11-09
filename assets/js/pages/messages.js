@@ -13,6 +13,15 @@
    (hardcoded) agents stay in this browser only.
    ========================================================================== */
 
+/* Customers chat on contact-agent.html, agents answer on messages.html (same script, two pages). */
+(function () {
+  var u; try { u = JSON.parse(window.localStorage.getItem('accoom-user')); } catch (e) { u = null; }
+  var page = (window.location.pathname.split('/').pop() || '').toLowerCase();
+  if (!u || (page !== 'messages.html' && page !== 'contact-agent.html')) return;
+  var want = u.role === 'agent' ? 'messages.html' : 'contact-agent.html';
+  if (page !== want) window.location.replace(want + window.location.search + window.location.hash);
+})();
+
 (function (Accoom) {
   'use strict';
 
@@ -31,7 +40,7 @@
     // Signed-in only: guests go to signup and come back here.
     if (!Accoom.isLoggedIn()) {
       Accoom.removeStorage('accoom-contact-request');
-      window.location.replace('auth.html?mode=signup&next=' + encodeURIComponent('messages.html' + location.search));
+      window.location.replace('auth.html?mode=signup&next=' + encodeURIComponent((location.pathname.split('/').pop() || 'contact-agent.html') + location.search));
       return;
     }
 

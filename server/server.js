@@ -270,7 +270,6 @@ function serveStatic(req, res, url) {
   try { rel = decodeURIComponent(url.pathname); } catch (e) { res.writeHead(400); return res.end('Bad request'); }
 
   // Same redirects vercel.json does in production.
-  if (rel === '/contact-agent.html') { res.writeHead(301, { Location: '/messages.html' + url.search }); return res.end(); }
   if (rel === '/filter-accomodation.html') { res.writeHead(301, { Location: '/filter-accommodation.html' + url.search }); return res.end(); }
 
   if (rel === '/') rel = '/index.html';

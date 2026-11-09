@@ -11,6 +11,12 @@ window.Accoom = window.Accoom || {};
   // Page content that is already in the static HTML at parse time
   // (not shipped via a [data-partial]), so this can run on plain
   // Accoom.ready as before.
+  // Customers chat on contact-agent.html, agents answer on messages.html.
+  function chatPage() {
+    try { var u = JSON.parse(window.localStorage.getItem('accoom-user')); return u && u.role === 'agent' ? 'messages.html' : 'contact-agent.html'; }
+    catch (e) { return 'contact-agent.html'; }
+  }
+
   Accoom.ready(function () {
     // ============================================================
     // TOAST — small site-wide pop-up notification (theme-aware,
@@ -198,6 +204,9 @@ window.Accoom = window.Accoom || {};
     // agent chat) may be visible to a signed-out visitor. Property listing
     // remains an entry point for guests and routes them to signup.
     var isLoggedIn = Accoom.isLoggedIn();
+
+    // "View all messages" in the header panel: agents -> messages.html, customers -> contact-agent.html.
+    Array.prototype.forEach.call(document.querySelectorAll('.notif-panel-footer[href="messages.html"]'), function (a) { a.setAttribute('href', chatPage()); });
     Accoom.$$('[data-agent-signup-cta]').forEach(function (link) {
       if (isLoggedIn) link.href = 'onboarding.html?upgrade=agent';
     });
@@ -226,12 +235,12 @@ window.Accoom = window.Accoom || {};
       // triggers, a message-panel row, or any "Contact/Message Agent"
       // link anywhere on the page — sends guests to signup instead.
       Accoom.on(document, 'click', function (e) {
-        var gated = e.target.closest('.msg-trigger, .panel-row--messages, a[href="messages.html"]');
+        var gated = e.target.closest('.msg-trigger, .panel-row--messages, a[href="messages.html"], a[href="contact-agent.html"]');
         if (!gated) return;
         e.preventDefault();
         // After signing up or in, carry the person to the chat they were opening (or back here for the messages icon).
         var anchor = e.target.closest('a[href]');
-        var dest = anchor ? anchor.getAttribute('href') : 'messages.html';
+        var dest = anchor ? anchor.getAttribute('href') : chatPage();
         window.location.href = 'auth.html?mode=signup&next=' + encodeURIComponent(dest);
       });
       // Header and menu "Log in" / "Sign up" links: remember the page the person was on.
@@ -722,7 +731,7 @@ window.Accoom = window.Accoom || {};
           item.className = 'notif-item' + (conv.unread ? ' is-unread' : '');
           item.setAttribute('data-msg-item', '');
           item.innerHTML =
-            '<a href="messages.html?open=' + encodeURIComponent(conv.property.id) + '" class="notif-item-main">' +
+            '<a href="' + chatPage() + '?open=' + encodeURIComponent(conv.property.id) + '" class="notif-item-main">' +
               '<span class="notif-item-icon notif-item-icon--message">' +
                 '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' +
               '</span>' +

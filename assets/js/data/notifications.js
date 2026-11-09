@@ -43,7 +43,7 @@ window.Accoom = window.Accoom || {};
         type: 'message',
         title: 'David O. replied',
         text: 'I hope to hear from you soon, and I will deliver my best to get you the apartment you want.',
-        link: 'messages.html?open=ACCOM-24567',
+        link: 'contact-agent.html?open=ACCOM-24567',
         time: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
         read: true
       },
@@ -70,7 +70,7 @@ window.Accoom = window.Accoom || {};
         type: 'message',
         title: 'Sarah A. replied',
         text: 'Sorry, no need for now. I already found a place closer to my office.',
-        link: 'messages.html?open=ACCOM-30988',
+        link: 'contact-agent.html?open=ACCOM-30988',
         time: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
         read: true
       }
@@ -94,7 +94,7 @@ window.Accoom = window.Accoom || {};
   var BUYER_ONLY_PAGES = [
     'purchase-details.html', 'purchases.html', 'saved-properties.html',
     'account-settings.html', 'help-support.html', 'profile.html',
-    'messages.html', 'payment.html'
+    'contact-agent.html', 'payment.html'
   ];
 
   function isAgentUser() {
