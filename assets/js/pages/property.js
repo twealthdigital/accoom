@@ -88,6 +88,8 @@
     // Expose to other modules (e.g. main.js's View Profile handler),
     // since `property` above is scoped to this Accoom.ready callback.
     Accoom.currentProperty = property;
+    // Stage 1 (permissions): who is looking at this listing. Read by later stages; changes nothing on screen.
+    property.ownership = Accoom.Ownership ? Accoom.Ownership.check(stored || property) : null;
 
     // ============================================================
     // Apply dynamic property name across the page

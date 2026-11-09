@@ -98,7 +98,7 @@
       // Agent's own registration details (only when the signed-in agent is this agent)
       var me = null;
       try { me = JSON.parse(window.localStorage.getItem('accoom-user')); } catch (e) { me = null; }
-      var isMe = !!(me && me.role === 'agent' && String(me.id || me.userId || me.agentId || 'local-agent') === String(stored.ownerId || 'local-agent'));
+      var isMe = Accoom.Ownership ? Accoom.Ownership.isOwn(stored) : !!(me && me.role === 'agent' && String(me.id || me.userId || me.agentId || 'local-agent') === String(stored.ownerId || 'local-agent'));
       var about = isMe && me.about ? String(me.about).trim() : '';
       var langs = isMe && Array.isArray(me.languages) ? me.languages.filter(Boolean) : [];
 
