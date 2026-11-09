@@ -129,7 +129,7 @@ await test('8d. same agentKey and customerKey -> 400, nothing stored', async () 
   assert.equal((await j('/api/conversations?key=' + keyA)).conversations.length, 0);
 });
 await test('a normal chat from a different person is still accepted', async () => {
-  const r = await post('c-ok', { senderKey: 'u-someoneelse', message: { id: 'm2', text: 'hello' }, meta: { agentKey: keyA, customerKey: 'u-someoneelse', propertyId: 'lst_e2e' } });
+  const r = await post('c-lst_e2e-u-someoneelse', { senderKey: 'u-someoneelse', message: { id: 'm2', text: 'hello' }, meta: { agentKey: keyA, customerKey: 'u-someoneelse', propertyId: 'lst_e2e' } });
   assert.equal(r.status, 200);
 });
 

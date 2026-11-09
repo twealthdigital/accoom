@@ -150,10 +150,13 @@ await test('someone who is not in the chat cannot post into it', async () => {
   assert.equal(r.status, 403);
 });
 await test('names with HTML are cleaned before they can reach another person\'s header', async () => {
-  const r = await fetch(base + '/api/conversations/c-x-u1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ senderKey: 'u1', message: { id: 'a', text: 'hi' }, meta: { agentKey: 'u2', customerKey: 'u1', customerName: '<img src=x onerror=alert(1)>Eve', agentName: 'A', propertyId: 'p', propertyName: 'P' } }) });
-  const { conversations } = await (await fetch(base + '/api/conversations?key=u2')).json();
-  assert.ok(!/[<>"']/.test(conversations[0].customerName), conversations[0].customerName);
+  // Recipient must be a real agent sharing the listing (Permissions Stage 3), so use the agent from above.
+  const r = await fetch(base + '/api/conversations/c-lst_e2e-u1/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ senderKey: 'u1', message: { id: 'a', text: 'hi' }, meta: { agentKey: item.agentKey, customerKey: 'u1', customerName: '<img src=x onerror=alert(1)>Eve', agentName: 'A', propertyId: 'lst_e2e', propertyName: 'P' } }) });
+  assert.equal(r.status, 200);
+  const { conversations } = await (await fetch(base + '/api/conversations?key=' + item.agentKey)).json();
+  const eve = conversations.filter((c) => c.id === 'c-lst_e2e-u1')[0];
+  assert.ok(eve && !/[<>\"']/.test(eve.customerName), eve && eve.customerName);
 });
 
 srv.kill();

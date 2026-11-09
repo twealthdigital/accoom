@@ -201,12 +201,23 @@ async function handleApi(req, res, url) {
       const meta = body.meta || {};
       const agentKey = cleanId(meta.agentKey), customerKey = cleanId(meta.customerKey);
       if (!agentKey || !customerKey || agentKey === customerKey || senderKey !== customerKey) {
-        return sendJson(res, 400, { error: 'A conversation is started by the customer' });
+        return sendJson(res, 400, { error: 'A conversation is started by the person writing first' });
       }
+      // Agent-to-agent (Permissions Stage 3): the person writing first may be a customer OR another agent.
+      // The recipient must be a real agent who shares the listing the chat is about, and the conversation id
+      // must belong to the starter (ends with their key), so nobody can pre-register an id another person
+      // will later use. (The starter's role is display-only: this test server has no authentication.)
+      const sharedByRecipient = db.listings[agentKey] || [];
+      const propId = cleanId(meta.propertyId);
+      if (!sharedByRecipient.length || (propId && !sharedByRecipient.some((l) => cleanId(l.id) === propId))) {
+        return sendJson(res, 400, { error: 'That agent does not share this listing' });
+      }
+      if (!id.endsWith('-' + customerKey)) return sendJson(res, 400, { error: 'Invalid conversation id' });
       conv = db.conversations[id] = {
         id, agentKey, customerKey,
         agentName: cleanName(meta.agentName) || 'Agent',
         customerName: cleanName(meta.customerName) || 'Customer',
+        customerRole: meta.customerRole === 'agent' ? 'agent' : 'customer',
         propertyId: cleanId(meta.propertyId),
         propertyName: cleanName(meta.propertyName, 140),
         createdAt: Date.now(), updatedAt: Date.now(),

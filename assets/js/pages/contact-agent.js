@@ -385,8 +385,8 @@
     if (agentView) {
       document.body.classList.add('is-agent-chat');
       var elInput = document.querySelector('[data-msgs-input]'); if (elInput) elInput.setAttribute('placeholder', 'Type a reply...');
-      var elEmpty = document.querySelector('[data-msgs-list-empty-text]'); if (elEmpty) elEmpty.textContent = 'Customers who contact you about your listings will show up here.';
-      var elChat = document.querySelector('[data-msgs-chat-empty-text]'); if (elChat) elChat.textContent = 'Choose a chat on the left to reply to a customer.';
+      var elEmpty = document.querySelector('[data-msgs-list-empty-text]'); if (elEmpty) elEmpty.textContent = 'Customers and agents who contact you, and chats you start with other agents, will show up here.';
+      var elChat = document.querySelector('[data-msgs-chat-empty-text]'); if (elChat) elChat.textContent = 'Choose a chat on the left to read and reply.';
     }
     var state = {
       conversations: agentView
@@ -783,7 +783,7 @@
       if (noConversations) {
         els.chatEmptyTitle.textContent = 'No conversations yet';
         els.chatEmptyText.textContent = agentView
-          ? 'Customers who message you about your listings will show up here.'
+          ? 'Customers and agents who message you, and chats you start with other agents, will show up here.'
           : "You haven't messaged any agents yet. Start a chat and it'll show up here.";
         return;
       }
@@ -871,7 +871,7 @@
       els.chatAvatar.src = conv.avatar;
       els.chatAvatar.alt = conv.name;
       els.chatName.textContent = conv.name;
-      els.chatStatus.textContent = conv.muted ? 'Muted' : (agentView ? 'Customer' : (conv.online ? 'Online' : 'Offline \u00B7 ' + conv.role));
+      els.chatStatus.textContent = conv.muted ? 'Muted' : (agentView ? (conv.role || 'Customer') : (conv.online ? 'Online' : 'Offline \u00B7 ' + conv.role));
       els.chatStatus.classList.toggle('is-online', conv.online && !conv.muted);
 
       if (els.viewProfile) {
@@ -2358,14 +2358,16 @@
       return h + ':' + (m < 10 ? '0' + m : m) + ' ' + ap;
     }
 
-    // Permissions Stage 2: a conversation whose other side is the signed-in person is never allowed.
+    // Permissions Stage 2/3: a conversation whose two sides are the same person is never allowed.
+    // An agent sees two kinds of chat on the inbox screen:
+    //   incoming  (conv.outgoing falsy): I am conv.agentKey, the other side is conv.customerKey (a customer OR an agent)
+    //   outgoing  (conv.outgoing):       I started it, I am conv.customerKey and the recipient is conv.agentKey
     function isSelfConversation(conv) {
       if (!conv || !me) return false;
-      // Agent inbox: the agent is conv.agentKey and the other side is the customer. The only self-chat
-      // possible there is a "customer" that is the same person.
-      if (agentView) return !!(conv.customerKey && String(conv.customerKey) === String(me));
-      // Starting side: the agent being written to must not be the signed-in person, and the listing
-      // must not be the signed-in agent's own.
+      if (conv.agentKey && conv.customerKey && String(conv.agentKey) === String(conv.customerKey)) return true;
+      if (agentView && !conv.outgoing) return !!(conv.customerKey && String(conv.customerKey) === String(me));
+      // Starting side (customer, or an agent writing to another agent): the recipient must not be me,
+      // and the listing must not be my own.
       if (conv.agentKey && String(conv.agentKey) === String(me)) return true;
       var O = Accoom.Ownership;
       if (O && conv.property && conv.property.id && O.isOwnListingId(conv.property.id)) return true;
@@ -2373,7 +2375,6 @@
     }
 
     function markRealAgent(conv, prop) {
-      if (agentView) return;
       var item = (Accoom.PropertyService && Accoom.PropertyService.getById) ? Accoom.PropertyService.getById(prop.id) : null;
       var key = item && item.agentListing && item.agentKey ? String(item.agentKey) : '';
       if (!key || !me || key === me || !(Sync && Sync.available)) return;
@@ -2385,16 +2386,23 @@
 
     function remoteIdOf(conv) { return conv.remoteId || conv.id; }
 
+    // Permissions Stage 3: a self-chat that somehow reached this browser's storage is dropped, not shown.
+    if (agentView) {
+      var keepConvs = state.conversations.filter(function (c) { return !isSelfConversation(c); });
+      if (keepConvs.length !== state.conversations.length) { state.conversations = keepConvs; saveConversations(); }
+    }
+
     function postToAgent(conv, msg) {
       if (!(Sync && Sync.available) || !conv.remote) return;
       if (isSelfConversation(conv)) { msg.sent = false; return; }
       var body = { senderKey: me, message: { id: msg.id, text: msg.text, ts: msg.ts } };
-      if (!agentView) {
+      if (!agentView || conv.outgoing) {          // the person writing first names both sides
         body.meta = {
           propertyId: conv.property && conv.property.id,
           propertyName: cleanTxt(conv.property && conv.property.name),
           agentKey: conv.agentKey, agentName: cleanTxt(conv.name),
-          customerKey: me, customerName: Sync.userName()
+          customerKey: me, customerName: Sync.userName(),
+          customerRole: agentView ? 'agent' : 'customer'
         };
       }
       Sync.api('POST', '/api/conversations/' + encodeURIComponent(remoteIdOf(conv)) + '/messages', body)
@@ -2416,7 +2424,17 @@
       Accoom.setStorage('accoom-hidden-chats', map);
     }
 
+    // Which side of a server conversation am I? 'agent' = I received it, 'customer' = I started it.
+    function mySideOf(rc) {
+      if (!rc || !me || rc.agentKey === rc.customerKey) return null;
+      return rc.agentKey === me ? 'agent' : (rc.customerKey === me ? 'customer' : null);
+    }
+
+    // Agent screen: turn a server conversation into a chat row. Works for chats other people started with me
+    // (side 'agent') AND chats I started with another agent (side 'customer', shown as outgoing).
     function agentConvFromServer(rc, old) {
+      var side = mySideOf(rc);
+      var outgoing = side === 'customer';
       var item = (Accoom.PropertyService && Accoom.PropertyService.getById) ? Accoom.PropertyService.getById(rc.propertyId) : null;
       var prop = (old && old.property && String(old.property.id) === String(rc.propertyId)) ? old.property : {
         id: rc.propertyId,
@@ -2431,18 +2449,21 @@
       var msgs = rc.messages.map(function (m) {
         seen[m.id] = true;
         if (oldById[m.id]) return oldById[m.id];
-        return { id: m.id, from: m.from === 'agent' ? 'me' : 'agent', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text, read: true, sent: true };
+        // my own messages are on my side, the other person's on theirs
+        return { id: m.id, from: m.from === side ? 'me' : 'agent', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text, read: true, sent: true };
       });
       ((old && old.messages) || []).forEach(function (m) { if (m.from === 'me' && m.sent === false && !seen[m.id]) msgs.push(m); });
       msgs.sort(function (x, y) { return (x.ts || 0) - (y.ts || 0); });
+      var otherName = outgoing ? (cleanTxt(rc.agentName) || 'Agent') : (cleanTxt(rc.customerName) || (rc.customerRole === 'agent' ? 'Agent' : 'Customer'));
+      var otherRole = outgoing ? 'Real Estate Agent' : (rc.customerRole === 'agent' ? 'Agent' : 'Customer');
       return Object.assign({}, old || {}, {
-        id: rc.id, remote: true, agentView: true,
-        name: cleanTxt(rc.customerName) || 'Customer', role: 'Customer',
-        avatar: (old && old.avatar) || AVATAR, online: false, verified: false,
+        id: old ? old.id : rc.id, remoteId: rc.id, remote: true, agentView: true, outgoing: outgoing,
+        name: otherName, role: otherRole,
+        avatar: (old && old.avatar) || AVATAR, online: false, verified: old ? !!old.verified : false,
         muted: old ? !!old.muted : false,
         property: prop, allProperties: [prop],
         agentKey: rc.agentKey, customerKey: rc.customerKey, updatedAt: rc.updatedAt,
-        unread: (rc.unread && rc.unread.agent) || 0,
+        unread: (rc.unread && rc.unread[side]) || 0,
         messages: msgs
       });
     }
@@ -2462,11 +2483,13 @@
 
         if (agentView) {
           (r.conversations || []).forEach(function (rc) {
-            if (rc.agentKey !== me) return;
+            if (!mySideOf(rc)) return;                       // not mine (or a self-chat): never shown
             if (hidden[rc.id] && rc.updatedAt <= hidden[rc.id]) return;
             if (hidden[rc.id]) { delete hidden[rc.id]; Accoom.setStorage('accoom-hidden-chats', hidden); }
             var idx = -1;
-            for (var i = 0; i < state.conversations.length; i++) { if (state.conversations[i].id === rc.id) { idx = i; break; } }
+            for (var i = 0; i < state.conversations.length; i++) {
+              if (state.conversations[i].id === rc.id || state.conversations[i].remoteId === rc.id) { idx = i; break; }
+            }
             var next = agentConvFromServer(rc, idx === -1 ? null : state.conversations[idx]);
             if (next.id === state.activeId && next.unread) { next.unread = 0; markReadRemote(next); }
             if (idx === -1) state.conversations.push(next); else state.conversations[idx] = next;
@@ -2536,6 +2559,39 @@
       openConversation(reopenConv.id);
       if (window.innerWidth <= 860) layout.setAttribute('data-view', 'chat');
       window.history.replaceState({}, '', window.location.pathname);
+    } else if (agentView && contactRequest && contactRequest.property && contactRequest.property.id) {
+      // Permissions Stage 3: an agent starting a chat with ANOTHER agent from their listing or profile.
+      // The recipient is taken from the shared catalogue (not from the stored request) when the listing is
+      // a real agent's. Contact is allowed with any other agent; self-chat is refused.
+      var aReq = contactRequest;
+      var aProp = aReq.property;
+      var aName = cleanTxt(aReq.agentName) || 'Agent';
+      var aExisting = state.conversations.filter(function (c) {
+        return c.outgoing && c.property && String(c.property.id) === String(aProp.id);
+      })[0];                                              // same listing again: reuse the chat, keep its history
+      var aConv = aExisting || {
+        id: 'conv-' + aProp.id + '-' + Date.now().toString().slice(-4),
+        name: aName, role: 'Real Estate Agent', avatar: aReq.agentAvatar || AVATAR,
+        online: false, verified: !!aReq.verified, muted: false,
+        property: aProp, allProperties: [aProp], messages: [],
+        agentView: true, outgoing: true
+      };
+      if (!aExisting) markRealAgent(aConv, aProp);        // real agent: sets agentKey + remote id from the catalogue
+      if (aConv.remote) { aConv.id = aConv.remoteId; aConv.customerKey = me; }
+      aConv.agentView = true; aConv.outgoing = true;
+      Accoom.removeStorage('accoom-contact-request');
+      if (isSelfConversation(aConv)) {
+        // Nothing is created: the request pointed back at the signed-in agent.
+        renderList();
+        if (window.innerWidth > 860 && state.conversations.length) openConversation(state.conversations[0].id);
+      } else {
+        if (!aExisting) state.conversations.unshift(aConv);
+        else state.conversations = [aConv].concat(state.conversations.filter(function (c) { return c !== aConv; }));
+        saveConversations();
+        renderList();
+        openConversation(aConv.id);
+        layout.setAttribute('data-view', 'chat');
+      }
     } else if (!agentView && contactRequest && contactRequest.property && contactRequest.property.id) {
       var reqProp = contactRequest.property;
       var agentName = contactRequest.agentName || 'Agent';
