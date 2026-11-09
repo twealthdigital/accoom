@@ -880,8 +880,22 @@
                        document.querySelector('.pd-agent-actions a[href*="contact-agent.html"]');
       if (!contactBtn) return;
 
+      // Permissions Stage 2: an agent never contacts themselves. Hidden on their own listing
+      // (re-checked if the account changes or the page comes back from the back/forward cache).
+      function gatePropertyContact() {
+        var o = Accoom.Ownership;
+        if (!o) return;
+        property.ownership = o.check(stored || property);
+        var scope = document.querySelector('.pd-agent-actions');
+        o.gateContact(scope ? scope.querySelectorAll(o.CONTACT_SELECTOR + ', a[href*="contact-agent.html"]') : [], stored || property);
+      }
+      gatePropertyContact();
+      if (Accoom.Ownership) Accoom.Ownership.onChange(gatePropertyContact);
+
       Accoom.on(contactBtn, 'click', function (e) {
         e.preventDefault();
+        // Second line of defence: the button may have been revealed by editing the page.
+        if (Accoom.Ownership && !Accoom.Ownership.canContact(stored || property)) return;
         var agent = property.agent || {};
         var agentAvatarEl = document.querySelector('[data-pd-agent-avatar]');
         var agentAvatar = (agentAvatarEl && agentAvatarEl.getAttribute('src')) || agent.avatar || 'assets/images/agent-images/agenticonimg.webp';
@@ -929,7 +943,9 @@
           reviews: agent.real ? (agent.reviews || 0) : (agent.reviews || 120),
           level: agent.level || (agent.real ? 'AL1' : 'AL5'),
           property: thisPropObj,
-          agentProperties: agentProps
+          agentProperties: agentProps,
+          ownerId: property.ownerId || (agent.ownerId || ''),
+          agentKey: (stored && stored.agentKey) || agent.agentKey || ''
         });
 
         window.location.href = Accoom.isLoggedIn() ? 'contact-agent.html' : 'auth.html?mode=signup&next=contact-agent.html';

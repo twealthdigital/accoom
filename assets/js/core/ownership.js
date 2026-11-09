@@ -127,11 +127,81 @@ window.Accoom = window.Accoom || {};
     return check(found);
   }
 
+  /* ------------------------------------------------------------------
+     Stage 2 - self-contact prevention
+     canContact(subject)    false only when the listing/profile is the
+                            signed-in agent's own. (Guests are sent to
+                            sign-up by the existing flow; unknown owner is
+                            allowed here because it cannot be proved own -
+                            the server must still refuse it.)
+     contactRequestOk(req)  false when a stored "accoom-contact-request"
+                            (or any {ownerId, agentKey, agent} object) names
+                            the signed-in agent as the person to contact.
+     gateContact(els, subj) hides (and disables) contact / message / chat
+                            controls on the signed-in agent's own listing or
+                            profile, and shows them again when it is not.
+     onChange(fn)           re-run a gate when the account changes in another
+                            tab or the page is restored from the back/forward
+                            cache, so no stale "own" state survives.
+     ------------------------------------------------------------------ */
+  function canContact(subject) { return !check(subject).isOwn; }
+
+  function contactRequestOk(req) {
+    if (!req || typeof req !== 'object') return true;
+    return !check(req).isOwn;
+  }
+
+  function setBlocked(el, blocked) {
+    if (!el) return;
+    if (blocked) {
+      if (el.getAttribute('data-self-contact') !== 'blocked') {
+        el.setAttribute('data-self-contact', 'blocked');
+        el.setAttribute('data-self-contact-display', el.style.display || '');
+      }
+      el.hidden = true;
+      el.style.display = 'none';
+      el.setAttribute('aria-hidden', 'true');
+      el.setAttribute('tabindex', '-1');
+      if ('disabled' in el) el.disabled = true;
+    } else if (el.getAttribute('data-self-contact') === 'blocked') {
+      el.removeAttribute('data-self-contact');
+      el.hidden = false;
+      el.style.display = el.getAttribute('data-self-contact-display') || '';
+      el.removeAttribute('data-self-contact-display');
+      el.removeAttribute('aria-hidden');
+      el.removeAttribute('tabindex');
+      if ('disabled' in el) el.disabled = false;
+    }
+  }
+
+  var CONTACT_SELECTOR = '[data-pd-contact-agent], [data-ap-contact], [data-contact-agent], [data-message-agent], [data-chat-agent]';
+
+  function gateContact(target, subject) {
+    var blocked = !canContact(subject);
+    var list = [];
+    if (typeof target === 'string') list = Array.prototype.slice.call(document.querySelectorAll(target));
+    else if (target && target.nodeType === 1) list = [target];
+    else if (target && target.length) list = Array.prototype.slice.call(target);
+    list.forEach(function (el) { setBlocked(el, blocked); });
+    return blocked;
+  }
+
+  function onChange(fn) {
+    if (typeof fn !== 'function') return;
+    window.addEventListener('storage', function (e) { if (!e || e.key === 'accoom-user' || e.key === null) fn(); });
+    window.addEventListener('pageshow', function (e) { if (e && e.persisted) fn(); });
+  }
+
   Accoom.Ownership = {
     check: check,
     checkListingId: checkListingId,
     isOwn: function (subject) { return check(subject).isOwn; },
     isOwnListingId: function (id) { return checkListingId(id).isOwn; },
-    viewer: viewer
+    viewer: viewer,
+    canContact: canContact,
+    contactRequestOk: contactRequestOk,
+    gateContact: gateContact,
+    onChange: onChange,
+    CONTACT_SELECTOR: CONTACT_SELECTOR
   };
 })(window.Accoom);

@@ -412,9 +412,22 @@
       var contactBtn = document.querySelector('[data-ap-contact]');
       if (!contactBtn) return;
 
+      // Permissions Stage 2: no contact / message actions on the signed-in agent's own profile.
+      function gateProfileContact() {
+        var o = Accoom.Ownership;
+        if (!o) return;
+        var scope = document.querySelector('.ap-actions') || document;
+        o.gateContact(scope.querySelectorAll(o.CONTACT_SELECTOR + ', a[href*="contact-agent.html"]'), stored || agent);
+      }
+      gateProfileContact();
+      if (Accoom.Ownership) Accoom.Ownership.onChange(gateProfileContact);
+
       Accoom.on(contactBtn, 'click', function (e) {
         e.preventDefault();
+        if (Accoom.Ownership && !Accoom.Ownership.canContact(stored || agent)) return;
         Accoom.setStorage('accoom-contact-request', {
+          ownerId: (stored && stored.ownerId) || '',
+          agentKey: (stored && stored.agentKey) || '',
           agentName: agent.name,
           agentAvatar: agent.avatar,
           verified: agent.verified,

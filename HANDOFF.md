@@ -145,3 +145,11 @@ Rules: inspect first, reuse existing systems, no redesign, no fake permission ch
 - Contact / payment UI NOT touched yet (Stage 2+).
 - Backend dependency: the test server has no authentication. A real backend must repeat the same comparison (authenticated user id vs listing owner id) before creating a conversation or payment. Stage 2 "enforced beyond hiding buttons" can only be frontend guards until then.
 - Test: `tests/ownership.test.mjs` (in `npm test`).
+
+### Stage 2 - prevent self-contact (DONE)
+- `ownership.js` additions: `canContact(subject)`, `contactRequestOk(req)`, `gateContact(els, subject)` (hides + disables, restores when not own), `onChange(fn)` (re-runs on account change in another tab and on back/forward-cache restore), `CONTACT_SELECTOR`. Contact controls use `[data-pd-contact-agent]`, `[data-ap-contact]`, `[data-contact-agent]`, `[data-message-agent]`, `[data-chat-agent]`: use one of these on any NEW contact button and it is covered automatically.
+- Property page: Contact Agent hidden on the agent's own listing; click handler re-checks; request now carries `ownerId` / `agentKey`. Agent profile: hidden on own profile, same re-check, request carries owner ids. Home suggested-card Contact Agent refuses own listings.
+- Chat page (`contact-agent.js`): a stored `accoom-contact-request` that names the signed-in agent (by owner ids OR by listing id) is discarded; `isSelfConversation()` blocks sending and `postToAgent`. NOTE: in the agent inbox the listing is the agent's own by design, so the check there is "customerKey === me" only (an earlier version blocked agent replies; `sync.e2e` caught it).
+- Server (`server/server.js`): message POST refuses a conversation whose two sides are the same key (400 "You cannot message yourself"), also for a stored conversation.
+- Limits: (1) listings saved in this browser before real ids carry the shared stand-in `local-agent`, so two different agents signing in one after the other in the SAME browser both see those local listings as their own (only a real account backend fixes this). (2) Agent-to-agent contact still lands on the agent inbox without creating a chat: that is Stage 3. (3) Server has no authentication; keys come from the client.
+- Tests: `tests/selfcontact.page.test.mjs` (real server + real pages, in `npm test`).

@@ -191,6 +191,12 @@ async function handleApi(req, res, url) {
     if (!senderKey || !text) return sendJson(res, 400, { error: 'senderKey and text required' });
 
     let conv = db.conversations[id];
+    // Nobody may write to themselves: refuse a conversation whose two sides are the same person.
+    if (conv && conv.agentKey === conv.customerKey) return sendJson(res, 400, { error: 'You cannot message yourself' });
+    {
+      const m0 = body.meta || {};
+      if (m0.agentKey && m0.customerKey && cleanId(m0.agentKey) === cleanId(m0.customerKey)) return sendJson(res, 400, { error: 'You cannot message yourself' });
+    }
     if (!conv) {
       const meta = body.meta || {};
       const agentKey = cleanId(meta.agentKey), customerKey = cleanId(meta.customerKey);

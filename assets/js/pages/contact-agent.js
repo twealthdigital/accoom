@@ -1786,6 +1786,7 @@
         if (!conv) return;
 
         if (cg.locked) return;
+        if (isSelfConversation(conv)) return; // Permissions Stage 2: nobody writes to themselves
         if (cgGuard(els.input)) return; // blocked text was removed + warned
 
         var text = els.input.value.trim();
@@ -2357,6 +2358,20 @@
       return h + ':' + (m < 10 ? '0' + m : m) + ' ' + ap;
     }
 
+    // Permissions Stage 2: a conversation whose other side is the signed-in person is never allowed.
+    function isSelfConversation(conv) {
+      if (!conv || !me) return false;
+      // Agent inbox: the agent is conv.agentKey and the other side is the customer. The only self-chat
+      // possible there is a "customer" that is the same person.
+      if (agentView) return !!(conv.customerKey && String(conv.customerKey) === String(me));
+      // Starting side: the agent being written to must not be the signed-in person, and the listing
+      // must not be the signed-in agent's own.
+      if (conv.agentKey && String(conv.agentKey) === String(me)) return true;
+      var O = Accoom.Ownership;
+      if (O && conv.property && conv.property.id && O.isOwnListingId(conv.property.id)) return true;
+      return false;
+    }
+
     function markRealAgent(conv, prop) {
       if (agentView) return;
       var item = (Accoom.PropertyService && Accoom.PropertyService.getById) ? Accoom.PropertyService.getById(prop.id) : null;
@@ -2372,6 +2387,7 @@
 
     function postToAgent(conv, msg) {
       if (!(Sync && Sync.available) || !conv.remote) return;
+      if (isSelfConversation(conv)) { msg.sent = false; return; }
       var body = { senderKey: me, message: { id: msg.id, text: msg.text, ts: msg.ts } };
       if (!agentView) {
         body.meta = {
@@ -2501,6 +2517,14 @@
     // Coming from a property page's "Contact Agent" button: open (or
     // create) the conversation for THAT exact property and agent.
     var contactRequest = Accoom.getStorage('accoom-contact-request', null);
+    // Permissions Stage 2: a request that points at the signed-in agent's own listing/profile is dropped
+    // (covers links, stale storage and edited pages, not just the hidden buttons).
+    if (contactRequest && Accoom.Ownership &&
+        (!Accoom.Ownership.contactRequestOk(contactRequest) ||
+         (contactRequest.property && contactRequest.property.id && Accoom.Ownership.isOwnListingId(contactRequest.property.id)))) {
+      Accoom.removeStorage('accoom-contact-request');
+      contactRequest = null;
+    }
 
     if (justPaidConv) {
       getPropState(justPaidConv, justPaidId).paymentStatus = 'review';
