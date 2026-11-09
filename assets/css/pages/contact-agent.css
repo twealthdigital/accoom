@@ -2399,3 +2399,15 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
   html.msgs-chat-open, html.msgs-chat-open body { overflow: hidden; overscroll-behavior: none; }
   .msgs-layout.is-kb { position: fixed; left: 0; right: 0; top: var(--vv-top, 0px); height: var(--vv-h, 100dvh); z-index: 1000; border-radius: 0; margin: 0; }
 }
+
+/* ---- Agent view (messages.html): same screen, customer-only parts hidden ---- */
+.is-agent-chat .msgs-property-extra-actions,
+.is-agent-chat .msgs-pay-menu,
+.is-agent-chat [data-msgs-view-profile],
+.is-agent-chat [data-msgs-property-review-btn],
+.is-agent-chat [data-msgs-block],
+.is-agent-chat [data-msgs-props-dropdown],
+.is-agent-chat [data-msgs-review-strip],
+.is-agent-chat [data-msgs-property-status],
+.is-agent-chat [data-msgs-blocked-bar] { display: none !important; }
+

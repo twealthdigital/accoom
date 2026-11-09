@@ -86,7 +86,7 @@ customer.close();
 customer = await browser('contact-agent.html', { ...customerStore, 'accoom-contact-request': JSON.stringify(request) });
 await test('customer opens a chat with the real agent and sends a message', async () => {
   const d = customer.document;
-  assert.ok(!d.querySelector('[data-msgs-chat]').hidden, 'chat not open');
+  assert.ok(!d.querySelector('[data-msgs-chat]').classList.contains('is-hidden'), 'chat not open');
   assert.equal(d.querySelector('[data-msgs-chat-name]').textContent, 'Adeola Fortune');
   const input = d.querySelector('[data-msgs-input]');
   input.value = 'Hello, is Akungba Flat still available?';
@@ -114,9 +114,11 @@ await test('agent inbox lists the customer and the property, with an unread badg
 });
 await test('agent opens it on desktop, sees the property and the customer message, composer says reply', () => {
   const d = agent.document;
-  assert.ok(!d.querySelector('[data-msgs-chat]').hidden);
+  assert.ok(!d.querySelector('[data-msgs-chat]').classList.contains('is-hidden'), 'agent chat not open');
   assert.equal(d.querySelector('[data-msgs-chat-name]').textContent, 'Chidi Okeke');
-  assert.equal(d.querySelector('[data-msgs-chat-status]').textContent, 'Akungba Flat');
+  assert.equal(d.querySelector('[data-msgs-chat-status]').textContent, 'Customer');
+  assert.equal(d.querySelector('[data-msgs-property-name]').textContent, 'Akungba Flat', 'property card shows what they asked about');
+  assert.ok(d.body.classList.contains('is-agent-chat'));
   assert.match(d.querySelector('[data-msgs-thread]').textContent, /still available/);
   assert.equal(d.querySelector('[data-msgs-input]').getAttribute('placeholder'), 'Type a reply...');
   assert.equal(d.querySelectorAll('.msgs-row--agent').length, 1, 'customer message shown as incoming');

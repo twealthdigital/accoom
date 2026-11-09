@@ -380,8 +380,18 @@
     });
 
     var storedConvs = Accoom.getStorage('accoom-conversations', null);
+    // The same screen serves two people: a customer (contact-agent.html) and an agent answering them (messages.html).
+    var agentView = !!(Accoom.Sync && Accoom.Sync.isAgent());
+    if (agentView) {
+      document.body.classList.add('is-agent-chat');
+      var elInput = document.querySelector('[data-msgs-input]'); if (elInput) elInput.setAttribute('placeholder', 'Type a reply...');
+      var elEmpty = document.querySelector('[data-msgs-list-empty-text]'); if (elEmpty) elEmpty.textContent = 'Customers who contact you about your listings will show up here.';
+      var elChat = document.querySelector('[data-msgs-chat-empty-text]'); if (elChat) elChat.textContent = 'Choose a chat on the left to reply to a customer.';
+    }
     var state = {
-      conversations: (Array.isArray(storedConvs) && storedConvs.length) ? storedConvs : seedConversations(),
+      conversations: agentView
+        ? (Array.isArray(storedConvs) ? storedConvs.filter(function (c) { return c && c.agentView; }) : [])
+        : ((Array.isArray(storedConvs) && storedConvs.length) ? storedConvs : seedConversations()),
       activeId: null,
       activeChatTab: 'messages',
       listTab: 'all',
@@ -602,6 +612,7 @@
     }
 
     function deleteConversation(id) {
+      hideRemote(findConv(id));
       var wasActive = state.activeId === id;
       var list = state.conversations.some(function (c) { return c.id === id; })
         ? state.conversations
@@ -771,7 +782,9 @@
 
       if (noConversations) {
         els.chatEmptyTitle.textContent = 'No conversations yet';
-        els.chatEmptyText.textContent = "You haven't messaged any agents yet. Start a chat and it'll show up here.";
+        els.chatEmptyText.textContent = agentView
+          ? 'Customers who message you about your listings will show up here.'
+          : "You haven't messaged any agents yet. Start a chat and it'll show up here.";
         return;
       }
 
@@ -825,6 +838,7 @@
         state.keepUnreadId = null;
       }
 
+      if (conv.unread && conv.remote) markReadRemote(conv);
       conv.unread = 0;
       state.activeId = id;
       state.activeChatTab = 'messages';
@@ -857,7 +871,7 @@
       els.chatAvatar.src = conv.avatar;
       els.chatAvatar.alt = conv.name;
       els.chatName.textContent = conv.name;
-      els.chatStatus.textContent = conv.muted ? 'Muted' : (conv.online ? 'Online' : 'Offline \u00B7 ' + conv.role);
+      els.chatStatus.textContent = conv.muted ? 'Muted' : (agentView ? 'Customer' : (conv.online ? 'Online' : 'Offline \u00B7 ' + conv.role));
       els.chatStatus.classList.toggle('is-online', conv.online && !conv.muted);
 
       if (els.viewProfile) {
@@ -2328,15 +2342,23 @@
       return c.property.id === reopenId;
     })[0] : null;
 
-    /* ---------------- REAL AGENTS (laptop test server, core/sync.js) ----------------
-       A listing uploaded by a real agent has an agentKey. Messages to that agent go to the server and show up in
-       the agent's inbox on messages.html; the agent's replies come back here as incoming messages.
-       Everything else in this chat (saved chats, payments, approve / decline) works exactly as before. */
+    /* ---------------- REAL PEOPLE (laptop test server, core/sync.js) ----------------
+       Customer view (this page): a listing from a real agent has an agentKey. Messages to that agent go to the
+       server; the agent's replies come back here as incoming messages.
+       Agent view (the same page, shown as messages.html): the customers who wrote to this agent are the
+       conversations; replying sends the text back to that customer.
+       Everything else (saved chats, search, tabs, message actions) works the same in both views. */
     var Sync = Accoom.Sync || null;
     var me = Sync ? Sync.userKey() : '';
     function cleanTxt(v) { return String(v == null ? '' : v).replace(/[<>&"'`]/g, '').trim(); }
+    function clock(ts) {
+      var d = new Date(ts), h = d.getHours(), m = d.getMinutes();
+      var ap = h >= 12 ? 'PM' : 'AM'; h = h % 12; if (h === 0) h = 12;
+      return h + ':' + (m < 10 ? '0' + m : m) + ' ' + ap;
+    }
 
     function markRealAgent(conv, prop) {
+      if (agentView) return;
       var item = (Accoom.PropertyService && Accoom.PropertyService.getById) ? Accoom.PropertyService.getById(prop.id) : null;
       var key = item && item.agentListing && item.agentKey ? String(item.agentKey) : '';
       if (!key || !me || key === me || !(Sync && Sync.available)) return;
@@ -2346,64 +2368,135 @@
       conv.online = false;
     }
 
+    function remoteIdOf(conv) { return conv.remoteId || conv.id; }
+
     function postToAgent(conv, msg) {
       if (!(Sync && Sync.available) || !conv.remote) return;
-      Sync.api('POST', '/api/conversations/' + encodeURIComponent(conv.remoteId) + '/messages', {
-        senderKey: me,
-        message: { id: msg.id, text: msg.text, ts: msg.ts },
-        meta: {
+      var body = { senderKey: me, message: { id: msg.id, text: msg.text, ts: msg.ts } };
+      if (!agentView) {
+        body.meta = {
           propertyId: conv.property && conv.property.id,
           propertyName: cleanTxt(conv.property && conv.property.name),
           agentKey: conv.agentKey, agentName: cleanTxt(conv.name),
           customerKey: me, customerName: Sync.userName()
-        }
-      }).then(function () { msg.sent = true; saveConversations(); }, function () { msg.sent = false; });
+        };
+      }
+      Sync.api('POST', '/api/conversations/' + encodeURIComponent(remoteIdOf(conv)) + '/messages', body)
+        .then(function () { msg.sent = true; saveConversations(); }, function () { msg.sent = false; });
     }
 
+    function markReadRemote(conv) {
+      if (!conv.remote || !(Sync && Sync.available)) return;
+      Sync.api('POST', '/api/conversations/' + encodeURIComponent(remoteIdOf(conv)) + '/read', { key: me }).catch(function () {});
+    }
+
+    // Agent view: chats the agent removed from their list stay removed until the customer writes again.
+    function hiddenMap() { return Accoom.getStorage('accoom-hidden-chats', {}) || {}; }
+    function hideRemote(conv) {
+      if (!agentView || !conv || !conv.remote) return;
+      var map = hiddenMap();
+      var last = conv.messages.length ? (conv.messages[conv.messages.length - 1].ts || 0) : 0;
+      map[conv.id] = Math.max(last, conv.updatedAt || 0, Date.now());
+      Accoom.setStorage('accoom-hidden-chats', map);
+    }
+
+    function agentConvFromServer(rc, old) {
+      var item = (Accoom.PropertyService && Accoom.PropertyService.getById) ? Accoom.PropertyService.getById(rc.propertyId) : null;
+      var prop = (old && old.property && String(old.property.id) === String(rc.propertyId)) ? old.property : {
+        id: rc.propertyId,
+        name: (item && item.name) || cleanTxt(rc.propertyName) || 'Property',
+        location: (item && item.location) || '',
+        price: item ? (typeof item.price === 'number' ? ('\u20A6' + item.price.toLocaleString('en-NG') + (item.priceLabel ? ' ' + item.priceLabel : '')) : item.price) : '',
+        image: (item && item.images && item.images[0]) || 'assets/images/home-properties/placeholder.webp'
+      };
+      var oldById = {};
+      ((old && old.messages) || []).forEach(function (m) { oldById[m.id] = m; });
+      var seen = {};
+      var msgs = rc.messages.map(function (m) {
+        seen[m.id] = true;
+        if (oldById[m.id]) return oldById[m.id];
+        return { id: m.id, from: m.from === 'agent' ? 'me' : 'agent', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text, read: true, sent: true };
+      });
+      ((old && old.messages) || []).forEach(function (m) { if (m.from === 'me' && m.sent === false && !seen[m.id]) msgs.push(m); });
+      msgs.sort(function (x, y) { return (x.ts || 0) - (y.ts || 0); });
+      return Object.assign({}, old || {}, {
+        id: rc.id, remote: true, agentView: true,
+        name: cleanTxt(rc.customerName) || 'Customer', role: 'Customer',
+        avatar: (old && old.avatar) || AVATAR, online: false, verified: false,
+        muted: old ? !!old.muted : false,
+        property: prop, allProperties: [prop],
+        agentKey: rc.agentKey, customerKey: rc.customerKey, updatedAt: rc.updatedAt,
+        unread: (rc.unread && rc.unread.agent) || 0,
+        messages: msgs
+      });
+    }
+
+    var firstPull = true;
     var polling = false;
-    function pullAgentReplies() {
+    function pullFromServer() {
       if (!me || !(Sync && Sync.available) || polling) return;
       polling = true;
-      // Messages that could not be delivered yet.
-      state.conversations.forEach(function (c) {
+      state.conversations.forEach(function (c) {          // messages that could not be delivered yet
         if (!c.remote) return;
         c.messages.forEach(function (m) { if (m.from === 'me' && m.text && m.sent === false) postToAgent(c, m); });
       });
       Sync.api('GET', '/api/conversations?key=' + encodeURIComponent(me)).then(function (r) {
-        var changed = false;
-        (r.conversations || []).forEach(function (rc) {
-          if (rc.customerKey !== me) return;
-          var conv = state.conversations.filter(function (c) { return c.remoteId === rc.id; })[0];
-          if (!conv) return;
-          var have = {};
-          conv.messages.forEach(function (m) { have[m.id] = true; });
-          rc.messages.forEach(function (m) {
-            if (m.from === 'customer') {                       // my own earlier message (e.g. after clearing the browser)
-              if (!have[m.id]) { conv.messages.push({ id: m.id, from: 'me', day: 'Today', ts: m.ts, time: formatNow(), text: m.text, read: true, sent: true }); changed = true; }
-              return;
-            }
-            if (m.from !== 'agent' || have['r-' + m.id]) return;
-            var d = new Date(m.ts);
-            conv.messages.push({ id: 'r-' + m.id, from: 'agent', day: 'Today', ts: m.ts, time: formatNow(d), text: m.text });
-            conv.unread = (conv.unread || 0) + 1;
-            changed = true;
+        var before = JSON.stringify(state.conversations);
+        var hidden = hiddenMap();
+
+        if (agentView) {
+          (r.conversations || []).forEach(function (rc) {
+            if (rc.agentKey !== me) return;
+            if (hidden[rc.id] && rc.updatedAt <= hidden[rc.id]) return;
+            if (hidden[rc.id]) { delete hidden[rc.id]; Accoom.setStorage('accoom-hidden-chats', hidden); }
+            var idx = -1;
+            for (var i = 0; i < state.conversations.length; i++) { if (state.conversations[i].id === rc.id) { idx = i; break; } }
+            var next = agentConvFromServer(rc, idx === -1 ? null : state.conversations[idx]);
+            if (next.id === state.activeId && next.unread) { next.unread = 0; markReadRemote(next); }
+            if (idx === -1) state.conversations.push(next); else state.conversations[idx] = next;
           });
-          if (changed) conv.messages.sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); });
-          if (conv.id === state.activeId && conv.unread) {   // I am reading this chat right now
-            conv.unread = 0;
-            Sync.api('POST', '/api/conversations/' + encodeURIComponent(rc.id) + '/read', { key: me }).catch(function () {});
-          }
-        });
-        if (!changed) return;
-        saveConversations();
-        renderList();
-        var open = findConv(state.activeId);
-        if (open) { renderThread(open); scrollChatToEnd(); }
+          state.conversations.sort(function (a, b) {
+            var la = lastMessage(a), lb = lastMessage(b);
+            return (lb ? lb.ts || 0 : 0) - (la ? la.ts || 0 : 0);
+          });
+        } else {
+          (r.conversations || []).forEach(function (rc) {
+            if (rc.customerKey !== me) return;
+            var conv = state.conversations.filter(function (c) { return c.remoteId === rc.id; })[0];
+            if (!conv) return;
+            var have = {};
+            conv.messages.forEach(function (m) { have[m.id] = true; });
+            rc.messages.forEach(function (m) {
+              if (m.from === 'customer') {                    // my own earlier message (e.g. after clearing the browser)
+                if (!have[m.id]) conv.messages.push({ id: m.id, from: 'me', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text, read: true, sent: true });
+                return;
+              }
+              if (have['r-' + m.id]) return;
+              conv.messages.push({ id: 'r-' + m.id, from: 'agent', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text });
+              conv.unread = (conv.unread || 0) + 1;
+            });
+            conv.messages.sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); });
+            if (conv.id === state.activeId && conv.unread) { conv.unread = 0; markReadRemote(conv); }
+          });
+        }
+
+        if (JSON.stringify(state.conversations) !== before) {
+          saveConversations();
+          renderList();
+          var open = findConv(state.activeId);
+          if (open) { renderThread(open); scrollChatToEnd(); }
+        }
+        if (firstPull && agentView && !state.activeId && window.innerWidth > 860 && state.conversations.length && !new URLSearchParams(window.location.search).get('open')) {
+          openConversation(state.conversations[0].id);
+        } else if (firstPull && agentView && !state.conversations.length) {
+          showChatEmpty(true);
+        }
+        firstPull = false;
       }).catch(function () {}).then(function () { polling = false; });
     }
-    window.setInterval(function () { if (!document.hidden) pullAgentReplies(); }, 3000);
-    document.addEventListener('visibilitychange', function () { if (!document.hidden) pullAgentReplies(); });
-    pullAgentReplies();
+    window.setInterval(function () { if (!document.hidden) pullFromServer(); }, 3000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) pullFromServer(); });
+    pullFromServer();
 
     // Coming from a property page's "Contact Agent" button: open (or
     // create) the conversation for THAT exact property and agent.
@@ -2419,7 +2512,7 @@
       openConversation(reopenConv.id);
       if (window.innerWidth <= 860) layout.setAttribute('data-view', 'chat');
       window.history.replaceState({}, '', window.location.pathname);
-    } else if (contactRequest && contactRequest.property && contactRequest.property.id) {
+    } else if (!agentView && contactRequest && contactRequest.property && contactRequest.property.id) {
       var reqProp = contactRequest.property;
       var agentName = contactRequest.agentName || 'Agent';
 
