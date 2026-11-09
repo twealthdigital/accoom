@@ -179,11 +179,16 @@ Rules: inspect first, reuse existing systems, no redesign, no fake permission ch
 
 ### Stage 5A - no payment UI on an agent's own listing (DONE)
 - `assets/js/pages/property.js` (`gateOwnListingPayment`, right after `initPayment`): when `Accoom.Ownership.check(listing).isOwn`, the whole Price Details card (Total + Make Payment) is hidden/disabled through the existing `Ownership.gateContact`, the payment dialog is closed, and a capture-phase click guard stops the existing Make Payment / dialog confirm handlers if the button is revealed by editing the page. Re-runs through `Ownership.onChange`. Existing payment logic is untouched; `other`, `guest` and `unknown` states are unchanged.
-- NOT done (Stage 5B): `payment.html?id=<own listing>` is not blocked yet; other own-listing payment surfaces (cards, dashboards) not audited.
+- Other own-listing payment surfaces (cards, dashboards) are not audited.
 - Test: `tests/stage5a.page.test.mjs` (10 checks, real server + real pages, in `npm test`). jsdom only; not checked in a real browser.
 
 ### Stage 5B - payment UI only for the initiating agent / customers on the property page (DONE)
 - `core/ownership.js`: new `canSeePaymentUI(subject)` and `gatePayment(els, subject)`. False for guests, the agent's own listing, and an agent on a listing with no provable owner (`unknown`). True for an agent on someone else's listing and for customers (customers own nothing, so a missing owner on the record is not a self-pay risk: their experience is unchanged).
-- `pages/property.js` `gateOwnListingPayment` now uses `canSeePaymentUI` / `gatePayment` (Stage 5A only handled `own`). Guests used to see Make Payment on the property page; they no longer do. The existing payment dialog and `payment.html` hand-off are untouched.
-- NOT done (5C): `payment.html?id=<own listing>` still not blocked by URL; cards/dashboards not audited.
+- `pages/property.js` `gateOwnListingPayment` now uses `canSeePaymentUI` / `gatePayment` (Stage 5A only handled `own`). Guests used to see Make Payment on the property page; they no longer do.
 - Test: `tests/stage5b.page.test.mjs` (12 checks, real server + real pages, in `npm test`). jsdom only; not checked in a real browser.
+
+### Stage 5C - direct payment-page access checks (DONE)
+- `core/ownership.js` `canAccessPaymentPage(propertyId)` blocks guests and agents whose listing is their own or whose owner cannot be verified. Agents may pay for another agent's listing; customers retain their existing behavior. A URL without a property id remains available for wallet top-ups.
+- `pages/payment.js` checks access on page load and again before wallet changes; `payment.html` hides an agent's property-payment card until the initial ownership check completes. A property id is checked even when the URL says `context=wallet`.
+- Test: `tests/stage5c.payment.page.test.mjs` covers direct URLs for an own listing, wallet-context bypass, another agent's listing, unknown/missing listings, customer access, wallet top-up, and guests. Included in `npm test`; jsdom only.
+- Limits: client-side checks are not a substitute for server-side authorization. This demo has no authenticated payment backend. Other own-listing payment surfaces (cards, dashboards) are not audited.
