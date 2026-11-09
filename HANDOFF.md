@@ -176,3 +176,8 @@ Rules: inspect first, reuse existing systems, no redesign, no fake permission ch
 - Test: `tests/agentpay.page.test.mjs` (16 checks, real server + real pages, in `npm test`).
 - NOT done: Stage 5 (own-listing payment on property pages / `payment.html?id=<own listing>` is not blocked yet), Stage 6 audit. Rate-this-seller strip is shown to the paying agent like a paying customer; reviews are keyed by the reviewer's account id, so an agent reviewer works, but check that this is wanted.
 - Limits: still no real payment gateway or server-side payment state (demo wallet in the browser); the server has no authentication. Not verified in a real browser or on mobile layouts (jsdom only).
+
+### Stage 5A - no payment UI on an agent's own listing (DONE)
+- `assets/js/pages/property.js` (`gateOwnListingPayment`, right after `initPayment`): when `Accoom.Ownership.check(listing).isOwn`, the whole Price Details card (Total + Make Payment) is hidden/disabled through the existing `Ownership.gateContact`, the payment dialog is closed, and a capture-phase click guard stops the existing Make Payment / dialog confirm handlers if the button is revealed by editing the page. Re-runs through `Ownership.onChange`. Existing payment logic is untouched; `other`, `guest` and `unknown` states are unchanged.
+- NOT done (Stage 5B): `payment.html?id=<own listing>` is not blocked yet; other own-listing payment surfaces (cards, dashboards) not audited.
+- Test: `tests/stage5a.page.test.mjs` (10 checks, real server + real pages, in `npm test`). jsdom only; not checked in a real browser.
