@@ -719,6 +719,8 @@ window.Accoom = window.Accoom || {};
       function renderMessages() {
         var conversations = Accoom.getStorage('accoom-conversations', []) || [];
         var withMessages = conversations.filter(function (c) {
+          // Permissions Stage 6: a chat with myself is never listed or counted as unread.
+          if (Accoom.Ownership && Accoom.Ownership.isSelfConversation(c)) return false;
           return c.property && lastIncomingMessage(c);
         });
 

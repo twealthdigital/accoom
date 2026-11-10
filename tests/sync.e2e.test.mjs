@@ -133,7 +133,8 @@ await test('agent replies and it is stored on the server as from the agent', asy
   assert.equal(m.length, 2);
   assert.equal(m[1].from, 'agent');
   assert.equal(conversations[0].unread.agent, 0, 'agent read it');
-  assert.equal(conversations[0].unread.customer, 1);
+  // the customer's page is open in the other browser and polls: it may already have read the reply, so 0 or 1 are both right
+  assert.ok([0, 1].includes(conversations[0].unread.customer), 'customer unread is 0 (already read by the open page) or 1');
 });
 await test('customer page (still open in the other browser) receives the reply by itself', async () => {
   await sleep(3500);   // poll interval

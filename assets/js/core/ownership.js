@@ -279,7 +279,30 @@ window.Accoom = window.Accoom || {};
     return { allowed: false, reason: c.isOwn ? 'own-listing' : 'unverifiable' };
   }
 
+  /* ------------------------------------------------------------------
+     Stage 6 - app-wide consistency: a stored conversation that is "with
+     myself". Used by every screen that lists conversations (header
+     dropdown, chat pages) so a self chat that reached this browser's
+     storage is never shown or counted.
+       agent, chat someone wrote to me (!outgoing):  customerKey is me
+       everyone else (I started it):                 recipient (agentKey) is
+                                                     me, or the listing is mine
+       any chat whose two sides are the same key
+     ------------------------------------------------------------------ */
+  function isSelfConversation(conv) {
+    if (!conv || typeof conv !== 'object') return false;
+    var v = viewer();
+    if (!v || !v.known) return false;
+    function mine(k) { k = clean(k); return !!k && v.ids.indexOf(k) !== -1; }
+    var a = clean(conv.agentKey), c = clean(conv.customerKey);
+    if (a && c && a === c) return true;
+    if (v.role === 'agent' && !conv.outgoing) return mine(c);
+    if (mine(a)) return true;
+    return !!(conv.property && conv.property.id && checkListingId(conv.property.id).isOwn);
+  }
+
   Accoom.Ownership = {
+    isSelfConversation: isSelfConversation,
     canAccessPaymentPage: canAccessPaymentPage,
     canSeePaymentUI: canSeePaymentUI,
     gatePayment: gatePayment,
