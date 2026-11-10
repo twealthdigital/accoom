@@ -908,6 +908,8 @@ html.dark-mode .msgs-props-item.is-active {
 }
 
 .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.14); }
+.msgs-reply-quote[data-reply-id] { cursor: pointer; }
+.msgs-row.is-reply-flash .msgs-bubble { box-shadow: 0 0 0 2px var(--gold); transition: box-shadow 0.3s; }
 .msgs-reply-quote b { color: var(--gold); font-size: 0.72rem; }
 .msgs-reply-quote span {
   color: var(--on-page-soft);

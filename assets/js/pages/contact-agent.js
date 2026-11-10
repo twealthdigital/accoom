@@ -1348,7 +1348,7 @@
 
       var replyHtml = '';
       if (msg.replyTo) {
-        replyHtml = '<div class="msgs-reply-quote"><b>' + msg.replyTo.name + '</b><span>' + msg.replyTo.text + '</span></div>';
+        replyHtml = '<div class="msgs-reply-quote"' + (msg.replyTo.id ? ' data-reply-id="' + escapeHtml(String(msg.replyTo.id)) + '" role="button" tabindex="0"' : '') + '><b>' + escapeHtml(msg.replyTo.name) + '</b><span>' + escapeHtml(msg.replyTo.text) + '</span></div>';
       }
 
       var bubbleInner = '';
@@ -1426,6 +1426,26 @@
           panel.classList.add('is-open');
         }
       });
+
+      // Tapping the quoted preview jumps to the original message (when it is still in this chat).
+      var replyQuote = row.querySelector('[data-reply-id]');
+      if (replyQuote) {
+        var jumpToOriginal = function (e) {
+          e.stopPropagation();
+          var wanted = replyQuote.getAttribute('data-reply-id');
+          var target = null;
+          (els.thread || document).querySelectorAll('[data-msg-id]').forEach(function (r) {
+            var rid = r.getAttribute('data-msg-id');
+            if (!target && (rid === wanted || rid === 'r-' + wanted)) target = r;
+          });
+          if (!target) return;
+          if (target.scrollIntoView) target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          target.classList.add('is-reply-flash');
+          window.setTimeout(function () { target.classList.remove('is-reply-flash'); }, 1400);
+        };
+        Accoom.on(replyQuote, 'click', jumpToOriginal);
+        Accoom.on(replyQuote, 'keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); jumpToOriginal(e); } });
+      }
 
       var replyOption = row.querySelector('[data-row-reply]');
       if (replyOption) {
@@ -1579,8 +1599,11 @@
         '</div>';
     }
     /* ---------------- REPLY PREVIEW ---------------- */
+    // The id a message has on the server: received messages are kept locally as 'r-<id>' (customer screen).
+    function canonicalMsgId(id) { id = String(id == null ? '' : id); return id.indexOf('r-') === 0 ? id.slice(2) : id; }
     function setReply(msg, conv) {
       state.replyTo = {
+        id: canonicalMsgId(msg.id),
         name: msg.from === 'me' ? 'You' : conv.name,
         text: msg.photos ? (msg.photos.length + ' Photos') : msg.text
       };
@@ -2452,6 +2475,9 @@
       if (!(Sync && Sync.available) || !conv.remote) return;
       if (isSelfConversation(conv)) { msg.sent = false; return; }
       var body = { senderKey: me, message: { id: msg.id, text: msg.text, ts: msg.ts } };
+      if (msg.replyTo && (msg.replyTo.id || msg.replyTo.text)) {   // the recipient must see which message this answers
+        body.message.replyTo = { id: msg.replyTo.id ? String(msg.replyTo.id) : '', text: String(msg.replyTo.text || '').slice(0, 200) };
+      }
       if (!agentView || conv.outgoing) {          // the person writing first names both sides
         body.meta = {
           propertyId: conv.property && conv.property.id,
@@ -2486,6 +2512,17 @@
       return rc.agentKey === me ? 'agent' : (rc.customerKey === me ? 'customer' : null);
     }
 
+    // Turn the replyTo a server message carries into the preview THIS side shows: the author's name is
+    // worked out from my own point of view ('You' for my messages, the other person's name otherwise).
+    function replyFromServer(m, rc, side, otherName) {
+      if (!m || !m.replyTo) return null;
+      var orig = null;
+      if (m.replyTo.id) rc.messages.forEach(function (x) { if (!orig && x.id === m.replyTo.id) orig = x; });
+      var text = orig ? orig.text : m.replyTo.text;
+      if (!text) return null;
+      return { id: orig ? orig.id : (m.replyTo.id || ''), name: orig ? (orig.from === side ? 'You' : otherName) : otherName, text: String(text).slice(0, 200) };
+    }
+
     // Agent screen: turn a server conversation into a chat row. Works for chats other people started with me
     // (side 'agent') AND chats I started with another agent (side 'customer', shown as outgoing).
     function agentConvFromServer(rc, old) {
@@ -2499,6 +2536,7 @@
         price: item ? (typeof item.price === 'number' ? ('\u20A6' + item.price.toLocaleString('en-NG') + (item.priceLabel ? ' ' + item.priceLabel : '')) : item.price) : '',
         image: (item && item.images && item.images[0]) || 'assets/images/home-properties/placeholder.webp'
       };
+      var otherName = outgoing ? (cleanTxt(rc.agentName) || 'Agent') : (cleanTxt(rc.customerName) || (rc.customerRole === 'agent' ? 'Agent' : 'Customer'));
       var oldById = {};
       ((old && old.messages) || []).forEach(function (m) { oldById[m.id] = m; });
       var seen = {};
@@ -2506,11 +2544,13 @@
         seen[m.id] = true;
         if (oldById[m.id]) return oldById[m.id];
         // my own messages are on my side, the other person's on theirs
-        return { id: m.id, from: m.from === side ? 'me' : 'agent', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text, read: true, sent: true };
+        var row = { id: m.id, from: m.from === side ? 'me' : 'agent', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text, read: true, sent: true };
+        var rp = replyFromServer(m, rc, side, otherName);
+        if (rp) row.replyTo = rp;
+        return row;
       });
       ((old && old.messages) || []).forEach(function (m) { if (m.from === 'me' && m.sent === false && !seen[m.id]) msgs.push(m); });
       msgs.sort(function (x, y) { return (x.ts || 0) - (y.ts || 0); });
-      var otherName = outgoing ? (cleanTxt(rc.agentName) || 'Agent') : (cleanTxt(rc.customerName) || (rc.customerRole === 'agent' ? 'Agent' : 'Customer'));
       var otherRole = outgoing ? 'Real Estate Agent' : (rc.customerRole === 'agent' ? 'Agent' : 'Customer');
       return Object.assign({}, old || {}, {
         id: old ? old.id : rc.id, remoteId: rc.id, remote: true, agentView: true, outgoing: outgoing,
@@ -2563,11 +2603,19 @@
             conv.messages.forEach(function (m) { have[m.id] = true; });
             rc.messages.forEach(function (m) {
               if (m.from === 'customer') {                    // my own earlier message (e.g. after clearing the browser)
-                if (!have[m.id]) conv.messages.push({ id: m.id, from: 'me', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text, read: true, sent: true });
+                if (!have[m.id]) {
+                  var mine = { id: m.id, from: 'me', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text, read: true, sent: true };
+                  var rpMine = replyFromServer(m, rc, 'customer', conv.name);
+                  if (rpMine) mine.replyTo = rpMine;
+                  conv.messages.push(mine);
+                }
                 return;
               }
               if (have['r-' + m.id]) return;
-              conv.messages.push({ id: 'r-' + m.id, from: 'agent', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text });
+              var incoming = { id: 'r-' + m.id, from: 'agent', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text };
+              var rpIn = replyFromServer(m, rc, 'customer', conv.name);
+              if (rpIn) incoming.replyTo = rpIn;
+              conv.messages.push(incoming);
               conv.unread = (conv.unread || 0) + 1;
             });
             conv.messages.sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); });

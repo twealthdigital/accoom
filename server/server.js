@@ -234,7 +234,17 @@ async function handleApi(req, res, url) {
     const mid = cleanId(msg.id) || ('m-' + Date.now() + '-' + crypto.randomBytes(3).toString('hex'));
     if (!conv.messages.some((x) => x.id === mid)) {
       const ts = Number(msg.ts) > 0 ? Math.min(Number(msg.ts), Date.now() + 60000) : Date.now();
-      conv.messages.push({ id: mid, from: side, text, ts });
+      const entry = { id: mid, from: side, text, ts };
+      // Reply link: which earlier message this one answers. The preview text comes from the stored original
+      // when it is in this chat (so it cannot be made to say something else), otherwise a short snapshot.
+      const rp = msg.replyTo && typeof msg.replyTo === 'object' ? msg.replyTo : null;
+      if (rp) {
+        const rid = cleanId(rp.id);
+        const orig = rid ? conv.messages.find((x) => x.id === rid) : null;
+        const rtext = orig ? orig.text.slice(0, 200) : cleanText(rp.text).slice(0, 200);
+        if (rtext) entry.replyTo = orig ? { id: rid, text: rtext } : { id: '', text: rtext };
+      }
+      conv.messages.push(entry);
       log('chat', (side === 'agent' ? conv.agentName : conv.customerName) + ' -> ' + (side === 'agent' ? conv.customerName : conv.agentName) + ' about "' + conv.propertyName + '"');
       conv.messages.sort((a, b) => a.ts - b.ts);
       const other = side === 'agent' ? 'customer' : 'agent';

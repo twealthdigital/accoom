@@ -126,7 +126,9 @@ await test('B replies; the server stores it as from the agent side', async () =>
   await sleep(900);
   const c = (await j('/api/conversations?key=' + keyB)).conversations[0];
   assert.equal(c.messages.length, 2); assert.equal(c.messages[1].from, 'agent');
-  assert.equal(c.unread.agent, 0); assert.equal(c.unread.customer, 1);
+  assert.equal(c.unread.agent, 0);
+  // the other side's page is open and polls, so it may already have read the reply: 0 or 1 are both right
+  assert.ok([0, 1].includes(c.unread.customer), 'customer unread is 0 (already read by the open page) or 1');
 });
 await test('A (still open) receives B\'s reply as INCOMING, and A\'s own message stays on A\'s side', async () => {
   await sleep(3500);
