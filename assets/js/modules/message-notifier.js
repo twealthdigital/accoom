@@ -73,6 +73,18 @@ window.Accoom = window.Accoom || {};
     return !!(Accoom.Ownership && Accoom.Ownership.isSelfConversation && Accoom.Ownership.isSelfConversation(conv));
   }
 
+  function clockOf(ts) {
+    if (!ts) return '';
+    var d = new Date(ts);
+    if (isNaN(d.getTime())) return '';
+    var now = new Date();
+    if (d.toDateString() !== now.toDateString()) {
+      var days = Math.round((now - d) / 86400000);
+      return days <= 1 ? 'Yesterday' : d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+    return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
+
   /* ----------------------------------------------------- local snapshot */
   function localItems() {
     var list = Accoom.getStorage(CONV_KEY, []);
@@ -86,7 +98,7 @@ window.Accoom = window.Accoom || {};
       conv.messages.forEach(function (m, i) {
         if (!m || m.from === 'me' || !str(m.text).trim()) return;
         var id = m.id ? stripId(m.id) : (str(m.ts) + ':' + i + ':' + str(m.text).slice(0, 40));
-        incoming.push({ id: id, text: m.text, ts: m.ts || 0, order: i });
+        incoming.push({ id: id, text: m.text, ts: m.ts || 0, order: i, label: (m.day && m.day !== 'Today') ? m.day : str(m.time) });
       });
       out.push({
         key: key, name: str(conv.name) || 'New message', property: conv.property || null,
@@ -113,7 +125,7 @@ window.Accoom = window.Accoom || {};
       var incoming = [];
       rc.messages.forEach(function (m, i) {
         if (!m || m.from === side || !str(m.text).trim()) return;
-        incoming.push({ id: stripId(m.id), text: m.text, ts: m.ts || 0, order: i });
+        incoming.push({ id: stripId(m.id), text: m.text, ts: m.ts || 0, order: i, label: clockOf(m.ts) });
       });
       out.push({
         key: str(rc.id), name: other, property: { id: rc.propertyId, name: str(rc.propertyName) },
@@ -295,8 +307,60 @@ window.Accoom = window.Accoom || {};
   }
 
   /* ---------------------------------------------------------- public API */
+  // Every chat that has something from the other person, local and server merged, newest first.
+  // The header dropdown renders from this, so a new message in a chat this browser already stores
+  // shows up exactly like the first one did.
+  function viewItems() {
+    var out = [];
+    snapshot().forEach(function (it) {
+      if (!it.incoming.length) return;
+      var last = latest(it.incoming);
+      out.push({
+        key: it.key, name: it.name, property: it.property, unread: it.unread, muted: it.muted,
+        text: last ? last.text : '', label: last ? last.label : '', ts: last ? (last.ts || 0) : 0, order: last ? last.order : 0
+      });
+    });
+    out.sort(function (a, b) { return (b.ts - a.ts) || (b.order - a.order); });
+    return out;
+  }
+
+  // Mark one chat read / unread from anywhere (header dropdown). Local copy, server copy, and the
+  // chat page's in-memory copy are all kept in step so nothing flips back on the next poll.
+  function setUnread(key, unread) {
+    key = str(key);
+    if (!key) return;
+    var count = unread ? 1 : 0;
+    var handled = false;
+    try {
+      var detail = { key: key, unread: count, handled: false };
+      document.dispatchEvent(new CustomEvent('accoom:set-chat-unread', { detail: detail }));
+      handled = !!detail.handled;
+    } catch (err) { /* old browser: fall through to storage */ }
+    if (!handled) {
+      var list = Accoom.getStorage(CONV_KEY, []);
+      if (Array.isArray(list)) {
+        var changed = false;
+        list.forEach(function (conv) {
+          if (!conv || str(conv.remoteId || conv.id) !== key) return;
+          var next = count ? Math.max(1, unreadOf(conv.unread)) : 0;
+          if (unreadOf(conv.unread) !== next) { conv.unread = next; changed = true; }
+        });
+        if (changed) Accoom.setStorage(CONV_KEY, list);
+      }
+    }
+    remote.forEach(function (it) { if (it.key === key) it.unread = count ? Math.max(1, it.unread) : 0; });
+    var s = sync(), myKey = me();
+    if (s && myKey && s.available === true) {
+      s.api('POST', '/api/conversations/' + encodeURIComponent(key) + (count ? '/unread' : '/read'), { key: myKey }, 5000).catch(function () {});
+    }
+    evaluate();
+  }
+
   Accoom.MessageNotifier = {
     refresh: function () { evaluate(); },
+    items: viewItems,
+    markRead: function (key) { setUnread(key, false); },
+    markUnread: function (key) { setUnread(key, true); },
     chatLink: chatLink,
     remoteOnlyItems: function () {
       var localKeys = {};

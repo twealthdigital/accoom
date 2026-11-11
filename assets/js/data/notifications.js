@@ -166,6 +166,12 @@ window.Accoom = window.Accoom || {};
   // Notifications can no longer be deleted by the user.
   NotificationService.dismiss = function () {};
 
+  // A notification added, read or unread in ANOTHER tab arrives as a 'storage' event; re-broadcast it
+  // so this tab's header dropdown and badge update on every new notification, not just the first.
+  window.addEventListener('storage', function (e) {
+    if (!e || e.key === null || e.key === STORAGE_KEY || e.key === 'accoom-notifications-muted' || e.key === 'accoom-user') broadcast();
+  });
+
   Accoom.NOTIFICATIONS_CHANGED_EVENT = CHANGED_EVENT;
 
   Accoom.NotificationService = NotificationService;

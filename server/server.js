@@ -267,6 +267,18 @@ async function handleApi(req, res, url) {
     return sendJson(res, 200, { ok: true });
   }
 
+  m = p.match(/^\/api\/conversations\/([A-Za-z0-9_.:-]{1,160})\/unread$/);
+  if (m && method === 'POST') {
+    const body = await readJson(req);
+    const conv = db.conversations[m[1]];
+    const key = cleanId(body.key);
+    if (!conv) return sendJson(res, 404, { error: 'Not found' });
+    const side = key === conv.agentKey ? 'agent' : key === conv.customerKey ? 'customer' : null;
+    if (!side) return sendJson(res, 403, { error: 'Not part of this conversation' });
+    if (!conv.unread[side]) { conv.unread[side] = 1; saveSoon(); }
+    return sendJson(res, 200, { ok: true });
+  }
+
   return sendJson(res, 404, { error: 'Unknown API route' });
 }
 

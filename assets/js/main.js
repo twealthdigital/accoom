@@ -724,58 +724,71 @@ window.Accoom = window.Accoom || {};
         msgTrigger.classList.toggle('has-unread', hasUnread);
       }
 
-      // Rebuilds the list from scratch every time — one row per
-      // conversation, always keyed to that conversation's LAST message
-      // FROM THE AGENT (never one of "my" own sent messages), so nothing
-      // can duplicate no matter how many times this runs.
-      function lastIncomingMessage(conv) {
-        for (var i = conv.messages.length - 1; i >= 0; i--) {
-          if (conv.messages[i].from !== 'me') return conv.messages[i];
-        }
-        return null;
+      // Rebuilds the list from scratch every time — one row per conversation,
+      // always keyed to that conversation's LAST message FROM THE OTHER PERSON
+      // (never one of "my" own sent messages). The rows come from the message
+      // notifier's merged view (this browser's chats + the server's), so the
+      // 2nd, 3rd, 4th... new message updates the list just like the first one.
+      function listItems() {
+        if (Accoom.MessageNotifier && Accoom.MessageNotifier.items) return Accoom.MessageNotifier.items();
+        var out = [];
+        (Accoom.getStorage('accoom-conversations', []) || []).forEach(function (c) {
+          if (Accoom.Ownership && Accoom.Ownership.isSelfConversation(c)) return;
+          if (!c.property || !c.messages) return;
+          for (var i = c.messages.length - 1; i >= 0; i--) {
+            if (c.messages[i].from !== 'me') {
+              out.push({ key: c.remoteId || c.id, name: c.name, property: c.property, unread: c.unread || 0, text: c.messages[i].text, label: lastTimeLabel(c.messages[i]) });
+              return;
+            }
+          }
+        });
+        return out;
+      }
+
+      var MAIL_ICONS =
+        '<svg class="notif-mail-icon notif-mail-icon--closed" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>' +
+        '<svg class="notif-mail-icon notif-mail-icon--open" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v2l-8 6-8-6Z"></path><path d="M2 8v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-9.1 6.8a1.5 1.5 0 0 1-1.8 0Z"></path></svg>';
+
+      function esc(v) {
+        return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
       }
 
       function renderMessages() {
-        var conversations = Accoom.getStorage('accoom-conversations', []) || [];
-        var withMessages = conversations.filter(function (c) {
-          // Permissions Stage 6: a chat with myself is never listed or counted as unread.
-          if (Accoom.Ownership && Accoom.Ownership.isSelfConversation(c)) return false;
-          return c.property && lastIncomingMessage(c);
-        });
-        // chats that arrived while this page was open elsewhere and are not stored in this browser yet
-        ((Accoom.MessageNotifier && Accoom.MessageNotifier.remoteOnlyItems()) || []).forEach(function (r) {
-          withMessages.push({
-            id: r.key, name: r.name, unread: r.unread,
-            property: { id: (r.property && r.property.id) || '', name: (r.property && r.property.name) || 'Property' },
-            messages: [{ from: 'agent', text: r.text, time: '', day: 'Today' }]
-          });
-        });
+        var withMessages = listItems();
 
         msgList.querySelectorAll('[data-msg-item]').forEach(function (el) { el.remove(); });
 
         withMessages.forEach(function (conv) {
-          var last = lastIncomingMessage(conv);
+          var isUnread = conv.unread > 0;
+          var propId = (conv.property && conv.property.id) || '';
+          var propName = (conv.property && conv.property.name) || '';
 
           var item = document.createElement('div');
-          item.className = 'notif-item' + (conv.unread ? ' is-unread' : '');
+          item.className = 'notif-item' + (isUnread ? ' is-unread' : '');
           item.setAttribute('data-msg-item', '');
+          item.setAttribute('data-msg-key', conv.key);
           item.innerHTML =
-            '<a href="' + chatPage() + '?open=' + encodeURIComponent(conv.property.id) + '&chat=' + encodeURIComponent(conv.remoteId || conv.id) + '" class="notif-item-main">' +
+            '<a href="' + chatPage() + '?' + (propId ? 'open=' + encodeURIComponent(propId) + '&' : '') + 'chat=' + encodeURIComponent(conv.key) + '" class="notif-item-main" data-msg-link>' +
               '<span class="notif-item-icon notif-item-icon--message">' +
                 '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' +
               '</span>' +
               '<span class="notif-item-body">' +
                 '<span class="notif-item-top">' +
-                  '<span class="notif-item-title">' + conv.name + '</span>' +
-                  '<span class="notif-item-time">' + lastTimeLabel(last) + '</span>' +
+                  '<span class="notif-item-title">' + esc(conv.name) + '</span>' +
+                  '<span class="notif-item-time">' + esc(conv.label) + '</span>' +
                 '</span>' +
-                '<span class="msg-item-property">' + conv.property.name + '</span>' +
+                (propName ? '<span class="msg-item-property">' + esc(propName) + '</span>' : '') +
                 '<span class="notif-item-text">' +
-                  '<span class="notif-text-content" data-notif-content>' + last.text + '</span>' +
+                  '<span class="notif-text-content" data-notif-content>' + esc(conv.text) + '</span>' +
                 '</span>' +
                 '<button type="button" class="notif-more-btn" data-notif-more>more</button>' +
               '</span>' +
-            '</a>';
+            '</a>' +
+            '<div class="notif-item-actions">' +
+              '<button type="button" class="notif-item-msg-box ' + (isUnread ? '' : 'is-read') + '" data-msg-mark-read aria-label="' + (isUnread ? 'Mark as read' : 'Mark as unread') + '">' +
+                MAIL_ICONS +
+              '</button>' +
+            '</div>';
           msgList.appendChild(item);
         });
 
@@ -791,6 +804,21 @@ window.Accoom = window.Accoom || {};
 
       // "more" / "show less" — identical mechanic to the notifications panel.
       msgList.addEventListener('click', function (e) {
+        // Mark as read / unread — same button and behaviour as the notifications panel.
+        var markBtn = e.target.closest('[data-msg-mark-read]');
+        if (markBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          var row = markBtn.closest('[data-msg-item]');
+          var chatKey = row && row.getAttribute('data-msg-key');
+          if (chatKey && Accoom.MessageNotifier) {
+            if (markBtn.classList.contains('is-read')) Accoom.MessageNotifier.markUnread(chatKey);
+            else Accoom.MessageNotifier.markRead(chatKey);
+            renderMessages();
+          }
+          return;
+        }
+
         var moreBtn = e.target.closest('[data-notif-more]');
         if (!moreBtn) return;
         e.preventDefault();

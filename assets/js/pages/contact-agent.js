@@ -575,18 +575,10 @@
               (unread ? '<span class="msgs-list-item-badge">' + unread + '</span>' : '') +
             '</span>' +
           '</span>' +
-          '<span class="msgs-list-item-menu">' +
-            '<button type="button" class="msgs-icon-btn" data-conv-delete aria-label="Delete conversation">' + ICONS.trash + '</button>' +
-          '</span>';
+          '';
 
         Accoom.on(li, 'click', function (e) {
-          if (!e.target.closest('[data-conv-delete]')) spawnRipple(li, e);
-
-          if (e.target.closest('[data-conv-delete]')) {
-            e.stopPropagation();
-            deleteConversation(conv.id);
-            return;
-          }
+          spawnRipple(li, e);
           if (state.selectMode) {
             toggleSelect(conv.id);
             return;
@@ -659,6 +651,23 @@
       state.selectMode = false;
       state.selected = {};
       updateSelectionBar();
+      renderList();
+    });
+
+    // The header messages dropdown marked a chat read / unread: apply it to this page's own copy so the
+    // next save does not undo it.
+    document.addEventListener('accoom:set-chat-unread', function (ev) {
+      var d = ev && ev.detail;
+      if (!d || !d.key) return;
+      var hit = false;
+      state.conversations.concat(state.savedConversations || []).forEach(function (c) {
+        if (String(c.remoteId || c.id) !== String(d.key)) return;
+        hit = true;
+        c.unread = d.unread ? Math.max(1, c.unread || 0) : 0;
+      });
+      if (!hit) return;
+      d.handled = true;
+      saveConversations();
       renderList();
     });
 
