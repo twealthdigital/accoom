@@ -5,10 +5,12 @@ import { JSDOM, VirtualConsole } from 'jsdom';
 import { IDBFactory, IDBKeyRange } from 'fake-indexeddb';
 import { webcrypto } from 'node:crypto';
 import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
+import { localResourceOptions } from './local-resources.mjs';
 // Stage 2 page test: drives the REAL addlistings.html (served locally) with image decoding stubbed,
 // because jsdom cannot decode images. Run: npm test
 import { Blob as NodeBlob, File as NodeFile } from 'node:buffer';
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' };
 const server = http.createServer(async (req, res) => {
   try { const p = join(ROOT, decodeURIComponent(req.url.split('?')[0])); const b = await readFile(p); res.writeHead(200, { 'content-type': types[extname(p)] || 'application/octet-stream' }); res.end(b); }
@@ -18,7 +20,7 @@ await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const base = 'http://127.0.0.1:' + server.address().port;
 const errors = []; const vc = new VirtualConsole();
 vc.on('jsdomError', (e) => errors.push((e.detail && e.detail.message) || e.message));
-const dom = await JSDOM.fromURL(base + '/addlistings.html', { runScripts: 'dangerously', resources: 'usable', pretendToBeVisual: true, virtualConsole: vc,
+const dom = await JSDOM.fromURL(base + '/addlistings.html', { runScripts: 'dangerously', resources: localResourceOptions(base), pretendToBeVisual: true, virtualConsole: vc,
   beforeParse(w) {
     w.indexedDB = new IDBFactory(); w.IDBKeyRange = IDBKeyRange; Object.defineProperty(w, 'crypto', { value: webcrypto, configurable: true });
     w.Blob = NodeBlob; w.File = NodeFile; w.URL.createObjectURL = () => 'blob:x'; w.URL.revokeObjectURL = () => {};

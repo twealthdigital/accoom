@@ -8,6 +8,7 @@ import { JSDOM, VirtualConsole } from 'jsdom';
 import { IDBFactory, IDBKeyRange } from 'fake-indexeddb';
 import { webcrypto } from 'node:crypto';
 import assert from 'node:assert/strict';
+import { localResourceOptions } from './local-resources.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const PORT = 3400 + Math.floor(Math.random() * 250);
@@ -27,7 +28,7 @@ const LISTING = { id: 'lst_e2e', name: 'Akungba Flat', location: 'Akungba, Ondo'
 const windows = [];
 async function browser(path, storage) {
   const vc = new VirtualConsole();
-  const dom = await JSDOM.fromURL(base + '/' + path, { runScripts: 'dangerously', resources: 'usable', pretendToBeVisual: true, virtualConsole: vc,
+  const dom = await JSDOM.fromURL(base + '/' + path, { runScripts: 'dangerously', resources: localResourceOptions(base), pretendToBeVisual: true, virtualConsole: vc,
     beforeParse(w) {
       w.indexedDB = new IDBFactory(); w.IDBKeyRange = IDBKeyRange; Object.defineProperty(w, 'crypto', { value: webcrypto, configurable: true });
       w.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} });
@@ -38,6 +39,13 @@ async function browser(path, storage) {
     } });
   windows.push(dom.window);
   await sleep(2500);
+  if (path.indexOf('property.html') === 0) {
+    const deadline = Date.now() + 10000;
+    while (!dom.window.Accoom || !dom.window.Accoom.currentProperty) {
+      if (Date.now() >= deadline) throw new Error('Property page did not initialize: ' + path);
+      await sleep(50);
+    }
+  }
   return dom.window;
 }
 let p = 0, f = 0;

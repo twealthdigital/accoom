@@ -8,8 +8,10 @@ import { JSDOM, VirtualConsole } from 'jsdom';
 import { IDBFactory, IDBKeyRange } from 'fake-indexeddb';
 import { webcrypto } from 'node:crypto';
 import assert from 'node:assert/strict';
+import { localResourceOptions } from './local-resources.mjs';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const PORT = 3800 + Math.floor(Math.random() * 150);
 const base = 'http://127.0.0.1:' + PORT;
 const dataDir = await mkdtemp(join(tmpdir(), 'accoom-flow-'));
@@ -19,7 +21,7 @@ for (let i = 0; i < 40; i++) { try { if ((await fetch(base + '/api/ping')).ok) b
 
 async function browser(path, storage, errors = []) {
   const vc = new VirtualConsole(); vc.on('jsdomError', (e) => errors.push(e.message)); vc.on('warn', (...a) => errors.push(a.join(' ')));
-  const dom = await JSDOM.fromURL(base + '/' + path, { runScripts: 'dangerously', resources: 'usable', pretendToBeVisual: true, virtualConsole: vc,
+  const dom = await JSDOM.fromURL(base + '/' + path, { runScripts: 'dangerously', resources: localResourceOptions(base), pretendToBeVisual: true, virtualConsole: vc,
     beforeParse(w) {
       w.indexedDB = new IDBFactory(); w.IDBKeyRange = IDBKeyRange; Object.defineProperty(w, 'crypto', { value: webcrypto, configurable: true });
       w.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} });

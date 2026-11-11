@@ -8,8 +8,10 @@ import { JSDOM, VirtualConsole } from 'jsdom';
 import { IDBFactory, IDBKeyRange } from 'fake-indexeddb';
 import { webcrypto } from 'node:crypto';
 import assert from 'node:assert/strict';
+import { localResourceOptions } from './local-resources.mjs';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const PORT = 3400 + Math.floor(Math.random() * 250);
 const base = 'http://127.0.0.1:' + PORT;
 const dataDir = await mkdtemp(join(tmpdir(), 'accoom-e2e-'));
@@ -27,7 +29,7 @@ const LISTING = { id: 'lst_e2e', name: 'Akungba Flat', location: 'Akungba, Ondo'
 const windows = [];
 async function browser(path, storage) {
   const vc = new VirtualConsole();
-  const dom = await JSDOM.fromURL(base + '/' + path, { runScripts: 'dangerously', resources: 'usable', pretendToBeVisual: true, virtualConsole: vc,
+  const dom = await JSDOM.fromURL(base + '/' + path, { runScripts: 'dangerously', resources: localResourceOptions(base), pretendToBeVisual: true, virtualConsole: vc,
     beforeParse(w) {
       w.indexedDB = new IDBFactory(); w.IDBKeyRange = IDBKeyRange; Object.defineProperty(w, 'crypto', { value: webcrypto, configurable: true });
       w.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} });

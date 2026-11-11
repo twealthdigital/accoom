@@ -8,6 +8,7 @@ import { JSDOM, VirtualConsole } from 'jsdom';
 import { IDBFactory, IDBKeyRange } from 'fake-indexeddb';
 import { webcrypto } from 'node:crypto';
 import assert from 'node:assert/strict';
+import { localResourceOptions } from './local-resources.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const PORT = 3400 + Math.floor(Math.random() * 250);
@@ -15,6 +16,15 @@ const base = 'http://127.0.0.1:' + PORT;
 const dataDir = await mkdtemp(join(tmpdir(), 'accoom-e2e-'));
 const srv = spawn(process.execPath, ['server/server.js'], { cwd: ROOT, env: { ...process.env, PORT: String(PORT), ACCOOM_DATA: dataDir }, stdio: 'inherit' });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, timeout = 10000) {
+  const end = Date.now() + timeout;
+  while (Date.now() < end) {
+    const result = await fn();
+    if (result) return result;
+    await sleep(100);
+  }
+  return null;
+}
 for (let i = 0; i < 40; i++) { try { if ((await fetch(base + '/api/ping')).ok) break; } catch { /* starting */ } await sleep(100); }
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
@@ -27,7 +37,7 @@ const LISTING = { id: 'lst_e2e', name: 'Akungba Flat', location: 'Akungba, Ondo'
 const windows = [];
 async function browser(path, storage) {
   const vc = new VirtualConsole();
-  const dom = await JSDOM.fromURL(base + '/' + path, { runScripts: 'dangerously', resources: 'usable', pretendToBeVisual: true, virtualConsole: vc,
+  const dom = await JSDOM.fromURL(base + '/' + path, { runScripts: 'dangerously', resources: localResourceOptions(base), pretendToBeVisual: true, virtualConsole: vc,
     beforeParse(w) {
       w.indexedDB = new IDBFactory(); w.IDBKeyRange = IDBKeyRange; Object.defineProperty(w, 'crypto', { value: webcrypto, configurable: true });
       w.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} });
@@ -38,6 +48,10 @@ async function browser(path, storage) {
     } });
   windows.push(dom.window);
   await sleep(2500);
+  if (path.indexOf('property.html') === 0) {
+    const ready = await waitFor(() => dom.window.Accoom && dom.window.Accoom.currentProperty);
+    assert.ok(ready, 'property page did not finish initialization');
+  }
   return dom.window;
 }
 let p = 0, f = 0;
@@ -60,7 +74,11 @@ console.log('Property page');
 a = await browser('property.html?id=lst_e2e', agentA);
 await test('1. agent A on A\'s own listing: no Contact Agent', () => {
   assert.ok(a.document.querySelector('[data-pd-contact-agent]'), 'button should exist in markup');
-  assert.ok(blocked(a, '[data-pd-contact-agent]'), 'button visible');
+  assert.ok(blocked(a, '[data-pd-contact-agent]'), 'button visible; ownership=' + JSON.stringify({
+    check: a.Accoom.currentProperty && a.Accoom.currentProperty.ownership,
+    viewer: a.Accoom.Ownership && a.Accoom.Ownership.viewer(),
+    listing: a.Accoom.PropertyService && a.Accoom.PropertyService.getById('lst_e2e')
+  }));
   assert.equal(a.Accoom.currentProperty.ownership.state, 'own');
 });
 await test('1b. View Profile stays available on own listing (not a contact action)', () => {

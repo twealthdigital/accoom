@@ -8,6 +8,7 @@ import { JSDOM, VirtualConsole } from 'jsdom';
 import { IDBFactory, IDBKeyRange } from 'fake-indexeddb';
 import { webcrypto } from 'node:crypto';
 import assert from 'node:assert/strict';
+import { localResourceOptions } from './local-resources.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const PORT = 3700 + Math.floor(Math.random() * 250);
@@ -15,6 +16,15 @@ const base = 'http://127.0.0.1:' + PORT;
 const dataDir = await mkdtemp(join(tmpdir(), 'accoom-e2e-'));
 const srv = spawn(process.execPath, ['server/server.js'], { cwd: ROOT, env: { ...process.env, PORT: String(PORT), ACCOOM_DATA: dataDir }, stdio: 'ignore' });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitFor(fn, timeout = 10000) {
+  const end = Date.now() + timeout;
+  while (Date.now() < end) {
+    const result = await fn();
+    if (result) return result;
+    await sleep(100);
+  }
+  return null;
+}
 for (let i = 0; i < 40; i++) { try { if ((await fetch(base + '/api/ping')).ok) break; } catch { /* starting */ } await sleep(100); }
 
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
@@ -29,7 +39,7 @@ const LST_B = mk('lst_b', 'Bola Duplex', 'Bola Agent');
 const windows = [];
 async function browser(path, storage) {
   const vc = new VirtualConsole();
-  const dom = await JSDOM.fromURL(base + '/' + path, { runScripts: 'dangerously', resources: 'usable', pretendToBeVisual: true, virtualConsole: vc,
+  const dom = await JSDOM.fromURL(base + '/' + path, { runScripts: 'dangerously', resources: localResourceOptions(base), pretendToBeVisual: true, virtualConsole: vc,
     beforeParse(w) {
       w.indexedDB = new IDBFactory(); w.IDBKeyRange = IDBKeyRange; Object.defineProperty(w, 'crypto', { value: webcrypto, configurable: true });
       w.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {} });
@@ -40,6 +50,10 @@ async function browser(path, storage) {
     } });
   windows.push(dom.window);
   await sleep(2500);
+  if (path.indexOf('property.html') === 0) {
+    const ready = await waitFor(() => dom.window.Accoom && dom.window.Accoom.currentProperty);
+    assert.ok(ready, 'property page did not finish initialization');
+  }
   return dom.window;
 }
 let p = 0, f = 0;
@@ -55,8 +69,12 @@ const agentB = { 'accoom-user': JSON.stringify({ role: 'agent', fullName: 'Bola 
 const customer = { 'accoom-user': JSON.stringify({ role: 'customer', name: 'Chidi Okeke', email: 'chidi@example.com' }) };
 
 // Both agents publish a listing; this also gives us their real owner keys.
-let w = await browser('home.html', agentA); await sleep(2500); w.close();
-w = await browser('home.html', agentB); await sleep(2500); w.close();
+let w = await browser('home.html', agentA);
+await waitFor(async () => (await j('/api/listings')).listings.some((l) => l.id === 'lst_a'));
+w.close();
+w = await browser('home.html', agentB);
+await waitFor(async () => (await j('/api/listings')).listings.some((l) => l.id === 'lst_b'));
+w.close();
 const listings = (await j('/api/listings')).listings;
 const keyA = listings.filter((l) => l.id === 'lst_a')[0].agentKey;
 const keyB = listings.filter((l) => l.id === 'lst_b')[0].agentKey;
@@ -123,8 +141,11 @@ await test('B\'s inbox shows A as an AGENT with A\'s message as incoming and no 
 });
 await test('B replies; the server stores it as from the agent side', async () => {
   send(b, 'Yes it is. When can you inspect?');
-  await sleep(900);
-  const c = (await j('/api/conversations?key=' + keyB)).conversations[0];
+  const c = await waitFor(async () => {
+    const conv = (await j('/api/conversations?key=' + keyB)).conversations[0];
+    return conv && conv.messages.length === 2 && conv.unread.agent === 0 ? conv : null;
+  });
+  assert.ok(c, 'server did not receive B\'s reply and clear unread state for both open chats');
   assert.equal(c.messages.length, 2); assert.equal(c.messages[1].from, 'agent');
   assert.equal(c.unread.agent, 0);
   // the other side's page is open and polls, so it may already have read the reply: 0 or 1 are both right

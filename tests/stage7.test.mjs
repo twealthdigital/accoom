@@ -5,6 +5,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { webcrypto } from 'node:crypto';
 import { Blob as NodeBlob, File as NodeFile } from 'node:buffer';
 import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
 
 let passed = 0, failed = 0;
 async function test(name, fn) { try { await fn(); passed++; console.log('  PASS ' + name); } catch (e) { failed++; console.log('  FAIL ' + name + '\n       ' + (e && e.message)); } }
@@ -256,7 +257,7 @@ await test('renewal during the Occupancy Extension still works (tenant asks, age
 console.log('\nWording and privacy');
 await test('"grace period" appears nowhere in the product: pages, scripts, styles, notifications', async () => {
   const bad = []; const walk = (dir) => { for (const f of readdirSync(dir)) { if (['node_modules', 'dist', '.git', 'tests'].includes(f)) continue; const p = dir + '/' + f, st = statSync(p); if (st.isDirectory()) walk(p); else if (/\.(html|js|css|json|md)$/.test(f) && /grace[ -_]?period/i.test(readFileSync(p, 'utf8'))) bad.push(p); } };
-  walk(new URL('..', import.meta.url).pathname.replace(/\/$/, '')); assert.deepEqual(bad.map(String), []);
+  walk(fileURLToPath(new URL('../', import.meta.url))); assert.deepEqual(bad.map(String), []);
   const w = boot(), O = w.Accoom.Occupancy; await ended(w); const all = JSON.stringify(await w.Accoom.Records.collection('notifications').all()); assert.ok(!/grace/i.test(all)); assert.ok(/Occupancy Extension/.test(all));
 });
 await test('nothing an agent can read in the extension, vacancy or handover records contains an email or phone number', async () => {

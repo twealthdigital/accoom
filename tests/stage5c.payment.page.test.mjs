@@ -7,6 +7,7 @@ import { JSDOM, VirtualConsole } from 'jsdom';
 import { IDBFactory, IDBKeyRange } from 'fake-indexeddb';
 import { webcrypto } from 'node:crypto';
 import assert from 'node:assert/strict';
+import { localResourceOptions } from './local-resources.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' };
@@ -36,7 +37,7 @@ async function open(query, user, expectedReason) {
   vc.on('jsdomError', (error) => errors.push(error.message));
   const dom = await JSDOM.fromURL(base + '/' + path, {
     runScripts: 'dangerously',
-    resources: 'usable',
+    resources: localResourceOptions(base),
     pretendToBeVisual: true,
     virtualConsole: vc,
     beforeParse(window) {
