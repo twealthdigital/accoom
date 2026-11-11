@@ -32,7 +32,7 @@ window.Accoom = window.Accoom || {};
     Accoom.showToast = function (options) {
       options = options || {};
       var toast = document.createElement('div');
-      toast.className = 'accoom-toast';
+      toast.className = 'accoom-toast' + (options.variant === 'message' ? ' accoom-toast--message' : '');
       toast.setAttribute('role', 'status');
       var viewHtml = options.link
         ? '<a href="' + options.link + '" class="accoom-toast-view">' + (options.linkLabel || 'View') + '</a>'
@@ -46,7 +46,24 @@ window.Accoom = window.Accoom || {};
         '<button type="button" class="accoom-toast-close" aria-label="Close notification">' +
           '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
         '</button>';
-      toast.querySelector('.accoom-toast-text').textContent = options.message || '';
+      var toastText = toast.querySelector('.accoom-toast-text');
+      if (options.title) {
+        var toastTitle = document.createElement('strong');
+        toastTitle.className = 'accoom-toast-title';
+        toastTitle.textContent = options.title;
+        toastText.appendChild(toastTitle);
+      }
+      var toastBody = document.createElement('span');
+      toastBody.className = 'accoom-toast-body';
+      toastBody.textContent = options.message || '';
+      toastText.appendChild(toastBody);
+      if (options.variant === 'message') {
+        toast.querySelector('.accoom-toast-icon').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>';
+      }
+      if (typeof options.onLinkClick === 'function') {
+        var toastLink = toast.querySelector('.accoom-toast-view');
+        if (toastLink) Accoom.on(toastLink, 'click', options.onLinkClick);
+      }
       document.body.appendChild(toast);
 
       var hideTimer;
@@ -57,7 +74,8 @@ window.Accoom = window.Accoom || {};
         toast.classList.remove('is-open');
         toast.classList.add('is-leaving');
         window.setTimeout(function () { toast.remove(); }, 320);
-        if (clearPersisted !== false) Accoom.removeStorage(TOAST_STORAGE_KEY);
+        if (clearPersisted !== false && options.variant !== 'message') Accoom.removeStorage(TOAST_STORAGE_KEY);
+        if (typeof options.onClose === 'function') options.onClose();
       }
 
       Accoom.on(toast.querySelector('.accoom-toast-close'), 'click', function () {
@@ -701,6 +719,7 @@ window.Accoom = window.Accoom || {};
       }
 
       function refreshMsgBadge() {
+        if (Accoom.MessageNotifier) { Accoom.MessageNotifier.refresh(); return; }   // one owner for the dot (message-notifier.js)
         var hasUnread = !!msgList.querySelector('.notif-item.is-unread');
         msgTrigger.classList.toggle('has-unread', hasUnread);
       }
@@ -723,6 +742,14 @@ window.Accoom = window.Accoom || {};
           if (Accoom.Ownership && Accoom.Ownership.isSelfConversation(c)) return false;
           return c.property && lastIncomingMessage(c);
         });
+        // chats that arrived while this page was open elsewhere and are not stored in this browser yet
+        ((Accoom.MessageNotifier && Accoom.MessageNotifier.remoteOnlyItems()) || []).forEach(function (r) {
+          withMessages.push({
+            id: r.key, name: r.name, unread: r.unread,
+            property: { id: (r.property && r.property.id) || '', name: (r.property && r.property.name) || 'Property' },
+            messages: [{ from: 'agent', text: r.text, time: '', day: 'Today' }]
+          });
+        });
 
         msgList.querySelectorAll('[data-msg-item]').forEach(function (el) { el.remove(); });
 
@@ -733,7 +760,7 @@ window.Accoom = window.Accoom || {};
           item.className = 'notif-item' + (conv.unread ? ' is-unread' : '');
           item.setAttribute('data-msg-item', '');
           item.innerHTML =
-            '<a href="' + chatPage() + '?open=' + encodeURIComponent(conv.property.id) + '" class="notif-item-main">' +
+            '<a href="' + chatPage() + '?open=' + encodeURIComponent(conv.property.id) + '&chat=' + encodeURIComponent(conv.remoteId || conv.id) + '" class="notif-item-main">' +
               '<span class="notif-item-icon notif-item-icon--message">' +
                 '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' +
               '</span>' +
@@ -788,6 +815,8 @@ window.Accoom = window.Accoom || {};
       // Re-render right before the panel opens, so a message sent/received
       // elsewhere on the same visit is never stale by the time it's checked.
       Accoom.on(msgTrigger, 'click', renderMessages);
+      // a message arrived or was read (any page, any tab): the list follows
+      Accoom.on(document, 'accoom:messages-changed', renderMessages);
 
       renderMessages();
     });

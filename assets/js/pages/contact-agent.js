@@ -663,12 +663,14 @@
     });
 
     Accoom.on(Accoom.$('[data-msgs-mark-read]'), 'click', function () {
-      state.conversations.forEach(function (c) { c.unread = 0; });
+      state.conversations.forEach(function (c) { if (c.unread && c.remote) markReadRemote(c); c.unread = 0; });
+      saveConversations();   // header dot and toasts on every page follow what is read here
       renderList();
     });
 
     Accoom.on(Accoom.$('[data-msgs-mark-unread]'), 'click', function () {
       state.conversations.forEach(function (c) { c.unread = c.unread || 1; });
+      saveConversations();
       renderList();
     });
 
@@ -2397,6 +2399,30 @@
       return c.property.id === reopenId;
     })[0] : null;
 
+    // Coming from a new message notification (toast or header list): open THAT exact conversation.
+    // ?chat= carries the conversation key (server id, or the local id), so two chats about the same
+    // property are never mixed up. A chat only the server knows yet is opened right after the first pull.
+    var chatParam = new URLSearchParams(window.location.search).get('chat');
+    var pendingChat = null;
+    function findChatByKey(key) {
+      return state.conversations.filter(function (c) {
+        return String(c.id) === String(key) || String(c.remoteId) === String(key);
+      })[0] || null;
+    }
+    function openChatByKey(key) {
+      var found = findChatByKey(key);
+      if (!found) return false;
+      openConversation(found.id);
+      if (window.innerWidth <= 860) layout.setAttribute('data-view', 'chat');
+      return true;
+    }
+    var chatConv = chatParam ? findChatByKey(chatParam) : null;
+    if (chatParam && !chatConv) pendingChat = chatParam;
+    document.addEventListener('accoom:open-chat', function (e) {
+      var d = e && e.detail;
+      if (d && d.key && openChatByKey(d.key)) d.handled = true;
+    });
+
     /* ---------------- REAL PEOPLE (laptop test server, core/sync.js) ----------------
        Customer view (this page): a listing from a real agent has an agentKey. Messages to that agent go to the
        server; the agent's replies come back here as incoming messages.
@@ -2629,6 +2655,9 @@
           var open = findConv(state.activeId);
           if (open) { renderThread(open); scrollChatToEnd(); }
         }
+        if (pendingChat) {
+          if (openChatByKey(pendingChat) || firstPull) { pendingChat = null; window.history.replaceState({}, '', window.location.pathname); }
+        }
         if (firstPull && agentView && !state.activeId && window.innerWidth > 860 && state.conversations.length && !new URLSearchParams(window.location.search).get('open')) {
           openConversation(state.conversations[0].id);
         } else if (firstPull && agentView && !state.conversations.length) {
@@ -2657,6 +2686,10 @@
       getPropState(justPaidConv, justPaidId).paymentStatus = 'review';
       upsertPurchaseRecord(justPaidConv, justPaidConv.property, 'upcoming');
       openConversation(justPaidConv.id);
+      if (window.innerWidth <= 860) layout.setAttribute('data-view', 'chat');
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (chatConv) {
+      openConversation(chatConv.id);
       if (window.innerWidth <= 860) layout.setAttribute('data-view', 'chat');
       window.history.replaceState({}, '', window.location.pathname);
     } else if (reopenConv) {
@@ -2750,7 +2783,7 @@
       renderList();
       openConversation(existingConv.id);
       layout.setAttribute('data-view', 'chat');
-    } else if (window.innerWidth > 860 && state.conversations.length) {
+    } else if (window.innerWidth > 860 && state.conversations.length && !pendingChat) {
       // Auto-open the first conversation on desktop so the chat panel
       // isn't blank on load (matches the reference screenshot).
       openConversation(state.conversations[0].id);
