@@ -205,28 +205,6 @@
       });
     }
 
-    // ----------------------------------------------------------------
-    // Notification Settings — each toggle's state is persisted, keyed
-    // by data-notif-key. SWAP FOR BACKEND: PATCH /api/account/notifications
-    // with the whole `prefs` object instead of localStorage.
-    // ----------------------------------------------------------------
-    var NOTIF_KEY = 'accoom-notification-prefs';
-    var notifPrefs = Accoom.getStorage(NOTIF_KEY, {
-      propertyMatches: true, messages: true, bookings: true, priceChanges: true, promotions: true
-    });
-
-    Accoom.$$('[data-notif-key]').forEach(function (row) {
-      var key = row.getAttribute('data-notif-key');
-      var input = row.querySelector('input[type="checkbox"]');
-      if (!input) return;
-      input.checked = notifPrefs[key] !== false;
-      Accoom.on(input, 'change', function () {
-        notifPrefs[key] = input.checked;
-        Accoom.setStorage(NOTIF_KEY, notifPrefs);
-      });
-    });
-
-
   });
 
 })(window.Accoom);

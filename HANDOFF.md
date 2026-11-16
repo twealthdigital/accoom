@@ -245,9 +245,10 @@ Rules: inspect first, reuse existing systems, no redesign, no fake permission ch
 
 ## Agent account settings (separate from the customer one) and optional agent details
 - Agents and customers have SEPARATE settings pages. Customer: `account-settings.html` (customer profile layout, nothing agent related; an agent who opens it is sent to the agent page). Agent: `agent-account-settings.html` + `assets/css/pages/agent-account-settings.css` + `assets/js/pages/agent-account-settings.js`, built on the agent dashboard layout (`ag-dash-sidebar`). They share no markup, css, js or notification prefs key (`accoom-agent-notification-prefs`).
-- The agent page has the same cards as the customer one (profile info, personal details, notifications) plus an OPTIONAL "Agent Details" card (`#agent-details`: NIN, agency, business type, address, experience, languages, about). Nothing in it is required. Name, email, phone and photo come from the signed-in account and are never asked again.
+- The agent page has the same cards as the customer one (profile info only; Personal Details and Notification Settings were removed from the agent page) plus an OPTIONAL "Agent Details" card (`#agent-details`: NIN, agency, business type, address, experience, languages, about). Nothing in it is required. Name, email, phone and photo come from the signed-in account and are never asked again.
 - `agent-details.html` (the old forced screen) is gone; `vercel.json` redirects it to `agent-account-settings.html#agent-details`. Login, Google sign-in and onboarding send agents straight to `agent-dashboard.html` (or the page they came from). The `!user.agentProfileCompleted` guards were removed from every agent page; `is-agent-done` now means `role === 'agent'`.
 - The "Account Settings" item in every agent sidebar (dashboard, my listings, add listing, payouts) opens `agent-account-settings.html`. The dashboard "Verify now" notice links to `#agent-details`.
 - Tests: `tests/agent-optional.page.test.mjs`.
 
 - Change Password and Preferences & Security (2FA, login activity, danger zone / delete account) were REMOVED from both settings pages (markup, modals and JS) on purpose: they will be added back later.
+- Notification Settings was removed from the customer settings page too (MVP). Customer page keeps profile info + Personal Details.

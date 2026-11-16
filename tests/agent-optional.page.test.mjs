@@ -107,7 +107,7 @@ await test('agent settings page: agent sees every card, agent details optional a
   assert.equal(d.querySelector('[data-ag-name]').textContent, 'Bola Agent');
   assert.equal(d.querySelector('[data-aas-info="email"]').textContent, 'bola@example.com');
   assert.equal(d.querySelector('[data-aas-info="accountType"]').textContent, 'Agent');
-  assert.ok(d.querySelector('[data-details-form]') && d.querySelector('[data-notif-settings]'), 'personal details + notifications cards');
+  assert.ok(!d.querySelector('[data-details-form]') && !d.querySelector('[data-notif-settings]'), 'agent page has no personal details or notification cards');
   const card = d.getElementById('agent-details');
   assert.ok(card && !card.hidden);
   assert.equal(d.getElementById('aad-city').value, 'Lagos');
@@ -124,14 +124,6 @@ await test('saving agent details with every field empty works and keeps the sign
   assert.equal(u.email, 'bola@example.com'); assert.equal(u.name, 'Bola Agent'); assert.equal(u.role, 'agent');
   assert.equal(u.ninVerified, false);
   assert.ok(!w.document.querySelector('[data-aad-success]').hidden, 'success message shown');
-});
-
-await test('agent personal details save works on the agent page', async () => {
-  const w = await open('agent-account-settings.html', freshAgent);
-  w.document.getElementById('aas-phone').value = '8012345678';
-  w.document.querySelector('[data-details-form]').dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true }));
-  await sleep(300);
-  assert.equal(JSON.parse(w.localStorage.getItem('accoom-user')).phone, '8012345678');
 });
 
 await test('a customer opening the agent settings page is not shown it (gate script sends them away)', () => {
