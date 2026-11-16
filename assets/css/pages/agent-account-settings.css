@@ -1,0 +1,701 @@
+/* ==========================================================================
+   ACCOOM — Agent Account Settings (own page, not shared with the customer one)
+   Every card here uses --surface-page-alt / --on-page / --gold, the same
+   tokens the rest of the site's dark mode already flips automatically —
+   nothing here is a fixed/hardcoded dark or blue color.
+   ========================================================================== */
+
+.aas-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---- Banner ---- */
+.aas-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  border-radius: var(--radius-m);
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+}
+
+.aas-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.aas-banner-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--surface-page);
+  color: var(--on-page-soft);
+  flex-shrink: 0;
+}
+
+.aas-banner-left h1 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--on-page);
+}
+
+.aas-banner-left p {
+  margin-top: 2px;
+  font-size: 0.85rem;
+  color: var(--on-page-soft);
+}
+
+.aas-banner-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+}
+
+@media (max-width: 640px) {
+  .aas-banner-progress {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .aas-progress-track {
+    width: 100%;
+  }
+}
+
+.aas-banner-progress span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--gold);
+  text-align: right;
+}
+
+.aas-progress-track {
+  width: 200px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-page);
+  overflow: hidden;
+}
+
+.aas-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--gold);
+  transition: width var(--dur-med) var(--ease);
+}
+
+/* ---- Cards ---- */
+.aas-card {
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-m);
+  padding: 22px;
+}
+
+.aas-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.aas-card-head-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.aas-card-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+
+.aas-card-head h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--on-page);
+}
+
+.aas-card-head p {
+  margin-top: 2px;
+  font-size: 0.82rem;
+  color: var(--on-page-soft);
+}
+
+.aas-edit-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-s);
+  color: var(--gold);
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: transparent;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.aas-edit-btn:hover {
+  background: var(--gold-soft);
+}
+
+/* ---- Profile Information body ---- */
+.aas-profile-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+}
+
+.aas-avatar-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.aas-change-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.aas-avatar-block .aas-avatar-wrap {
+  width: 76px;
+  height: 76px;
+}
+
+.aas-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.aas-change-photo {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gold);
+  background: none;
+  border: 0;
+}
+
+.aas-info-grid {
+  flex: 1;
+  min-width: 260px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px 24px;
+}
+
+@media (max-width: 640px) {
+  .aas-info-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-auto-flow: dense;
+    gap: 16px;
+  }
+
+  /* Email is the one value that's genuinely too long to share a row —
+     give it the full width so it can never get clipped at the edge.
+     Everything else naturally pairs up two-per-row around it. */
+  .aas-info-grid > div:has([data-aas-info="email"]) {
+    grid-column: 1 / -1;
+  }
+
+  .aas-info-value {
+    overflow-wrap: anywhere;
+  }
+
+  .aas-avatar-block {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .aas-avatar-row {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .aas-banner-progress {
+    width: 65%;
+    margin-left: auto;
+  }
+
+  .aas-progress-track {
+    width: 100%;
+  }
+}
+
+.aas-info-label {
+  display: block;
+  font-size: 0.74rem;
+  color: var(--on-page-soft);
+  margin-bottom: 4px;
+}
+
+.aas-info-value {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--on-page);
+}
+
+.aas-info-value--icon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--on-page-soft);
+  font-weight: 500;
+  font-size: 0.86rem;
+}
+
+.aas-info-value--icon svg {
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+/* ---- Two-column grid of cards ---- */
+.aas-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 900px) {
+  .aas-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+/* ---- Forms ---- */
+.aas-form {
+  display: grid;
+  gap: 16px;
+}
+
+.aas-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 480px) {
+  .aas-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.aas-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.aas-field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--on-page);
+}
+
+.aas-password-wrap {
+  position: relative;
+}
+
+.aas-password-wrap input {
+  padding-right: 40px;
+}
+
+.aas-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: var(--on-page-soft);
+  background: none;
+  border: 0;
+  display: flex;
+}
+
+.aas-phone-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  background: var(--white);
+  overflow: hidden;
+}
+
+.aas-phone-prefix {
+  flex-shrink: 0;
+  padding: 0 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+  border-right: 1px solid var(--line);
+}
+
+.aas-phone-wrap input {
+  border: 0;
+  border-radius: 0;
+}
+
+.aas-phone-wrap input:focus {
+  box-shadow: none;
+}
+
+.aas-error {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #e5484d;
+}
+
+.aas-success {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #2f9950;
+}
+
+.aas-submit {
+  justify-self: start;
+}
+
+/* ---- Preference / toggle rows ---- */
+.aas-pref-row,
+.aas-danger-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line-page);
+  cursor: pointer;
+}
+
+.aas-pref-row:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.aas-danger-row {
+  cursor: default;
+}
+
+.aas-pref-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+
+.aas-pref-icon--danger {
+  background: rgba(230, 85, 63, 0.14);
+  color: #e6553f;
+}
+
+.aas-pref-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.aas-pref-text strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--on-page);
+}
+
+.aas-pref-text small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--on-page-soft);
+}
+
+.aas-danger-text {
+  color: #e6553f !important;
+}
+
+.aas-outline-btn {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-s);
+  color: var(--gold);
+  background: transparent;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.aas-outline-btn:hover {
+  background: var(--gold-soft);
+}
+
+.aas-danger-btn {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border: 1px solid rgba(230, 85, 63, 0.4);
+  border-radius: var(--radius-s);
+  color: #e6553f;
+  background: rgba(230, 85, 63, 0.1);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.aas-danger-btn:hover {
+  background: rgba(230, 85, 63, 0.18);
+}
+
+/* ---- 2FA modal extras ---- */
+.aas-modal-link {
+  display: block;
+  margin-top: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gold);
+  cursor: pointer;
+}
+
+.aas-modal-link:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ---- Loading states (Verify & Enable / Resend code) ---- */
+.aas-submit:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  position: relative;
+  color: transparent !important;
+}
+
+.aas-submit:disabled::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 15px;
+  height: 15px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid rgba(0, 0, 0, 0.25);
+  border-top-color: var(--on-page);
+  border-radius: 50%;
+  animation: as-spin 0.7s linear infinite;
+}
+
+.aas-modal-link:disabled {
+  color: var(--on-page-soft);
+}
+
+@keyframes as-spin {
+  to { transform: rotate(360deg); }
+}
+
+.aas-2fa-success {
+  text-align: center;
+  padding-top: 4px;
+}
+
+.aas-2fa-success-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(52, 168, 83, 0.14);
+  color: #34a853;
+  margin-bottom: 12px;
+}
+
+.aas-2fa-success .aas-submit {
+  justify-self: center;
+  margin: 0 auto;
+}
+
+.aas-2fa-confirm-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.aas-2fa-confirm-actions .btn,
+.aas-2fa-confirm-actions .aas-danger-btn {
+  flex: 1;
+  justify-content: center;
+}
+
+.aas-notif-list .aas-pref-row {
+  align-items: flex-start;
+}
+
+/* ---- Login activity modal ---- */
+body > .aas-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  margin: 0 !important;
+  z-index: 300 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--dur-med) var(--ease), visibility var(--dur-med) var(--ease);
+}
+
+body > .aas-modal-overlay.is-open {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.aas-modal-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.aas-modal {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  border-radius: var(--radius-m);
+  padding: 22px;
+  transform: scale(0.85) translateY(12px);
+  opacity: 0;
+  transition: transform var(--dur-med) cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity var(--dur-fast) var(--ease);
+}
+
+.aas-modal-overlay.is-open .aas-modal {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+.aas-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-page-soft);
+  background: var(--gold-soft);
+}
+
+.aas-modal h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--on-page);
+}
+
+.aas-modal-sub {
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: var(--on-page-soft);
+  margin-bottom: 16px;
+}
+
+/* ---- 2FA code input: outlined, same fill as the modal itself ---- */
+.aas-modal input[type="text"] {
+  background: var(--surface-page-alt);
+  border: 1px solid var(--line-page);
+  color: var(--on-page);
+}
+
+.aas-modal input[type="text"]:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
+.aas-modal input[type="text"]::placeholder {
+  color: var(--line-page);
+}
+
+/* Breathing room between the code field and the Verify & Enable button */
+.aas-modal .aas-field {
+  margin-bottom: 14px;
+}
+
+.aas-login-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.aas-login-list li {
+  padding: 10px 12px;
+  border-radius: var(--radius-s);
+  background: var(--surface-page);
+  border: 1px solid var(--line-page);
+  font-size: 0.82rem;
+  color: var(--on-page);
+}
+
+.aas-login-list li small {
+  display: block;
+  margin-top: 2px;
+  color: var(--on-page-soft);
+}
+
+/* ---- Avatar (own copy, not shared with the customer profile) ---- */
+.aas-avatar-wrap { position: relative; flex-shrink: 0; width: 76px; height: 76px; }
+.aas-avatar {
+  width: 100%; height: 100%; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+  color: var(--navy-2); font-size: 1.3rem; font-weight: 800; letter-spacing: 0.02em;
+}
+.aas-avatar-img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.aas-avatar-img[hidden] { display: none; }
+
+/* ---- Agent Details card (optional) ---- */
+.aad-card { scroll-margin-top: 90px; }
+.aad-optional { font-weight: 400; font-size: 0.8em; color: var(--on-page-soft); }
+.aad-textarea { resize: vertical; min-height: 90px; font-family: inherit; }
+.aad-hint { display: block; margin-top: 6px; font-size: 11.5px; color: var(--on-page-soft); }
+.aad-hint--error { color: var(--danger, #e5484d); }
+.aad-hint--success { color: var(--success, #2f9e44); }
+.aad-nin-row { display: flex; gap: 8px; }
+.aad-nin-row .input { flex: 1; min-width: 0; }
+.aad-nin-verify { flex-shrink: 0; padding: 0 16px; }
+.aad-nin-row .input, .aad-nin-verify { min-height: 50px; }

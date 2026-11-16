@@ -78,26 +78,46 @@ await test('login, Google sign-in and onboarding send an agent to the agent dash
   assert.ok(auth.includes("goAfterDelay(msg, 'onboarding.html')"));
 });
 
-await test('the agent side panel Account Settings link opens the Agent Details card on every agent page', () => {
+await test('the agent side panel Account Settings link opens the AGENT settings page on every agent page', () => {
   for (const n of ['agent-dashboard.html', 'my-listings.html', 'addlistings.html', 'payout.html']) {
     const h = readFileSync(join(ROOT, n), 'utf8');
     const m = h.match(/<a href="([^"]*)"[^>]*class="ag-dash-nav-link"[^>]*>(?:(?!<\/a>)[\s\S])*?<span>Account Settings<\/span>/);
-    assert.ok(m && m[1] === 'account-settings.html#agent-details', n + ' Account Settings link is ' + (m && m[1]));
+    assert.ok(m && m[1] === 'agent-account-settings.html', n + ' Account Settings link is ' + (m && m[1]));
   }
 });
 
-await test('account settings shows the optional Agent Details card to an agent, prefilled and not required', async () => {
-  const w = await open('account-settings.html', { ...freshAgent, city: 'Lagos', businessName: 'Bola Realty' });
-  const card = w.document.querySelector('[data-agent-only]');
-  assert.ok(card && !card.hidden, 'card should be visible for an agent');
-  assert.equal(w.document.getElementById('aad-city').value, 'Lagos');
-  assert.equal(w.document.getElementById('aad-business').value, 'Bola Realty');
-  assert.equal(card.querySelectorAll('[required]').length, 0, 'nothing in the card may be required');
+await test('customer account settings has nothing agent related, and sends agents to their own page', () => {
+  const h = readFileSync(join(ROOT, 'account-settings.html'), 'utf8');
+  assert.ok(!/agent-details|data-agent-form|aad-|languages\.js|account-agent|agent-account/.test(h.replace("window.location.replace('agent-account-settings.html')", '')), 'agent markup leaked into the customer page');
+  assert.ok(h.includes("window.location.replace('agent-account-settings.html')"), 'agents must be sent to their own settings page');
+});
+
+await test('agent settings page uses the agent layout and shares no customer profile markup or css', () => {
+  const h = readFileSync(join(ROOT, 'agent-account-settings.html'), 'utf8');
+  assert.ok(h.includes('ag-dash-sidebar') && h.includes('agent-dashboard.css'));
+  assert.ok(!/profile\.css|profile-sidebar|profile-page|profile-layout|class="[^"]*\bas-/.test(h), 'customer profile markup/css found');
+  const js = readFileSync(join(ROOT, 'assets/js/pages/agent-account-settings.js'), 'utf8');
+  assert.ok(!js.includes('.profile-page') && !js.includes("'accoom-notification-prefs'"));
+});
+
+await test('agent settings page: agent sees every card, agent details optional and prefilled, identity comes from signup', async () => {
+  const w = await open('agent-account-settings.html', { ...freshAgent, city: 'Lagos', businessName: 'Bola Realty' });
+  const d = w.document;
+  assert.ok(w.location.pathname.endsWith('agent-account-settings.html'));
+  assert.equal(d.querySelector('[data-ag-name]').textContent, 'Bola Agent');
+  assert.equal(d.querySelector('[data-aas-info="email"]').textContent, 'bola@example.com');
+  assert.equal(d.querySelector('[data-aas-info="accountType"]').textContent, 'Agent');
+  assert.ok(d.querySelector('[data-password-form]') && d.querySelector('[data-details-form]') && d.querySelector('[data-notif-settings]'), 'same settings cards as a customer account');
+  const card = d.getElementById('agent-details');
+  assert.ok(card && !card.hidden);
+  assert.equal(d.getElementById('aad-city').value, 'Lagos');
+  assert.equal(d.getElementById('aad-business').value, 'Bola Realty');
+  assert.equal(card.querySelectorAll('[required]').length, 0, 'nothing in the agent details card may be required');
   assert.ok(!card.querySelector('[data-aad-field="name"], [data-aad-field="email"], [data-aad-field="phone"]'), 'name/email/phone are not asked again');
 });
 
-await test('saving with every field empty works and keeps the signed-in identity', async () => {
-  const w = await open('account-settings.html', freshAgent);
+await test('saving agent details with every field empty works and keeps the signed-in identity', async () => {
+  const w = await open('agent-account-settings.html', freshAgent);
   w.document.querySelector('[data-agent-form]').dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true }));
   await sleep(300);
   const u = JSON.parse(w.localStorage.getItem('accoom-user'));
@@ -106,9 +126,19 @@ await test('saving with every field empty works and keeps the signed-in identity
   assert.ok(!w.document.querySelector('[data-aad-success]').hidden, 'success message shown');
 });
 
-await test('a customer never sees the Agent Details card', async () => {
-  const w = await open('account-settings.html', customer);
-  assert.ok(w.document.querySelector('[data-agent-only]').hidden);
+await test('agent personal details save works on the agent page', async () => {
+  const w = await open('agent-account-settings.html', freshAgent);
+  w.document.getElementById('aas-phone').value = '8012345678';
+  w.document.querySelector('[data-details-form]').dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true }));
+  await sleep(300);
+  assert.equal(JSON.parse(w.localStorage.getItem('accoom-user')).phone, '8012345678');
+});
+
+await test('a customer opening the agent settings page is not shown it (gate script sends them away)', () => {
+  const h = readFileSync(join(ROOT, 'agent-account-settings.html'), 'utf8');
+  assert.ok(h.includes("user.role === 'customer'"));
+  const js = readFileSync(join(ROOT, 'assets/js/pages/agent-account-settings.js'), 'utf8');
+  assert.ok(js.includes("window.location.replace(user.role === 'customer' ? 'account-settings.html'"));
 });
 
 console.log('\n' + p + ' passed, ' + f + ' failed');

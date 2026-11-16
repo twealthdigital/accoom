@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Account Settings — ACCOOM Agent</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.webp" />
+
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark') document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+
+  <!-- auth-state: tags <html> as guest / signed-in BEFORE first paint so account-only
+       parts of the header (balance, messages, notifications, agent CTA) never flash. -->
+  <script>
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('accoom-user')), c = document.documentElement.classList;
+        if (!u) c.add('is-guest');
+        else { c.add('is-auth'); if (u.role === 'agent') c.add('is-agent-done'); }
+      } catch (e) { document.documentElement.classList.add('is-guest'); }
+    })();
+  </script>
+
+  <!--
+    SECURITY GATE — same soft, client-side-only caveat as every other
+    gated page here (see onboarding.html / account-settings.html).
+  -->
+  <script>
+    (function () {
+      try {
+        var user = JSON.parse(localStorage.getItem('accoom-user'));
+        if (!user || !user.email) {
+          window.location.replace( 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash));
+          return;
+        }
+        if (!user.role) {
+          window.location.replace('onboarding.html');
+          return;
+        }
+        if (user.role === 'customer') {
+          window.location.replace('home.html');
+          return;
+        }
+      } catch (e) {
+        window.location.replace( 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash));
+      }
+    })();
+  </script>
+
+  <!-- early-partials: paints header/footer immediately (see assets/js/core/partials.js) -->
+  <script>
+    (function () {
+      try {
+        var PREFIX = 'accoom-partial:', pending = {};
+        var load = function (url) {
+          if (pending[url]) return pending[url];
+          var cached = null;
+          try { cached = window.sessionStorage.getItem(PREFIX + url); } catch (e) {}
+          var net = fetch(url, { priority: 'high' }).then(function (r) {
+            if (!r.ok) throw new Error(url);
+            return r.text();
+          }).then(function (html) {
+            try { window.sessionStorage.setItem(PREFIX + url, html); } catch (e) {}
+            return html;
+          });
+          if (cached) { net.catch(function () {}); pending[url] = Promise.resolve(cached); }
+          else { pending[url] = net; }
+          return pending[url];
+        };
+        var scan = function (root) {
+          var list = root.querySelectorAll('[data-partial]');
+          for (var i = 0; i < list.length; i++) claim(list[i]);
+        };
+        var claim = function (el) {
+          if (el.__early) return;
+          var url = el.getAttribute('data-partial');
+          if (!url) return;
+          el.__early = load(url).then(function (html) {
+            if (el.getAttribute('data-partial') !== url) return;
+            el.innerHTML = html;
+            el.setAttribute('data-early', '1');
+            scan(el);
+          }, function () {});
+        };
+        load('partials/header.html');
+        load('partials/footer.html');
+        var mo = new MutationObserver(function () { scan(document); });
+        mo.observe(document.documentElement, { childList: true, subtree: true });
+        document.addEventListener('DOMContentLoaded', function () { scan(document); mo.disconnect(); });
+      } catch (e) { /* older browser: the normal loader still works */ }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/agent-dashboard.css" />
+  <link rel="stylesheet" href="assets/css/pages/agent-account-settings.css" />
+</head>
+<body>
+
+  <div class="partial-mount" data-partial="partials/header.html"></div>
+
+  <main class="ag-dash-page">
+    <div class="ag-dash-layout">
+
+      <div class="ag-dash-backdrop" data-ag-backdrop hidden></div>
+
+      <aside class="ag-dash-sidebar" data-ag-sidebar>
+        <div class="ag-dash-identity">
+          <div class="ag-dash-avatar-wrap">
+            <span class="ag-dash-avatar" data-ag-avatar>AG</span>
+            <img class="ag-dash-avatar-img" data-ag-avatar-img alt="" hidden />
+            <span class="ag-dash-verified" data-ag-verified-badge hidden title="NIN verified">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+          </div>
+          <div class="ag-dash-identity-text">
+            <p class="ag-dash-name" data-ag-name>Agent</p>
+            <p class="ag-dash-role" data-ag-type>Individual Landlord</p>
+          </div>
+        </div>
+
+        <nav class="ag-dash-nav" aria-label="Dashboard">
+          <a href="agent-dashboard.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+            <span>Overview</span>
+          </a>
+          <a href="my-listings.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg>
+            <span>My Listings</span>
+          </a>
+          <a href="payout.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            <span>Payouts</span>
+          </a>
+          <a href="#" class="ag-dash-nav-link" data-ag-soon>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            <span>My Purchases</span>
+          </a>
+          <a href="#" class="ag-dash-nav-link" data-ag-soon>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21 12 16l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z"></path></svg>
+            <span>Saved Properties</span>
+          </a>
+          <a href="agent-account-settings.html" class="ag-dash-nav-link is-active" aria-current="page">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.63a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"></path></svg>
+            <span>Account Settings</span>
+          </a>
+          <a href="#" class="ag-dash-nav-link" data-ag-soon>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span>Help &amp; Support</span>
+          </a>
+        </nav>
+
+        <button type="button" class="ag-dash-nav-link ag-dash-signout" data-ag-signout>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          <span>Sign Out</span>
+        </button>
+      </aside>
+
+      <section class="ag-dash-main aas-main">
+
+        <button type="button" class="ag-dash-mobile-toggle" data-ag-mobile-toggle aria-label="Open menu" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <span>Menu</span>
+        </button>
+
+        <!-- Header banner -->
+        <div class="aas-banner">
+          <div class="aas-banner-left">
+            <div class="aas-banner-avatar" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+            </div>
+            <div>
+              <h1>Account Settings</h1>
+              <p>Manage your personal information, security and preferences.</p>
+            </div>
+          </div>
+          <div class="aas-banner-progress">
+            <span data-aas-progress-label>Your profile is 0% complete</span>
+            <div class="aas-progress-track">
+              <div class="aas-progress-fill" data-aas-progress-fill style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Information (read-only summary) -->
+        <div class="aas-card aas-profile-card">
+          <div class="aas-card-head">
+            <div class="aas-card-head-title">
+              <span class="aas-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="10" r="3"></circle><path d="M6.5 19a6 6 0 0 1 11 0"></path></svg>
+              </span>
+              <div>
+                <h2>Profile Information</h2>
+                <p>This information will be visible to other users on the platform.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="aas-profile-body">
+            <div class="aas-avatar-block">
+              <div class="aas-avatar-row">
+                <div class="aas-avatar-wrap">
+                  <div class="aas-avatar" data-aas-avatar>AC</div>
+                  <img class="aas-avatar-img" data-aas-avatar-img alt="" hidden />
+                  <input type="file" accept="image/*" class="aas-avatar-input" data-aas-avatar-input hidden />
+                </div>
+          </div>
+              <button type="button" class="aas-change-photo" data-aas-avatar-trigger>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.71 5.63l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83a1 1 0 0 0 0-1.41zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path></svg>
+                Change photo
+              </button>
+            </div>
+
+            <div class="aas-info-grid">
+              <div>
+                <span class="aas-info-label">Full Name</span>
+                <span class="aas-info-value" data-aas-info="name">&mdash;</span>
+              </div>
+              <div>
+                <span class="aas-info-label">Email Address</span>
+                <span class="aas-info-value" data-aas-info="email">&mdash;</span>
+              </div>
+              <div>
+                <span class="aas-info-label">Phone Number</span>
+                <span class="aas-info-value" data-aas-info="phone">Not added yet</span>
+              </div>
+              <div>
+                <span class="aas-info-label">Location</span>
+                <span class="aas-info-value" data-aas-info="location">Not added yet</span>
+              </div>
+              <div>
+                <span class="aas-info-label">Account Type</span>
+                <span class="aas-info-value aas-info-value--icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path></svg>
+                  <span data-aas-info="accountType">Buyer</span>
+                </span>
+              </div>
+              <div>
+                <span class="aas-info-label">Date Joined</span>
+                <span class="aas-info-value aas-info-value--icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  <span data-aas-info="dateJoined">&mdash;</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Agent Details (agents only, completely optional) -->
+        <div class="aas-card aad-card" id="agent-details">
+          <div class="aas-card-head">
+            <div class="aas-card-head-title">
+              <span class="aas-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></span>
+              <div>
+                <h2>Agent Details <span class="aad-optional">(optional)</span></h2>
+                <p>Add these whenever you like. Your name, email, phone and photo come from the account you signed in with. Nothing here is needed to use your agent account, so fill it in whenever you like.</p>
+              </div>
+            </div>
+          </div>
+
+          <form class="aas-form" data-agent-form novalidate>
+
+            <div class="aas-form-row">
+              <div class="aas-field">
+                <label for="aad-nin">NIN (National Identification Number)</label>
+                <div class="aad-nin-row">
+                  <input class="input" type="text" id="aad-nin" data-aad-field="nin" inputmode="numeric" maxlength="11" autocomplete="off" placeholder="Enter your 11-digit NIN" />
+                  <button type="button" class="btn btn--ghost aad-nin-verify" data-aad-nin-verify>Verify</button>
+                </div>
+                <small class="aad-hint" data-aad-nin-status></small>
+              </div>
+              <div class="aas-field">
+                <label for="aad-business">Agency / Company name</label>
+                <input class="input" type="text" id="aad-business" data-aad-field="businessName" autocomplete="organization" placeholder="e.g. Fortune Realty Ltd" />
+              </div>
+            </div>
+
+            <div class="aas-form-row">
+              <div class="aas-field">
+                <label>Business type</label>
+                <div class="dropdown" id="aad-business-type">
+                  <button type="button" class="input select-dropdown-trigger dropdown-trigger" aria-haspopup="listbox" aria-expanded="false" data-placeholder="true">
+                    <span data-dropdown-label data-placeholder-text="Select business type">Select business type</span>
+                    <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <ul class="dropdown-panel" data-dropdown-panel>
+                    <li role="option" data-value="landlord">Individual Landlord</li>
+                    <li role="option" data-value="manager">Property Manager</li>
+                    <li role="option" data-value="agency">Real Estate Agency</li>
+                    <li role="option" data-value="agent">Agent</li>
+                  </ul>
+                  <input type="hidden" data-aad-field="agentType" />
+                </div>
+              </div>
+              <div class="aas-field">
+                <label for="aad-reg-number">Business registration number</label>
+                <input class="input" type="text" id="aad-reg-number" data-aad-field="businessRegNumber" placeholder="e.g. RC 1234567" />
+              </div>
+            </div>
+
+            <div class="aas-form-row">
+              <div class="aas-field">
+                <label for="aad-website">Website</label>
+                <input class="input" type="url" id="aad-website" data-aad-field="website" placeholder="https://yourwebsite.com" />
+              </div>
+              <div class="aas-field">
+                <label for="aad-office-address">Office address</label>
+                <input class="input" type="text" id="aad-office-address" data-aad-field="officeAddress" placeholder="Enter your office address" />
+              </div>
+            </div>
+
+            <div class="aas-form-row">
+              <div class="aas-field">
+                <label for="aad-city">City</label>
+                <input class="input" type="text" id="aad-city" data-aad-field="city" placeholder="e.g. Lagos" />
+              </div>
+              <div class="aas-field">
+                <label>State</label>
+                <div class="dropdown select-dropdown" id="aad-state">
+                  <button type="button" class="select-dropdown-trigger dropdown-trigger input" aria-haspopup="listbox" aria-expanded="false" data-placeholder="true">
+                    <span data-dropdown-label data-placeholder-text="Select state">Select state</span>
+                    <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <div class="dropdown-panel select-dropdown-panel" data-dropdown-panel>
+                    <div class="select-dropdown-search">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.6" y2="16.6"></line></svg>
+                      <input type="text" data-dropdown-search placeholder="Search state..." />
+                    </div>
+                    <ul class="dropdown-options" data-dropdown-options><!-- populated from assets/js/data/locations.js --></ul>
+                    <p class="select-dropdown-empty" data-dropdown-empty hidden>No states match your search.</p>
+                  </div>
+                  <input type="hidden" data-aad-field="state" />
+                </div>
+              </div>
+            </div>
+
+            <div class="aas-form-row">
+              <div class="aas-field">
+                <label>Years of experience</label>
+                <div class="dropdown" id="aad-experience">
+                  <button type="button" class="input select-dropdown-trigger dropdown-trigger" aria-haspopup="listbox" aria-expanded="false" data-placeholder="true">
+                    <span data-dropdown-label data-placeholder-text="Select experience range">Select experience range</span>
+                    <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <ul class="dropdown-panel" data-dropdown-panel>
+                    <li role="option" data-value="Less than 1 year">Less than 1 year</li>
+                    <li role="option" data-value="1–2 years">1–2 years</li>
+                    <li role="option" data-value="3–5 years">3–5 years</li>
+                    <li role="option" data-value="6–10 years">6–10 years</li>
+                    <li role="option" data-value="10+ years">10+ years</li>
+                  </ul>
+                  <input type="hidden" data-aad-field="yearsExperience" />
+                </div>
+              </div>
+              <div class="aas-field">
+                <label>Languages spoken</label>
+                <div class="dropdown" id="aad-languages" data-dropdown-multiple>
+                  <button type="button" class="input select-dropdown-trigger dropdown-trigger" aria-haspopup="listbox" aria-expanded="false" data-placeholder="true">
+                    <span data-dropdown-label data-placeholder-text="Select languages">Select languages</span>
+                    <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <div class="dropdown-panel select-dropdown-panel" data-dropdown-panel>
+                    <div class="select-dropdown-search">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.6" y2="16.6"></line></svg>
+                      <input type="text" data-dropdown-search placeholder="Search language..." />
+                    </div>
+                    <ul class="dropdown-options" data-dropdown-options><!-- populated from assets/js/data/languages.js --></ul>
+                    <p class="select-dropdown-empty" data-dropdown-empty hidden>No languages match your search.</p>
+                  </div>
+                  <input type="hidden" data-aad-field="languages" />
+                </div>
+              </div>
+            </div>
+
+            <div class="aas-field">
+              <label for="aad-about">About you</label>
+              <textarea class="input aad-textarea" id="aad-about" data-aad-field="about" rows="4" placeholder="Tell guests a little about yourself, your experience and what makes you unique…"></textarea>
+            </div>
+
+            <p class="aas-success" data-aad-success hidden>Agent details saved.</p>
+            <button type="submit" class="btn btn--primary aas-submit">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              Save Agent Details
+            </button>
+          </form>
+        </div>
+
+
+        <div class="aas-grid">
+
+          <!-- Change Password -->
+          <div class="aas-card">
+            <div class="aas-card-head">
+              <div class="aas-card-head-title">
+                <span class="aas-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+                <div>
+                  <h2>Change Password</h2>
+                  <p>Keep your account secure with a strong password.</p>
+                </div>
+              </div>
+            </div>
+
+            <form class="aas-form" data-password-form novalidate>
+              <div class="aas-field">
+                <label for="aas-current-password">Current Password</label>
+                <div class="aas-password-wrap">
+                  <input class="input" type="password" id="aas-current-password" autocomplete="current-password" required />
+                  <button type="button" class="aas-password-toggle" data-aas-toggle-password aria-label="Show password">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="aas-field">
+                <label for="aas-new-password">New Password</label>
+                <div class="aas-password-wrap">
+                  <input class="input" type="password" id="aas-new-password" autocomplete="new-password" minlength="8" required />
+                  <button type="button" class="aas-password-toggle" data-aas-toggle-password aria-label="Show password">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="aas-field">
+                <label for="aas-confirm-password">Confirm New Password</label>
+                <div class="aas-password-wrap">
+                  <input class="input" type="password" id="aas-confirm-password" autocomplete="new-password" minlength="8" required />
+                  <button type="button" class="aas-password-toggle" data-aas-toggle-password aria-label="Show password">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+              <p class="aas-error" data-password-error hidden></p>
+              <p class="aas-success" data-password-success hidden>Password updated.</p>
+              <button type="submit" class="btn btn--primary aas-submit">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Update Password
+              </button>
+            </form>
+          </div>
+
+          <!-- Personal Details (editable) -->
+          <div class="aas-card">
+            <div class="aas-card-head">
+              <div class="aas-card-head-title">
+                <span class="aas-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg></span>
+                <div>
+                  <h2>Personal Details</h2>
+                  <p>Update your personal and contact information.</p>
+                </div>
+              </div>
+            </div>
+
+            <form class="aas-form" data-details-form novalidate>
+              <div class="aas-form-row">
+                <div class="aas-field">
+                  <label for="aas-full-name">Full Name</label>
+                  <input class="input" type="text" id="aas-full-name" data-aas-field="name" />
+                </div>
+                <div class="aas-field">
+                  <label for="aas-email">Email Address</label>
+                  <input class="input" type="email" id="aas-email" data-aas-field="email" />
+                </div>
+              </div>
+              <div class="aas-form-row">
+                <div class="aas-field">
+                  <label for="aas-phone">Phone Number</label>
+                  <div class="aas-phone-wrap">
+                    <span class="aas-phone-prefix">&#127475;&#127468; +234</span>
+                    <input class="input" type="tel" id="aas-phone" data-aas-field="phone" maxlength="15" placeholder="901 234 5678" />
+                  </div>
+                </div>
+                <div class="aas-field">
+                  <label>Location</label>
+                  <div class="dropdown select-dropdown" id="aas-location-dropdown">
+                    <button type="button" class="select-dropdown-trigger dropdown-trigger input" aria-haspopup="listbox" aria-expanded="false">
+                      <span data-dropdown-label data-placeholder-text="Select state">Select state</span>
+                      <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <ul class="dropdown-panel select-dropdown-panel" role="listbox" data-dropdown-panel></ul>
+                    <input type="hidden" data-aas-field="location" />
+                  </div>
+                </div>
+              </div>
+              <button type="submit" class="btn btn--primary aas-submit">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                Save Changes
+              </button>
+            </form>
+          </div>
+
+          <!-- Preferences & Security -->
+          <div class="aas-card">
+            <div class="aas-card-head">
+              <div class="aas-card-head-title">
+                <div>
+                  <h2>Preferences &amp; Security</h2>
+                  <p>Manage your account preferences and security options.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="aas-pref-row">
+              <span class="aas-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-3.5 7-10V5l-7-3-7 3v7c0 6.5 7 10 7 10Z"></path></svg></span>
+              <span class="aas-pref-text">
+                <strong>Two-Factor Authentication (2FA)</strong>
+                <small>Add an extra layer of security to your account.</small>
+              </span>
+              <span class="switch">
+                <input type="checkbox" data-2fa-toggle />
+                <span class="track"></span>
+                <span class="thumb"></span>
+              </span>
+            </div>
+
+            <div class="aas-pref-row">
+              <span class="aas-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 16 14"></polyline></svg></span>
+              <span class="aas-pref-text">
+                <strong>Login Activity</strong>
+                <small>See where and when your account was accessed.</small>
+              </span>
+              <button type="button" class="aas-outline-btn" data-aas-login-activity>View Activity</button>
+            </div>
+
+            <div class="aas-danger-row">
+              <span class="aas-pref-icon aas-pref-icon--danger"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.7 18.3-9-15.6a1 1 0 0 0-1.7 0l-9 15.6a1 1 0 0 0 .8 1.5h18a1 1 0 0 0 .9-1.5Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
+              <span class="aas-pref-text">
+                <strong class="aas-danger-text">Danger Zone</strong>
+                <small>Permanently delete your account and all data.</small>
+              </span>
+              <button type="button" class="aas-danger-btn" data-delete-account>Delete Account</button>
+            </div>
+          </div>
+
+          <!-- Notification Settings -->
+          <div class="aas-card">
+            <div class="aas-card-head">
+              <div class="aas-card-head-title">
+                <div>
+                  <h2>Notification Settings</h2>
+                  <p>Choose what you want to be notified about.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="aas-notif-list" data-notif-settings>
+              <label class="aas-pref-row" data-notif-key="propertyMatches">
+                <span class="aas-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v10h14V10"></path></svg></span>
+                <span class="aas-pref-text">
+                  <strong>New Property Matches</strong>
+                  <small>Get notified about properties matching your search</small>
+                </span>
+                <span class="switch">
+                  <input type="checkbox" checked />
+                  <span class="track"></span>
+                  <span class="thumb"></span>
+                </span>
+              </label>
+              <label class="aas-pref-row" data-notif-key="messages">
+                <span class="aas-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
+                <span class="aas-pref-text">
+                  <strong>Messages</strong>
+                  <small>Receive new message alerts</small>
+                </span>
+                <span class="switch">
+                  <input type="checkbox" checked />
+                  <span class="track"></span>
+                  <span class="thumb"></span>
+                </span>
+              </label>
+              <label class="aas-pref-row" data-notif-key="bookings">
+                <span class="aas-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
+                <span class="aas-pref-text">
+                  <strong>Bookings &amp; Appointments</strong>
+                  <small>Updates on your bookings and schedules</small>
+                </span>
+                <span class="switch">
+                  <input type="checkbox" checked />
+                  <span class="track"></span>
+                  <span class="thumb"></span>
+                </span>
+              </label>
+              <label class="aas-pref-row" data-notif-key="priceChanges">
+                <span class="aas-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 8 4 3 6-7 6 7 4-3-2 11H4Z"></path></svg></span>
+                <span class="aas-pref-text">
+                  <strong>Price Changes</strong>
+                  <small>Get notified when property prices change</small>
+                </span>
+                <span class="switch">
+                  <input type="checkbox" checked />
+                  <span class="track"></span>
+                  <span class="thumb"></span>
+                </span>
+              </label>
+              <label class="aas-pref-row" data-notif-key="promotions">
+                <span class="aas-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path></svg></span>
+                <span class="aas-pref-text">
+                  <strong>Promotions &amp; Offers</strong>
+                  <small>Exclusive deals and discounts</small>
+                </span>
+                <span class="switch">
+                  <input type="checkbox" checked />
+                  <span class="track"></span>
+                  <span class="thumb"></span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+
+      </section>
+    </div>
+  </main>
+
+  <!-- Login Activity modal -->
+  <div class="aas-modal-overlay" data-aas-login-modal aria-hidden="true">
+    <div class="aas-modal" role="dialog" aria-modal="true" aria-label="Login activity">
+      <button type="button" class="aas-modal-close" data-aas-login-modal-close aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <h3>Login Activity</h3>
+      <p class="aas-modal-sub">Recent sign-ins to your account.</p>
+      <ul class="aas-login-list" data-aas-login-list></ul>
+    </div>
+  </div>
+
+  <!-- Two-Factor Authentication modal (enable / disable flow) -->
+  <div class="aas-modal-overlay" data-aas-2fa-modal aria-hidden="true">
+    <div class="aas-modal" role="dialog" aria-modal="true" aria-label="Two-factor authentication">
+      <button type="button" class="aas-modal-close" data-aas-2fa-modal-close aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <div data-aas-2fa-modal-body></div>
+    </div>
+  </div>
+
+  <div data-partial="partials/footer.html"></div>
+
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/wallet.js"></script>
+  <script src="assets/js/core/skeleton.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/pricing.js"></script>
+  <script src="assets/js/data/listing-review.js"></script>
+  <script src="assets/js/data/reviews.js"></script>
+  <script src="assets/js/core/sync.js"></script>
+  <script src="assets/js/core/ownership.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/data/notifications.js"></script>
+  <script src="assets/js/data/locations.js"></script>
+  <script src="assets/js/data/languages.js"></script>
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+  <script>Accoom.loadPartials();</script>
+  <script src="assets/js/modules/message-notifier.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/agent-account-settings.js"></script>
+
+</body>
+</html>

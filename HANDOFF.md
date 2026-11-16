@@ -243,8 +243,9 @@ Rules: inspect first, reuse existing systems, no redesign, no fake permission ch
 - Full `npm test`: 33 files, **534 passed, 0 failed** (516 before plus 18 new); `npm run build` OK (29 pages bundled).
 - Nothing unrelated was touched.
 
-## Agent details are optional now (moved into Account Settings)
-- `agent-details.html` (and its js/css) is gone. Agents are no longer forced through it: sign in, Google sign in and onboarding all go straight to `agent-dashboard.html` (or the page they came from). `vercel.json` redirects the old URL to `account-settings.html#agent-details`.
-- The same fields now live in an optional "Agent Details" card on `account-settings.html` (agents only; `assets/js/pages/account-agent-details.js`, `assets/css/pages/account-agent-details.css`). Name, email, phone and photo are NOT asked again: they come from the signed-in account (Personal Details card). Nothing is required; saving writes to the same `accoom-user` fields.
-- The `!user.agentProfileCompleted` guards were removed from every agent page. `is-agent-done` (hides the "become an agent" CTA) now means `role === 'agent'`.
-- The dashboard "Verify now" notice links to `account-settings.html#agent-details`; saving a verified NIN there sets `user.ninVerified`.
+## Agent account settings (separate from the customer one) and optional agent details
+- Agents and customers have SEPARATE settings pages. Customer: `account-settings.html` (customer profile layout, nothing agent related; an agent who opens it is sent to the agent page). Agent: `agent-account-settings.html` + `assets/css/pages/agent-account-settings.css` + `assets/js/pages/agent-account-settings.js`, built on the agent dashboard layout (`ag-dash-sidebar`). They share no markup, css, js or notification prefs key (`accoom-agent-notification-prefs`).
+- The agent page has the same cards as the customer one (profile info, change password, personal details, 2FA / login activity / delete, notifications) plus an OPTIONAL "Agent Details" card (`#agent-details`: NIN, agency, business type, address, experience, languages, about). Nothing in it is required. Name, email, phone and photo come from the signed-in account and are never asked again.
+- `agent-details.html` (the old forced screen) is gone; `vercel.json` redirects it to `agent-account-settings.html#agent-details`. Login, Google sign-in and onboarding send agents straight to `agent-dashboard.html` (or the page they came from). The `!user.agentProfileCompleted` guards were removed from every agent page; `is-agent-done` now means `role === 'agent'`.
+- The "Account Settings" item in every agent sidebar (dashboard, my listings, add listing, payouts) opens `agent-account-settings.html`. The dashboard "Verify now" notice links to `#agent-details`.
+- Tests: `tests/agent-optional.page.test.mjs`.

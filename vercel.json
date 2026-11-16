@@ -81,7 +81,7 @@
     },
     {
       "source": "/agent-details.html",
-      "destination": "/account-settings.html#agent-details",
+      "destination": "/agent-account-settings.html#agent-details",
       "permanent": true
     }
   ]
