@@ -78,6 +78,14 @@ await test('login, Google sign-in and onboarding send an agent to the agent dash
   assert.ok(auth.includes("goAfterDelay(msg, 'onboarding.html')"));
 });
 
+await test('the agent side panel Account Settings link opens the Agent Details card on every agent page', () => {
+  for (const n of ['agent-dashboard.html', 'my-listings.html', 'addlistings.html', 'payout.html']) {
+    const h = readFileSync(join(ROOT, n), 'utf8');
+    const m = h.match(/<a href="([^"]*)"[^>]*class="ag-dash-nav-link"[^>]*>(?:(?!<\/a>)[\s\S])*?<span>Account Settings<\/span>/);
+    assert.ok(m && m[1] === 'account-settings.html#agent-details', n + ' Account Settings link is ' + (m && m[1]));
+  }
+});
+
 await test('account settings shows the optional Agent Details card to an agent, prefilled and not required', async () => {
   const w = await open('account-settings.html', { ...freshAgent, city: 'Lagos', businessName: 'Bola Realty' });
   const card = w.document.querySelector('[data-agent-only]');
