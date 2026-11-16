@@ -78,6 +78,11 @@
       "source": "/filter-accomodation.html",
       "destination": "/filter-accommodation.html",
       "permanent": true
+    },
+    {
+      "source": "/agent-details.html",
+      "destination": "/account-settings.html#agent-details",
+      "permanent": true
     }
   ]
 }

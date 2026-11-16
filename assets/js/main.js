@@ -270,13 +270,11 @@ window.Accoom = window.Accoom || {};
         a.setAttribute('href', a.getAttribute('href') + (a.getAttribute('href').indexOf('?') > -1 ? '&' : '?') + 'next=' + encodeURIComponent(here));
       }, true);
     } else if (
-      Accoom.getStorage('accoom-user', {}).role === 'agent' &&
-      Accoom.getStorage('accoom-user', {}).agentProfileCompleted
+      Accoom.getStorage('accoom-user', {}).role === 'agent'
     ) {
-      // role flips to 'agent' as soon as onboarding is picked, but the CTA
-      // should only disappear once the agent-details page has actually been
-      // filled in and confirmed — otherwise it vanishes before there's a
-      // real agent profile behind it.
+      // Agents already have an agent account, so the "become an agent" CTA
+      // is hidden for them. Their extra details are optional and live in
+      // Account Settings.
       Accoom.$$('[data-agent-cta]').forEach(function (el) {
         el.classList.add('is-hidden');
       });

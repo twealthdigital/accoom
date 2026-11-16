@@ -19,7 +19,7 @@
         if (!user) document.documentElement.classList.add('is-guest');
         else {
           document.documentElement.classList.add('is-auth');
-          if (user.role === 'agent' && user.agentProfileCompleted) document.documentElement.classList.add('is-agent-done');
+          if (user.role === 'agent') document.documentElement.classList.add('is-agent-done');
         }
       } catch (e) { document.documentElement.classList.add('is-guest'); }
     })();
@@ -31,7 +31,6 @@
         if (!user || !user.email) { window.location.replace( 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash)); return; }
         if (!user.role) { window.location.replace('onboarding.html'); return; }
         if (user.role === 'customer') { window.location.replace('home.html'); return; }
-        if (user.role === 'agent' && !user.agentProfileCompleted) window.location.replace('agent-details.html');
       } catch (e) { window.location.replace( 'auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash)); }
     })();
   </script>

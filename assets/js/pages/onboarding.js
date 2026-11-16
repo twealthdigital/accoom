@@ -32,10 +32,10 @@
     }
     // isAgentUpgrade must win over the role check below — otherwise
     // "Become an Agent" on an already-agent account silently redirects
-    // straight to agent-details instead of showing this screen.
+    // straight to the agent dashboard instead of showing this screen.
     if (!isAgentUpgrade) {
       if (user.role === 'agent') {
-        window.location.replace('agent-details.html');
+        window.location.replace('agent-dashboard.html');
         return;
       }
       if (user.role === 'customer') {
@@ -136,7 +136,7 @@
       setStep('loading');
 
       // Use replace() (not href) so the finished onboarding step never sits
-      // in browser history — pressing "back" from home/agent-details can't
+      // in browser history — pressing "back" from home/agent-dashboard can't
       // land the user back in the middle of onboarding.
       setTimeout(function () {
         var back = null;
@@ -144,7 +144,7 @@
           back = window.localStorage.getItem('accoom-return-to');
           if (!back || /^[a-z][a-z0-9+.\-]*:|^\/\/|\\/i.test(back) || !/^[a-z0-9_\-\/]+\.html([?#]|$)/i.test(back) || /^(auth|onboarding)\.html/i.test(back)) back = null;
         } catch (e) { back = null; }
-        window.location.replace(state.role === 'agent' ? 'agent-details.html' : (back || 'home.html'));
+        window.location.replace(state.role === 'agent' ? (back || 'agent-dashboard.html') : (back || 'home.html'));
       }, 900);
     }
 

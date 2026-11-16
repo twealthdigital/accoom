@@ -193,7 +193,7 @@
       if (!user.role) {
         goAfterDelay(msg, 'onboarding.html');
       } else if (user.role === 'agent') {
-        goAfterDelay(msg, (back && user.agentProfileCompleted) ? back : 'agent-details.html');
+        goAfterDelay(msg, back || 'agent-dashboard.html');
       } else {
         goAfterDelay(msg, back || 'home.html');
       }

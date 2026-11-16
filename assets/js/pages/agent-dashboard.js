@@ -1,7 +1,7 @@
 /* ==========================================================================
    ACCOOM — Agent Dashboard
    No backend yet: reads the agent record from 'accoom-user' (same one
-   agent-details.js writes) and their uploads from 'accoom-agent-listings'.
+   account-agent-details.js writes) and their uploads from 'accoom-agent-listings'.
    Swap FOLDERS / ACTIVITY for real fetches once those endpoints exist —
    the render functions below already take a plain array.
    ========================================================================== */

@@ -10,7 +10,7 @@
    a real API, e.g.:
      - https://countriesnow.space/api/v0.1/countries/states (free, no key)
      - https://countrystatecity.in/ (needs an API key, more complete)
-   The rendering code (agent-details.js) only cares about the shape
+   The rendering code (account-agent-details.js) only cares about the shape
    returned — an array of { value, label } — so nothing else has to change.
    ========================================================================== */
 

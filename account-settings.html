@@ -23,7 +23,7 @@
       try {
         var u = JSON.parse(localStorage.getItem('accoom-user')), c = document.documentElement.classList;
         if (!u) c.add('is-guest');
-        else { c.add('is-auth'); if (u.role === 'agent' && u.agentProfileCompleted) c.add('is-agent-done'); }
+        else { c.add('is-auth'); if (u.role === 'agent') c.add('is-agent-done'); }
       } catch (e) { document.documentElement.classList.add('is-guest'); }
     })();
   </script>
@@ -86,6 +86,7 @@
   <link rel="stylesheet" href="assets/css/main.css" />
   <link rel="stylesheet" href="assets/css/pages/profile.css" />
   <link rel="stylesheet" href="assets/css/pages/account-settings.css" />
+  <link rel="stylesheet" href="assets/css/pages/account-agent-details.css" />
 </head>
 <body>
 
@@ -460,6 +461,145 @@
 
         </div>
 
+        <!-- Agent Details (agents only, completely optional) -->
+        <div class="as-card aad-card" id="agent-details" data-agent-only hidden>
+          <div class="as-card-head">
+            <div class="as-card-head-title">
+              <span class="as-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></span>
+              <div>
+                <h2>Agent Details <span class="aad-optional">(optional)</span></h2>
+                <p>Add these whenever you like. Your name, email, phone and photo come from your account above, and nothing here is needed to use your agent account.</p>
+              </div>
+            </div>
+          </div>
+
+          <form class="as-form" data-agent-form novalidate>
+
+            <div class="as-form-row">
+              <div class="as-field">
+                <label for="aad-nin">NIN (National Identification Number)</label>
+                <div class="aad-nin-row">
+                  <input class="input" type="text" id="aad-nin" data-aad-field="nin" inputmode="numeric" maxlength="11" autocomplete="off" placeholder="Enter your 11-digit NIN" />
+                  <button type="button" class="btn btn--ghost aad-nin-verify" data-aad-nin-verify>Verify</button>
+                </div>
+                <small class="aad-hint" data-aad-nin-status></small>
+              </div>
+              <div class="as-field">
+                <label for="aad-business">Agency / Company name</label>
+                <input class="input" type="text" id="aad-business" data-aad-field="businessName" autocomplete="organization" placeholder="e.g. Fortune Realty Ltd" />
+              </div>
+            </div>
+
+            <div class="as-form-row">
+              <div class="as-field">
+                <label>Business type</label>
+                <div class="dropdown" id="aad-business-type">
+                  <button type="button" class="input select-dropdown-trigger dropdown-trigger" aria-haspopup="listbox" aria-expanded="false" data-placeholder="true">
+                    <span data-dropdown-label data-placeholder-text="Select business type">Select business type</span>
+                    <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <ul class="dropdown-panel" data-dropdown-panel>
+                    <li role="option" data-value="landlord">Individual Landlord</li>
+                    <li role="option" data-value="manager">Property Manager</li>
+                    <li role="option" data-value="agency">Real Estate Agency</li>
+                    <li role="option" data-value="agent">Agent</li>
+                  </ul>
+                  <input type="hidden" data-aad-field="agentType" />
+                </div>
+              </div>
+              <div class="as-field">
+                <label for="aad-reg-number">Business registration number</label>
+                <input class="input" type="text" id="aad-reg-number" data-aad-field="businessRegNumber" placeholder="e.g. RC 1234567" />
+              </div>
+            </div>
+
+            <div class="as-form-row">
+              <div class="as-field">
+                <label for="aad-website">Website</label>
+                <input class="input" type="url" id="aad-website" data-aad-field="website" placeholder="https://yourwebsite.com" />
+              </div>
+              <div class="as-field">
+                <label for="aad-office-address">Office address</label>
+                <input class="input" type="text" id="aad-office-address" data-aad-field="officeAddress" placeholder="Enter your office address" />
+              </div>
+            </div>
+
+            <div class="as-form-row">
+              <div class="as-field">
+                <label for="aad-city">City</label>
+                <input class="input" type="text" id="aad-city" data-aad-field="city" placeholder="e.g. Lagos" />
+              </div>
+              <div class="as-field">
+                <label>State</label>
+                <div class="dropdown select-dropdown" id="aad-state">
+                  <button type="button" class="select-dropdown-trigger dropdown-trigger input" aria-haspopup="listbox" aria-expanded="false" data-placeholder="true">
+                    <span data-dropdown-label data-placeholder-text="Select state">Select state</span>
+                    <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <div class="dropdown-panel select-dropdown-panel" data-dropdown-panel>
+                    <div class="select-dropdown-search">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.6" y2="16.6"></line></svg>
+                      <input type="text" data-dropdown-search placeholder="Search state..." />
+                    </div>
+                    <ul class="dropdown-options" data-dropdown-options><!-- populated from assets/js/data/locations.js --></ul>
+                    <p class="select-dropdown-empty" data-dropdown-empty hidden>No states match your search.</p>
+                  </div>
+                  <input type="hidden" data-aad-field="state" />
+                </div>
+              </div>
+            </div>
+
+            <div class="as-form-row">
+              <div class="as-field">
+                <label>Years of experience</label>
+                <div class="dropdown" id="aad-experience">
+                  <button type="button" class="input select-dropdown-trigger dropdown-trigger" aria-haspopup="listbox" aria-expanded="false" data-placeholder="true">
+                    <span data-dropdown-label data-placeholder-text="Select experience range">Select experience range</span>
+                    <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <ul class="dropdown-panel" data-dropdown-panel>
+                    <li role="option" data-value="Less than 1 year">Less than 1 year</li>
+                    <li role="option" data-value="1–2 years">1–2 years</li>
+                    <li role="option" data-value="3–5 years">3–5 years</li>
+                    <li role="option" data-value="6–10 years">6–10 years</li>
+                    <li role="option" data-value="10+ years">10+ years</li>
+                  </ul>
+                  <input type="hidden" data-aad-field="yearsExperience" />
+                </div>
+              </div>
+              <div class="as-field">
+                <label>Languages spoken</label>
+                <div class="dropdown" id="aad-languages" data-dropdown-multiple>
+                  <button type="button" class="input select-dropdown-trigger dropdown-trigger" aria-haspopup="listbox" aria-expanded="false" data-placeholder="true">
+                    <span data-dropdown-label data-placeholder-text="Select languages">Select languages</span>
+                    <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </button>
+                  <div class="dropdown-panel select-dropdown-panel" data-dropdown-panel>
+                    <div class="select-dropdown-search">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.6" y2="16.6"></line></svg>
+                      <input type="text" data-dropdown-search placeholder="Search language..." />
+                    </div>
+                    <ul class="dropdown-options" data-dropdown-options><!-- populated from assets/js/data/languages.js --></ul>
+                    <p class="select-dropdown-empty" data-dropdown-empty hidden>No languages match your search.</p>
+                  </div>
+                  <input type="hidden" data-aad-field="languages" />
+                </div>
+              </div>
+            </div>
+
+            <div class="as-field">
+              <label for="aad-about">About you</label>
+              <textarea class="input aad-textarea" id="aad-about" data-aad-field="about" rows="4" placeholder="Tell guests a little about yourself, your experience and what makes you unique…"></textarea>
+            </div>
+
+            <p class="as-success" data-aad-success hidden>Agent details saved.</p>
+            <button type="submit" class="btn btn--primary as-submit">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              Save Agent Details
+            </button>
+          </form>
+        </div>
+
       </section>
     </div>
   </main>
@@ -502,6 +642,7 @@
   <script src="assets/js/data/properties.js"></script>
   <script src="assets/js/data/notifications.js"></script>
   <script src="assets/js/data/locations.js"></script>
+  <script src="assets/js/data/languages.js"></script>
   <script src="assets/js/modules/dropdown.js"></script>
   <script src="assets/js/modules/offcanvas.js"></script>
   <script src="assets/js/modules/theme.js"></script>
@@ -510,6 +651,7 @@
   <script src="assets/js/modules/message-notifier.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/pages/account-settings.js"></script>
+  <script src="assets/js/pages/account-agent-details.js"></script>
 
 </body>
 </html>

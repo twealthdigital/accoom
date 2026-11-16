@@ -24,14 +24,14 @@
       try {
         var u = JSON.parse(localStorage.getItem('accoom-user')), c = document.documentElement.classList;
         if (!u) c.add('is-guest');
-        else { c.add('is-auth'); if (u.role === 'agent' && u.agentProfileCompleted) c.add('is-agent-done'); }
+        else { c.add('is-auth'); if (u.role === 'agent') c.add('is-agent-done'); }
       } catch (e) { document.documentElement.classList.add('is-guest'); }
     })();
   </script>
 
   <!--
     SECURITY GATE, Same soft, client-side-only caveat as every other
-    gated page here (see onboarding.html / agent-details.html).
+    gated page here (see onboarding.html / account-settings.html).
   -->
   <script>
     (function () {
@@ -47,10 +47,6 @@
         }
         if (user.role === 'customer') {
           window.location.replace('home.html');
-          return;
-        }
-        if (user.role === 'agent' && !user.agentProfileCompleted) {
-          window.location.replace('agent-details.html');
           return;
         }
       } catch (e) {
