@@ -107,7 +107,7 @@ await test('agent settings page: agent sees every card, agent details optional a
   assert.equal(d.querySelector('[data-ag-name]').textContent, 'Bola Agent');
   assert.equal(d.querySelector('[data-aas-info="email"]').textContent, 'bola@example.com');
   assert.equal(d.querySelector('[data-aas-info="accountType"]').textContent, 'Agent');
-  assert.ok(d.querySelector('[data-password-form]') && d.querySelector('[data-details-form]') && d.querySelector('[data-notif-settings]'), 'same settings cards as a customer account');
+  assert.ok(d.querySelector('[data-details-form]') && d.querySelector('[data-notif-settings]'), 'personal details + notifications cards');
   const card = d.getElementById('agent-details');
   assert.ok(card && !card.hidden);
   assert.equal(d.getElementById('aad-city').value, 'Lagos');

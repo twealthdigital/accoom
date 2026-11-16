@@ -242,55 +242,6 @@
 
         <div class="as-grid">
 
-          <!-- Change Password -->
-          <div class="as-card">
-            <div class="as-card-head">
-              <div class="as-card-head-title">
-                <span class="as-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
-                <div>
-                  <h2>Change Password</h2>
-                  <p>Keep your account secure with a strong password.</p>
-                </div>
-              </div>
-            </div>
-
-            <form class="as-form" data-password-form novalidate>
-              <div class="as-field">
-                <label for="as-current-password">Current Password</label>
-                <div class="as-password-wrap">
-                  <input class="input" type="password" id="as-current-password" autocomplete="current-password" required />
-                  <button type="button" class="as-password-toggle" data-as-toggle-password aria-label="Show password">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                  </button>
-                </div>
-              </div>
-              <div class="as-field">
-                <label for="as-new-password">New Password</label>
-                <div class="as-password-wrap">
-                  <input class="input" type="password" id="as-new-password" autocomplete="new-password" minlength="8" required />
-                  <button type="button" class="as-password-toggle" data-as-toggle-password aria-label="Show password">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                  </button>
-                </div>
-              </div>
-              <div class="as-field">
-                <label for="as-confirm-password">Confirm New Password</label>
-                <div class="as-password-wrap">
-                  <input class="input" type="password" id="as-confirm-password" autocomplete="new-password" minlength="8" required />
-                  <button type="button" class="as-password-toggle" data-as-toggle-password aria-label="Show password">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                  </button>
-                </div>
-              </div>
-              <p class="as-error" data-password-error hidden></p>
-              <p class="as-success" data-password-success hidden>Password updated.</p>
-              <button type="submit" class="btn btn--primary as-submit">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                Update Password
-              </button>
-            </form>
-          </div>
-
           <!-- Personal Details (editable) -->
           <div class="as-card">
             <div class="as-card-head">
@@ -339,49 +290,6 @@
                 Save Changes
               </button>
             </form>
-          </div>
-
-          <!-- Preferences & Security -->
-          <div class="as-card">
-            <div class="as-card-head">
-              <div class="as-card-head-title">
-                <div>
-                  <h2>Preferences &amp; Security</h2>
-                  <p>Manage your account preferences and security options.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="as-pref-row">
-              <span class="as-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-3.5 7-10V5l-7-3-7 3v7c0 6.5 7 10 7 10Z"></path></svg></span>
-              <span class="as-pref-text">
-                <strong>Two-Factor Authentication (2FA)</strong>
-                <small>Add an extra layer of security to your account.</small>
-              </span>
-              <span class="switch">
-                <input type="checkbox" data-2fa-toggle />
-                <span class="track"></span>
-                <span class="thumb"></span>
-              </span>
-            </div>
-
-            <div class="as-pref-row">
-              <span class="as-pref-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 16 14"></polyline></svg></span>
-              <span class="as-pref-text">
-                <strong>Login Activity</strong>
-                <small>See where and when your account was accessed.</small>
-              </span>
-              <button type="button" class="as-outline-btn" data-as-login-activity>View Activity</button>
-            </div>
-
-            <div class="as-danger-row">
-              <span class="as-pref-icon as-pref-icon--danger"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.7 18.3-9-15.6a1 1 0 0 0-1.7 0l-9 15.6a1 1 0 0 0 .8 1.5h18a1 1 0 0 0 .9-1.5Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
-              <span class="as-pref-text">
-                <strong class="as-danger-text">Danger Zone</strong>
-                <small>Permanently delete your account and all data.</small>
-              </span>
-              <button type="button" class="as-danger-btn" data-delete-account>Delete Account</button>
-            </div>
           </div>
 
           <!-- Notification Settings -->
@@ -464,28 +372,6 @@
       </section>
     </div>
   </main>
-
-  <!-- Login Activity modal -->
-  <div class="as-modal-overlay" data-as-login-modal aria-hidden="true">
-    <div class="as-modal" role="dialog" aria-modal="true" aria-label="Login activity">
-      <button type="button" class="as-modal-close" data-as-login-modal-close aria-label="Close">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
-      <h3>Login Activity</h3>
-      <p class="as-modal-sub">Recent sign-ins to your account.</p>
-      <ul class="as-login-list" data-as-login-list></ul>
-    </div>
-  </div>
-
-  <!-- Two-Factor Authentication modal (enable / disable flow) -->
-  <div class="as-modal-overlay" data-as-2fa-modal aria-hidden="true">
-    <div class="as-modal" role="dialog" aria-modal="true" aria-label="Two-factor authentication">
-      <button type="button" class="as-modal-close" data-as-2fa-modal-close aria-label="Close">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
-      <div data-as-2fa-modal-body></div>
-    </div>
-  </div>
 
   <div data-partial="partials/footer.html"></div>
 
