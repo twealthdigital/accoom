@@ -173,7 +173,8 @@ window.Accoom = window.Accoom || {};
         videosAll: Array.isArray(rec.videosAll) && rec.videosAll.length ? rec.videosAll : (rec.video ? [rec.video] : []),
         agent: (function () {
           var sm = Accoom.Reviews ? Accoom.Reviews.summary(Accoom.Reviews.agentKey(rec.ownerId, rec.agentName)) : { count: 0, avg: 0 };
-          return { name: rec.agentName || 'Agent', real: true, ownerId: rec.ownerId || '', agentKey: rec.agentKey || '', verified: verified, rating: sm.avg, reviews: sm.count, online: false, level: 'AL1' };
+          var av = Accoom.Avatar ? Accoom.Avatar.forSeller(rec.agentKey, rec.ownerId, rec.agentAvatar) : (rec.agentAvatar || '');
+          return { name: rec.agentName || 'Agent', avatar: av, real: true, ownerId: rec.ownerId || '', agentKey: rec.agentKey || '', verified: verified, rating: sm.avg, reviews: sm.count, online: false, level: 'AL1' };
         })()
       });
     });

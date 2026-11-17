@@ -567,7 +567,7 @@ function cardTemplate(item) {
               '<div class="listing-agent">' +
 '<div class="listing-agent-id">' +
                   '<span class="listing-agent-avatar">' +
-                    '<img src="assets/images/agent-images/agenticonimg.webp" alt="" loading="lazy" />' +
+                    '<img src="' + (item.agent.avatar || 'assets/images/agent-images/agenticonimg.webp') + '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'assets/images/agent-images/agenticonimg.webp\'" />' +
                     '<i class="listing-agent-status ' + (item.agent.online ? 'is-online' : 'is-offline') + '" aria-label="' + (item.agent.online ? 'Online' : 'Offline') + '"></i>' +
                   '</span>' +
 '<span class="listing-agent-name">' + item.agent.name +

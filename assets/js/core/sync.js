@@ -209,6 +209,9 @@ window.Accoom = window.Accoom || {};
     // Every agent used to share the stand-in id "local-agent"; on the server each agent's id is their own.
     copy.ownerId = Sync.userKey();
     copy.agentKey = Sync.userKey();
+    // The agent's current profile photo travels with the listing so buyers see it.
+    var av = Accoom.Avatar && Accoom.Avatar.mine();
+    if (av && av.indexOf('data:image/') === 0 && av.length < 200000) copy.agentAvatar = av; else delete copy.agentAvatar;
     return copy;
   }
 
@@ -252,6 +255,8 @@ window.Accoom = window.Accoom || {};
     window.clearTimeout(pushTimer);
     pushTimer = window.setTimeout(pushListings, 1200);
   }
+
+  Sync.pushListingsSoon = schedulePush;
 
   // Any save of the agent's listings (status change, edit, new listing) goes to the server too.
   if (window.Storage && window.Storage.prototype) {

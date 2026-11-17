@@ -146,15 +146,15 @@
       Accoom.on(asAvatarInput, 'change', function () {
         var file = asAvatarInput.files && asAvatarInput.files[0];
         if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function () {
-          user.avatar = reader.result;
+        Accoom.Avatar.fromFile(file, function (data) {
+          if (!data) return;
+          user.avatar = data;
           Accoom.setStorage('accoom-user', user);
           refreshAsAvatar();
           refreshSidebarAvatar();
           refreshCompletion();
-        };
-        reader.readAsDataURL(file);
+          Accoom.Avatar.changed();
+        });
         asAvatarInput.value = '';
       });
     }

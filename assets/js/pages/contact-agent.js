@@ -515,7 +515,19 @@
       return list;
     }
 
+    // The seller's current profile photo (it comes with their listing), so a changed photo shows in old chats too.
+    function refreshSellerAvatars() {
+      var svc = Accoom.PropertyService;
+      if (!svc || !svc.getById) return;
+      state.conversations.concat(state.savedConversations || []).forEach(function (c) {
+        if (!c || !c.property || (c.agentView && !c.outgoing)) return;
+        var it = svc.getById(c.property.id);
+        if (it && it.agentListing && it.agent && it.agent.avatar) c.avatar = it.agent.avatar;
+      });
+    }
+
     function renderList() {
+      refreshSellerAvatars();
       var items = visibleConversations();
       els.list.innerHTML = '';
 
@@ -1162,7 +1174,12 @@
 
       renderPropertyStatus(conv);
 
-      if (els.propPayBtn) els.propPayBtn.classList.toggle('is-hidden', status !== 'idle' || blockedBySold(conv));
+      // After a declined payment the customer can pay again: the same button reads "Repay".
+      if (els.propPayBtn) {
+        els.propPayBtn.classList.toggle('is-hidden', (status !== 'idle' && status !== 'declined') || blockedBySold(conv));
+        var payLabel = els.propPayBtn.querySelector('span');
+        if (payLabel) payLabel.textContent = status === 'declined' ? 'Repay' : 'Make Payment';
+      }
       if (els.propApproveBtn) {
         els.propApproveBtn.classList.remove('is-loading');
         els.propApproveBtn.classList.toggle('is-hidden', status !== 'review' && status !== 'approved');
@@ -1183,6 +1200,7 @@
       }
       if (status === 'approved' && els.propDeclineBtn) els.propDeclineBtn.classList.add('is-hidden');
       if (status === 'declined' && els.propApproveBtn) els.propApproveBtn.classList.add('is-hidden');
+      if (status === 'declined' && els.propDeclineBtn) els.propDeclineBtn.classList.add('is-hidden');   // Repay replaces it
     }
 
     /* ---------------- CHAT TABS (Messages / Saved) ---------------- */
@@ -2822,7 +2840,7 @@
       return Object.assign({}, old || {}, {
         id: old ? old.id : rc.id, remoteId: rc.id, remote: true, agentView: true, outgoing: outgoing,
         name: otherName, role: otherRole,
-        avatar: (old && old.avatar) || AVATAR, online: false, verified: old ? !!old.verified : false,
+        avatar: (outgoing && prop && Accoom.PropertyService && Accoom.PropertyService.getById && (Accoom.PropertyService.getById(prop.id) || {}).agent && Accoom.PropertyService.getById(prop.id).agent.avatar) || (old && old.avatar) || AVATAR, online: false, verified: old ? !!old.verified : false,
         muted: old ? !!old.muted : false,
         property: prop, allProperties: [prop],
         agentKey: rc.agentKey, customerKey: rc.customerKey, updatedAt: rc.updatedAt,
