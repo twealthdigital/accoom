@@ -237,6 +237,13 @@ html.dark-mode .ap-header-card {
 }
 
 @media (max-width: 640px) {
+  /* Wishlist on top, Share directly under it (stops the icons clashing
+     with the name + verified badge on small screens) */
+  .ap-header-icons {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
   .ap-header-top {
     flex-wrap: wrap;
     padding-right: 44px;
