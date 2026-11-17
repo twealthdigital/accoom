@@ -70,8 +70,9 @@ const walletBefore = seller.Accoom.getWalletBalance();
 
 console.log('Seller creates an offer');
 await test('seller sees the Create offer bar; customer does not', () => {
-  assert.ok(visible(seller, '[data-msgs-deal-bar]'), 'deal bar hidden for seller');
-  assert.ok(!visible(cust, '[data-msgs-deal-bar]'), 'deal bar visible for customer');
+  assert.ok(visible(seller, '[data-msgs-offer-btn]'), 'offer button hidden for seller');
+  assert.ok(!visible(cust, '[data-msgs-offer-btn]'), 'offer button visible for customer');
+  assert.ok(seller.document.querySelector('.msgs-chat-tabs-right [data-msgs-offer-btn]'), 'offer button not in the tabs row');
 });
 await test('seller sends a 90,000 offer', async () => {
   clickEv(seller, seller.document.querySelector('[data-msgs-offer-btn]'));
@@ -102,7 +103,7 @@ await test('customer pays: debited 90,000 and the seller sees Paid · pending ap
   assert.match(text(seller, '[data-msgs-deal-status]'), /pending approval/i);
   assert.ok(visible(seller, '[data-msgs-deal-bar]'));
   assert.equal(seller.Accoom.getWalletBalance(), walletBefore, 'seller credited before approval');
-  assert.ok(!seller.document.querySelector('[data-msgs-offer-btn]').offsetParent === false || seller.document.querySelector('[data-msgs-offer-btn]').hidden, 'offer button still offered while paid');
+  assert.ok(!visible(seller, '[data-msgs-offer-btn]'), 'offer button still offered while paid');
 });
 await test('customer approves: seller is credited 90,000 automatically, once', async () => {
   clickEv(cust, cust.document.querySelector('[data-msgs-property-approve-btn]'));

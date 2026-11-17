@@ -1944,31 +1944,30 @@
 
     function renderSellerDeal(conv) {
       var bar = Accoom.$('[data-msgs-deal-bar]');
-      if (!bar) return;
+      var btn = Accoom.$('[data-msgs-offer-btn]');
+      if (!bar || !btn) return;
       var statusEl = bar.querySelector('[data-msgs-deal-status]');
-      var btn = bar.querySelector('[data-msgs-offer-btn]');
-      if (!isSeller(conv) || !conv.property) { bar.classList.add('is-hidden'); return; }
+      if (!isSeller(conv) || !conv.property) { bar.classList.add('is-hidden'); btn.classList.add('is-hidden'); return; }
       var pid = conv.property.id;
       var d = dealOf(conv, pid);
       var sold = isSoldId(pid);
       var text = '', stateKey = 'idle', canOffer = true;
       if (d.last && d.last.kind === 'paid') {
-        text = 'Paid · pending approval — ' + money(d.last.data.amount) + '. Your balance is credited when the customer approves.'; stateKey = 'paid'; canOffer = false;
+        text = 'Paid \u00B7 pending approval \u2014 ' + money(d.last.data.amount) + '. Your balance is credited when the customer approves.'; stateKey = 'paid'; canOffer = false;
       } else if (d.last && d.last.kind === 'approved') {
-        text = 'Approved · ' + money(d.last.data.amount) + ' has been added to your balance. This property is sold.'; stateKey = 'approved'; canOffer = false;
+        text = 'Approved \u00B7 ' + money(d.last.data.amount) + ' has been added to your balance. This property is sold.'; stateKey = 'approved'; canOffer = false;
       } else if (sold) {
         text = 'This property is sold.'; stateKey = 'sold'; canOffer = false;
       } else if (d.offer) {
-        text = 'Offer sent: ' + money(d.offer.data.amount) + ' — waiting for the customer.';
+        text = 'Offer sent: ' + money(d.offer.data.amount) + ' \u2014 waiting for the customer.';
       } else if (d.last && d.last.kind === 'declined') {
-        text = 'Payment declined — the customer was refunded. You can send a new offer.';
-      } else {
-        text = 'Agreed a different price? Send the customer a custom offer.';
+        text = 'Payment declined \u2014 the customer was refunded. You can send a new offer.';
       }
-      bar.classList.remove('is-hidden');
+      // The offer button is a button on its own (opposite the Messages / Saved tabs); the strip only appears when there is a deal to report.
+      bar.classList.toggle('is-hidden', !text);
       bar.setAttribute('data-state', stateKey);
       statusEl.textContent = text;
-      btn.hidden = !canOffer;
+      btn.classList.toggle('is-hidden', !canOffer);
       btn.textContent = d.offer ? 'Send a new offer' : 'Create offer';
     }
 

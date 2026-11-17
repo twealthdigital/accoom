@@ -2430,7 +2430,7 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
 .msgs-deal-bar[data-state="sold"] { background: #EEF0F3; border-color: #D3D7DE; }
 .msgs-deal-offer-btn { border: 0; border-radius: 999px; padding: 8px 16px; font: inherit; font-size: 13px; font-weight: 700;
   background: #DF962E; color: #0B1F3A; cursor: pointer; }
-.msgs-deal-offer-btn[hidden] { display: none; }
+.msgs-deal-offer-btn.is-hidden { display: none !important; }
 .msgs-offer-card { min-width: 220px; max-width: 320px; padding: 14px 16px; border-radius: 14px; background: #fff;
   border: 1px solid #F0D9A8; box-shadow: 0 1px 4px rgba(11,31,58,.08); color: #0B1F3A; }
 .msgs-offer-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #B26F0A; }
