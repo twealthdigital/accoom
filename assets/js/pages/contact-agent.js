@@ -2437,12 +2437,14 @@
     (function keyboardFit() {
       var vv = window.visualViewport;
       var root = document.documentElement;
+      var baseH = window.innerHeight;   // height with no keyboard (some phones shrink innerHeight too when the keyboard opens)
       function sync() {
+        if (document.activeElement !== els.input) baseH = Math.max(window.innerHeight, vv ? vv.height : 0);
         var layoutEl = Accoom.$('.msgs-layout') || layout;
         if (!layoutEl) return;
         var mobileChat = window.innerWidth <= 860 && layoutEl.getAttribute('data-view') === 'chat';
         root.classList.toggle('msgs-chat-open', mobileChat);
-        var kb = !!(mobileChat && vv && (window.innerHeight - vv.height) > 120);
+        var kb = !!(mobileChat && vv && (baseH - vv.height) > 120);
         layoutEl.classList.toggle('is-kb', kb);
         if (kb) {
           layoutEl.style.setProperty('--vv-h', Math.round(vv.height) + 'px');

@@ -2460,3 +2460,14 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
 .msgs-deal-pill .msgs-deal-t--mid, .msgs-deal-pill .msgs-deal-t--short { display: none; }
 @container msgs-card (max-width: 560px) { .msgs-deal-pill .msgs-deal-t--full { display: none; } .msgs-deal-pill .msgs-deal-t--mid { display: inline; } }
 @container msgs-card (max-width: 330px) { .msgs-deal-pill .msgs-deal-t--mid { display: none; } .msgs-deal-pill .msgs-deal-t--short { display: inline; } }
+
+/* Phones: a compact property card (no location, small picture, buttons tucked up under the name) */
+@media (max-width: 600px) {
+  .msgs-property-card { margin: 6px 12px 0; padding: 5px 8px; gap: 4px 8px; }
+  .msgs-property-card img { width: 34px; height: 34px; border-radius: 7px; }
+  .msgs-property-loc { display: none; }
+  .msgs-property-name { font-size: 0.84rem; line-height: 1.2; }
+  .msgs-property-price { margin-top: 1px; font-size: 0.8rem; line-height: 1.2; }
+  .msgs-property-extra-actions { gap: 6px; margin-top: 0; }
+  .msgs-property-pay-btn, .msgs-property-approve-btn, .msgs-property-decline-btn { height: 30px; font-size: 0.74rem; padding: 0 8px; }
+}
