@@ -2399,7 +2399,15 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
    visible area exactly so the composer sits right on top of the keyboard. */
 @media (max-width: 860px) {
   html.msgs-chat-open, html.msgs-chat-open body { overflow: hidden; overscroll-behavior: none; }
-  .msgs-layout.is-kb { position: fixed; left: 0; right: 0; top: var(--vv-top, 0px); height: var(--vv-h, 100dvh); z-index: 1000; border-radius: 0; margin: 0; }
+  /* min-height must be released here: the desktop rule (520px) is taller than the space left above a phone
+     keyboard, which pushed the composer down behind the keyboard. */
+  .msgs-layout.is-kb { position: fixed; left: 0; right: 0; top: var(--vv-top, 0px); height: var(--vv-h, 100dvh); min-height: 0; max-height: var(--vv-h, 100dvh); z-index: 1000; border-radius: 0; margin: 0; }
+  /* the keyboard already covers the home-indicator area, so no extra bottom padding while it is open */
+  .msgs-layout.is-kb .msgs-composer { padding-bottom: 12px; }
+  /* while typing, give the space to the messages: the property card and tabs come back when the keyboard closes */
+  .msgs-layout.is-kb .msgs-property-card,
+  .msgs-layout.is-kb .msgs-chat-tabs-row,
+  .msgs-layout.is-kb .msgs-review-strip { display: none; }
 }
 
 /* ---- Agent view (messages.html): same screen, customer-only parts hidden ---- */
