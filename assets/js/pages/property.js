@@ -1025,7 +1025,7 @@
         buyBtn.parentNode.insertBefore(note, buyBtn);
       }
       if (actions) {
-        Array.prototype.slice.call(actions.querySelectorAll('[data-pd-contact-agent], a[href*="contact-agent.html"]')).forEach(function (el) { el.style.display = 'none'; });
+        // Contact Agent stays: buyers keep their chat with the seller after a sale.
         if (!buyBtn) actions.appendChild(note);
       }
       var tag = document.querySelector('[data-pd-type-tag]');

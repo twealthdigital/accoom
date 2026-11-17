@@ -129,6 +129,15 @@ await test('the listing is sold: server, seller storage, marketplace', async () 
   assert.ok(!onMarket, 'sold listing still on the marketplace');
   assert.ok(byId && byId.sold, 'sold listing lost its details page');
 });
+await test('after the sale the buyer and seller can still message each other (chat is kept)', async () => {
+  assert.ok(cust.document.querySelectorAll('[data-msgs-thread] .msgs-row').length > 3, 'buyer chat was cleared');
+  assert.ok(!cust.document.querySelector('[data-msgs-composer]').classList.contains('is-hidden'), 'buyer composer hidden');
+  send(cust, 'Thanks, when can I collect the keys?'); await sleep(1200);
+  send(seller, 'Tomorrow morning works.'); await sleep(1200);
+  await sleep(3500);
+  assert.match(cust.document.querySelector('[data-msgs-thread]').textContent, /Tomorrow morning/);
+  assert.match(seller.document.querySelector('[data-msgs-thread]').textContent, /collect the keys/);
+});
 await test('another customer cannot pay for it (server refuses)', async () => {
   const r = await post('c-lst_a-someone', { senderKey: 'someone', message: { id: 'x1', text: 'paid', kind: 'paid', data: { propertyId: 'lst_a', amount: 90000 } }, meta: { agentKey: keyA, customerKey: 'someone', propertyId: 'lst_a', propertyName: 'Akungba Flat' } });
   assert.equal(r.status, 409);
@@ -137,7 +146,8 @@ await test('property page shows Sold and no payment button', async () => {
   const pg = await browser('property.html?id=lst_a', customer2); await sleep(1500);
   const note = pg.document.querySelector('[data-pd-sold-note]');
   const pay = pg.document.querySelector('[data-pd-payment]');
-  const ok = !!note && (!pay || pay.style.display === 'none');
+  const contact = pg.document.querySelector('[data-pd-contact-agent]');
+  const ok = !!note && (!pay || pay.style.display === 'none') && !!contact && contact.style.display !== 'none';
   pg.close();
   assert.ok(ok, 'sold state missing on property page');
 });
