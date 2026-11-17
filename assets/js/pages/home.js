@@ -454,6 +454,33 @@ var currentPage = 1;
         return '₦' + n.toLocaleString('en-NG');
       }
 
+      // Saved hearts persist through Accoom.SavedProperties (customers and
+      // agents each get their own list). Guests have nothing to save to, so
+      // for them the heart stays a plain on-page toggle.
+      function isListingSaved(id) {
+        return !!(Accoom.SavedProperties && Accoom.isLoggedIn() && Accoom.SavedProperties.has(id));
+      }
+
+      // Builds the saved-property record from the rendered card, so what is
+      // stored is exactly what the person was looking at.
+      function savedRecordFromCard(card) {
+        var text = function (sel) { var el = card.querySelector(sel); return el ? el.textContent.trim() : ''; };
+        var priceEl = card.querySelector('.listing-price');
+        var unitEl = priceEl && priceEl.querySelector('small');
+        var meta = card.querySelectorAll('.listing-meta > span');
+        var num = function (el) { var n = parseInt(el && el.textContent, 10); return isNaN(n) ? 0 : n; };
+        return {
+          id: card.getAttribute('data-listing-id'),
+          name: text('.listing-name'),
+          location: text('.listing-location'),
+          price: priceEl && priceEl.firstChild ? priceEl.firstChild.textContent.trim() : '',
+          priceUnit: unitEl ? unitEl.textContent.trim() : '',
+          image: card.getAttribute('data-share-image') || '',
+          beds: num(meta[0]),
+          baths: num(meta[1])
+        };
+      }
+
       function mediaSlidesTemplate(item) {
         var html = '';
         if (item.video) {
@@ -503,7 +530,7 @@ function cardTemplate(item) {
               (totalSlides > 1 ? mediaNavTemplate() : '') +
               (totalSlides > 1 ? mediaDotsTemplate(totalSlides) : '') +
               '<span class="listing-tag">Available Now</span>' +
-'<button type="button" class="listing-save" aria-label="Save listing" data-save-listing>' +
+'<button type="button" class="listing-save' + (isListingSaved(item.id) ? ' is-saved' : '') + '" aria-label="Save listing" aria-pressed="' + (isListingSaved(item.id) ? 'true' : 'false') + '" data-save-listing>' +
                 '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                   '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"></path>' +
                 '</svg>' +
@@ -1266,6 +1293,13 @@ Accoom.delegate(listingsGrid, 'click', '[data-view-listing]', function (e) {
       Accoom.delegate(listingsGrid, 'click', '[data-save-listing]', function (e) {
         e.preventDefault();
         e.stopPropagation();
+        var card = this.closest('.listing-card');
+        if (card && Accoom.SavedProperties && Accoom.isLoggedIn()) {
+          var nowSaved = Accoom.SavedProperties.toggle(savedRecordFromCard(card));
+          this.classList.toggle('is-saved', nowSaved);
+          this.setAttribute('aria-pressed', nowSaved ? 'true' : 'false');
+          return;
+        }
         this.classList.toggle('is-saved');
       });
       

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Saved Properties — ACCOOM</title>
+  <link rel="icon" href="assets/images/accoom-dark-logo.webp" />
+
+  <script>
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('accoom-theme'));
+        if (t === 'dark') document.documentElement.classList.add('dark-mode');
+      } catch (e) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+
+  <!-- auth-state: tags <html> as guest / signed-in BEFORE first paint so account-only
+       parts of the header (balance, messages, notifications, agent CTA) never flash. -->
+  <script>
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('accoom-user')), c = document.documentElement.classList;
+        if (!u) c.add('is-guest');
+        else { c.add('is-auth'); if (u.role === 'agent' && u.agentProfileCompleted) c.add('is-agent-done'); }
+      } catch (e) { document.documentElement.classList.add('is-guest'); }
+    })();
+  </script>
+
+  <!--
+    Agent-only page. Soft, client-side gate like the other dashboard pages:
+    guests go to sign-in, customers go home. No extra profile step is required.
+  -->
+  <script>
+    (function () {
+      try {
+        var user = JSON.parse(localStorage.getItem('accoom-user'));
+        if (!user || !user.email) { window.location.replace('auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash)); return; }
+        if (!user.role) { window.location.replace('onboarding.html'); return; }
+        if (user.role === 'customer') { window.location.replace('home.html'); return; }
+      } catch (e) { window.location.replace('auth.html?next=' + encodeURIComponent((location.pathname.split('/').pop() || 'home.html') + location.search + location.hash)); }
+    })();
+  </script>
+
+  <!-- early-partials: paints header/footer immediately (see assets/js/core/partials.js) -->
+  <script>
+    (function () {
+      try {
+        var PREFIX = 'accoom-partial:', pending = {};
+        var load = function (url) {
+          if (pending[url]) return pending[url];
+          var cached = null;
+          try { cached = window.sessionStorage.getItem(PREFIX + url); } catch (e) {}
+          var net = fetch(url, { priority: 'high' }).then(function (r) {
+            if (!r.ok) throw new Error(url);
+            return r.text();
+          }).then(function (html) {
+            try { window.sessionStorage.setItem(PREFIX + url, html); } catch (e) {}
+            return html;
+          });
+          if (cached) { net.catch(function () {}); pending[url] = Promise.resolve(cached); }
+          else { pending[url] = net; }
+          return pending[url];
+        };
+        var scan = function (root) {
+          var list = root.querySelectorAll('[data-partial]');
+          for (var i = 0; i < list.length; i++) claim(list[i]);
+        };
+        var claim = function (el) {
+          if (el.__early) return;
+          var url = el.getAttribute('data-partial');
+          if (!url) return;
+          el.__early = load(url).then(function (html) {
+            if (el.getAttribute('data-partial') !== url) return;
+            el.innerHTML = html;
+            el.setAttribute('data-early', '1');
+            scan(el);
+          }, function () {});
+        };
+        load('partials/header.html');
+        load('partials/footer.html');
+        var mo = new MutationObserver(function () { scan(document); });
+        mo.observe(document.documentElement, { childList: true, subtree: true });
+        document.addEventListener('DOMContentLoaded', function () { scan(document); mo.disconnect(); });
+      } catch (e) { /* older browser: the normal loader still works */ }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/pages/agent-dashboard.css" />
+  <link rel="stylesheet" href="assets/css/pages/saved-properties.css" />
+</head>
+<body>
+
+  <div class="partial-mount" data-partial="partials/header.html"></div>
+
+  <main class="ag-dash-page" data-agx-page="saved">
+    <div class="ag-dash-layout">
+
+      <div class="ag-dash-backdrop" data-ag-backdrop hidden></div>
+
+      <!-- Sidebar -->
+      <aside class="ag-dash-sidebar" data-ag-sidebar>
+        <div class="ag-dash-identity">
+          <div class="ag-dash-avatar-wrap">
+            <span class="ag-dash-avatar" data-ag-avatar>AG</span>
+            <img class="ag-dash-avatar-img" data-ag-avatar-img alt="" hidden />
+            <span class="ag-dash-verified" data-ag-verified-badge hidden title="NIN verified">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </span>
+          </div>
+          <div class="ag-dash-identity-text">
+            <p class="ag-dash-name" data-ag-name>Agent</p>
+            <p class="ag-dash-role" data-ag-type>Individual Landlord</p>
+          </div>
+        </div>
+
+        <nav class="ag-dash-nav" aria-label="Dashboard">
+          <a href="agent-dashboard.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+            <span>Overview</span>
+          </a>
+          <a href="my-listings.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg>
+            <span>My Listings</span>
+          </a>
+          <a href="payout.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            <span>Payouts</span>
+          </a>
+          <a href="agent-purchases.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            <span>My Purchases</span>
+          </a>
+          <a href="agent-saved-properties.html" class="ag-dash-nav-link is-active" aria-current="page">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21 12 16l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z"></path></svg>
+            <span>Saved Properties</span>
+          </a>
+          <a href="agent-account-settings.html" class="ag-dash-nav-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 0 1 4 0v.09A1.7 1.7 0 0 0 15 4.63a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 0 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"></path></svg>
+            <span>Account Settings</span>
+          </a>
+          <a href="#" class="ag-dash-nav-link" data-ag-soon>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span>Help &amp; Support</span>
+          </a>
+        </nav>
+
+        <button type="button" class="ag-dash-nav-link ag-dash-signout" data-ag-signout>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          <span>Sign Out</span>
+        </button>
+      </aside>
+
+      <!-- Main -->
+      <section class="ag-dash-main agx-main">
+
+        <button type="button" class="ag-dash-mobile-toggle" data-ag-mobile-toggle aria-label="Open menu" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          <span>Menu</span>
+        </button>
+
+        <div class="saved-card">
+          <div class="saved-head">
+            <h1 class="saved-title">Saved Properties</h1>
+            <p class="saved-subtitle">Properties you have saved for later.</p>
+          </div>
+
+          <p class="saved-count" data-saved-count>0 Saved Properties</p>
+
+          <div class="saved-list" data-saved-list></div>
+
+          <p class="saved-empty" data-saved-empty hidden>
+            You haven&rsquo;t saved any properties yet.
+          </p>
+
+          <div class="saved-cta">
+            <span class="saved-cta-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v10h14V10"></path><path d="M9 21v-6h6v6"></path></svg>
+            </span>
+            <h3>Looking for more properties?</h3>
+            <p>Browse verified properties on ACCOOM</p>
+            <a href="home.html" class="btn btn--primary saved-cta-btn">Explore Properties</a>
+          </div>
+        </div>
+
+
+      </section>
+    </div>
+  </main>
+
+  <div data-partial="partials/footer.html"></div>
+
+  <script src="assets/js/core/dom.js"></script>
+  <script src="assets/js/core/events.js"></script>
+  <script src="assets/js/core/storage.js"></script>
+  <script src="assets/js/core/wallet.js"></script>
+  <script src="assets/js/core/skeleton.js"></script>
+  <script src="assets/js/core/partials.js"></script>
+  <script src="assets/js/data/pricing.js"></script>
+  <script src="assets/js/data/listing-review.js"></script>
+  <script src="assets/js/data/reviews.js"></script>
+  <script src="assets/js/core/sync.js"></script>
+  <script src="assets/js/data/saved-properties.js"></script>
+  <script src="assets/js/core/ownership.js"></script>
+  <script src="assets/js/data/properties.js"></script>
+  <script src="assets/js/data/notifications.js"></script>
+
+  <script src="assets/js/modules/dropdown.js"></script>
+  <script src="assets/js/modules/offcanvas.js"></script>
+  <script src="assets/js/modules/theme.js"></script>
+  <script src="assets/js/modules/location.js"></script>
+
+  <script>Accoom.loadPartials();</script>
+
+  <script src="assets/js/modules/message-notifier.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/agent-activity.js"></script>
+
+</body>
+</html>
