@@ -139,6 +139,7 @@ window.Accoom = window.Accoom || {};
     var s = sync(), myKey = me();
     if (!s || !myKey || !signedIn() || onChatPage() || s.available !== true) { remote = []; return Promise.resolve(); }
     return s.api('GET', '/api/conversations?key=' + encodeURIComponent(myKey), undefined, 5000).then(function (r) {
+      if (Accoom.Deals && r && r.conversations) Accoom.Deals.process(r.conversations, myKey);   // credit an approved sale on any page
       remote = remoteItemsFrom(r && r.conversations, myKey);
     }).catch(function () { /* server away: keep the last snapshot */ });
   }

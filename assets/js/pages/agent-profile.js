@@ -92,8 +92,10 @@
       function hideRow(el) { var r = el && (el.closest('.ap-detail-row') || el); if (r) r.style.display = 'none'; }
       function uniq(a) { return a.filter(function (v, i) { return v && a.indexOf(v) === i; }); }
 
-      var all = (Accoom.PropertyService && Accoom.PropertyService.getAll) ? Accoom.PropertyService.getAll() : [];
-      var mine = all.filter(function (i) { return i.agentListing && String(i.ownerId) === String(stored.ownerId || ''); });
+      var all = (Accoom.PropertyService && (Accoom.PropertyService.getAllWithSold || Accoom.PropertyService.getAll)) ? (Accoom.PropertyService.getAllWithSold || Accoom.PropertyService.getAll)() : [];
+      var everything = all.filter(function (i) { return i.agentListing && String(i.ownerId) === String(stored.ownerId || ''); });
+      var mine = everything.filter(function (i) { return !i.sold; });      // still on the market
+      var soldMine = everything.filter(function (i) { return i.sold; });   // approved sales
 
       // Agent's own registration details (only when the signed-in agent is this agent)
       var me = null;
@@ -156,7 +158,7 @@
         var meta = (i.beds ? '<span>' + i.beds + ' Bed</span>' : '') + (i.baths ? '<span>' + i.baths + ' Bath</span>' : '');
         return '<article class="listing-card ap-listing-card"><div class="listing-card-media" data-media>' + slides +
           (total > 1 ? nav('media-nav-prev', 'data-media-prev', 'Previous', CHEV_L) + nav('media-nav-next', 'data-media-next', 'Next', CHEV_R) + '<div class="media-dots">' + dots + '</div>' : '') +
-          '<span class="listing-tag ap-status-tag ap-status-tag--available">Available</span>' +
+          '<span class="listing-tag ap-status-tag ap-status-tag--' + (i.sold ? 'sold' : 'available') + '">' + (i.sold ? 'Sold' : 'Available') + '</span>' +
           '<button type="button" class="ap-card-share-btn" data-ap-card-share aria-label="Share this property"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"></line><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"></line></svg></button>' +
           '</div><div class="listing-card-body"><p class="listing-name">' + esc(i.name) + '</p>' +
           '<p class="listing-price">' + price + suffix + '</p><p class="listing-location">' + esc(i.location) + '</p>' +
@@ -165,7 +167,7 @@
       }
       var empty = function (t) { return '<p class="ap-bio-text">' + t + '</p>'; };
       var panels = { available: mine.length ? '<div class="ap-listing-scroll">' + mine.map(card).join('') + '</div>' : empty('No available properties yet.'),
-                     sold: empty('No sold properties yet.') };
+                     sold: soldMine.length ? '<div class="ap-listing-scroll">' + soldMine.map(card).join('') + '</div>' : empty('No sold properties yet.') };
       Object.keys(panels).forEach(function (k) {
         var panel = document.querySelector('[data-ap-panel="' + k + '"]');
         if (panel) panel.innerHTML = panels[k];

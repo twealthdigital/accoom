@@ -2417,3 +2417,27 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
 .is-agent-chat:not(.is-agent-payer) [data-msgs-review-strip],
 .is-agent-chat:not(.is-agent-payer) [data-msgs-property-status] { display: none !important; }
 
+
+/* ---------- Deals: seller bar, offer card, offer dialog ---------- */
+.msgs-deal-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  margin: 8px 16px 0; padding: 10px 14px; border-radius: 12px; background: #FFF7E8; border: 1px solid #F0D9A8; }
+.msgs-deal-bar.is-hidden { display: none !important; }
+.msgs-deal-status { font-size: 13px; font-weight: 600; color: #3B2F12; }
+.msgs-deal-bar[data-state="paid"] { background: #E8F1FF; border-color: #B7D0F5; }
+.msgs-deal-bar[data-state="paid"] .msgs-deal-status { color: #153B73; }
+.msgs-deal-bar[data-state="approved"] { background: #E6F6EC; border-color: #A9DDB9; }
+.msgs-deal-bar[data-state="approved"] .msgs-deal-status { color: #0F5A2B; }
+.msgs-deal-bar[data-state="sold"] { background: #EEF0F3; border-color: #D3D7DE; }
+.msgs-deal-offer-btn { border: 0; border-radius: 999px; padding: 8px 16px; font: inherit; font-size: 13px; font-weight: 700;
+  background: #DF962E; color: #0B1F3A; cursor: pointer; }
+.msgs-deal-offer-btn[hidden] { display: none; }
+.msgs-offer-card { min-width: 220px; max-width: 320px; padding: 14px 16px; border-radius: 14px; background: #fff;
+  border: 1px solid #F0D9A8; box-shadow: 0 1px 4px rgba(11,31,58,.08); color: #0B1F3A; }
+.msgs-offer-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #B26F0A; }
+.msgs-offer-amount { font-size: 24px; font-weight: 800; margin: 4px 0; }
+.msgs-offer-text { font-size: 13px; opacity: .8; margin: 0 0 10px; overflow-wrap: anywhere; }
+.msgs-offer-accept { width: 100%; border: 0; border-radius: 10px; padding: 10px 14px; font: inherit; font-weight: 700;
+  background: #0B1F3A; color: #fff; cursor: pointer; }
+.msgs-offer-state { font-size: 12px; font-weight: 600; opacity: .7; }
+.msgs-offer-field { width: 100%; box-sizing: border-box; margin: 6px 0; padding: 12px 14px; border: 1px solid #CBD2DC; border-radius: 10px; font: inherit; }
+.msgs-offer-error { color: #B3261E; font-size: 13px; min-height: 18px; margin: 4px 0 0; }

@@ -1051,6 +1051,7 @@
       var propState = activePropState(conv);
       if (propState.disputed) return 'dispute';
       var status = propState.paymentStatus || 'idle';
+      if (status === 'idle' && isSoldId(conv.property.id)) return 'sold';   // someone else bought it
       if (status === 'approved') return 'sold';
       if (status === 'review') return 'pending';
       return 'available'; // idle (never paid) or declined (payment released back)
@@ -1144,6 +1145,7 @@
     })();
 
     function renderPaymentState(conv) {
+      renderSellerDeal(conv);
       // Permissions Stage 4: the payment feature belongs to the sender only (see canPayInChat).
       var payer = canPayInChat(conv);
       document.body.classList.toggle('is-agent-payer', agentView && payer);
@@ -1160,7 +1162,7 @@
 
       renderPropertyStatus(conv);
 
-      if (els.propPayBtn) els.propPayBtn.classList.toggle('is-hidden', status !== 'idle');
+      if (els.propPayBtn) els.propPayBtn.classList.toggle('is-hidden', status !== 'idle' || blockedBySold(conv));
       if (els.propApproveBtn) {
         els.propApproveBtn.classList.remove('is-loading');
         els.propApproveBtn.classList.toggle('is-hidden', status !== 'review' && status !== 'approved');
@@ -1372,7 +1374,17 @@
         if (msg.attachments && msg.attachments.length) {
           bubbleInner += buildAttachmentsBubble(msg.attachments);
         }
-        if (msg.text) {
+        if (msg.kind === 'offer' && msg.data) {
+          var offerOpen = msg.from !== 'me' && canPayInChat(conv) && isOpenOffer(conv, msg);
+          var offerNote = msg.from === 'me' ? 'Offer sent' : (offerOpen ? '' : 'Offer closed');
+          bubbleInner += '<div class="msgs-offer-card" data-offer-card>' +
+            '<div class="msgs-offer-label">Custom offer</div>' +
+            '<div class="msgs-offer-amount">' + escapeHtml(money(msg.data.amount)) + '</div>' +
+            '<p class="msgs-offer-text">' + escapeHtml(String(msg.text || '').replace(/^Custom offer:\s*\S+\s*/, '')) + '</p>' +
+            (offerOpen ? '<button type="button" class="msgs-offer-accept" data-offer-accept>Accept &amp; pay ' + escapeHtml(money(msg.data.amount)) + '</button>'
+                       : '<span class="msgs-offer-state">' + offerNote + '</span>') +
+            '</div>';
+        } else if (msg.text) {
           bubbleInner += '<div class="msgs-bubble">' + escapeHtml(msg.text) + (msg.saved ? '<span class="msgs-bubble-saved">' + ICONS.star + '</span>' : '') + '</div>';
         }
       }
@@ -1404,6 +1416,23 @@
       row.innerHTML =
         avatarHtml +
         '<div class="msgs-bubble-col">' + dragHintHtml + replyHtml + bubbleInner + actionHtml + metaHtml + '</div>';
+
+      var acceptBtn = row.querySelector('[data-offer-accept]');
+      if (acceptBtn) {
+        Accoom.on(acceptBtn, 'click', function () {
+          var c = findConv(conv.id) || conv;
+          if (!canPayInChat(c) || !isOpenOffer(c, msg)) return;
+          if (String(c.property.id) !== String(msg.data.propertyId)) {
+            var other = (c.allProperties || []).filter(function (pp) { return String(pp.id) === String(msg.data.propertyId); })[0];
+            if (!other) return;
+            c.property = other;
+          }
+          if (blockedBySold(c)) { renderPaymentState(c); window.alert('This property has been sold and can no longer be paid for.'); return; }
+          getPropState(c, msg.data.propertyId).acceptedOffer = { amount: Number(msg.data.amount), offerId: msg.data.offerId || '' };
+          saveConversations();
+          openPaymentModal(c);
+        });
+      }
 
       var actionBtn = row.querySelector('[data-row-action]');
       var panel = row.querySelector('[data-row-menu-panel]');
@@ -1876,6 +1905,153 @@
       });
     }
 
+    /* ---------------- DEALS: offers, paid / pending approval, sold ---------------- */
+    function money(n) { return '₦' + Number(n || 0).toLocaleString('en-NG'); }
+    function Deals() { return Accoom.Deals || null; }
+    function isSoldId(id) { var D = Deals(); return !!(D && D.isSold(id)); }
+
+    // Sold and nothing of mine in progress: this person can no longer pay for it.
+    function blockedBySold(conv) {
+      if (!conv || !conv.property) return false;
+      return isSoldId(conv.property.id) && (activePropState(conv).paymentStatus || 'idle') === 'idle';
+    }
+
+    // An offer can be accepted while it is the newest offer for its property, nothing is paid yet, and it is not sold.
+    function isOpenOffer(conv, offerMsg) {
+      var pid = offerMsg.data.propertyId;
+      if (isSoldId(pid)) return false;
+      var st = getPropState(conv, pid).paymentStatus || 'idle';
+      if (st === 'review' || st === 'approved') return false;
+      var newer = (conv.messages || []).some(function (m) {
+        return m.kind && m.data && String(m.data.propertyId) === String(pid) && (m.ts || 0) > (offerMsg.ts || 0) && m.id !== offerMsg.id;
+      });
+      return !newer;
+    }
+
+    function isSeller(conv) { return !!(agentView && conv && !conv.outgoing && conv.remote); }
+
+    // Reads the deal story of one property from the chat messages (both sides see the same messages).
+    function dealOf(conv, propId) {
+      var offer = null, last = null;
+      (conv.messages || []).forEach(function (m) {
+        if (!m.kind || !m.data || String(m.data.propertyId) !== String(propId)) return;
+        if (m.kind === 'offer') offer = m; else last = m;
+      });
+      var openOffer = offer && (!last || (offer.ts || 0) > (last.ts || 0) || last.kind === 'declined') &&
+        !(last && last.kind === 'declined' && (offer.ts || 0) < (last.ts || 0)) ? offer : null;
+      return { offer: openOffer, last: last };
+    }
+
+    function renderSellerDeal(conv) {
+      var bar = Accoom.$('[data-msgs-deal-bar]');
+      if (!bar) return;
+      var statusEl = bar.querySelector('[data-msgs-deal-status]');
+      var btn = bar.querySelector('[data-msgs-offer-btn]');
+      if (!isSeller(conv) || !conv.property) { bar.classList.add('is-hidden'); return; }
+      var pid = conv.property.id;
+      var d = dealOf(conv, pid);
+      var sold = isSoldId(pid);
+      var text = '', stateKey = 'idle', canOffer = true;
+      if (d.last && d.last.kind === 'paid') {
+        text = 'Paid · pending approval — ' + money(d.last.data.amount) + '. Your balance is credited when the customer approves.'; stateKey = 'paid'; canOffer = false;
+      } else if (d.last && d.last.kind === 'approved') {
+        text = 'Approved · ' + money(d.last.data.amount) + ' has been added to your balance. This property is sold.'; stateKey = 'approved'; canOffer = false;
+      } else if (sold) {
+        text = 'This property is sold.'; stateKey = 'sold'; canOffer = false;
+      } else if (d.offer) {
+        text = 'Offer sent: ' + money(d.offer.data.amount) + ' — waiting for the customer.';
+      } else if (d.last && d.last.kind === 'declined') {
+        text = 'Payment declined — the customer was refunded. You can send a new offer.';
+      } else {
+        text = 'Agreed a different price? Send the customer a custom offer.';
+      }
+      bar.classList.remove('is-hidden');
+      bar.setAttribute('data-state', stateKey);
+      statusEl.textContent = text;
+      btn.hidden = !canOffer;
+      btn.textContent = d.offer ? 'Send a new offer' : 'Create offer';
+    }
+
+    // Sends a deal event as a normal chat message (text for people, kind/data for the app).
+    function postEvent(conv, kind, data, text) {
+      if (!conv || !conv.remote) return null;   // not delivered yet (sent:false) is retried by the poll loop
+      var ts = Date.now();
+      var msg = { id: 'm-' + ts + '-' + Math.random().toString(36).slice(2, 7), from: 'me', day: 'Today', ts: ts, time: clock(ts),
+                  text: text, read: true, sent: false, kind: kind, data: data };
+      conv.messages.push(msg);
+      saveConversations();
+      postToAgent(conv, msg);
+      if (state.activeId === conv.id) { renderThread(conv); scrollChatToEnd(); }
+      renderList();
+      return msg;
+    }
+
+    // The server said the property was sold already: give the money back and close the door.
+    function paymentRejectedAsSold(conv, msg) {
+      var pid = msg.data.propertyId;
+      conv.messages = conv.messages.filter(function (m) { return m.id !== msg.id; });
+      var ps = getPropState(conv, pid);
+      if (ps.paymentStatus === 'review') {
+        ps.paymentStatus = 'idle';
+        Accoom.creditWallet(msg.data.amount, 'Refund: property was already sold', { category: 'refund', propertyId: pid });
+        if (ps.purchaseOrderId) {
+          var log = Accoom.getStorage('accoom-purchases-log', []);
+          if (Array.isArray(log)) { log.forEach(function (r) { if (r.id === ps.purchaseOrderId) r.status = 'cancelled'; }); Accoom.setStorage('accoom-purchases-log', log); }
+        }
+      }
+      if (Deals()) Deals().markSold(pid);
+      saveConversations();
+      if (state.activeId === conv.id) { renderThread(conv); renderPaymentState(conv); }
+      window.alert('Sorry, this property was just sold to someone else. Your payment has been refunded to your balance.');
+    }
+
+    function openOfferDialog(conv) {
+      if (!isSeller(conv)) return;
+      var overlay = document.createElement('div');
+      overlay.className = 'msgs-payment-modal-overlay is-open';
+      overlay.setAttribute('aria-hidden', 'false');
+      overlay.innerHTML =
+        '<div class="msgs-payment-modal" role="dialog" aria-modal="true" aria-labelledby="msgs-offer-title">' +
+          '<h2 id="msgs-offer-title">Create an offer</h2>' +
+          '<p>Set the price you agreed for <b data-offer-prop></b>. The customer can accept and pay it right here in the chat.</p>' +
+          '<input class="msgs-offer-field" type="text" inputmode="numeric" autocomplete="off" placeholder="Offer price in ₦" data-offer-amount aria-label="Offer price in Naira" />' +
+          '<input class="msgs-offer-field" type="text" maxlength="160" placeholder="Note (optional)" data-offer-note aria-label="Note" />' +
+          '<p class="msgs-offer-error" data-offer-error role="alert"></p>' +
+          '<div class="msgs-payment-actions">' +
+            '<button type="button" class="btn btn--ghost" data-offer-cancel>Cancel</button>' +
+            '<button type="button" class="btn btn--primary" data-offer-send>Send offer</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(overlay);
+      overlay.querySelector('[data-offer-prop]').textContent = conv.property.name || 'this property';
+      var amountInput = overlay.querySelector('[data-offer-amount]');
+      var noteInput = overlay.querySelector('[data-offer-note]');
+      var errorEl = overlay.querySelector('[data-offer-error]');
+      function close() { overlay.remove(); }
+      amountInput.focus();
+      overlay.querySelector('[data-offer-cancel]').addEventListener('click', close);
+      overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+      overlay.querySelector('[data-offer-send]').addEventListener('click', function () {
+        var amount = parsePaymentAmount(amountInput.value);
+        if (!(amount >= 100)) { errorEl.textContent = 'Enter a price of at least ₦100.'; return; }
+        if (amount > 1e11) { errorEl.textContent = 'That price is too large.'; return; }
+        if (isSoldId(conv.property.id)) { errorEl.textContent = 'This property is already sold.'; return; }
+        var note = cleanTxt(noteInput.value).slice(0, 160);
+        var text = 'Custom offer: ' + money(amount) + ' for ' + (conv.property.name || 'this property') + (note ? ' — ' + note : '');
+        postEvent(conv, 'offer', { propertyId: String(conv.property.id), amount: amount, offerId: 'o-' + Date.now() }, text);
+        close();
+        renderSellerDeal(conv);
+      });
+      overlay.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    }
+
+    Accoom.on(document, 'click', function (e) {
+      var btn = e.target.closest && e.target.closest('[data-msgs-offer-btn]');
+      if (!btn) return;
+      var conv = findConv(state.activeId);
+      if (conv) openOfferDialog(conv);
+    });
+
     /* ---------------- ATTACHMENTS ---------------- */
     /* ---------------- PAYMENT ---------------- */
     /* ---------------- PAYMENT ---------------- */
@@ -1924,10 +2100,11 @@
     }
 
     function openPaymentModal(conv) {
-      var amount = parsePaymentAmount(conv.property.price);
+      var accepted = getPropState(conv, conv.property.id).acceptedOffer;
+      var amount = accepted && accepted.amount > 0 ? accepted.amount : parsePaymentAmount(conv.property.price);
       var balance = getBalance();
       var hasFunds = balance >= amount && amount > 0;
-      paymentTarget = { id: conv.property.id, property: conv.property, amount: amount, mode: hasFunds ? 'checkout' : 'deposit', convId: conv.id };
+      paymentTarget = { id: conv.property.id, property: conv.property, amount: amount, mode: hasFunds ? 'checkout' : 'deposit', convId: conv.id, offerId: accepted ? accepted.offerId : '' };
 
       paymentIcon.className = 'msgs-payment-icon ' + (hasFunds ? 'is-confirm' : 'is-warning');
       paymentIcon.innerHTML = hasFunds
@@ -1949,6 +2126,7 @@
     function goToCheckout() {
       var conv = findConv(state.activeId);
       if (!conv || !canPayInChat(conv)) return;   // second line of defence behind the hidden buttons
+      if (blockedBySold(conv)) { renderPaymentState(conv); window.alert('This property has been sold and can no longer be paid for.'); return; }
       openPaymentModal(conv);
     }
 
@@ -1975,7 +2153,7 @@
         paymentConfirm.disabled = true;
         if (paymentCancel) paymentCancel.disabled = true;
 
-        window.setTimeout(function () {
+        function finishPayment() {
           paymentProcessing = false;
           paymentConfirm.classList.remove('is-loading');
           paymentConfirm.disabled = false;
@@ -1985,21 +2163,41 @@
             closePaymentModal();
             return;
           }
+          if (isSoldId(target.id)) {            // sold while the payment dialog was open: nothing is charged
+            closePaymentModal();
+            renderPaymentState(payingConv);
+            window.alert('This property has just been sold and can no longer be paid for.');
+            return;
+          }
           Accoom.debitWallet(target.amount, 'Property payment', { category: 'property-payment', propertyId: target.id });
           closePaymentModal();
 
-          if (payingConv) {
-            getPropState(payingConv, target.id).paymentStatus = 'review';
-            upsertPurchaseRecord(payingConv, target.property, 'upcoming');
-            saveConversations();   // the status was only kept in memory before: closing the page lost it
-            if (state.activeId === payingConv.id && String(payingConv.property.id) === String(target.id)) {
-              renderPaymentState(payingConv);
-            }
+          var ps = getPropState(payingConv, target.id);
+          ps.paymentStatus = 'review';
+          ps.paidAmount = target.amount;
+          delete ps.acceptedOffer;
+          upsertPurchaseRecord(payingConv, target.property, 'upcoming', target.amount);
+          saveConversations();   // the status was only kept in memory before: closing the page lost it
+          announcePaid(payingConv, target.property, target.amount, target.offerId);
+          if (state.activeId === payingConv.id && String(payingConv.property.id) === String(target.id)) {
+            renderPaymentState(payingConv);
+          }
+        }
+
+        window.setTimeout(function () {
+          // Ask the server whether someone else already bought it (works across browsers).
+          if (payingConv && payingConv.remote && Sync && Sync.available) {
+            Sync.api('GET', '/api/sold', undefined, 4000).then(function (r) {
+              if (r && Array.isArray(r.sold) && Deals()) Deals().syncSold(r.sold);
+            }).catch(function () {}).then(finishPayment);
+          } else {
+            finishPayment();
           }
         }, 3000);
         return;
       }
 
+      Accoom.setStorage('accoom-pending-pay', { convId: paymentTarget.convId, propertyId: String(paymentTarget.id), amount: paymentTarget.amount, offerId: paymentTarget.offerId || '' });
       window.location.href = 'payment.html?id=' + encodeURIComponent(paymentTarget.id)
         + '&amount=' + encodeURIComponent(paymentTarget.amount)
         + '&mode=' + paymentTarget.mode
@@ -2029,7 +2227,12 @@
     // same record follows the property from 'upcoming' (paid, awaiting the
     // agent's decision) through to 'completed'/'cancelled' — never
     // duplicated, just moved between tabs by updating its status.
-    function upsertPurchaseRecord(conv, property, status) {
+    function announcePaid(conv, property, amount, offerId) {
+      postEvent(conv, 'paid', { propertyId: String(property.id), amount: amount, offerId: offerId || '' },
+        'Payment of ' + money(amount) + ' made for ' + (property.name || 'this property') + '. Paid \u00B7 pending your approval.');
+    }
+
+    function upsertPurchaseRecord(conv, property, status, paidAmount) {
       var propState = getPropState(conv, property.id);
       var log = Accoom.getStorage('accoom-purchases-log', []);
       if (!Array.isArray(log)) log = [];
@@ -2051,7 +2254,7 @@
         location: property.location,
         dates: new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' }),
         guests: property.beds || 1,
-        amount: property.price,
+        amount: paidAmount > 0 ? money(paidAmount) : property.price,
         image: property.image,
         status: status,
         // Permissions Stage 4: who paid, in which chat, to whom (the initiating user, never the recipient)
@@ -2075,8 +2278,13 @@
 
         window.setTimeout(function () {
           propState.paymentStatus = 'approved';
+          var paidAmt = propState.paidAmount > 0 ? propState.paidAmount : parsePaymentAmount(targetProperty.price);
+          if (conv.remote && !dealOf(conv, targetProperty.id).last) announcePaid(conv, targetProperty, paidAmt, '');   // payment made before this update: tell the seller first
           upsertPurchaseRecord(conv, targetProperty, 'completed');
+          if (Deals()) Deals().markSold(targetProperty.id);           // off the marketplace for everyone using this browser
           saveConversations();
+          postEvent(conv, 'approved', { propertyId: String(targetProperty.id), amount: paidAmt },
+            'Payment approved. ' + money(paidAmt) + ' has been released to the seller. This property is sold.');
           if (state.activeId === conv.id && String(conv.property.id) === String(targetProperty.id)) {
             renderPaymentState(conv);
             openReview(conv, 'approved');
@@ -2098,9 +2306,14 @@
 
         window.setTimeout(function () {
           propState.paymentStatus = 'declined';
-          Accoom.creditWallet(parsePaymentAmount(targetProperty.price), 'Property payment refund', { category: 'refund', propertyId: targetProperty.id });
+          delete propState.acceptedOffer;
+          var refundAmt = propState.paidAmount > 0 ? propState.paidAmount : parsePaymentAmount(targetProperty.price);
+          Accoom.creditWallet(refundAmt, 'Property payment refund', { category: 'refund', propertyId: targetProperty.id });
           upsertPurchaseRecord(conv, targetProperty, 'cancelled');
           saveConversations();
+          if (conv.remote && !dealOf(conv, targetProperty.id).last) announcePaid(conv, targetProperty, refundAmt, '');
+          postEvent(conv, 'declined', { propertyId: String(targetProperty.id), amount: refundAmt },
+            'Payment declined. ' + money(refundAmt) + ' was refunded to the customer.');
           if (state.activeId === conv.id && String(conv.property.id) === String(targetProperty.id)) {
             renderPaymentState(conv);
             openReview(conv, 'declined');
@@ -2510,6 +2723,7 @@
       if (!(Sync && Sync.available) || !conv.remote) return;
       if (isSelfConversation(conv)) { msg.sent = false; return; }
       var body = { senderKey: me, message: { id: msg.id, text: msg.text, ts: msg.ts } };
+      if (msg.kind && msg.data) { body.message.kind = msg.kind; body.message.data = msg.data; }
       if (msg.replyTo && (msg.replyTo.id || msg.replyTo.text)) {   // the recipient must see which message this answers
         body.message.replyTo = { id: msg.replyTo.id ? String(msg.replyTo.id) : '', text: String(msg.replyTo.text || '').slice(0, 200) };
       }
@@ -2523,7 +2737,16 @@
         };
       }
       Sync.api('POST', '/api/conversations/' + encodeURIComponent(remoteIdOf(conv)) + '/messages', body)
-        .then(function () { msg.sent = true; saveConversations(); }, function () { msg.sent = false; });
+        .then(function () { msg.sent = true; saveConversations(); }, function (err) {
+          if (msg.kind && err && /\b409\b/.test(String(err.message))) {      // the server refused this deal step for good
+            if (msg.kind === 'paid') { msg.sent = true; paymentRejectedAsSold(conv, msg); return; }
+            msg.retries = (msg.retries || 0) + 1;      // e.g. 'approved' overtook 'paid': try again a few times
+            msg.sent = msg.retries >= 5;
+            saveConversations();
+            return;
+          }
+          msg.sent = false;
+        });
     }
 
     function markReadRemote(conv) {
@@ -2580,6 +2803,7 @@
         if (oldById[m.id]) return oldById[m.id];
         // my own messages are on my side, the other person's on theirs
         var row = { id: m.id, from: m.from === side ? 'me' : 'agent', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text, read: true, sent: true };
+        if (m.kind && m.data) { row.kind = m.kind; row.data = m.data; }
         var rp = replyFromServer(m, rc, side, otherName);
         if (rp) row.replyTo = rp;
         return row;
@@ -2611,6 +2835,10 @@
       Sync.api('GET', '/api/conversations?key=' + encodeURIComponent(me)).then(function (r) {
         var before = JSON.stringify(state.conversations);
         var hidden = hiddenMap();
+        // Money + sold: the seller's balance is credited here, once per approved payment.
+        if (Deals() && Deals().process(r.conversations || [], me)) {
+          document.dispatchEvent(new CustomEvent('accoom:deals-updated'));
+        }
 
         if (agentView) {
           (r.conversations || []).forEach(function (rc) {
@@ -2640,6 +2868,7 @@
               if (m.from === 'customer') {                    // my own earlier message (e.g. after clearing the browser)
                 if (!have[m.id]) {
                   var mine = { id: m.id, from: 'me', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text, read: true, sent: true };
+                  if (m.kind && m.data) { mine.kind = m.kind; mine.data = m.data; }
                   var rpMine = replyFromServer(m, rc, 'customer', conv.name);
                   if (rpMine) mine.replyTo = rpMine;
                   conv.messages.push(mine);
@@ -2648,6 +2877,7 @@
               }
               if (have['r-' + m.id]) return;
               var incoming = { id: 'r-' + m.id, from: 'agent', day: 'Today', ts: m.ts, time: clock(m.ts), text: m.text };
+              if (m.kind && m.data) { incoming.kind = m.kind; incoming.data = m.data; }
               var rpIn = replyFromServer(m, rc, 'customer', conv.name);
               if (rpIn) incoming.replyTo = rpIn;
               conv.messages.push(incoming);
@@ -2664,6 +2894,8 @@
           var open = findConv(state.activeId);
           if (open) { renderThread(open); scrollChatToEnd(); }
         }
+        var shown = findConv(state.activeId);
+        if (shown) { renderSellerDeal(shown); renderPaymentState(shown); }
         if (pendingChat) {
           if (openChatByKey(pendingChat) || firstPull) { pendingChat = null; window.history.replaceState({}, '', window.location.pathname); }
         }
@@ -2692,8 +2924,15 @@
     }
 
     if (justPaidConv) {
-      getPropState(justPaidConv, justPaidId).paymentStatus = 'review';
-      upsertPurchaseRecord(justPaidConv, justPaidConv.property, 'upcoming');
+      var pend = Accoom.getStorage('accoom-pending-pay', null);
+      var pendOk = pend && String(pend.propertyId) === String(justPaidId) && Number(pend.amount) > 0;
+      var jps = getPropState(justPaidConv, justPaidId);
+      jps.paymentStatus = 'review';
+      jps.paidAmount = pendOk ? Number(pend.amount) : parsePaymentAmount(justPaidConv.property.price);
+      Accoom.removeStorage('accoom-pending-pay');
+      upsertPurchaseRecord(justPaidConv, justPaidConv.property, 'upcoming', jps.paidAmount);
+      saveConversations();
+      if (!dealOf(justPaidConv, justPaidId).last) announcePaid(justPaidConv, justPaidConv.property, jps.paidAmount, pendOk ? pend.offerId : '');
       openConversation(justPaidConv.id);
       if (window.innerWidth <= 860) layout.setAttribute('data-view', 'chat');
       window.history.replaceState({}, '', window.location.pathname);

@@ -34,7 +34,7 @@ const MAX_MEDIA = 600 * 1024 * 1024;       // one photo / video
 fs.mkdirSync(UPLOADS, { recursive: true });
 
 /* ----------------------------------------------------------------- database */
-let db = { instance: crypto.randomBytes(6).toString('hex'), listings: {}, conversations: {} };
+let db = { instance: crypto.randomBytes(6).toString('hex'), listings: {}, conversations: {}, sold: {} };
 try {
   const saved = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
   if (saved && typeof saved === 'object') db = Object.assign(db, saved);
@@ -129,9 +129,13 @@ async function handleApi(req, res, url) {
   if (p === '/api/listings' && method === 'GET') {
     const out = [];
     Object.keys(db.listings).forEach((agentKey) => {
-      (db.listings[agentKey] || []).forEach((l) => out.push(Object.assign({}, l, { agentKey })));
+      (db.listings[agentKey] || []).forEach((l) => {
+        const copy = Object.assign({}, l, { agentKey });
+        if (db.sold && db.sold[String(l.id)]) copy.status = 'sold';   // a sold property never goes back on the market
+        out.push(copy);
+      });
     });
-    return sendJson(res, 200, { listings: out });
+    return sendJson(res, 200, { listings: out, sold: Object.keys(db.sold || {}) });
   }
 
   let m = p.match(/^\/api\/listings\/([A-Za-z0-9_-]{1,60})$/);
@@ -143,6 +147,8 @@ async function handleApi(req, res, url) {
     log('listings', 'agent ' + m[1] + ' now shares ' + list.length + ' listing(s)' + (list.length ? ': ' + list.map((l) => l.name || l.id).join(', ') : ''));
     return sendJson(res, 200, { ok: true, count: list.length });
   }
+
+  if (p === '/api/sold' && method === 'GET') return sendJson(res, 200, { sold: Object.keys(db.sold || {}) });
 
   /* ---- media: raw body, stored by content hash ---- */
   if (p === '/api/media' && method === 'POST') {
@@ -190,6 +196,18 @@ async function handleApi(req, res, url) {
     const text = cleanText(msg.text);
     if (!senderKey || !text) return sendJson(res, 400, { error: 'senderKey and text required' });
 
+    // Deal events (offer / paid / approved / declined) ride the chat so both sides see the same story.
+    const DEAL_KINDS = ['offer', 'paid', 'approved', 'declined'];
+    const kind = DEAL_KINDS.includes(msg.kind) ? msg.kind : '';
+    let dealData = null;
+    if (kind) {
+      const d = msg.data && typeof msg.data === 'object' ? msg.data : {};
+      const amount = Math.round(Number(d.amount) * 100) / 100;
+      const propertyId = cleanId(d.propertyId);
+      if (!propertyId || !isFinite(amount) || amount <= 0 || amount > 1e12) return sendJson(res, 400, { error: 'Invalid deal amount or property' });
+      dealData = { propertyId, amount, offerId: cleanId(d.offerId) };
+    }
+
     let conv = db.conversations[id];
     // Nobody may write to themselves: refuse a conversation whose two sides are the same person.
     if (conv && conv.agentKey === conv.customerKey) return sendJson(res, 400, { error: 'You cannot message yourself' });
@@ -233,8 +251,29 @@ async function handleApi(req, res, url) {
 
     const mid = cleanId(msg.id) || ('m-' + Date.now() + '-' + crypto.randomBytes(3).toString('hex'));
     if (!conv.messages.some((x) => x.id === mid)) {
+      if (kind) {
+        // Who may say what: the seller makes offers; the payer pays, approves or declines. The sale is final once approved.
+        if (kind === 'offer' && side !== 'agent') return sendJson(res, 403, { error: 'Only the seller can make an offer' });
+        if (kind !== 'offer' && side !== 'customer') return sendJson(res, 403, { error: 'Only the payer can do that' });
+        if ((kind === 'offer' || kind === 'paid') && db.sold[dealData.propertyId]) return sendJson(res, 409, { error: 'sold' });
+        if (kind === 'approved' || kind === 'declined') {
+          const last = conv.messages.filter((x) => x.kind && x.kind !== 'offer' && x.data && x.data.propertyId === dealData.propertyId).pop();
+          if (!last || last.kind !== 'paid') return sendJson(res, 409, { error: 'No payment waiting for approval' });
+          if (Math.abs(last.data.amount - dealData.amount) > 0.01) return sendJson(res, 409, { error: 'Amount does not match the payment' });
+        }
+        if (kind === 'paid') {
+          const prior = conv.messages.filter((x) => x.kind && x.kind !== 'offer' && x.data && x.data.propertyId === dealData.propertyId).pop();
+          if (prior && prior.kind === 'paid') return sendJson(res, 409, { error: 'A payment is already waiting for approval' });
+        }
+      }
       const ts = Number(msg.ts) > 0 ? Math.min(Number(msg.ts), Date.now() + 60000) : Date.now();
       const entry = { id: mid, from: side, text, ts };
+      if (kind) entry.kind = kind, entry.data = dealData;
+      if (kind === 'approved') {
+        db.sold[dealData.propertyId] = { at: Date.now(), buyerKey: senderKey, amount: dealData.amount };
+        (db.listings[conv.agentKey] || []).forEach((l) => { if (String(l.id) === dealData.propertyId) l.status = 'sold'; });
+        log('sold', '"' + conv.propertyName + '" sold for ' + dealData.amount);
+      }
       // Reply link: which earlier message this one answers. The preview text comes from the stored original
       // when it is in this chat (so it cannot be made to say something else), otherwise a short snapshot.
       const rp = msg.replyTo && typeof msg.replyTo === 'object' ? msg.replyTo : null;

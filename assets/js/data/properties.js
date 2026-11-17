@@ -113,7 +113,14 @@ window.Accoom = window.Accoom || {};
     if (!Accoom.ListingReview || !Accoom.Pricing) return [];
     var raw;
     try { raw = JSON.parse(window.localStorage.getItem('accoom-agent-listings')); } catch (e) { return []; }
-    var own = Accoom.ListingReview.filterPublic(Array.isArray(raw) ? raw : []);
+    // Sold listings stay in this list (flagged sold) so profiles can show them; the marketplace drops them.
+    function visibleOrSold(list) {
+      return (Array.isArray(list) ? list : []).filter(function (l) {
+        return Accoom.ListingReview.isPubliclyVisible(l) ||
+          (l && l.status === 'sold' && l.approval && l.approval.state === 'approved' && l.approval.published === true);
+      });
+    }
+    var own = visibleOrSold(raw);
 
     // Public listings of other agents, shared through the test server (core/sync.js).
     // This browser's own copy wins when the same listing is in both.
@@ -122,7 +129,7 @@ window.Accoom = window.Accoom || {};
     if (!Array.isArray(remote) || !remote.length) return own;
     var have = {};
     own.forEach(function (l) { have[String(l.id)] = true; });
-    return own.concat(Accoom.ListingReview.filterPublic(remote).filter(function (l) { return !have[String(l.id)]; }));
+    return own.concat(visibleOrSold(remote).filter(function (l) { return !have[String(l.id)]; }));
   }
 
   function agentItems() {
@@ -152,6 +159,7 @@ window.Accoom = window.Accoom || {};
         verified: verified,
         // Everything the agent entered, so the details page shows exactly that (never sample text).
         agentListing: true,
+        sold: rec.status === 'sold' || !!(Accoom.Deals && Accoom.Deals.isSold(rec.id)),
         listingType: rec.listingType || rec.category || '',
         ownerId: rec.ownerId || '',
         agentKey: rec.agentKey || '',
@@ -174,7 +182,14 @@ window.Accoom = window.Accoom || {};
 
   // Mock catalogue first (unchanged), then public agent listings.
   var SLIDER_MIN = 100000, SLIDER_MAX = 1000000; // same range as the homepage price slider (home.js)
-  function all() { return ALL.concat(agentItems()); }
+  // Everything, sold or not (details pages, chats, purchases and profiles still need sold items).
+  function all() {
+    var D = Accoom.Deals;
+    var sample = D ? ALL.map(function (item) { return D.isSold(item.id) ? Object.assign({}, item, { sold: true }) : item; }) : ALL;
+    return sample.concat(agentItems());
+  }
+  // The marketplace: a sold property is gone, so nobody can pay for it a second time.
+  function onMarket() { return all().filter(function (item) { return !item.sold; }); }
   function rank(item) { return item.order != null ? item.order : item.id; }
 
   // Typo tolerant matcher. Tries an exact substring first (fast path),
@@ -330,7 +345,7 @@ window.Accoom = window.Accoom || {};
   // sortBy: 'nearby' | 'newest' | 'online' | 'verified'
   // filters: { priceMin, priceMax, levels: [], beds: [], verifiedOnly, onlineOnly }
   function fetchPage(page, perPage, sortBy, filters) {
-    var list = all();
+    var list = onMarket();
     filters = filters || {};
 
     // The homepage slider runs from SLIDER_MIN to SLIDER_MAX; sitting on an end stop means
@@ -384,6 +399,10 @@ window.Accoom = window.Accoom || {};
   }
 
   function getAll() {
+    return onMarket();
+  }
+
+  function getAllWithSold() {
     return all();
   }
 
@@ -394,6 +413,6 @@ window.Accoom = window.Accoom || {};
     return { items: items, total: items.length };
   }
 
-  Accoom.PropertyService = { fetchPage: fetchPage, getById: getById, getAll: getAll, searchList: searchList };
+  Accoom.PropertyService = { fetchPage: fetchPage, getById: getById, getAll: getAll, getAllWithSold: getAllWithSold, searchList: searchList };
 
 })(window.Accoom);

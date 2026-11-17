@@ -1007,6 +1007,31 @@
       });
     })();
 
+    // SOLD: once a payment for this property was approved nobody can pay for it again.
+    (function initSoldState() {
+      var item = Accoom.PropertyService && Accoom.PropertyService.getById ? Accoom.PropertyService.getById(property.id) : null;
+      if (!item || !item.sold) return;
+      var buyBtn = document.querySelector('[data-pd-payment]');
+      var actions = document.querySelector('.pd-agent-actions');
+      var note = document.createElement('p');
+      note.className = 'pd-sold-note';
+      note.setAttribute('data-pd-sold-note', '');
+      note.setAttribute('role', 'status');
+      note.textContent = 'This property has been sold and is no longer available.';
+      note.style.cssText = 'margin:12px 0 0;padding:10px 14px;border-radius:10px;background:#EEF0F3;color:#3B4350;font-weight:600;text-align:center';
+      if (buyBtn) {
+        buyBtn.disabled = true;
+        buyBtn.style.display = 'none';
+        buyBtn.parentNode.insertBefore(note, buyBtn);
+      }
+      if (actions) {
+        Array.prototype.slice.call(actions.querySelectorAll('[data-pd-contact-agent], a[href*="contact-agent.html"]')).forEach(function (el) { el.style.display = 'none'; });
+        if (!buyBtn) actions.appendChild(note);
+      }
+      var tag = document.querySelector('[data-pd-type-tag]');
+      if (tag) { var sold = document.createElement('span'); sold.className = tag.className; sold.textContent = 'Sold'; sold.style.background = '#5A606A'; sold.style.color = '#fff'; tag.parentNode.insertBefore(sold, tag); }
+    })();
+
     console.log('ACCOOM property page initialized');
   });
 

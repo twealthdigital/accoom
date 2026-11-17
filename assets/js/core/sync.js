@@ -86,6 +86,7 @@ window.Accoom = window.Accoom || {};
       Sync.available = true;
       return Sync.api('GET', '/api/listings', undefined, 6000);
     }).then(function (r) {
+      if (Accoom.Deals && Array.isArray(r.sold)) Accoom.Deals.syncSold(r.sold);
       var json = JSON.stringify(Array.isArray(r.listings) ? r.listings : []);
       try { if (window.localStorage.getItem(REMOTE_KEY) !== json) window.localStorage.setItem(REMOTE_KEY, json); } catch (e) { /* full */ }
       return true;
@@ -233,7 +234,10 @@ window.Accoom = window.Accoom || {};
 
     var raw;
     try { raw = JSON.parse(window.localStorage.getItem(LISTINGS_KEY)); } catch (e) { raw = null; }
-    var mine = Accoom.ListingReview.filterPublic(Array.isArray(raw) ? raw : []);
+    var mine = (Array.isArray(raw) ? raw : []).filter(function (l) {
+      return Accoom.ListingReview.isPubliclyVisible(l) ||
+        (l && l.status === 'sold' && l.approval && l.approval.state === 'approved' && l.approval.published === true);
+    });
 
     var items = mine.map(function (rec) { return withUploadedMedia(publicCopy(rec)); });
     return Sync.api('PUT', '/api/listings/' + encodeURIComponent(key), { listings: items }, 20000)
