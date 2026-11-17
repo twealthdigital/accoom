@@ -2441,3 +2441,10 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
 .msgs-offer-state { font-size: 12px; font-weight: 600; opacity: .7; }
 .msgs-offer-field { width: 100%; box-sizing: border-box; margin: 6px 0; padding: 12px 14px; border: 1px solid #CBD2DC; border-radius: 10px; font: inherit; }
 .msgs-offer-error { color: #B3261E; font-size: 13px; min-height: 18px; margin: 4px 0 0; }
+
+/* Deal strip: always ONE line; the wording shortens with the width of the chat */
+.msgs-deal-bar { container-type: inline-size; flex: none; flex-wrap: nowrap; padding: 7px 14px; min-height: 0; }
+.msgs-deal-status { display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3; }
+.msgs-deal-t--mid, .msgs-deal-t--short { display: none; }
+@container (max-width: 440px) { .msgs-deal-t--full { display: none; } .msgs-deal-t--mid { display: inline; } }
+@container (max-width: 210px) { .msgs-deal-t--mid { display: none; } .msgs-deal-t--short { display: inline; } }

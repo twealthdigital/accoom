@@ -1951,22 +1951,29 @@
       var pid = conv.property.id;
       var d = dealOf(conv, pid);
       var sold = isSoldId(pid);
-      var text = '', stateKey = 'idle', canOffer = true;
+      var text = null, stateKey = 'idle', canOffer = true;
       if (d.last && d.last.kind === 'paid') {
-        text = 'Paid \u00B7 pending approval \u2014 ' + money(d.last.data.amount) + '. Your balance is credited when the customer approves.'; stateKey = 'paid'; canOffer = false;
+        text = ['Paid \u00B7 pending approval for ' + money(d.last.data.amount), 'Pending approval \u00B7 ' + money(d.last.data.amount), 'Pending']; stateKey = 'paid'; canOffer = false;
       } else if (d.last && d.last.kind === 'approved') {
-        text = 'Approved \u00B7 ' + money(d.last.data.amount) + ' has been added to your balance. This property is sold.'; stateKey = 'approved'; canOffer = false;
+        text = ['Approved \u00B7 ' + money(d.last.data.amount) + ' added to your balance \u00B7 sold', 'Approved \u00B7 ' + money(d.last.data.amount), 'Approved']; stateKey = 'approved'; canOffer = false;
       } else if (sold) {
-        text = 'This property is sold.'; stateKey = 'sold'; canOffer = false;
+        text = ['This property is sold', 'Sold', 'Sold']; stateKey = 'sold'; canOffer = false;
       } else if (d.offer) {
-        text = 'Offer sent: ' + money(d.offer.data.amount) + ' \u2014 waiting for the customer.';
+        text = ['Offer sent: ' + money(d.offer.data.amount) + ' \u2014 waiting for the customer', 'Offer sent \u00B7 ' + money(d.offer.data.amount), 'Offer sent'];
       } else if (d.last && d.last.kind === 'declined') {
-        text = 'Payment declined \u2014 the customer was refunded. You can send a new offer.';
+        text = ['Payment declined \u2014 customer refunded', 'Declined \u00B7 refunded', 'Declined'];
       }
       // The offer button is a button on its own (opposite the Messages / Saved tabs); the strip only appears when there is a deal to report.
       bar.classList.toggle('is-hidden', !text);
       bar.setAttribute('data-state', stateKey);
-      statusEl.textContent = text;
+      // Three lengths of the same message; CSS shows the one that fits the width (keeps the strip one line tall).
+      statusEl.textContent = '';
+      ['full', 'mid', 'short'].forEach(function (size, n) {
+        var span = document.createElement('span');
+        span.className = 'msgs-deal-t msgs-deal-t--' + size;
+        span.textContent = text ? text[n] : '';
+        statusEl.appendChild(span);
+      });
       btn.classList.toggle('is-hidden', !canOffer);
       btn.textContent = d.offer ? 'Send a new offer' : 'Create offer';
     }
