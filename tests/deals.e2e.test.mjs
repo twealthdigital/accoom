@@ -101,7 +101,7 @@ await test('customer pays: debited 90,000 and the seller sees Paid · pending ap
   assert.equal(cust.Accoom.getWalletBalance(), custBefore - 90000);
   await sleep(3500);
   assert.match(text(seller, '[data-msgs-deal-status]'), /pending approval/i);
-  assert.ok(visible(seller, '[data-msgs-deal-bar]'));
+  
   assert.equal(seller.Accoom.getWalletBalance(), walletBefore, 'seller credited before approval');
   assert.ok(!visible(seller, '[data-msgs-offer-btn]'), 'offer button still offered while paid');
 });

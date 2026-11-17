@@ -2448,3 +2448,15 @@ html.dark-mode .msgs-row--me .msgs-reply-quote { background: rgba(0, 0, 0, 0.25)
 .msgs-deal-t--mid, .msgs-deal-t--short { display: none; }
 @container (max-width: 440px) { .msgs-deal-t--full { display: none; } .msgs-deal-t--mid { display: inline; } }
 @container (max-width: 210px) { .msgs-deal-t--mid { display: none; } .msgs-deal-t--short { display: inline; } }
+
+/* Deal status pill: right side of the property card, one line, wording by card width */
+.msgs-deal-pill { display: inline-flex; align-items: center; flex: 0 0 auto; margin-left: auto; max-width: 100%;
+  padding: 7px 14px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; line-height: 1.2; white-space: nowrap;
+  background: #FFF7E8; color: #3B2F12; border: 1px solid #F0D9A8; }
+.msgs-deal-pill.is-hidden { display: none !important; }
+.msgs-deal-pill[data-state="paid"] { background: #E8F1FF; color: #153B73; border-color: #B7D0F5; }
+.msgs-deal-pill[data-state="approved"] { background: #E6F6EC; color: #0F5A2B; border-color: #A9DDB9; }
+.msgs-deal-pill[data-state="sold"] { background: #EEF0F3; color: #3B4350; border-color: #D3D7DE; }
+.msgs-deal-pill .msgs-deal-t--mid, .msgs-deal-pill .msgs-deal-t--short { display: none; }
+@container msgs-card (max-width: 560px) { .msgs-deal-pill .msgs-deal-t--full { display: none; } .msgs-deal-pill .msgs-deal-t--mid { display: inline; } }
+@container msgs-card (max-width: 330px) { .msgs-deal-pill .msgs-deal-t--mid { display: none; } .msgs-deal-pill .msgs-deal-t--short { display: inline; } }

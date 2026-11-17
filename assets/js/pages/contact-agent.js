@@ -1943,10 +1943,10 @@
     }
 
     function renderSellerDeal(conv) {
-      var bar = Accoom.$('[data-msgs-deal-bar]');
+      var statusEl = Accoom.$('[data-msgs-deal-status]');
       var btn = Accoom.$('[data-msgs-offer-btn]');
-      if (!bar || !btn) return;
-      var statusEl = bar.querySelector('[data-msgs-deal-status]');
+      if (!statusEl || !btn) return;
+      var bar = statusEl;   // the status pill sits on the right of the property card
       if (!isSeller(conv) || !conv.property) { bar.classList.add('is-hidden'); btn.classList.add('is-hidden'); return; }
       var pid = conv.property.id;
       var d = dealOf(conv, pid);
